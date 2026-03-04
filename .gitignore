@@ -1,0 +1,145 @@
+# =============================================================================
+# ScorePlay – Comprehensive .gitignore
+# =============================================================================
+
+# -----------------------------------------------
+# Flutter / Dart
+# -----------------------------------------------
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.dart_snapshot
+*.jit
+
+# Generated files
+*.freezed.dart
+*.g.dart
+*.gen.dart
+
+# -----------------------------------------------
+# Android
+# -----------------------------------------------
+score_play/android/.gradle/
+score_play/android/captures/
+score_play/android/gradlew
+score_play/android/gradlew.bat
+score_play/android/local.properties
+score_play/android/GeneratedPluginRegistrant.java
+score_play/android/key.properties
+score_play/android/app/google-services.json
+
+# -----------------------------------------------
+# iOS / macOS
+# -----------------------------------------------
+score_play/ios/.last_build_id
+score_play/ios/Flutter/App.framework
+score_play/ios/Flutter/Flutter.framework
+score_play/ios/Flutter/Generated.xcconfig
+score_play/ios/Flutter/app.flx
+score_play/ios/Flutter/flutter_export_environment.sh
+score_play/ios/Runner/GoogleService-Info.plist
+score_play/ios/Podfile.lock
+score_play/ios/Pods/
+*.xcworkspace
+xcuserdata/
+*.mode1v3
+*.mode2v3
+*.moved-aside
+*.pbxuser
+*.perspectivev3
+!default.mode1v3
+!default.mode2v3
+!default.pbxuser
+!default.perspectivev3
+
+score_play/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# -----------------------------------------------
+# Web
+# -----------------------------------------------
+score_play/web/flutter_service_worker.js
+
+# -----------------------------------------------
+# Firebase
+# -----------------------------------------------
+score_play/lib/firebase_options.dart
+google-services.json
+GoogleService-Info.plist
+.firebaserc
+
+# -----------------------------------------------
+# Build outputs – never commit compiled artifacts
+# -----------------------------------------------
+*.apk
+*.aab
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.aar
+
+# -----------------------------------------------
+# IDE & Editor
+# -----------------------------------------------
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# -----------------------------------------------
+# CI/CD – local secrets, never commit
+# -----------------------------------------------
+*.env
+.env*
+!.env.example
+secrets/
+*.pem
+*.key
+*.p8
+*.p12
+*.mobileprovision
+service-account.json
+
+# -----------------------------------------------
+# Docker (local dev)
+# -----------------------------------------------
+.docker/
+
+# -----------------------------------------------
+# Node (if used for tooling)
+# -----------------------------------------------
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# -----------------------------------------------
+# macOS system files
+# -----------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# -----------------------------------------------
+# Windows system files
+# -----------------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# -----------------------------------------------
+# Logs
+# -----------------------------------------------
+*.log
+*.log.*
+logs/

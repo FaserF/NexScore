@@ -1,0 +1,39 @@
+name: nexscore
+description: "NexScore – Cross-platform score tracker for Wizard, Qwixx, Schafkopf, Kniffel, SipDeck, Phase 10, Darts (X01), Rommé, and Arschloch/President."
+publish_to: 'none'
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^3.2.1
+  riverpod_annotation: ^4.0.2
+  go_router: ^17.1.0
+  firebase_core: ^4.5.0
+  firebase_auth: ^6.2.0
+  cloud_firestore: ^6.1.3
+  flex_color_scheme: ^8.4.0
+  shared_preferences: ^2.5.4
+  uuid: ^4.5.3
+  intl: ^0.20.2
+  flutter_localizations:
+    sdk: flutter
+  sqflite: ^2.4.2
+  path: ^1.9.1
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.14
+  riverpod_generator: ^4.0.3
+
+flutter:
+  uses-material-design: true

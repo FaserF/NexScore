@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussion
+    url: https://github.com/FaserF/ScorePlay/discussions
+    about: Ask questions and chat with the community
+  - name: 📖 Documentation
+    url: https://faserF.github.io/ScorePlay
+    about: Read the ScorePlay documentation and game rule guides

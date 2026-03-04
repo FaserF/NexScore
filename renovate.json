@@ -1,0 +1,72 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:best-practices",
+        ":dependencyDashboard"
+    ],
+    "baseBranches": [
+        "main"
+    ],
+    "labels": [
+        "dependencies"
+    ],
+    "commitMessageAction": "Update",
+    "commitMessageTopic": "{{depName}}",
+    "commitMessageExtra": "to {{newVersion}}",
+    "commitMessageSuffix": "",
+    "packageRules": [
+        {
+            "description": "Auto-merge all stable minor and patch updates",
+            "matchUpdateTypes": [
+                "minor",
+                "patch"
+            ],
+            "matchCurrentVersion": "!/^0/",
+            "automerge": true,
+            "autoclose": true,
+            "platformAutomerge": true
+        },
+        {
+            "description": "Flutter/Dart pub dependencies – update weekly on Monday early morning",
+            "matchDatasources": [
+                "pub"
+            ],
+            "schedule": [
+                "before 4am on Monday"
+            ]
+        },
+        {
+            "description": "GitHub Actions – update on Monday",
+            "matchManagers": [
+                "github-actions"
+            ],
+            "schedule": [
+                "before 4am on Monday"
+            ],
+            "automerge": true,
+            "platformAutomerge": true
+        },
+        {
+            "description": "Docker base images (Dockerfile FROM statements)",
+            "matchManagers": [
+                "dockerfile"
+            ],
+            "schedule": [
+                "before 4am on Monday"
+            ],
+            "automerge": true,
+            "platformAutomerge": true
+        },
+        {
+            "description": "Major version updates require manual review",
+            "matchUpdateTypes": [
+                "major"
+            ],
+            "automerge": false,
+            "labels": [
+                "dependencies",
+                "major-update"
+            ]
+        }
+    ]
+}

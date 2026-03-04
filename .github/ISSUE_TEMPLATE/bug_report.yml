@@ -1,0 +1,96 @@
+name: Bug Report
+description: Tell us about a problem in ScorePlay
+title: '[Bug]: '
+labels: ['bug', 'needs-triage']
+assignees: ['FaserF']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Thank you for taking the time to report a bug!**
+        Please fill out the form below as completely as possible so we can reproduce and fix the issue quickly.
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: Which platform(s) did you encounter this bug on?
+      multiple: true
+      options:
+        - Android
+        - iOS
+        - Web (Browser)
+        - PWA (Installed)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: game_module
+    attributes:
+      label: Game Module
+      description: Which game module did this occur in?
+      options:
+        - General App (not game-specific)
+        - Wizard
+        - Qwixx
+        - Schafkopf
+        - Kniffel
+        - Phase 10
+        - Darts X01
+        - Rommé
+        - SipDeck
+        - Arschloch / President
+        - Players Management
+        - History / Leaderboard
+        - Settings / Account
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: What happened? What did you expect to happen instead?
+      placeholder: |
+        Example: When I tap "End Round" in Wizard, the app crashes.
+        Expected: The round results should be saved and the next round starts.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Please provide clear steps to reliably reproduce the issue.
+      placeholder: |
+        1. Open the app and navigate to Wizard
+        2. Start a new game with 4 players
+        3. Enter bids for all players (round 5)
+        4. Tap "End Round"
+        5. App crashes / error shown
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: App version, OS version, device model.
+      placeholder: |
+        - App version: 1.2.0
+        - OS: Android 17 / iOS 26 / Chrome 145
+        - Device: Google Pixel 10 / iPhone 17 / MacBook M5
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / Logs
+      description: If applicable, attach screenshots or relevant log output.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I searched existing issues and this hasn't been reported yet.
+          required: true
+        - label: I am using the latest available version of ScorePlay.
+          required: false

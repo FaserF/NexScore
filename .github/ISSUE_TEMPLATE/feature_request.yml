@@ -1,0 +1,83 @@
+name: Feature Request
+description: Suggest a new feature or improvement for ScorePlay
+title: '[Feature]: '
+labels: ['enhancement']
+assignees: ['FaserF']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Thanks for helping make ScorePlay better!**
+        Please describe your feature request clearly. The more detail you provide, the easier it is to implement.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What area of the app does this feature relate to?
+      options:
+        - New Game Module
+        - Existing Game Improvement
+        - UI / UX Improvement
+        - Internationalization (i18n)
+        - Performance / Stability
+        - Sync / Cloud
+        - Statistics / Leaderboard
+        - Accessibility
+        - PWA / Platform Feature
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Motivation
+      description: What problem does this feature solve? What's the current pain point?
+      placeholder: |
+        Example: When playing Schafkopf with house rules, I can't configure the base value per game,
+        so I have to manually calculate payouts outside the app.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature or improvement you'd like to see.
+      placeholder: |
+        Example: Add a configurable "base value" setting to the Schafkopf setup screen.
+        The payout calculation should then multiply using this custom value.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you thought of other ways to solve this? Why is your proposed solution better?
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How important is this feature to you?
+      options:
+        - Nice to have
+        - Would improve my experience significantly
+        - Blocking me from using ScorePlay
+    validations:
+      required: true
+
+  - type: textarea
+    id: mockup
+    attributes:
+      label: Mockups / Screenshots
+      description: If you have a sketch, screenshot, or reference design, attach it here.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I searched existing issues and this feature hasn't been requested yet.
+          required: true
