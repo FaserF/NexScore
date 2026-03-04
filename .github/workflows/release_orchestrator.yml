@@ -1,4 +1,4 @@
-# Professional Release Orchestrator for ScorePlay
+# Professional Release Orchestrator for NexScore
 # Builds APK, IPA, and Docker Web Image. Creates a single consolidated GitHub Release.
 
 name: Release Orchestrator
@@ -33,10 +33,10 @@ jobs:
           cache: true
       - name: Install dependencies
         run: flutter pub get
-        working-directory: score_play
+        working-directory: nexscore
       - name: Run tests
         run: flutter test
-        working-directory: score_play
+        working-directory: nexscore
 
   build-android:
     needs: test
@@ -62,19 +62,19 @@ jobs:
             DART_DEFINES="--dart-define=IS_BETA=true"
           fi
           flutter build apk --release $DART_DEFINES
-        working-directory: score_play
+        working-directory: nexscore
       - name: Generate SHA256
         id: generate_sha
         run: |
           SHA=$(sha256sum build/app/outputs/flutter-apk/app-release.apk | awk '{print $1}')
           echo "sha256=$SHA" >> $GITHUB_OUTPUT
           echo "$SHA" > build/app/outputs/flutter-apk/app-release.apk.sha256
-        working-directory: score_play
+        working-directory: nexscore
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ScorePlay-Android
-          path: score_play/build/app/outputs/flutter-apk/app-release.apk*
+          name: NexScore-Android
+          path: nexscore/build/app/outputs/flutter-apk/app-release.apk*
 
   build-ios:
     needs: test
@@ -93,12 +93,12 @@ jobs:
             DART_DEFINES="--dart-define=IS_BETA=true"
           fi
           flutter build ipa --no-codesign --release $DART_DEFINES
-        working-directory: score_play
+        working-directory: nexscore
       - name: Upload IPA (Artifacts)
         uses: actions/upload-artifact@v4
         with:
-          name: ScorePlay-iOS
-          path: score_play/build/ios/archive/*.xcarchive
+          name: NexScore-iOS
+          path: nexscore/build/ios/archive/*.xcarchive
 
   build-web:
     needs: test
@@ -117,13 +117,13 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./score_play
+          context: ./nexscore
           push: true
           build-args: |
             IS_BETA=${{ github.event.inputs.is_prerelease }}
           tags: |
-            ghcr.io/${{ github.repository_owner }}/scoreplay:latest
-            ghcr.io/${{ github.repository_owner }}/scoreplay:${{ github.event.inputs.version_name }}
+            ghcr.io/${{ github.repository_owner }}/nexscore:latest
+            ghcr.io/${{ github.repository_owner }}/nexscore:${{ github.event.inputs.version_name }}
 
   create-release:
     needs: [build-android, build-ios, build-web]
@@ -138,23 +138,23 @@ jobs:
       - name: Prepare Release Assets
         run: |
           mkdir release_assets
-          cp artifacts/ScorePlay-Android/app-release.apk release_assets/ScorePlay-v${{ github.event.inputs.version_name }}.apk
-          cp artifacts/ScorePlay-Android/app-release.apk.sha256 release_assets/ScorePlay-v${{ github.event.inputs.version_name }}.apk.sha256
+          cp artifacts/NexScore-Android/app-release.apk release_assets/NexScore-v${{ github.event.inputs.version_name }}.apk
+          cp artifacts/NexScore-Android/app-release.apk.sha256 release_assets/NexScore-v${{ github.event.inputs.version_name }}.apk.sha256
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.event.inputs.version_name }}${{ github.event.inputs.is_prerelease == 'true' && '-beta' || '' }}
-          name: ScorePlay v${{ github.event.inputs.version_name }}${{ github.event.inputs.is_prerelease == 'true' && ' (Beta)' || '' }}
+          name: NexScore v${{ github.event.inputs.version_name }}${{ github.event.inputs.is_prerelease == 'true' && ' (Beta)' || '' }}
           prerelease: ${{ github.event.inputs.is_prerelease }}
           files: release_assets/*
           body: |
-            ## 🚀 ScorePlay v${{ github.event.inputs.version_name }}
+            ## 🚀 NexScore v${{ github.event.inputs.version_name }}
 
             ### 📦 Downloads & Artifacts
             | Platform | File | SHA256 Checksum |
             |----------|------|-----------------|
-            | **Android** | [ScorePlay.apk](https://github.com/${{ github.repository }}/releases/download/v${{ github.event.inputs.version_name }}${{ github.event.inputs.is_prerelease == 'true' && '-beta' || '' }}/ScorePlay-v${{ github.event.inputs.version_name }}.apk) | `${{ needs.build-android.outputs.sha256 }}` |
-            | **Web** | `docker pull ghcr.io/${{ github.repository_owner }}/scoreplay:${{ github.event.inputs.version_name }}` | _Container Image_ |
+            | **Android** | [NexScore.apk](https://github.com/${{ github.repository }}/releases/download/v${{ github.event.inputs.version_name }}${{ github.event.inputs.is_prerelease == 'true' && '-beta' || '' }}/NexScore-v${{ github.event.inputs.version_name }}.apk) | `${{ needs.build-android.outputs.sha256 }}` |
+            | **Web** | `docker pull ghcr.io/${{ github.repository_owner }}/nexscore:${{ github.event.inputs.version_name }}` | _Container Image_ |
 
             ---
             *Released by Orchestrator on $(date +'%Y-%m-%d %H:%M:%S')*

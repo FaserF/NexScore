@@ -1,4 +1,4 @@
-name: ScorePlay CI/CD
+name: NexScore CI/CD
 
 on:
   push:
@@ -22,29 +22,29 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-        working-directory: score_play
+        working-directory: nexscore
 
       - name: Analyze code
         run: flutter analyze
-        working-directory: score_play
+        working-directory: nexscore
 
       - name: Run tests
         run: flutter test
-        working-directory: score_play
+        working-directory: nexscore
 
       - name: Build Web
         run: |
           flutter build web --release --base-href "/"
-        working-directory: score_play
+        working-directory: nexscore
 
       - name: Build Android APK
         run: flutter build apk --release
-        working-directory: score_play
+        working-directory: nexscore
 
       - name: Build Docker Image for Web
         run: |
-          docker build -t scoreplay-web:latest -f Dockerfile .
-        working-directory: score_play
+          docker build -t nexscore-web:latest -f Dockerfile .
+        working-directory: nexscore
 
   build-ios:
     runs-on: macos-latest
@@ -59,8 +59,8 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-        working-directory: score_play
+        working-directory: nexscore
 
       - name: Build iOS IPA (Unsigned/Simulator)
         run: flutter build ios --release --no-codesign
-        working-directory: score_play
+        working-directory: nexscore

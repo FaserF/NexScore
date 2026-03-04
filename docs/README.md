@@ -1,7 +1,7 @@
-# ScorePlay Documentation
+# NexScore Documentation
 
-> Full docs for the ScorePlay app — game rules, architecture, deployment, and contribution guide.
-> 🌐 **Live app:** [scoreplay.fabiseitz.de](https://scoreplay.fabiseitz.de) · 💻 **Source:** [github.com/FaserF/ScorePlay](https://github.com/FaserF/ScorePlay)
+> Full docs for the NexScore app — game rules, architecture, deployment, and contribution guide.
+> 🌐 **Live app:** [nexscore.fabiseitz.de](https://nexscore.fabiseitz.de) · 💻 **Source:** [github.com/FaserF/NexScore](https://github.com/FaserF/NexScore)
 
 ---
 
@@ -26,13 +26,13 @@
 |------|-----------------|
 | Flutter | stable channel, ≥ 3.29 |
 | Dart | ^3.11.1 |
-| Firebase CLI | optional (for Firestore/Auth) |
+| Firebase CLI | optional (for Firestore / Auth) |
 
 ### Local Setup
 
 ```bash
-git clone https://github.com/FaserF/ScorePlay.git
-cd ScorePlay/score_play
+git clone https://github.com/FaserF/NexScore.git
+cd NexScore/nexscore
 flutter pub get
 flutter run              # runs on connected device or emulator
 ```
@@ -197,7 +197,7 @@ Party drinking card game with 50+ challenge cards across 5 categories:
 ### Folder Structure
 
 ```
-score_play/lib/
+nexscore/lib/
 ├── core/
 │   ├── i18n/          # AppLocalizations (75+ keys, EN + DE)
 │   ├── models/        # Session, Player models
@@ -223,7 +223,7 @@ score_play/lib/
 
 ## Internationalization
 
-ScorePlay ships with full **English** and **German** translations (75+ keys). The app auto-detects the system locale. Fallback is always English.
+NexScore ships with full **English** and **German** translations (75+ keys). The app auto-detects the system locale. Fallback is always English.
 
 The CI suite includes an **i18n parity test** (`test/core/i18n/i18n_parity_test.dart`) that:
 - Verifies both `en` and `de` locale maps have identical key sets
@@ -255,7 +255,7 @@ The workflows support `workflow_dispatch` (manual trigger).
 
 ## Settings & Customization
 
-ScorePlay features a dedicated Settings view.
+NexScore features a dedicated Settings view.
 
 | Feature | implementation | Persistence |
 |---------|----------------|-------------|
@@ -271,14 +271,14 @@ The web app is built into a Docker image using a multi-stage Flutter web build:
 
 ```bash
 # Build
-docker build -t scoreplay-web:local .
+docker build -t nexscore-web:local .
 
 # Run – open http://localhost:8080
-docker run -p 8080:80 scoreplay-web:local
+docker run -p 8080:80 nexscore-web:local
 
 # Production (via GitHub Actions)
-# Image is pushed to: ghcr.io/faserF/scoreplay:latest
-# Served at: https://scoreplay.fabiseitz.de
+# Image is pushed to: ghcr.io/faserf/nexscore:latest
+# Served at: https://nexscore.fabiseitz.de
 ```
 
 ---
@@ -303,6 +303,6 @@ Contributions are welcome!
 
 **Attribution:** Created by [Fabian Seitz (FaserF)](https://fabiseitz.de)
 
-**Trademark Notice:** Wizard® is a trademark of Amigo. Qwixx® is a trademark of Nürnberger Spielkarten. Kniffel® is a trademark of MB Spiele (Hasbro). Phase 10® is a trademark of Mattel. ScorePlay is not affiliated with any of these companies. SipDeck is an original game concept by the author. Arschloch / President is a traditional public-domain folk card game.
+**Trademark Notice:** Wizard® is a trademark of Amigo. Qwixx® is a trademark of Nürnberger Spielkarten. Kniffel® is a trademark of MB Spiele (Hasbro). Phase 10® is a trademark of Mattel. NexScore is not affiliated with any of these companies. SipDeck is an original game concept by the author. Arschloch / President is a traditional public-domain folk card game.
 
 MIT License — see [LICENSE](../LICENSE).

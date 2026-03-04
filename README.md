@@ -1,4 +1,4 @@
-# ScorePlay
+# NexScore
 
 <p align="center">
   <strong>A cross-platform score tracker for your favourite card and board games.</strong><br>
@@ -6,15 +6,15 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/FaserF/ScorePlay/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/FaserF/ScorePlay/actions/workflows/test.yml/badge.svg"></a>
-  <a href="https://github.com/FaserF/ScorePlay/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/FaserF/ScorePlay"></a>
+  <a href="https://github.com/FaserF/NexScore/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/FaserF/NexScore/actions/workflows/test.yml/badge.svg"></a>
+  <a href="https://github.com/FaserF/NexScore/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/FaserF/NexScore"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
 </p>
 
 ---
 
 ### 🚀 Version 0.1.0 (Beta)
-ScorePlay is now in its official Beta phase.
+NexScore is now in its official Beta phase.
 
 ## Features
 
@@ -45,8 +45,8 @@ ScorePlay is now in its official Beta phase.
 ## Quick Start
 
 ```bash
-git clone https://github.com/FaserF/ScorePlay.git
-cd ScorePlay/score_play
+git clone https://github.com/FaserF/NexScore.git
+cd NexScore/nexscore
 flutter pub get
 flutter run
 ```
@@ -55,10 +55,10 @@ flutter run
 
 ```bash
 # Build the Docker image
-docker build -t scoreplay-web:local .
+docker build -t nexscore-web:local .
 
 # Run locally – open http://localhost:8080 in your browser
-docker run -p 8080:80 scoreplay-web:local
+docker run -p 8080:80 nexscore-web:local
 ```
 
 ## Build APK (Android)
@@ -81,15 +81,15 @@ flutter build apk --release
 
 ## Contributing
 
-- 🐛 [Report a Bug](https://github.com/FaserF/ScorePlay/issues/new?template=bug_report.yml)
-- 💡 [Request a Feature](https://github.com/FaserF/ScorePlay/issues/new?template=feature_request.yml)
-- 📖 [Documentation](https://faserF.github.io/ScorePlay)
-- 💬 [Discussions](https://github.com/FaserF/ScorePlay/discussions)
+- 🐛 [Report a Bug](https://github.com/FaserF/NexScore/issues/new?template=bug_report.yml)
+- 💡 [Request a Feature](https://github.com/FaserF/NexScore/issues/new?template=feature_request.yml)
+- 📖 [Documentation](https://faserF.github.io/NexScore)
+- 💬 [Discussions](https://github.com/FaserF/NexScore/discussions)
 
 ## Legal
 
-**Attribution:** Created by [Fabian Seitz (FaserF)](https://fabiseitz.de) — [github.com/FaserF/ScorePlay](https://github.com/FaserF/ScorePlay)
+**Attribution:** Created by [Fabian Seitz (FaserF)](https://fabiseitz.de) — [github.com/FaserF/NexScore](https://github.com/FaserF/NexScore)
 
-**Trademark Notice:** ScorePlay holds no copyright or trademark over any referenced physical games. Wizard® (Amigo), Qwixx® (Nürnberger Spielkarten), Kniffel® (MB Spiele), Phase 10® (Mattel), and others are property of their respective owners. SipDeck is an original concept. Arschloch / President is a traditional public-domain folk card game.
+**Trademark Notice:** NexScore holds no copyright or trademark over any referenced physical games. Wizard® (Amigo), Qwixx® (Nürnberger Spielkarten), Kniffel® (MB Spiele), Phase 10® (Mattel), and others are property of their respective owners. SipDeck is an original concept. Arschloch / President is a traditional public-domain folk card game.
 
 This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
