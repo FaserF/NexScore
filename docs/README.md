@@ -30,6 +30,7 @@ We avoid throwing exceptions for expected failures. Instead, we use a functional
     - `DatabaseFailure`: SQL or persistence errors.
     - `ValidationFailure`: User input or business rule violations.
     - `AuthFailure`: Authentication and permission issues.
+    - `SyncFailure`: Cloud sync and backup errors (e.g. Gist API failures).
     - `UnexpectedFailure`: Catch-all for unknown errors.
 
 ### 2. Structured Logging (`AppLogger`)
@@ -43,6 +44,13 @@ Located in `lib/core/utils/logger.dart`, the `AppLogger` provides a unified inte
 The `DatabaseService` (`lib/core/storage/database_service.dart`) handles the local SQLite state.
 - **Optimized Queries**: All heavy reads use database indexes for $O(1)$ or $O(\log n)$ performance.
 - **Async Threading**: Database operations are strictly asynchronous to keep the UI at 60+ FPS.
+
+### 4. Data Sync & Backup
+NexScore supports two cloud backup methods via Firebase Authentication:
+- **Google Sign-In** → Cloud Firestore sync (planned).
+- **GitHub Sign-In** → Private **GitHub Gist** backup/restore via `GistSyncService` (`lib/core/sync/gist_sync_service.dart`).
+
+> For detailed setup instructions, see [AUTH_SETUP.md](AUTH_SETUP.md).
 
 ---
 
