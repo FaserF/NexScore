@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../i18n/app_localizations.dart';
 import '../theme/widgets/glass_container.dart';
 
 class ScaffoldWithNavBar extends StatelessWidget {
@@ -28,36 +29,36 @@ class ScaffoldWithNavBar extends StatelessWidget {
                 initialLocation: index == navigationShell.currentIndex,
               );
             },
-            destinations: const [
+            destinations: [
               NavigationDestination(
-                icon: Icon(Icons.people_outline),
-                selectedIcon: Icon(Icons.people),
-                label: 'Players',
+                icon: const Icon(Icons.people_outline),
+                selectedIcon: const Icon(Icons.people),
+                label: AppLocalizations.of(context).get('nav_players'),
               ),
               NavigationDestination(
-                icon: Icon(Icons.videogame_asset_outlined),
-                selectedIcon: Icon(Icons.videogame_asset),
-                label: 'Games',
+                icon: const Icon(Icons.videogame_asset_outlined),
+                selectedIcon: const Icon(Icons.videogame_asset),
+                label: AppLocalizations.of(context).get('nav_games'),
               ),
               NavigationDestination(
-                icon: Icon(Icons.history_outlined),
-                selectedIcon: Icon(Icons.history),
-                label: 'History',
+                icon: const Icon(Icons.history_outlined),
+                selectedIcon: const Icon(Icons.history),
+                label: AppLocalizations.of(context).get('nav_history'),
               ),
               NavigationDestination(
-                icon: Icon(Icons.emoji_events_outlined),
-                selectedIcon: Icon(Icons.emoji_events),
-                label: 'Leaderboard',
+                icon: const Icon(Icons.emoji_events_outlined),
+                selectedIcon: const Icon(Icons.emoji_events),
+                label: AppLocalizations.of(context).get('nav_leaderboard'),
               ),
               NavigationDestination(
-                icon: Icon(Icons.account_circle_outlined),
-                selectedIcon: Icon(Icons.account_circle),
-                label: 'Account',
+                icon: const Icon(Icons.account_circle_outlined),
+                selectedIcon: const Icon(Icons.account_circle),
+                label: AppLocalizations.of(context).get('nav_account'),
               ),
               NavigationDestination(
-                icon: Icon(Icons.help_outline),
-                selectedIcon: Icon(Icons.help),
-                label: 'Help',
+                icon: const Icon(Icons.help_outline),
+                selectedIcon: const Icon(Icons.help),
+                label: AppLocalizations.of(context).get('nav_help'),
               ),
             ],
           ),

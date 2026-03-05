@@ -20,6 +20,7 @@ class AppLocalizations {
       'nav_history': 'History',
       'nav_leaderboard': 'Leaderboard',
       'nav_account': 'Account',
+      'nav_help': 'Help',
 
       // ── General
       'app_name': 'NexScore',
@@ -129,6 +130,7 @@ class AppLocalizations {
       'help_discuss_desc': 'Ask questions and chat with other NexScore users.',
       'help_source': 'Source Code',
       'help_source_desc': 'NexScore is open source on GitHub.',
+      'help_settings': 'App Settings',
 
       // ── Wizard
       'wizard_title': 'Wizard',
@@ -326,6 +328,8 @@ class AppLocalizations {
       'account_sync_github': 'Gist Sync active',
       'account_sign_out': 'Sign Out',
       'account_sign_in_error': 'Sign-in failed: {0}',
+      'account_data_stay_note':
+          'Your local data remains on this device when you sign out.',
     },
     'de': {
       // ── Navigation
@@ -334,6 +338,7 @@ class AppLocalizations {
       'nav_history': 'Verlauf',
       'nav_leaderboard': 'Rangliste',
       'nav_account': 'Konto',
+      'nav_help': 'Hilfe',
 
       // ── General
       'app_name': 'NexScore',
@@ -447,6 +452,7 @@ class AppLocalizations {
           'Stell Fragen und chatte mit anderen NexScore-Nutzern.',
       'help_source': 'Quellcode',
       'help_source_desc': 'NexScore ist Open Source auf GitHub.',
+      'help_settings': 'App-Einstellungen',
 
       // ── Wizard
       'wizard_title': 'Wizard',
@@ -648,6 +654,8 @@ class AppLocalizations {
       'account_sync_github': 'Gist Sync aktiv',
       'account_sign_out': 'Abmelden',
       'account_sign_in_error': 'Anmeldung fehlgeschlagen: {0}',
+      'account_data_stay_note':
+          'Deine lokalen Daten bleiben auf diesem Gerät gespeichert, wenn du dich abmeldest.',
     },
   };
 

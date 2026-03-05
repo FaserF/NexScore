@@ -30,92 +30,125 @@ class LeaderboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playersAsync = ref.watch(playersProvider);
     final sessionsAsync = ref.watch(sessionsProvider);
-
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.get('leaderboard'))),
-      body: playersAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) =>
-            Center(child: Text(l10n.getWith('error_msg', [e.toString()]))),
-        data: (players) => sessionsAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) =>
-              Center(child: Text(l10n.getWith('error_msg', [e.toString()]))),
-          data: (sessions) {
-            final entries = _buildLeaderboard(players, sessions);
-            if (entries.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.emoji_events_outlined,
-                      size: 80,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n.get('leaderboard_empty'),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 18, color: Colors.grey),
-                    ),
-                  ],
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            title: Text(
+              l10n.get('leaderboard_title'),
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: -1,
+              ),
+            ),
+            centerTitle: false,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            surfaceTintColor: Colors.transparent,
+          ),
+          playersAsync.when(
+            loading: () => const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => SliverFillRemaining(
+              child: Center(
+                child: Text(l10n.getWith('error_msg', [e.toString()])),
+              ),
+            ),
+            data: (players) => sessionsAsync.when(
+              loading: () => const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (e, _) => SliverFillRemaining(
+                child: Center(
+                  child: Text(l10n.getWith('error_msg', [e.toString()])),
                 ),
-              );
-            }
-            return ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: entries.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final entry = entries[index];
-                final medal = index == 0
-                    ? '🥇'
-                    : index == 1
-                    ? '🥈'
-                    : index == 2
-                    ? '🥉'
-                    : '${index + 1}.';
-                return Card(
-                  elevation: 2,
-                  child: ListTile(
-                    leading: Text(medal, style: const TextStyle(fontSize: 24)),
-                    title: Text(
-                      entry.player.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+              ),
+              data: (sessions) {
+                final entries = _buildLeaderboard(players, sessions);
+                if (entries.isEmpty) {
+                  return SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.emoji_events_outlined,
+                            size: 80,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            l10n.get('leaderboard_empty'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    subtitle: Text(
-                      '${entry.gamesPlayed} ${l10n.get('leaderboard_games')} · ${(entry.winRate * 100).toStringAsFixed(0)}% ${l10n.get('leaderboard_win_rate')}',
-                    ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '${entry.gamesWon} ${l10n.get('leaderboard_wins')}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                  );
+                }
+                return SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final entry = entries[index];
+                      final medal = index == 0
+                          ? '🥇'
+                          : index == 1
+                          ? '🥈'
+                          : index == 2
+                          ? '🥉'
+                          : '${index + 1}.';
+                      return Card(
+                        elevation: 2,
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: ListTile(
+                          leading: Text(
+                            medal,
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          title: Text(
+                            entry.player.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${entry.gamesPlayed} ${l10n.get('leaderboard_games')} · ${(entry.winRate * 100).toStringAsFixed(0)}% ${l10n.get('leaderboard_win_rate')}',
+                          ),
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '${entry.gamesWon} ${l10n.get('leaderboard_wins')}',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                '${l10n.get('leaderboard_score')}: ${entry.totalScore}',
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ],
                           ),
                         ),
-                        Text(
-                          '${l10n.get('leaderboard_score')}: ${entry.totalScore}',
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
+                      );
+                    }, childCount: entries.length),
                   ),
                 );
               },
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -111,7 +111,7 @@ class GamesListScreen extends StatelessWidget {
             ],
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 140),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate((context, index) {
                 if (index == 0) {

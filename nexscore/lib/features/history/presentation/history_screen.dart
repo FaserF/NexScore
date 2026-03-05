@@ -85,7 +85,7 @@ class HistoryScreen extends ConsumerWidget {
                 }
 
                 return SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 120),
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 140),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final session = completed[index];

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../core/i18n/app_localizations.dart';
 import '../../../core/utils/logger.dart';
 import '../../../core/error/failures.dart';
@@ -57,19 +58,26 @@ class AuthService {
     final stopwatch = Stopwatch()..start();
     try {
       final googleProvider = GoogleAuthProvider();
-      final credential = await _auth.signInWithProvider(googleProvider);
+      UserCredential credential;
+      if (kIsWeb) {
+        // Use popup on web for better reliability on GitHub Pages
+        credential = await _auth.signInWithPopup(googleProvider);
+      } else {
+        credential = await _auth.signInWithProvider(googleProvider);
+      }
       AppLogger.info(
-        'Google Sign-In (Native) successful',
+        'Google Sign-In successful',
         tag: 'Auth',
         metadata: {
           'duration': '${stopwatch.elapsedMilliseconds}ms',
           'uid': credential.user?.uid,
+          'platform': kIsWeb ? 'web' : 'native',
         },
       );
       return Result.success(credential);
     } catch (e, stack) {
       AppLogger.error(
-        'Google Sign-In (Native) failed',
+        'Google Sign-In failed',
         tag: 'Auth',
         error: e,
         stackTrace: stack,
@@ -154,17 +162,35 @@ class ProfileScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.get('account'))),
-      body: userAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) =>
-            Center(child: Text(l10n.getWith('error_msg', [e.toString()]))),
-        data: (user) {
-          if (user == null) {
-            return _SignedOutView(ref: ref);
-          }
-          return _SignedInView(user: user, ref: ref);
-        },
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            title: Text(
+              l10n.get('account'),
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: -1,
+              ),
+            ),
+            centerTitle: false,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            surfaceTintColor: Colors.transparent,
+          ),
+          SliverToBoxAdapter(
+            child: userAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(
+                child: Text(l10n.getWith('error_msg', [e.toString()])),
+              ),
+              data: (user) {
+                if (user == null) {
+                  return _SignedOutView(ref: ref);
+                }
+                return _SignedInView(user: user, ref: ref);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -177,35 +203,59 @@ class _SignedOutView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.account_circle_outlined,
-              size: 96,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              l10n.get('account_signed_out_body'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.get('account_offline_note'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 40),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final authService = ref.read(authServiceProvider);
-                final result = await authService.signInWithGoogleNative();
-                result.fold((failure) {
+    return Padding(
+      padding: const EdgeInsets.all(32.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.account_circle_outlined,
+            size: 96,
+            color: Colors.grey,
+          ),
+          const SizedBox(height: 24),
+          Text(
+            l10n.get('account_signed_out_body'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.get('account_offline_note'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.grey),
+          ),
+          const SizedBox(height: 40),
+          OutlinedButton.icon(
+            onPressed: () async {
+              final authService = ref.read(authServiceProvider);
+              final result = await authService.signInWithGoogleNative();
+              result.fold((failure) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        l10n.getWith('account_sign_in_error', [
+                          failure.message,
+                        ]),
+                      ),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }, (_) {});
+            },
+            icon: const Icon(Icons.login),
+            label: Text(l10n.get('account_sign_in_google')),
+            style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () async {
+              final authService = ref.read(authServiceProvider);
+              final result = await authService.signInWithGithub();
+              result.fold(
+                (failure) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -218,55 +268,30 @@ class _SignedOutView extends StatelessWidget {
                       ),
                     );
                   }
-                }, (_) {});
-              },
-              icon: const Icon(Icons.login),
-              label: Text(l10n.get('account_sign_in_google')),
-              style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final authService = ref.read(authServiceProvider);
-                final result = await authService.signInWithGithub();
-                result.fold(
-                  (failure) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            l10n.getWith('account_sign_in_error', [
-                              failure.message,
-                            ]),
-                          ),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    }
-                  },
-                  (credential) {
-                    // Capture GitHub OAuth access-token for Gist API calls
-                    final oauthCred = credential.credential as OAuthCredential?;
-                    if (oauthCred?.accessToken != null) {
-                      ref
-                          .read(gistSyncServiceProvider)
-                          .setAccessToken(oauthCred!.accessToken!);
-                    }
-                  },
-                );
-              },
-              icon: const Icon(Icons.code),
-              label: Text(l10n.get('account_sign_in_github')),
-              style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
-            ),
-            const SizedBox(height: 48),
-            Text(
-              l10n.get('account_data_stay_note'),
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+                },
+                (credential) {
+                  // Capture GitHub OAuth access-token for Gist API calls
+                  final oauthCred = credential.credential as OAuthCredential?;
+                  if (oauthCred?.accessToken != null) {
+                    ref
+                        .read(gistSyncServiceProvider)
+                        .setAccessToken(oauthCred!.accessToken!);
+                  }
+                },
+              );
+            },
+            icon: const Icon(Icons.code),
+            label: Text(l10n.get('account_sign_in_github')),
+            style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
+          ),
+          const SizedBox(height: 48),
+          Text(
+            l10n.get('account_data_stay_note'),
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 140),
+        ],
       ),
     );
   }
@@ -354,7 +379,7 @@ class _SignedInView extends StatelessWidget {
             leading: const Icon(Icons.settings_outlined),
             title: Text(l10n.get('settings')),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.go('/settings'),
+            onTap: () => context.push('/profile/settings'),
           ),
           const Divider(),
           const SizedBox(height: 24),
@@ -370,6 +395,7 @@ class _SignedInView extends StatelessWidget {
               minimumSize: const Size(200, 48),
             ),
           ),
+          const SizedBox(height: 140),
         ],
       ),
     );

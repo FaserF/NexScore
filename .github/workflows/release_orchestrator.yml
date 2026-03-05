@@ -138,6 +138,7 @@ jobs:
           push: true
           build-args: |
             APP_VERSION=${{ needs.version-calc.outputs.version_name }}
+            IS_BETA=${{ github.event.inputs.release_type == 'beta' }}
           tags: |
             ${{ steps.image_name.outputs.IMAGE_NAME }}:latest
             ${{ steps.image_name.outputs.IMAGE_NAME }}:${{ needs.version-calc.outputs.docker_tag }}
@@ -149,6 +150,7 @@ jobs:
     with:
       deploy_pwa: true
       version_name: ${{ needs.version-calc.outputs.version_name }}
+      is_beta: ${{ github.event.inputs.release_type == 'beta' }}
 
   create-release:
     needs: [version-calc, build-android, build-ios, build-web, deploy-pwa]

@@ -37,25 +37,24 @@ class NexScoreApp extends ConsumerWidget {
 
     final router = ref.watch(routerProvider);
 
-    return EnvironmentBanner(
-      child: MaterialApp.router(
-        title: 'NexScore',
-        theme: lightTheme,
-        darkTheme: darkTheme,
-        themeMode: themeMode,
-        locale: locale,
-        routerConfig: router,
-        supportedLocales: const [
-          Locale('en', ''), // English
-          Locale('de', ''), // German
-        ],
-        localizationsDelegates: const [
-          AppLocalizationsDelegate(),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-      ),
+    return MaterialApp.router(
+      title: 'NexScore',
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeMode,
+      locale: locale,
+      routerConfig: router,
+      supportedLocales: const [
+        Locale('en', ''), // English
+        Locale('de', ''), // German
+      ],
+      localizationsDelegates: const [
+        AppLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      builder: (context, child) => EnvironmentBanner(child: child!),
     );
   }
 }

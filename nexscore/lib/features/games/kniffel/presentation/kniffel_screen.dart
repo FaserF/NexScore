@@ -60,7 +60,7 @@ class KniffelScreen extends ConsumerWidget {
     AppLocalizations l10n,
   ) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

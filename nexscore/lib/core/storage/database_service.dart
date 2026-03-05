@@ -1,33 +1,37 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import '../utils/logger.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
   static Database? _database;
 
-  // Web-only in-memory storage
-  final Map<String, List<Map<String, dynamic>>> _webDb = {
-    'players': [],
-    'sessions': [],
-  };
-
   static const _dbName = 'nexscore.db';
 
   DatabaseService._init();
 
-  Future<Database?> get _db async {
-    if (kIsWeb) return null;
+  Future<Database> get _db async {
     if (_database != null) return _database!;
     _database = await _initDB(_dbName);
     return _database!;
   }
 
   Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    if (kIsWeb) {
+      // Use FFI web for persistence on web
+      var factory = databaseFactoryFfiWeb;
+      final path = filePath; // On web, the path is usually just the filename
+      return await factory.openDatabase(
+        path,
+        options: OpenDatabaseOptions(version: 1, onCreate: _createDB),
+      );
+    } else {
+      final dbPath = await getDatabasesPath();
+      final path = join(dbPath, filePath);
+      return await openDatabase(path, version: 1, onCreate: _createDB);
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -75,21 +79,13 @@ CREATE TABLE sessions (
   }) async {
     final stopwatch = Stopwatch()..start();
     try {
-      List<Map<String, dynamic>> results;
-      if (kIsWeb) {
-        results = List<Map<String, dynamic>>.from(_webDb[table] ?? []);
-        if (where?.contains('isDeleted = ?') ?? false) {
-          results = results.where((e) => e['isDeleted'] == 0).toList();
-        }
-      } else {
-        final db = await _db;
-        results = await db!.query(
-          table,
-          where: where,
-          whereArgs: whereArgs,
-          orderBy: orderBy,
-        );
-      }
+      final db = await _db;
+      final results = await db.query(
+        table,
+        where: where,
+        whereArgs: whereArgs,
+        orderBy: orderBy,
+      );
       AppLogger.info(
         'Query $table complete',
         tag: 'Database',
@@ -115,16 +111,12 @@ CREATE TABLE sessions (
   Future<void> insert(String table, Map<String, dynamic> values) async {
     final stopwatch = Stopwatch()..start();
     try {
-      if (kIsWeb) {
-        _webDb[table]!.add(values);
-      } else {
-        final db = await _db;
-        await db!.insert(
-          table,
-          values,
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
+      final db = await _db;
+      await db.insert(
+        table,
+        values,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
       AppLogger.info(
         'Insert into $table complete',
         tag: 'Database',
@@ -153,16 +145,8 @@ CREATE TABLE sessions (
   }) async {
     final stopwatch = Stopwatch()..start();
     try {
-      if (kIsWeb) {
-        final id = values['id'] ?? whereArgs?.first;
-        final index = _webDb[table]!.indexWhere((e) => e['id'] == id);
-        if (index != -1) {
-          _webDb[table]![index] = {..._webDb[table]![index], ...values};
-        }
-      } else {
-        final db = await _db;
-        await db!.update(table, values, where: where, whereArgs: whereArgs);
-      }
+      final db = await _db;
+      await db.update(table, values, where: where, whereArgs: whereArgs);
       AppLogger.info(
         'Update $table complete',
         tag: 'Database',
@@ -190,13 +174,8 @@ CREATE TABLE sessions (
   }) async {
     final stopwatch = Stopwatch()..start();
     try {
-      if (kIsWeb) {
-        final id = whereArgs?.first;
-        _webDb[table]!.removeWhere((e) => e['id'] == id);
-      } else {
-        final db = await _db;
-        await db!.delete(table, where: where, whereArgs: whereArgs);
-      }
+      final db = await _db;
+      await db.delete(table, where: where, whereArgs: whereArgs);
       AppLogger.info(
         'Delete from $table complete',
         tag: 'Database',
@@ -219,20 +198,14 @@ CREATE TABLE sessions (
 
   Future<void> clearDatabase() async {
     AppLogger.warning('Clearing entire database!', tag: 'Database');
-    if (kIsWeb) {
-      _webDb['players']!.clear();
-      _webDb['sessions']!.clear();
-      return;
-    }
     final db = await _db;
-    await db!.delete('players');
+    await db.delete('players');
     await db.delete('sessions');
   }
 
   Future<void> close() async {
-    if (kIsWeb) return;
     final db = await _db;
-    await db?.close();
+    await db.close();
     AppLogger.info('Database closed.', tag: 'Database');
   }
 }

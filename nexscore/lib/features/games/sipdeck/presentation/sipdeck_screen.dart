@@ -109,6 +109,7 @@ class SipDeckScreen extends ConsumerWidget {
                     backgroundColor: Colors.pink.shade700,
                   ),
                 ),
+                const SizedBox(height: 120),
               ],
             ),
           ),
@@ -150,7 +151,7 @@ class SipDeckScreen extends ConsumerWidget {
               color: currentCard.isVirus
                   ? Colors.deepOrange.shade800
                   : _colorForCategory(currentCard.category),
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.fromLTRB(32, 32, 32, 120),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,

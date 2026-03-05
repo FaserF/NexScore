@@ -70,7 +70,7 @@ class PlayersScreen extends ConsumerWidget {
                 );
               }
               return SliverPadding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 120),
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 140),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final player = players[index];
@@ -161,10 +161,13 @@ class PlayersScreen extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddPlayerDialog(context, ref),
-        elevation: 4,
-        child: const Icon(Icons.add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 90.0),
+        child: FloatingActionButton(
+          onPressed: () => _showAddPlayerDialog(context, ref),
+          elevation: 4,
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }

@@ -189,7 +189,7 @@ class SettingsScreen extends ConsumerWidget {
                   child: Column(
                     children: [
                       Text(
-                        'NexScore v${const String.fromEnvironment('APP_VERSION', defaultValue: '0.1.0+1')}',
+                        'NexScore ${AppVersion.displayVersion}',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.outline,
                           fontSize: 12,

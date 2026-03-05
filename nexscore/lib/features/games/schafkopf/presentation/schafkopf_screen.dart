@@ -122,7 +122,7 @@ class SchafkopfScreen extends ConsumerWidget {
                         ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 110.0),
                   child: FilledButton.icon(
                     onPressed: () => _showAddRoundDialog(
                       context,

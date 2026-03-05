@@ -92,6 +92,7 @@ class ArschlochScreen extends ConsumerWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 120),
           ],
         ),
       ),
@@ -148,9 +149,9 @@ class ArschlochScreen extends ConsumerWidget {
             ),
           ),
         ],
-        // Scoreboard
         Expanded(
           child: ListView.separated(
+            padding: const EdgeInsets.only(bottom: 110),
             itemCount: leaders.length,
             separatorBuilder: (_, _) => const Divider(height: 1),
             itemBuilder: (context, index) {
@@ -234,7 +235,7 @@ class ArschlochScreen extends ConsumerWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
           child: FilledButton.icon(
             onPressed: () =>
                 _showRoundEntryDialog(context, ref, players, gameState, l10n),

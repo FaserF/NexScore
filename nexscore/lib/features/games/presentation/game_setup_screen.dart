@@ -98,7 +98,7 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
                   ),
                 ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 120.0),
                 child: FilledButton(
                   onPressed: _selectedPlayerIds.length >= _minPlayers
                       ? () => _startGame(context, players)
@@ -115,9 +115,12 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddPlayerDialog(context, ref),
-        child: const Icon(Icons.person_add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 90.0),
+        child: FloatingActionButton(
+          onPressed: () => _showAddPlayerDialog(context, ref),
+          child: const Icon(Icons.person_add),
+        ),
       ),
     );
   }

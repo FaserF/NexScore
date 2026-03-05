@@ -81,7 +81,7 @@ class _QwixxPlayerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 140),
       child: Column(
         children: [
           Padding(

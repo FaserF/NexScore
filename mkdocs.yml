@@ -1,0 +1,54 @@
+site_name: NexScore Documentation
+site_description: Professional game score tracking application.
+site_url: https://faserf.github.io/NexScore/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Home: index.md
+  - User Guide:
+      - Getting Started: user_guide/getting_started.md
+      - Featured Games: user_guide/games.md
+      - Account & Sync: user_guide/account.md
+  - Developer Guide:
+      - Architecture: dev_guide/architecture.md
+      - Tech Stack: dev_guide/tech_stack.md
+      - Setup & CI/CD: dev_guide/setup.md
+  - Release Notes: release_notes.md
+  - Community:
+      - Discussions: https://github.com/FaserF/NexScore/discussions
+      - Issue Tracker: https://github.com/FaserF/NexScore/issues
+  - Launch App: app/

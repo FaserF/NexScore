@@ -81,6 +81,7 @@ class DartsScreen extends ConsumerWidget {
         ],
       ),
       body: ListView.separated(
+        padding: const EdgeInsets.only(bottom: 140),
         itemCount: players.length,
         separatorBuilder: (context, index) => const Divider(height: 1),
         itemBuilder: (context, index) {
