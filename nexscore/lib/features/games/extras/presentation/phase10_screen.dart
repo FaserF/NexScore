@@ -121,193 +121,181 @@ class Phase10Screen extends ConsumerWidget {
           ),
         ],
       ),
-      body: SafeArea(
-        bottom: true,
-        child: Column(
-          children: [
-            // Phase legend button
-            InkWell(
-              onTap: () => _showPhaseLegend(context),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.info_outline, size: 16),
-                    const SizedBox(width: 6),
-                    Text(
-                      l10n.get('phase10_legend_tap'),
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
+      body: Column(
+        children: [
+          // Phase legend button
+          InkWell(
+            onTap: () => _showPhaseLegend(context),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.info_outline, size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    l10n.get('phase10_legend_tap'),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
               ),
             ),
-            Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.only(bottom: 16),
-                itemCount: players.length,
-                separatorBuilder: (context, _) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final p = players[index];
-                  final pState =
-                      gameState.playerStates[p.id] ??
-                      const Phase10PlayerState();
-                  final isLeader = leaders.isNotEmpty && leaders.first == p.id;
-                  final isLast =
-                      leaders.isNotEmpty &&
-                      leaders.last == p.id &&
-                      players.length > 1;
+          ),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.only(bottom: 16),
+              itemCount: players.length,
+              separatorBuilder: (context, _) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final p = players[index];
+                final pState =
+                    gameState.playerStates[p.id] ?? const Phase10PlayerState();
+                final isLeader = leaders.isNotEmpty && leaders.first == p.id;
+                final isLast =
+                    leaders.isNotEmpty &&
+                    leaders.last == p.id &&
+                    players.length > 1;
 
-                  final phase = Phase10Phase.values[pState.currentPhase - 1];
-                  final phaseTitle = _labelForPhase(phase, l10n, isTitle: true);
-                  final phaseDesc = _labelForPhase(phase, l10n, isTitle: false);
+                final phase = Phase10Phase.values[pState.currentPhase - 1];
+                final phaseTitle = _labelForPhase(phase, l10n, isTitle: true);
+                final phaseDesc = _labelForPhase(phase, l10n, isTitle: false);
 
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
+                  leading: CircleAvatar(
+                    backgroundColor: Color(
+                      int.parse(p.avatarColor.replaceFirst('#', '0xff')),
                     ),
-                    leading: CircleAvatar(
-                      backgroundColor: Color(
-                        int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+                    child: isLeader
+                        ? const Icon(Icons.star, color: Colors.amber, size: 20)
+                        : Text(p.name.substring(0, 1).toUpperCase()),
+                  ),
+                  title: Text(
+                    p.name,
+                    style: TextStyle(
+                      fontWeight: isLeader
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isLast ? Colors.red : null,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$phaseTitle: $phaseDesc',
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
-                      child: isLeader
-                          ? const Icon(
-                              Icons.star,
-                              color: Colors.amber,
-                              size: 20,
-                            )
-                          : Text(p.name.substring(0, 1).toUpperCase()),
-                    ),
-                    title: Text(
-                      p.name,
-                      style: TextStyle(
-                        fontWeight: isLeader
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                        color: isLast ? Colors.red : null,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      if (gameState.variant == Phase10Variant.masters &&
+                          pState.completedPhases.isNotEmpty)
                         Text(
-                          '$phaseTitle: $phaseDesc',
-                          style: Theme.of(context).textTheme.bodySmall,
+                          l10n.getWith('phase10_done', [
+                            pState.completedPhases.toList().toString(),
+                          ]),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.green.shade700),
                         ),
-                        if (gameState.variant == Phase10Variant.masters &&
-                            pState.completedPhases.isNotEmpty)
-                          Text(
-                            l10n.getWith('phase10_done', [
-                              pState.completedPhases.toList().toString(),
-                            ]),
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: Colors.green.shade700),
-                          ),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (gameState.variant == Phase10Variant.masters)
-                          _MastersPhaseSelector(
-                            currentPhase: pState.currentPhase,
-                            completedPhases: pState.completedPhases,
-                            onChanged: (p) => ref
-                                .read(phase10StateProvider.notifier)
-                                .selectMastersPhase(p.toString(), p),
-                            playerId: p.id,
-                            ref: ref,
-                            l10n: l10n,
-                          )
-                        else
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.remove_circle_outline),
-                                onPressed: pState.currentPhase > 1
-                                    ? () {
-                                        final states =
-                                            Map<
-                                              String,
-                                              Phase10PlayerState
-                                            >.from(gameState.playerStates);
-                                        states[p.id] = pState.copyWith(
-                                          currentPhase: pState.currentPhase - 1,
-                                        );
-                                        ref
-                                            .read(phase10StateProvider.notifier)
-                                            .setFullState(
-                                              gameState.copyWith(
-                                                playerStates: states,
-                                              ),
-                                            );
-                                      }
-                                    : null,
-                              ),
-                              SizedBox(
-                                width: 28,
-                                child: Text(
-                                  '${pState.currentPhase}',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
+                    ],
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (gameState.variant == Phase10Variant.masters)
+                        _MastersPhaseSelector(
+                          currentPhase: pState.currentPhase,
+                          completedPhases: pState.completedPhases,
+                          onChanged: (p) => ref
+                              .read(phase10StateProvider.notifier)
+                              .selectMastersPhase(p.toString(), p),
+                          playerId: p.id,
+                          ref: ref,
+                          l10n: l10n,
+                        )
+                      else
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle_outline),
+                              onPressed: pState.currentPhase > 1
+                                  ? () {
+                                      final states =
+                                          Map<String, Phase10PlayerState>.from(
+                                            gameState.playerStates,
+                                          );
+                                      states[p.id] = pState.copyWith(
+                                        currentPhase: pState.currentPhase - 1,
+                                      );
+                                      ref
+                                          .read(phase10StateProvider.notifier)
+                                          .setFullState(
+                                            gameState.copyWith(
+                                              playerStates: states,
+                                            ),
+                                          );
+                                    }
+                                  : null,
+                            ),
+                            SizedBox(
+                              width: 28,
+                              child: Text(
+                                '${pState.currentPhase}',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                 ),
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.add_circle_outline),
-                                onPressed: pState.currentPhase < 10
-                                    ? () => ref
-                                          .read(phase10StateProvider.notifier)
-                                          .advancePhase(p.id)
-                                    : null,
-                              ),
-                            ],
-                          ),
-                        const SizedBox(width: 8),
-                        InkWell(
-                          onTap: () =>
-                              _showPointsDialog(context, ref, p, pState, l10n),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 8,
                             ),
-                            decoration: BoxDecoration(
+                            IconButton(
+                              icon: const Icon(Icons.add_circle_outline),
+                              onPressed: pState.currentPhase < 10
+                                  ? () => ref
+                                        .read(phase10StateProvider.notifier)
+                                        .advancePhase(p.id)
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () =>
+                            _showPointsDialog(context, ref, p, pState, l10n),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${pState.totalScore}',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                               color: Theme.of(
                                 context,
-                              ).colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '${pState.totalScore}',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onPrimaryContainer,
-                              ),
+                              ).colorScheme.onPrimaryContainer,
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

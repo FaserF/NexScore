@@ -340,6 +340,97 @@ class AppLocalizations {
       'account_sign_in_error': 'Sign-in failed: {0}',
       'account_data_stay_note':
           'Your local data remains on this device when you sign out.',
+      'error_name_taken': 'A player with this name already exists.',
+
+      // ── SipDeck Cards (EN)
+      'sd_card_w001':
+          '{0}, name three things you can see that are blue. Fail? Take 2 sips.',
+      'sd_card_w002':
+          'Waterfall! {0} starts. Everyone follows. Stop only when the person to your left stops.',
+      'sd_card_w003':
+          '{0} gives {1} a compliment. {1} must respond in a made-up language. Fail? Take 3 sips.',
+      'sd_card_w004':
+          'Group votes: who would survive a zombie apocalypse? Fewest votes = 2 sips.',
+      'sd_card_w005':
+          '{0}, 10 seconds to name 5 animals. Miss any? Drink 1 sip per miss.',
+      'sd_card_w006': 'Thumb war! {0} vs {1}. Loser takes 2 sips.',
+      'sd_card_w007': 'Everyone wearing socks takes 1 sip.',
+      'sd_card_w008':
+          '{0}, do your best celebrity impression. Bad impression? Take 3 sips.',
+      'sd_card_w009':
+          'Never Have I Ever: {0} starts. Go around the circle once.',
+      'sd_card_w010':
+          '{0} and {1} have a staring contest. First to blink takes 2 sips.',
+      'sd_card_w011':
+          'Rock Paper Scissors tournament. Last place takes 3 sips.',
+      'sd_card_w012':
+          '{0}, mimic the person to your left for the next 2 minutes. Forget? Take 2 sips.',
+      'sd_card_w013':
+          'Group vote: who talks the most? That person takes 2 sips.',
+      'sd_card_wc001':
+          '{0} must speak like a pirate for the next 3 rounds, or take 4 sips.',
+      'sd_card_wc002':
+          'Make a rule. {0} creates a rule everyone must follow this round. Break it? 2 sips.',
+      'sd_card_wc003':
+          '{0}, you have a new name: "{1}". Anyone using your real name drinks 1 sip.',
+      'sd_card_wc004':
+          '{0} assigns one sip each to three different people. No questions asked.',
+      'sd_card_wc005': 'CHALLENGE: {0} does 10 jumping jacks, or takes 5 sips.',
+      'sd_card_wc006':
+          'Telephone! {0} whispers a phrase, it goes around. Wrong at the end? Take 3 sips.',
+      'sd_card_wc007':
+          'Everyone on their phones: screenshot your last search. Most embarrassing? Take 3 sips.',
+      'sd_card_wc008':
+          '{0}, every time you laugh for the next 5 minutes, take 1 sip.',
+      'sd_card_wc009':
+          'VIRUS CURED: The ongoing rule ends. Everyone else takes 1 sip in celebration.',
+      'sd_card_wc010':
+          '{0} draws a portrait of {1} without looking at the paper. Worst drawing? Drink 3.',
+      'sd_card_wc011':
+          'Group challenge: plank position. Last one standing gives out 5 sips.',
+      'sd_card_f001':
+          '{0}, give {1} a genuine compliment about their style. If you blush, take 2 sips.',
+      'sd_card_f002':
+          '{0} and {1} have 30 seconds to find one thing in common. Fail? Both take 3 sips.',
+      'sd_card_f003':
+          '{0}, text your most recent contact a heart emoji. Refuse? Take 2 sips.',
+      'sd_card_f004':
+          'Everyone votes: cutest smile in the room. That person gives out 3 sips.',
+      'sd_card_f005':
+          '{0}, describe your crush without naming them. Group tries to guess.',
+      'sd_card_f006': 'Truth: {0}, rate each person 1–10. Refuse? Take 4 sips.',
+      'sd_card_f007':
+          'Everyone writes a one-word compliment for {0}. {0} guesses who wrote each. Wrong? 1 sip each.',
+      'sd_card_b001':
+          '{0} starts a toast. Everyone adds a sentence. Break the flow? Take 2 sips.',
+      'sd_card_b002':
+          'Guess the price of the most expensive drink here. Furthest off takes 2 sips.',
+      'sd_card_b003':
+          'Everyone orders something they have never tried before, or takes 2 sips.',
+      'sd_card_b004':
+          '{0} must say "cheers" in 3 languages this round, or 1 sip per missing language.',
+      'sd_card_b005':
+          'Group: everyone stands and switches seats. Last to sit takes 2 sips.',
+      'sd_card_b006':
+          '{0}, talk to a stranger for at least 1 minute. Fail? Take 4 sips.',
+      'sd_card_l001':
+          '{0}, walk like a penguin to the other end of the room and back.',
+      'sd_card_l002':
+          'VIRUS: {0} must end every sentence with "and that\'s the tea" for the next 5 cards, or take 2 sips.',
+      'sd_card_l003':
+          '{0}, narrate what is happening right now as a nature documentary. 60 seconds.',
+      'sd_card_l004':
+          'Everyone says the funniest word they know at the same time. Best word gives out 2 sips.',
+      'sd_card_l005':
+          '{0} can only ask questions for the next 2 minutes. Statements? 1 sip each.',
+      'sd_card_l006':
+          '{0}, explain your job using only hand gestures. Nobody guesses in 30s? Take 3 sips.',
+      'sd_card_l007':
+          '{0}, invent a new word and use it convincingly. Group votes if it sounds real.',
+      'sd_card_l008':
+          'Speed round: name a film, a song, and a city starting with the letter the person to your left picks.',
+      'sd_card_l009':
+          '{0}, speak in slow motion for the next 3 turns or take 3 sips.',
     },
     'de': {
       // ── Navigation
@@ -651,7 +742,7 @@ class AppLocalizations {
       'sipdeck_players_ready': '{0} Spieler bereit',
       'sipdeck_start': 'SPIEL STARTEN',
       'sipdeck_tap_continue': 'Tippe irgendwo für die nächste Karte',
-      'sipdeck_sips': '{0} Schlucke',
+      'sipdeck_sips': '{0} Schlücke',
       'sipdeck_categories': 'Kategorien',
       'sipdeck_no_players': 'Füge zuerst Spieler hinzu, um SipDeck zu spielen.',
       'sipdeck_18_warning': 'Ab 18 Jahren freigegeben.',
@@ -678,6 +769,99 @@ class AppLocalizations {
       'account_sign_in_error': 'Anmeldung fehlgeschlagen: {0}',
       'account_data_stay_note':
           'Deine lokalen Daten bleiben auf diesem Gerät gespeichert, wenn du dich abmeldest.',
+      'error_name_taken': 'Ein Spieler mit diesem Namen existiert bereits.',
+
+      // ── SipDeck Cards (DE)
+      'sd_card_w001':
+          '{0}, nenne drei Dinge, die du siehst und die blau sind. Vergessen? Trinke 2 Schlücke.',
+      'sd_card_w002':
+          'Wasserfall! {0} beginnt. Alle folgen. Hör erst auf, wenn die Person links von dir aufhört.',
+      'sd_card_w003':
+          '{0} gibt {1} ein Kompliment. {1} muss in einer erfundenen Sprache antworten. Vergessen? Trinke 3 Schlücke.',
+      'sd_card_w004':
+          'Abstimmung: Wer würde eine Zombie-Apokalypse überleben? Wenigste Stimmen = 2 Schlücke.',
+      'sd_card_w005':
+          '{0}, nenne in 10 Sekunden 5 Tiere. Jedes fehlende Tier = 1 Schluck.',
+      'sd_card_w006':
+          'Daumencatchen! {0} gegen {1}. Verlierer trinkt 2 Schlücke.',
+      'sd_card_w007': 'Alle, die Socken tragen, trinken 1 Schluck.',
+      'sd_card_w008':
+          '{0}, mache deine beste Promi-Imitation. Schlecht? Trinke 3 Schlucke.',
+      'sd_card_w009': 'Noch nie habe ich: {0} beginnt. Einmal die Runde herum.',
+      'sd_card_w010':
+          '{0} und {1}: Starre-Wettbewerb. Wer zuerst blinzelt, trinkt 2 Schlücke.',
+      'sd_card_w011':
+          'Schere-Stein-Papier-Turnier. Der Letzte trinkt 3 Schlücke.',
+      'sd_card_w012':
+          '{0}, ahme die Person links von dir für die nächsten 2 Minuten nach. Vergessen? Trinke 2 Schlücke.',
+      'sd_card_w013':
+          'Abstimmung: Wer redet am meisten? Diese Person trinkt 2 Schlücke.',
+      'sd_card_wc001':
+          '{0} muss für die nächsten 3 Runden wie ein Pirat sprechen, oder 4 Schlücke trinken.',
+      'sd_card_wc002':
+          'Regel erstellen! {0} denkt sich eine Regel aus, die für diese Runde gilt. Bruch? 2 Schlucke.',
+      'sd_card_wc003':
+          '{0}, du hast einen neuen Namen: "{1}". Wer deinen echten Namen benutzt, trinkt 1 Schluck.',
+      'sd_card_wc004':
+          '{0} verteilt jeweils einen Schluck an drei verschiedene Personen. Keine Fragen erlaubt.',
+      'sd_card_wc005':
+          'CHALLENGE: {0} macht 10 Hampelmänner oder trinkt 5 Schlucke.',
+      'sd_card_wc006':
+          'Stille Post! {0} flüstert einen Satz. Falsch am Ende? Trinke 3 Schlucke.',
+      'sd_card_wc007':
+          'Alle am Handy: Screenshot von der letzten Suche zeigen. Am peinlichsten? Trinke 3 Schlucke.',
+      'sd_card_wc008':
+          '{0}, jedes Mal wenn du in den nächsten 5 Minuten lachst, trinke 1 Schluck.',
+      'sd_card_wc009':
+          'VIRUS GEHEILT: Die aktive Regel endet. Alle anderen trinken 1 Schluck zur Feier.',
+      'sd_card_wc010':
+          '{0} zeichnet ein Porträt von {1}, ohne auf das Papier zu schauen. Schlechteste Zeichnung? Trinke 3.',
+      'sd_card_wc011':
+          'Gruppen-Challenge: Planken! Wer zuletzt aufgibt, darf 5 Schlucke verteilen.',
+      'sd_card_f001':
+          '{0}, mache {1} ein echtes Kompliment über den Style. Wenn du rot wirst, trinke 2 Schlucke.',
+      'sd_card_f002':
+          '{0} und {1} haben 30 Sekunden Zeit, eine Gemeinsamkeit zu finden. Scheitern? Beide 3 Schlucke.',
+      'sd_card_f003':
+          '{0}, schreibe dem letzten Kontakt ein Herz-Emoji. Verweigern? Trinke 2 Schlucke.',
+      'sd_card_f004':
+          'Abstimmung: Schönstes Lächeln im Raum. Diese Person darf 3 Schlucke verteilen.',
+      'sd_card_f005':
+          '{0}, beschreibe deinen Schwarm, ohne den Namen zu nennen. Die Gruppe rät.',
+      'sd_card_f006':
+          'Wahrheit: {0}, bewerte jede Person von 1–10. Verweigern? Trinke 4 Schlucke.',
+      'sd_card_f007':
+          'Jeder schreibt ein Ein-Wort-Kompliment für {0}. {0} rät, von wem es ist. Falsch? 1 Schluck jeweils.',
+      'sd_card_b001':
+          '{0} beginnt einen Trinkspruch. Jeder fügt einen Satz hinzu. Fehler? Trinke 2 Schlucke.',
+      'sd_card_b002':
+          'Rate den Preis des teuersten Getränks hier. Am weitesten weg? Trinke 2 Schlucke.',
+      'sd_card_b003':
+          'Alle bestellen etwas, das sie noch nie probiert haben, oder trinken 2 Schlucke.',
+      'sd_card_b004':
+          '{0} muss diese Runde "Prost" in 3 Sprachen sagen. Pro fehlender Sprache 1 Schluck.',
+      'sd_card_b005':
+          'Alle stehen auf und tauschen Sitzplätze. Der Letzte trinkt 2 Schlucke.',
+      'sd_card_b006':
+          '{0}, rede für mindestens 1 Minute mit einem Fremden. Scheitern? Trinke 4 Schlucke.',
+      'sd_card_l001':
+          '{0}, watschele wie ein Pinguin ans andere Ende des Raums und zurück.',
+      'sd_card_l002':
+          'VIRUS: {0} muss die nächsten 5 Karten jeden Satz mit "und das ist Tee-Zeit" beenden. Vergessen? 2 Schlucke.',
+      'sd_card_l003':
+          '{0}, kommentiere das aktuelle Geschehen für 60s wie eine Naturdokumentation.',
+      'sd_card_l004':
+          'Alle sagen gleichzeitig das lustigste Wort, das sie kennen. Bestes Wort darf 2 Schlucke verteilen.',
+      'sd_card_l005':
+          '{0} darf für die nächsten 2 Minuten nur Fragen stellen. Aussage getätigt? 1 Schluck.',
+      'sd_card_l006':
+          '{0}, erkläre deinen Job nur mit Handbewegungen. Keiner rät nach 30s? Trinke 3 Schlucke.',
+      'sd_card_l007':
+          '{0}, erfinde ein neues Wort und nutze es überzeugend. Die Gruppe stimmt ab.',
+      'sd_card_l008':
+          'Schnellrunde: Nenne einen Film, ein Lied und eine Stadt mit dem Anfangsbuchstaben, den die Person links wählt.',
+      'sd_card_l009':
+          '{0}, sprich für die nächsten 3 Runden in Zeitlupe oder trinke 3 Schlucke.',
     },
   };
 
