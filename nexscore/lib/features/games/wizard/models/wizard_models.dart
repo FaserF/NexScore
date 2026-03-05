@@ -6,17 +6,20 @@ class WizardRound {
   final int roundIndex;
   final Map<String, int> bids;
   final Map<String, int> tricks;
+  final int blownTricks; // For special cards like "Bomb" in Extreme variant
 
   const WizardRound({
     required this.roundIndex,
     this.bids = const {},
     this.tricks = const {},
+    this.blownTricks = 0,
   });
 
   Map<String, dynamic> toJson() => {
     'roundIndex': roundIndex,
     'bids': bids,
     'tricks': tricks,
+    'blownTricks': blownTricks,
   };
 
   factory WizardRound.fromJson(Map<String, dynamic> json) {
@@ -24,6 +27,7 @@ class WizardRound {
       roundIndex: json['roundIndex'] as int,
       bids: Map<String, int>.from(json['bids'] as Map),
       tricks: Map<String, int>.from(json['tricks'] as Map),
+      blownTricks: json['blownTricks'] as int? ?? 0,
     );
   }
 
@@ -31,11 +35,13 @@ class WizardRound {
     int? roundIndex,
     Map<String, int>? bids,
     Map<String, int>? tricks,
+    int? blownTricks,
   }) {
     return WizardRound(
       roundIndex: roundIndex ?? this.roundIndex,
       bids: bids ?? this.bids,
       tricks: tricks ?? this.tricks,
+      blownTricks: blownTricks ?? this.blownTricks,
     );
   }
 }
