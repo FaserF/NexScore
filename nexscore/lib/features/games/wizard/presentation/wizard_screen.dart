@@ -184,13 +184,27 @@ class WizardScreen extends ConsumerWidget {
                   title: Text(
                     '${l10n.get('wizard_round')} ${round.roundIndex}',
                   ),
-                  subtitle: Text(
-                    players
-                        .map(
-                          (p) =>
-                              '${p.name}: ${l10n.get('wizard_bid')} ${round.bids[p.id] ?? 0} / ${l10n.get('wizard_won')} ${round.tricks[p.id] ?? 0}',
-                        )
-                        .join(' · '),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        players
+                            .map(
+                              (p) =>
+                                  '${p.name}: ${l10n.get('wizard_bid')} ${round.bids[p.id] ?? 0} / ${l10n.get('wizard_won')} ${round.tricks[p.id] ?? 0}',
+                            )
+                            .join(' · '),
+                      ),
+                      if (round.blownTricks > 0)
+                        Text(
+                          '${l10n.get('wizard_bombs')}: ${round.blownTricks}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                    ],
                   ),
                 );
               }).toList(),
