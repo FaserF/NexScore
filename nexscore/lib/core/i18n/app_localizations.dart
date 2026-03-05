@@ -20,6 +20,7 @@ class AppLocalizations {
       'nav_history': 'History',
       'nav_leaderboard': 'Leaderboard',
       'nav_account': 'Account',
+      'account': 'Account',
       'nav_help': 'Help',
 
       // ── General
@@ -298,7 +299,7 @@ class AppLocalizations {
       'history_players': 'Players',
       'history_share_tooltip': 'Share result',
       'history_copied': 'Result copied to clipboard!',
-      'history_pts': 'pts',
+      'history_pts': 'Pts',
       'history_no_sessions': 'No completed sessions yet.',
 
       // ── Leaderboard
@@ -306,8 +307,8 @@ class AppLocalizations {
       'leaderboard_empty':
           'No game history yet. Play some games to see rankings!',
       'leaderboard_wins': 'W',
-      'leaderboard_games': 'games',
-      'leaderboard_win_rate': 'win rate',
+      'leaderboard_games': 'Games',
+      'leaderboard_win_rate': 'Win Rate',
       'leaderboard_score': 'Score',
 
       // ── SipDeck
@@ -442,6 +443,7 @@ class AppLocalizations {
       'nav_history': 'Verlauf',
       'nav_leaderboard': 'Rangliste',
       'nav_account': 'Konto',
+      'account': 'Konto',
       'nav_help': 'Hilfe',
 
       // ── General
