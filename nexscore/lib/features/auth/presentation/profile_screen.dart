@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,6 +58,17 @@ class AuthService {
   Future<Result<UserCredential>> signInWithGoogleNative() async {
     final stopwatch = Stopwatch()..start();
     try {
+      // Check if Firebase is available
+      try {
+        Firebase.app();
+      } catch (_) {
+        return Result.failure(
+          const AuthFailure(
+            'Firebase not initialized. Check your Web configuration/Secrets.',
+          ),
+        );
+      }
+
       final googleProvider = GoogleAuthProvider();
       UserCredential credential;
       if (kIsWeb) {
@@ -100,6 +112,17 @@ class AuthService {
   Future<Result<UserCredential>> signInWithGithub() async {
     final stopwatch = Stopwatch()..start();
     try {
+      // Check if Firebase is available
+      try {
+        Firebase.app();
+      } catch (_) {
+        return Result.failure(
+          const AuthFailure(
+            'Firebase not initialized. Check your Web configuration/Secrets.',
+          ),
+        );
+      }
+
       final githubProvider = GithubAuthProvider();
       githubProvider.addScope('gist');
       githubProvider.setCustomParameters({'allow_signup': 'false'});

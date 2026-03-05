@@ -23,27 +23,27 @@ build/
 # -----------------------------------------------
 # Android
 # -----------------------------------------------
-score_play/android/.gradle/
-score_play/android/captures/
-score_play/android/gradlew
-score_play/android/gradlew.bat
-score_play/android/local.properties
-score_play/android/GeneratedPluginRegistrant.java
-score_play/android/key.properties
-score_play/android/app/google-services.json
+nexscore/android/.gradle/
+nexscore/android/captures/
+nexscore/android/gradlew
+nexscore/android/gradlew.bat
+nexscore/android/local.properties
+nexscore/android/GeneratedPluginRegistrant.java
+nexscore/android/key.properties
+nexscore/android/app/google-services.json
 
 # -----------------------------------------------
 # iOS / macOS
 # -----------------------------------------------
-score_play/ios/.last_build_id
-score_play/ios/Flutter/App.framework
-score_play/ios/Flutter/Flutter.framework
-score_play/ios/Flutter/Generated.xcconfig
-score_play/ios/Flutter/app.flx
-score_play/ios/Flutter/flutter_export_environment.sh
-score_play/ios/Runner/GoogleService-Info.plist
-score_play/ios/Podfile.lock
-score_play/ios/Pods/
+nexscore/ios/.last_build_id
+nexscore/ios/Flutter/App.framework
+nexscore/ios/Flutter/Flutter.framework
+nexscore/ios/Flutter/Generated.xcconfig
+nexscore/ios/Flutter/app.flx
+nexscore/ios/Flutter/flutter_export_environment.sh
+nexscore/ios/Runner/GoogleService-Info.plist
+nexscore/ios/Podfile.lock
+nexscore/ios/Pods/
 *.xcworkspace
 xcuserdata/
 *.mode1v3
@@ -56,17 +56,17 @@ xcuserdata/
 !default.pbxuser
 !default.perspectivev3
 
-score_play/macos/Flutter/GeneratedPluginRegistrant.swift
+nexscore/macos/Flutter/GeneratedPluginRegistrant.swift
 
 # -----------------------------------------------
 # Web
 # -----------------------------------------------
-score_play/web/flutter_service_worker.js
+nexscore/web/flutter_service_worker.js
 
 # -----------------------------------------------
 # Firebase
 # -----------------------------------------------
-score_play/lib/firebase_options.dart
+nexscore/lib/firebase_options.dart
 google-services.json
 GoogleService-Info.plist
 .firebaserc

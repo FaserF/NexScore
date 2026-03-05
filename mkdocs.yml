@@ -1,6 +1,8 @@
 site_name: NexScore Documentation
 site_description: Professional game score tracking application.
 site_url: https://faserf.github.io/NexScore/docs/
+repo_url: https://github.com/FaserF/NexScore
+repo_name: FaserF/NexScore
 
 theme:
   name: material
@@ -53,4 +55,6 @@ nav:
   - Community:
       - Discussions: https://github.com/FaserF/NexScore/discussions
       - Issue Tracker: https://github.com/FaserF/NexScore/issues
+      - GitHub Repository: https://github.com/FaserF/NexScore
+      - GitHub Releases: https://github.com/FaserF/NexScore/releases
   - Launch App: ../

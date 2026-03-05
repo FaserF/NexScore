@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'core/firebase/firebase_options_web.dart';
+
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/i18n/app_localizations.dart';
@@ -13,9 +16,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Basic initialization. On Web, options are required but if missing,
-    // we should at least catch the specific error gracefully.
-    await Firebase.initializeApp();
+    if (kIsWeb && FirebaseOptionsWeb.isConfigured) {
+      await Firebase.initializeApp(options: FirebaseOptionsWeb.currentPlatform);
+    } else {
+      // Basic initialization for mobile (uses google-services.json / plist)
+      await Firebase.initializeApp();
+    }
   } catch (e) {
     debugPrint('Firebase initialization skipped: $e');
   }

@@ -117,6 +117,8 @@ jobs:
       image_name: ${{ steps.image_name.outputs.IMAGE_NAME }}
     steps:
       - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
@@ -135,7 +137,9 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./nexscore
+          platforms: linux/amd64,linux/arm64
           push: true
+          provenance: false
           build-args: |
             APP_VERSION=${{ needs.version-calc.outputs.version_name }}
             IS_BETA=${{ github.event.inputs.release_type == 'beta' }}

@@ -135,6 +135,14 @@ class PlayersScreen extends ConsumerWidget {
                               ),
                               IconButton(
                                 icon: Icon(
+                                  Icons.edit_outlined,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                onPressed: () =>
+                                    _showEditPlayerDialog(context, ref, player),
+                              ),
+                              IconButton(
+                                icon: Icon(
                                   Icons.delete_outline,
                                   color: Theme.of(context).colorScheme.error,
                                 ),
@@ -240,6 +248,55 @@ class PlayersScreen extends ConsumerWidget {
                 Navigator.pop(dialogContext);
               },
               child: Text(l10n.get('add')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditPlayerDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Player player,
+  ) {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController(text: player.name);
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.get('edit_player')),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: l10n.get('player_name')),
+            autofocus: true,
+            onSubmitted: (_) {
+              final name = controller.text.trim();
+              if (name.isNotEmpty) {
+                final updatedPlayer = player.copyWith(name: name);
+                ref.read(playersProvider.notifier).updatePlayer(updatedPlayer);
+              }
+              Navigator.pop(dialogContext);
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n.get('cancel')),
+            ),
+            FilledButton(
+              onPressed: () {
+                final name = controller.text.trim();
+                if (name.isNotEmpty) {
+                  final updatedPlayer = player.copyWith(name: name);
+                  ref
+                      .read(playersProvider.notifier)
+                      .updatePlayer(updatedPlayer);
+                }
+                Navigator.pop(dialogContext);
+              },
+              child: Text(l10n.get('save')),
             ),
           ],
         );

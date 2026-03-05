@@ -44,11 +44,15 @@ class WizardGameState {
   final List<WizardRound> rounds;
   final WizardScoringVariant scoringVariant;
   final bool ruleSticheDuertenNichtAufgehen;
+  final int customStartRound;
+  final Map<String, int>? currentRoundBids;
 
   const WizardGameState({
     this.rounds = const [],
     this.scoringVariant = WizardScoringVariant.standard,
     this.ruleSticheDuertenNichtAufgehen = false,
+    this.customStartRound = 1,
+    this.currentRoundBids,
   });
 
   bool get isLenientScoring => scoringVariant == WizardScoringVariant.lenient;
@@ -57,6 +61,8 @@ class WizardGameState {
     'rounds': rounds.map((r) => r.toJson()).toList(),
     'scoringVariant': scoringVariant.name,
     'ruleSticheDuertenNichtAufgehen': ruleSticheDuertenNichtAufgehen,
+    'customStartRound': customStartRound,
+    'currentRoundBids': currentRoundBids,
   };
 
   factory WizardGameState.fromJson(Map<String, dynamic> json) {
@@ -70,6 +76,10 @@ class WizardGameState {
       ),
       ruleSticheDuertenNichtAufgehen:
           json['ruleSticheDuertenNichtAufgehen'] as bool? ?? false,
+      customStartRound: json['customStartRound'] as int? ?? 1,
+      currentRoundBids: json['currentRoundBids'] != null
+          ? Map<String, int>.from(json['currentRoundBids'] as Map)
+          : null,
     );
   }
 
@@ -77,12 +87,19 @@ class WizardGameState {
     List<WizardRound>? rounds,
     WizardScoringVariant? scoringVariant,
     bool? ruleSticheDuertenNichtAufgehen,
+    int? customStartRound,
+    Map<String, int>? currentRoundBids,
+    bool resetBids = false,
   }) {
     return WizardGameState(
       rounds: rounds ?? this.rounds,
       scoringVariant: scoringVariant ?? this.scoringVariant,
       ruleSticheDuertenNichtAufgehen:
           ruleSticheDuertenNichtAufgehen ?? this.ruleSticheDuertenNichtAufgehen,
+      customStartRound: customStartRound ?? this.customStartRound,
+      currentRoundBids: resetBids
+          ? null
+          : (currentRoundBids ?? this.currentRoundBids),
     );
   }
 

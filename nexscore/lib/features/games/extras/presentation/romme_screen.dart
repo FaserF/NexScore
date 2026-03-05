@@ -93,20 +93,23 @@ class RommeScreen extends ConsumerWidget {
                     },
                   ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 110.0),
-            child: FilledButton.icon(
-              onPressed: () => _showAddRoundDialog(
-                context,
-                ref,
-                players,
-                gameState.rounds.length + 1,
-                l10n,
-              ),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.get('add_round')),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
+          SafeArea(
+            bottom: true,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+              child: FilledButton.icon(
+                onPressed: () => _showAddRoundDialog(
+                  context,
+                  ref,
+                  players,
+                  gameState.rounds.length + 1,
+                  l10n,
+                ),
+                icon: const Icon(Icons.add),
+                label: Text(l10n.get('add_round')),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
               ),
             ),
           ),

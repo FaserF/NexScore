@@ -151,7 +151,7 @@ class ArschlochScreen extends ConsumerWidget {
         ],
         Expanded(
           child: ListView.separated(
-            padding: const EdgeInsets.only(bottom: 110),
+            padding: const EdgeInsets.only(bottom: 16),
             itemCount: leaders.length,
             separatorBuilder: (_, _) => const Divider(height: 1),
             itemBuilder: (context, index) {
@@ -234,17 +234,20 @@ class ArschlochScreen extends ConsumerWidget {
             },
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
-          child: FilledButton.icon(
-            onPressed: () =>
-                _showRoundEntryDialog(context, ref, players, gameState, l10n),
-            icon: const Icon(Icons.add),
-            label: Text(
-              '${l10n.get('wizard_round')} ${gameState.rounds.length + 1}',
-            ),
-            style: FilledButton.styleFrom(
-              minimumSize: const Size(double.infinity, 50),
+        SafeArea(
+          bottom: true,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: FilledButton.icon(
+              onPressed: () =>
+                  _showRoundEntryDialog(context, ref, players, gameState, l10n),
+              icon: const Icon(Icons.add),
+              label: Text(
+                '${l10n.get('wizard_round')} ${gameState.rounds.length + 1}',
+              ),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+              ),
             ),
           ),
         ),

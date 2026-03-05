@@ -149,78 +149,84 @@ class SipDeckScreen extends ConsumerWidget {
               color: currentCard.isVirus
                   ? Colors.deepOrange.shade800
                   : _colorForCategory(currentCard.category),
-              padding: const EdgeInsets.fromLTRB(32, 32, 32, 120),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _labelForCategory(currentCard.category, l10n).toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-                  Text(
-                    currentCard.text,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-                  if (currentCard.sips > 0)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+              padding: const EdgeInsets.fromLTRB(32, 32, 32, 32),
+              child: SafeArea(
+                bottom: true,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _labelForCategory(
+                        currentCard.category,
+                        l10n,
+                      ).toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        letterSpacing: 2,
+                        fontWeight: FontWeight.bold,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.black26,
-                        borderRadius: BorderRadius.circular(30),
+                    ),
+                    const SizedBox(height: 48),
+                    Text(
+                      currentCard.text,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.4,
                       ),
-                      child: Text(
-                        l10n.getWith('sipdeck_sips', [
-                          currentCard.sips.toString(),
-                        ]),
-                        style: const TextStyle(
-                          fontSize: 24,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(height: 48),
+                    if (currentCard.sips > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black26,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Text(
+                          l10n.getWith('sipdeck_sips', [
+                            currentCard.sips.toString(),
+                          ]),
+                          style: const TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  if (currentCard.isVirus)
-                    Container(
-                      margin: const EdgeInsets.only(top: 12),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black38,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white30),
-                      ),
-                      child: const Text(
-                        '🦠 ONGOING RULE',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          letterSpacing: 1,
+                    if (currentCard.isVirus)
+                      Container(
+                        margin: const EdgeInsets.only(top: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black38,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white30),
+                        ),
+                        child: const Text(
+                          '🦠 ONGOING RULE',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            letterSpacing: 1,
+                          ),
                         ),
                       ),
+                    const Spacer(),
+                    Text(
+                      l10n.get('sipdeck_tap_continue'),
+                      style: const TextStyle(color: Colors.white54),
                     ),
-                  const Spacer(),
-                  Text(
-                    l10n.get('sipdeck_tap_continue'),
-                    style: const TextStyle(color: Colors.white54),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -42,6 +42,12 @@ class WizardScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => _showSettingsDialog(context, ref, state),
+            tooltip: l10n.get('settings'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            onPressed: () => _showEndGameDialog(context, ref),
+            tooltip: l10n.get('wizard_end_game'),
           ),
         ],
       ),
@@ -70,6 +76,55 @@ class WizardScreen extends ConsumerWidget {
               ],
             ),
 
+          // Active Round / Current Predictions
+          if (state.currentRoundBids != null)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Card(
+                elevation: 4,
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound}',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          Chip(label: Text(l10n.get('wizard_predictions'))),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 8,
+                        children: players.map((p) {
+                          return Column(
+                            children: [
+                              Text(
+                                p.name,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              Text(
+                                (state.currentRoundBids![p.id] ?? 0).toString(),
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
           // Scoreboard
           Expanded(
             child: ListView.builder(
@@ -90,21 +145,19 @@ class WizardScreen extends ConsumerWidget {
                     child: Text(p.name.substring(0, 1).toUpperCase()),
                   ),
                   title: Text(p.name),
-                  subtitle: Text(
-                    l10n.getWith('wizard_history', [
-                      state.rounds.length.toString(),
-                    ]),
-                  ),
-                  trailing: Text(
-                    score.toString(),
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: score >= 0
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.error,
-                    ),
-                  ),
+                  subtitle: Text('${l10n.get('leaderboard_score')}: $score'),
+                  trailing: state.rounds.isEmpty
+                      ? null
+                      : Text(
+                          score >= 0 ? '+$score' : score.toString(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: score >= 0
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.error,
+                          ),
+                        ),
                 );
               },
             ),
@@ -136,19 +189,29 @@ class WizardScreen extends ConsumerWidget {
               }).toList(),
             ),
 
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 110.0),
-            child: FilledButton.icon(
-              onPressed: () =>
-                  _showRoundInputDialog(context, ref, state, players),
-              icon: const Icon(Icons.add),
-              label: Text(
-                l10n.getWith('wizard_next_round', [
-                  (state.rounds.length + 1).toString(),
-                ]),
-              ),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
+          SafeArea(
+            bottom: true,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+              child: FilledButton.icon(
+                onPressed: () {
+                  if (state.currentRoundBids == null) {
+                    _showPredictionDialog(context, ref, state, players);
+                  } else {
+                    _showResultsDialog(context, ref, state, players);
+                  }
+                },
+                icon: Icon(
+                  state.currentRoundBids == null ? Icons.edit : Icons.check,
+                ),
+                label: Text(
+                  state.currentRoundBids == null
+                      ? '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound} ${l10n.get('wizard_predictions')}'
+                      : '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound} ${l10n.get('wizard_actuals')}',
+                ),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                ),
               ),
             ),
           ),
@@ -224,6 +287,49 @@ class WizardScreen extends ConsumerWidget {
                   Navigator.pop(context);
                 },
               ),
+              const Divider(),
+              ListTile(
+                title: Text(l10n.get('wizard_start_round')),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.remove),
+                      onPressed: state.customStartRound > 1
+                          ? () {
+                              ref
+                                  .read(wizardStateProvider.notifier)
+                                  .updateState(
+                                    state.copyWith(
+                                      customStartRound:
+                                          state.customStartRound - 1,
+                                    ),
+                                  );
+                            }
+                          : null,
+                    ),
+                    Text(
+                      state.customStartRound.toString(),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        ref
+                            .read(wizardStateProvider.notifier)
+                            .updateState(
+                              state.copyWith(
+                                customStartRound: state.customStartRound + 1,
+                              ),
+                            );
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           actions: [
@@ -237,16 +343,118 @@ class WizardScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _showRoundInputDialog(
+  void _showEndGameDialog(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('wizard_end_game')),
+        content: Text(l10n.get('wizard_end_game_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              context.go('/games');
+            },
+            child: Text(l10n.get('ok')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showPredictionDialog(
     BuildContext context,
     WidgetRef ref,
     WizardGameState state,
     List<Player> players,
   ) async {
-    final roundIndex = state.rounds.length + 1;
+    final roundIndex = state.rounds.length + state.customStartRound;
     final Map<String, TextEditingController> bidControllers = {
       for (var p in players) p.id: TextEditingController(text: '0'),
     };
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        return AlertDialog(
+          title: Text(
+            '${l10n.get('wizard_round')} $roundIndex — ${l10n.get('wizard_predictions')}',
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ...players.map((p) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            p.name,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: 80,
+                          child: TextField(
+                            controller: bidControllers[p.id],
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              labelText: l10n.get('wizard_bid'),
+                              border: const OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.get('cancel')),
+            ),
+            FilledButton(
+              onPressed: () {
+                final bids = {
+                  for (var p in players)
+                    p.id: int.tryParse(bidControllers[p.id]!.text) ?? 0,
+                };
+                ref
+                    .read(wizardStateProvider.notifier)
+                    .updateState(state.copyWith(currentRoundBids: bids));
+                Navigator.pop(context);
+              },
+              child: Text(l10n.get('save')),
+            ),
+          ],
+        );
+      },
+    );
+
+    for (var c in bidControllers.values) {
+      c.dispose();
+    }
+  }
+
+  Future<void> _showResultsDialog(
+    BuildContext context,
+    WidgetRef ref,
+    WizardGameState state,
+    List<Player> players,
+  ) async {
+    final roundIndex = state.rounds.length + state.customStartRound;
     final Map<String, TextEditingController> trickControllers = {
       for (var p in players) p.id: TextEditingController(text: '0'),
     };
@@ -256,14 +464,13 @@ class WizardScreen extends ConsumerWidget {
       builder: (context) {
         final l10n = AppLocalizations.of(context);
         return AlertDialog(
-          title: Text('${l10n.get('wizard_round')} $roundIndex'),
+          title: Text(
+            '${l10n.get('wizard_round')} $roundIndex — ${l10n.get('wizard_actuals')}',
+          ),
           content: SingleChildScrollView(
             child: StatefulBuilder(
               builder: (context, setDialogState) {
                 final currentTricksSum = trickControllers.values
-                    .map((c) => int.tryParse(c.text) ?? 0)
-                    .fold(0, (a, b) => a + b);
-                final currentBidsSum = bidControllers.values
                     .map((c) => int.tryParse(c.text) ?? 0)
                     .fold(0, (a, b) => a + b);
 
@@ -271,100 +478,60 @@ class WizardScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 16,
-                      ),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Theme.of(
                           context,
                         ).colorScheme.primaryContainer.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Total Tricks: $currentTricksSum / $roundIndex',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: currentTricksSum == roundIndex
-                                  ? Colors.green
-                                  : Theme.of(context).colorScheme.error,
-                            ),
-                          ),
-                          Text(
-                            'Total Bids: $currentBidsSum',
-                            style: const TextStyle(fontWeight: FontWeight.w500),
-                          ),
-                        ],
+                      child: Text(
+                        'Total Tricks: $currentTricksSum / $roundIndex',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: currentTricksSum == roundIndex
+                              ? Colors.green
+                              : Theme.of(context).colorScheme.error,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     ...players.map((p) {
-                      final isLastPlayer = p.id == players.last.id;
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Row(
                           children: [
                             Expanded(
-                              child: Text(
-                                p.name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            SizedBox(
-                              width: 70,
-                              child: TextField(
-                                controller: bidControllers[p.id],
-                                keyboardType: TextInputType.number,
-                                textAlign: TextAlign.center,
-                                textInputAction: TextInputAction.next,
-                                decoration: InputDecoration(
-                                  labelText: l10n.get('wizard_bid'),
-                                  border: const OutlineInputBorder(),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 8,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    p.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                                onChanged: (_) => setDialogState(() {}),
+                                  Text(
+                                    '${l10n.get('wizard_bid')}: ${state.currentRoundBids?[p.id] ?? 0}',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(width: 8),
                             SizedBox(
-                              width: 70,
+                              width: 80,
                               child: TextField(
                                 controller: trickControllers[p.id],
                                 keyboardType: TextInputType.number,
                                 textAlign: TextAlign.center,
-                                textInputAction: isLastPlayer
-                                    ? TextInputAction.done
-                                    : TextInputAction.next,
                                 decoration: InputDecoration(
                                   labelText: l10n.get('wizard_won'),
                                   border: const OutlineInputBorder(),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 8,
-                                  ),
                                 ),
                                 onChanged: (_) => setDialogState(() {}),
-                                onSubmitted: isLastPlayer
-                                    ? (_) => _saveRound(
-                                        context,
-                                        ref,
-                                        state,
-                                        players,
-                                        roundIndex,
-                                        bidControllers,
-                                        trickControllers,
-                                        l10n,
-                                      )
-                                    : null,
                               ),
                             ),
                           ],
@@ -382,13 +549,12 @@ class WizardScreen extends ConsumerWidget {
               child: Text(l10n.get('cancel')),
             ),
             FilledButton(
-              onPressed: () => _saveRound(
+              onPressed: () => _saveResults(
                 context,
                 ref,
                 state,
                 players,
                 roundIndex,
-                bidControllers,
                 trickControllers,
                 l10n,
               ),
@@ -399,46 +565,36 @@ class WizardScreen extends ConsumerWidget {
       },
     );
 
-    for (var c in bidControllers.values) {
-      c.dispose();
-    }
     for (var c in trickControllers.values) {
       c.dispose();
     }
   }
 
-  void _saveRound(
+  void _saveResults(
     BuildContext context,
     WidgetRef ref,
     WizardGameState state,
     List<Player> players,
     int roundIndex,
-    Map<String, TextEditingController> bidControllers,
     Map<String, TextEditingController> trickControllers,
     AppLocalizations l10n,
   ) {
-    final newRound = WizardRound(
-      roundIndex: roundIndex,
-      bids: {
-        for (var p in players)
-          p.id: int.tryParse(bidControllers[p.id]!.text) ?? 0,
-      },
-      tricks: {
-        for (var p in players)
-          p.id: int.tryParse(trickControllers[p.id]!.text) ?? 0,
-      },
-    );
+    final Map<String, int> tricks = {
+      for (var p in players)
+        p.id: int.tryParse(trickControllers[p.id]!.text) ?? 0,
+    };
 
-    final tricksSum = newRound.tricks.values.fold<int>(
-      0,
-      (sum, val) => sum + val,
-    );
+    final tricksSum = tricks.values.fold<int>(0, (sum, val) => sum + val);
+
     if (tricksSum != roundIndex) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             l10n.getWith('error_msg', [
-              'Tricks sum ($tricksSum) must equal round number ($roundIndex).',
+              l10n.getWith('wizard_error_tricks', [
+                tricksSum.toString(),
+                roundIndex.toString(),
+              ]),
             ]),
           ),
           backgroundColor: Theme.of(context).colorScheme.error,
@@ -447,9 +603,17 @@ class WizardScreen extends ConsumerWidget {
       return;
     }
 
+    final newRound = WizardRound(
+      roundIndex: roundIndex,
+      bids: state.currentRoundBids ?? {},
+      tricks: tricks,
+    );
+
     ref
         .read(wizardStateProvider.notifier)
-        .updateState(state.copyWith(rounds: [...state.rounds, newRound]));
+        .updateState(
+          state.copyWith(rounds: [...state.rounds, newRound], resetBids: true),
+        );
     Navigator.pop(context);
   }
 }
