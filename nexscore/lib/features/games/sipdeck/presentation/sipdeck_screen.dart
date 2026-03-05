@@ -36,7 +36,7 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
       body: players.isEmpty
           ? Center(child: Text(l10n.get('sipdeck_no_players')))
           : state.playedCards.isEmpty
-          ? _buildStartScreen(context, ref, players, l10n)
+          ? _buildStartScreen(context, ref, state, players, l10n)
           : _buildCardScreen(context, ref, state, players, l10n),
     );
   }
@@ -44,6 +44,7 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
   Widget _buildStartScreen(
     BuildContext context,
     WidgetRef ref,
+    SipDeckGameState state,
     List<Player> players,
     AppLocalizations l10n,
   ) {
@@ -95,7 +96,50 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                   l10n.get('sipdeck_18_warning'),
                   style: const TextStyle(fontSize: 12, color: Colors.red),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
+                // Category Selection Section
+                Text(
+                  l10n.get('sipdeck_select_modes'),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: SipDeckCategory.values.map((cat) {
+                      final isSelected = state.selectedCategories.contains(cat);
+                      final label = _labelForCategory(cat, l10n);
+                      final icon = _iconForCategory(cat);
+                      final color = _colorForCategory(cat);
+
+                      return FilterChip(
+                        label: Text(label),
+                        avatar: Icon(icon, size: 16, color: color),
+                        selected: isSelected,
+                        onSelected: (_) {
+                          ref
+                              .read(sipDeckStateProvider.notifier)
+                              .toggleCategory(cat);
+                        },
+                        selectedColor: color.withValues(alpha: 0.2),
+                        checkmarkColor: color,
+                        labelStyle: TextStyle(
+                          color: isSelected ? color : null,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 32),
                 FilledButton.icon(
                   onPressed: () => ref
                       .read(sipDeckStateProvider.notifier)
@@ -157,7 +201,7 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
               color: currentCard.isVirus
                   ? Colors.deepOrange.shade800
                   : _colorForCategory(currentCard.category),
-              padding: const EdgeInsets.fromLTRB(32, 32, 32, 32),
+              padding: const EdgeInsets.fromLTRB(24, 48, 24, 32),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -168,20 +212,66 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                       color: Colors.white70,
                       letterSpacing: 2,
                       fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
                   ),
-                  const SizedBox(height: 48),
+                  const Spacer(),
+                  // Emoji Section
+                  if (currentCard.emoji != null)
+                    Text(
+                      currentCard.emoji!,
+                      style: const TextStyle(fontSize: 80),
+                    )
+                  else
+                    Icon(
+                      _iconForCategory(currentCard.category),
+                      size: 80,
+                      color: Colors.white24,
+                    ),
+                  const SizedBox(height: 32),
+                  // Main Challenge Text
                   Text(
                     currentCard.text,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 30,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      height: 1.4,
+                      height: 1.3,
                     ),
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 32),
+                  // Explanation Section
+                  if (currentCard.explanation != null)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.black12,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white10),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.info_outline,
+                            color: Colors.white70,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              currentCard.explanation!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.white70,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 32),
                   if (currentCard.sips > 0)
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -191,6 +281,13 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                       decoration: BoxDecoration(
                         color: Colors.black26,
                         borderRadius: BorderRadius.circular(30),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Text(
                         l10n.getWith('sipdeck_sips', [
@@ -205,7 +302,7 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                     ),
                   if (currentCard.isVirus)
                     Container(
-                      margin: const EdgeInsets.only(top: 12),
+                      margin: const EdgeInsets.only(top: 16),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,
@@ -215,18 +312,36 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: Colors.white30),
                       ),
-                      child: const Text(
-                        '🦠 ONGOING RULE',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          letterSpacing: 1,
-                        ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('🦠', style: TextStyle(fontSize: 16)),
+                          SizedBox(width: 8),
+                          Text(
+                            'ONGOING RULE',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   const Spacer(),
-                  Text(
-                    l10n.get('sipdeck_tap_continue'),
-                    style: const TextStyle(color: Colors.white54),
+                  // Interactive hint
+                  Column(
+                    children: [
+                      const Icon(Icons.touch_app, color: Colors.white38),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.get('sipdeck_tap_continue'),
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
