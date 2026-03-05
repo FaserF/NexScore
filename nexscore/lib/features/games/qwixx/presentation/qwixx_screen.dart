@@ -80,63 +80,58 @@ class _QwixxPlayerView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: true,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Text(
-                l10n.getWith('qwixx_score_label', [
-                  sheet.totalScore.toString(),
-                ]),
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Text(
+              l10n.getWith('qwixx_score_label', [sheet.totalScore.toString()]),
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
-            _buildRow(
-              context,
-              l10n.get('qwixx_red'),
-              Colors.red.shade300,
-              sheet.red,
-              true,
-              (list) => onUpdate(sheet.copyWith(red: list)),
-            ),
-            const SizedBox(height: 8),
-            _buildRow(
-              context,
-              l10n.get('qwixx_yellow'),
-              Colors.yellow.shade600,
-              sheet.yellow,
-              true,
-              (list) => onUpdate(sheet.copyWith(yellow: list)),
-            ),
-            const SizedBox(height: 8),
-            _buildRow(
-              context,
-              l10n.get('qwixx_green'),
-              Colors.green.shade400,
-              sheet.green,
-              false,
-              (list) => onUpdate(sheet.copyWith(green: list)),
-            ),
-            const SizedBox(height: 8),
-            _buildRow(
-              context,
-              l10n.get('qwixx_blue'),
-              Colors.blue.shade300,
-              sheet.blue,
-              false,
-              (list) => onUpdate(sheet.copyWith(blue: list)),
-            ),
-            const SizedBox(height: 24),
-            _buildPenaltiesRow(context),
-          ],
-        ),
+          ),
+          _buildRow(
+            context,
+            l10n.get('qwixx_red'),
+            Colors.red.shade300,
+            sheet.red,
+            true,
+            (list) => onUpdate(sheet.copyWith(red: list)),
+          ),
+          const SizedBox(height: 8),
+          _buildRow(
+            context,
+            l10n.get('qwixx_yellow'),
+            Colors.yellow.shade600,
+            sheet.yellow,
+            true,
+            (list) => onUpdate(sheet.copyWith(yellow: list)),
+          ),
+          const SizedBox(height: 8),
+          _buildRow(
+            context,
+            l10n.get('qwixx_green'),
+            Colors.green.shade400,
+            sheet.green,
+            false,
+            (list) => onUpdate(sheet.copyWith(green: list)),
+          ),
+          const SizedBox(height: 8),
+          _buildRow(
+            context,
+            l10n.get('qwixx_blue'),
+            Colors.blue.shade300,
+            sheet.blue,
+            false,
+            (list) => onUpdate(sheet.copyWith(blue: list)),
+          ),
+          const SizedBox(height: 24),
+          _buildPenaltiesRow(context),
+        ],
       ),
     );
   }
