@@ -7,19 +7,20 @@ import '../../../../core/providers/active_players_provider.dart';
 import '../models/sipdeck_models.dart';
 import '../providers/sipdeck_provider.dart';
 
-// Local provider for banner dismissal
-final sipDeckBannerDismissedProvider = StateProvider.autoDispose<bool>(
-  (ref) => false,
-);
-
-class SipDeckScreen extends ConsumerWidget {
+class SipDeckScreen extends ConsumerStatefulWidget {
   const SipDeckScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SipDeckScreen> createState() => _SipDeckScreenState();
+}
+
+class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
+  bool _isBannerDismissed = false;
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(sipDeckStateProvider);
     final players = ref.watch(activePlayersProvider);
-    final isBannerDismissed = ref.watch(sipDeckBannerDismissedProvider);
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -35,7 +36,7 @@ class SipDeckScreen extends ConsumerWidget {
       body: players.isEmpty
           ? Center(child: Text(l10n.get('sipdeck_no_players')))
           : state.playedCards.isEmpty
-          ? _buildStartScreen(context, ref, players, isBannerDismissed, l10n)
+          ? _buildStartScreen(context, ref, players, l10n)
           : _buildCardScreen(context, ref, state, players, l10n),
     );
   }
@@ -44,12 +45,11 @@ class SipDeckScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     List<Player> players,
-    bool isBannerDismissed,
     AppLocalizations l10n,
   ) {
     return Column(
       children: [
-        if (players.length == 2 && !isBannerDismissed)
+        if (players.length == 2 && !_isBannerDismissed)
           MaterialBanner(
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
             content: Text(
@@ -64,9 +64,7 @@ class SipDeckScreen extends ConsumerWidget {
             ),
             actions: [
               TextButton(
-                onPressed: () =>
-                    ref.read(sipDeckBannerDismissedProvider.notifier).state =
-                        true,
+                onPressed: () => setState(() => _isBannerDismissed = true),
                 child: Text(l10n.get('ok')),
               ),
             ],

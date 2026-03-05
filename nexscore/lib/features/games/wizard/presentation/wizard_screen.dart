@@ -7,26 +7,20 @@ import '../../../../core/providers/active_players_provider.dart';
 import '../models/wizard_models.dart';
 import '../providers/wizard_provider.dart';
 
-// Local provider for banner dismissal
-class WizardBannerDismissedNotifier extends AutoDisposeNotifier<bool> {
-  @override
-  bool build() => false;
-  void dismiss() => state = true;
-}
-
-final wizardBannerDismissedProvider =
-    NotifierProvider.autoDispose<WizardBannerDismissedNotifier, bool>(
-      WizardBannerDismissedNotifier.new,
-    );
-
-class WizardScreen extends ConsumerWidget {
+class WizardScreen extends ConsumerStatefulWidget {
   const WizardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WizardScreen> createState() => _WizardScreenState();
+}
+
+class _WizardScreenState extends ConsumerState<WizardScreen> {
+  bool _isBannerDismissed = false;
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(wizardStateProvider);
     final players = ref.watch(activePlayersProvider);
-    final isBannerDismissed = ref.watch(wizardBannerDismissedProvider);
     final l10n = AppLocalizations.of(context);
 
     if (players.isEmpty) {
@@ -67,7 +61,7 @@ class WizardScreen extends ConsumerWidget {
       body: Column(
         children: [
           // 2-player warning banner
-          if (players.length == 2 && !isBannerDismissed)
+          if (players.length == 2 && !_isBannerDismissed)
             MaterialBanner(
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
               content: Text(
@@ -82,9 +76,7 @@ class WizardScreen extends ConsumerWidget {
               ),
               actions: [
                 TextButton(
-                  onPressed: () =>
-                      ref.read(wizardBannerDismissedProvider.notifier).state =
-                          true,
+                  onPressed: () => setState(() => _isBannerDismissed = true),
                   child: Text(l10n.get('ok')),
                 ),
               ],
