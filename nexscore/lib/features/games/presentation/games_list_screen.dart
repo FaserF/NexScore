@@ -63,7 +63,7 @@ class GamesListScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: AnimatedScaleButton(
-                  onPressed: () => context.go('/settings'),
+                  onPressed: () => context.go('/profile/settings'),
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
