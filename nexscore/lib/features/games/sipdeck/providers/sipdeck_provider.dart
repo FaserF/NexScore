@@ -33,10 +33,18 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
       baseText = card.text;
     }
 
+    String baseExpl = l10n.get(card.explanationKey);
+    if (baseExpl == card.explanationKey) {
+      baseExpl = card.explanation ?? '';
+    }
+
     String hydratedText = baseText;
+    String hydratedExpl = baseExpl;
+
     if (activePlayers.isNotEmpty) {
       final p1 = activePlayers[random.nextInt(activePlayers.length)].name;
       hydratedText = hydratedText.replaceAll('{0}', p1);
+      hydratedExpl = hydratedExpl.replaceAll('{0}', p1);
 
       if (activePlayers.length > 1) {
         String p2 = activePlayers[random.nextInt(activePlayers.length)].name;
@@ -44,12 +52,15 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
           p2 = activePlayers[random.nextInt(activePlayers.length)].name;
         }
         hydratedText = hydratedText.replaceAll('{1}', p2);
+        hydratedExpl = hydratedExpl.replaceAll('{1}', p2);
       }
     }
 
     final hydratedCard = SipDeckCard(
       id: card.id,
       text: hydratedText,
+      explanation: hydratedExpl.isNotEmpty ? hydratedExpl : null,
+      emoji: card.emoji, // Primary emoji stays from DB or could be in l10n too
       category: card.category,
       sips: card.sips,
       isVirus: card.isVirus,

@@ -970,49 +970,93 @@ class AppLocalizations {
       'sd_card_wc011_expl':
           'Alle auf den Boden! Wer am längsten plankt, darf 5 Schlucke an die anderen verteilen.',
       'sd_card_f001':
-          '{0}, mache {1} ein echtes Kompliment über den Style. Wenn du rot wirst, trinke 2 Schlucke.',
+          '💖 {0}, mache {1} ein echtes Kompliment über den Style. Wenn du rot wirst, trinke 2 Schlücke.',
+      'sd_card_f001_expl':
+          'Wähle etwas Spezifisches aus (Haare, Outfit, Augen) und sei ehrlich. Wenn du dabei errötest, musst du 2 Schlücke trinken.',
       'sd_card_f002':
-          '{0} und {1} haben 30 Sekunden Zeit, eine Gemeinsamkeit zu finden. Scheitern? Beide 3 Schlucke.',
+          '🤝 {0} und {1} haben 30 Sekunden Zeit, eine Gemeinsamkeit zu finden. Scheitern? Beide 3 Schlücke.',
+      'sd_card_f002_expl':
+          'Redet! Findet ein gemeinsames Hobby, ein Lieblingsessen oder ein Erlebnis. Wenn nach 30s nichts gefunden wurde, trinken beide.',
       'sd_card_f003':
-          '{0}, schreibe dem letzten Kontakt ein Herz-Emoji. Verweigern? Trinke 2 Schlucke.',
+          '💌 {0}, schreibe dem letzten Kontakt ein Herz-Emoji. Verweigern? Trinke 2 Schlücke.',
+      'sd_card_f003_expl':
+          'Öffne deine Messenger-App und sende ein "❤️" an die erste Person in deiner Liste. Keine Lust? Dann trinke 2.',
       'sd_card_f004':
-          'Abstimmung: Schönstes Lächeln im Raum. Diese Person darf 3 Schlucke verteilen.',
+          '😁 Abstimmung: Schönstes Lächeln im Raum. Diese Person darf 3 Schlücke verteilen.',
+      'sd_card_f004_expl':
+          'Zeigt eure Zähne! Die Gruppe zeigt auf ihren Favoriten. Der Gewinner bestimmt, wer 3 Schlücke trinken muss.',
       'sd_card_f005':
-          '{0}, beschreibe deinen Schwarm, ohne den Namen zu nennen. Die Gruppe rät.',
+          '🤐 {0}, beschreibe deinen Schwarm, ohne den Namen zu nennen. Die Gruppe rät.',
+      'sd_card_f005_expl':
+          'Gib Hinweise zu Aussehen oder Charakter. Wenn nach einer Minute niemand darauf kommt, solltest du bessere Tipps geben!',
       'sd_card_f006':
-          'Wahrheit: {0}, bewerte jede Person von 1–10. Verweigern? Trinke 4 Schlucke.',
+          '📊 Wahrheit: {0}, bewerte jede Person von 1–10. Verweigern? Trinke 4 Schlucke.',
+      'sd_card_f006_expl':
+          'Sei ehrlich, aber charmant! Bewerte alle im Raum auf einer Skala von 1 bis 10. Zu feige? Dann trinke 4 Schlücke.',
       'sd_card_f007':
-          'Jeder schreibt ein Ein-Wort-Kompliment für {0}. {0} rät, von wem es ist. Falsch? 1 Schluck jeweils.',
+          '📝 Jeder schreibt ein Ein-Wort-Kompliment für {0}. {0} rät, von wem es ist. Falsch? 1 Schluck jeweils.',
+      'sd_card_f007_expl':
+          'Jeder (außer {0}) schreibt ein nettes Wort auf sein Handy. {0} versucht, das Wort dem Schreiber zuzuordnen. Trinke für jeden falschen Tipp.',
       'sd_card_b001':
-          '{0} beginnt einen Trinkspruch. Jeder fügt einen Satz hinzu. Fehler? Trinke 2 Schlucke.',
+          '🥂 {0} beginnt einen Trinkspruch. Jeder fügt einen Satz hinzu. Fehler? Trinke 2 Schlücke.',
+      'sd_card_b001_expl':
+          'Starte eine Rede. Jeder in der Runde setzt die Geschichte mit einem Satz fort. Wenn jemand stockt oder den Faden verliert: Trinken!',
       'sd_card_b002':
-          'Rate den Preis des teuersten Getränks hier. Am weitesten weg? Trinke 2 Schlucke.',
+          '💰 Rate den Preis des teuersten Getränks hier. Am weitesten weg? Trinke 2 Schlücke.',
+      'sd_card_b002_expl':
+          'Schaut in die Karte! Jeder nennt einen Preis. Wer am weitesten vom tatsächlichen Preis entfernt liegt, trinkt 2.',
       'sd_card_b003':
-          'Alle bestellen etwas, das sie noch nie probiert haben, oder trinken 2 Schlucke.',
+          '🍹 Alle bestellen etwas, das sie noch nie probiert haben, oder trinken 2 Schlücke.',
+      'sd_card_b003_expl':
+          'Nächste Runde Pflicht! Wenn du dein Standard-Getränk bestellst, nimmst du 2 Schlücke als Strafe. Probiere was Neues!',
       'sd_card_b004':
-          '{0} muss diese Runde "Prost" in 3 Sprachen sagen. Pro fehlender Sprache 1 Schluck.',
+          '🍻 {0} muss diese Runde "Prost" in 3 Sprachen sagen. Pro fehlender Sprache 1 Schluck.',
+      'sd_card_b004_expl':
+          'Zeig wie international du bist. "Prost", "Salute", "Cheers"... du brauchst 3. Trinke für jede Sprache, die dir fehlt.',
       'sd_card_b005':
-          'Alle stehen auf und tauschen Sitzplätze. Der Letzte trinkt 2 Schlucke.',
+          '🪑 Alle stehen auf und tauschen Sitzplätze. Der Letzte trinkt 2 Schlücke.',
+      'sd_card_b005_expl':
+          'Reise nach Jerusalem ohne Musik! Jeder muss sich einen neuen Platz suchen. Der langsamste Teilnehmer trinkt 2.',
       'sd_card_b006':
-          '{0}, rede für mindestens 1 Minute mit einem Fremden. Scheitern? Trinke 4 Schlucke.',
+          '🤝 {0}, rede für mindestens 1 Minute mit einem Fremden. Scheitern? Trinke 4 Schlucke.',
+      'sd_card_b006_expl':
+          'Soziale Challenge! Geh auf jemanden zu, den du nicht kennst, und halte das Gespräch für 60s am Laufen. Oder trinke 4.',
       'sd_card_l001':
-          '{0}, watschele wie ein Pinguin ans andere Ende des Raums und zurück.',
+          '🐧 {0}, watschele wie ein Pinguin ans andere Ende des Raums und zurück.',
+      'sd_card_l001_expl':
+          'Arme eng an den Körper und watscheln! Wenn du aus der Rolle fällst, kann die Gruppe eine Strafe verlangen.',
       'sd_card_l002':
-          'VIRUS: {0} muss die nächsten 5 Karten jeden Satz mit "und das ist Tee-Zeit" beenden. Vergessen? 2 Schlucke.',
+          '☕ VIRUS: {0} muss die nächsten 5 Karten jeden Satz mit "und das ist Tee-Zeit" beenden. Vergessen? 2 Schlücke.',
+      'sd_card_l002_expl':
+          'Die nächsten 5 Runden lang musst du nach jedem Mal Sprechen "und das ist Tee-Zeit" sagen. Wenn du es vergisst, trinke 2.',
       'sd_card_l003':
-          '{0}, kommentiere das aktuelle Geschehen für 60s wie eine Naturdokumentation.',
+          '🦒 {0}, kommentiere das aktuelle Geschehen für 60s wie eine Naturdokumentation.',
+      'sd_card_l003_expl':
+          'Spiele den Tierfilmer. Beschreibe das Verhalten deiner "wilden" Freunde an der Bar oder auf der Party.',
       'sd_card_l004':
-          'Alle sagen gleichzeitig das lustigste Wort, das sie kennen. Bestes Wort darf 2 Schlucke verteilen.',
+          '🤣 Alle sagen gleichzeitig das lustigste Wort, das sie kennen. Bestes Wort darf 2 Schlucke verteilen.',
+      'sd_card_l004_expl':
+          'Auf drei rufen alle! Das lustigste Wort (Abstimmung der Gruppe) gewinnt und darf 2 Schlücke verteilen.',
       'sd_card_l005':
-          '{0} darf für die nächsten 2 Minuten nur Fragen stellen. Aussage getätigt? 1 Schluck.',
+          '❓ {0} darf für die nächsten 2 Minuten nur Fragen stellen. Aussage getätigt? 1 Schluck.',
+      'sd_card_l005_expl':
+          'Keine Fakten nennen! Jedes Mal, wenn du sprichst, muss es eine Frage sein? Wenn du etwas behauptest: Trinken!',
       'sd_card_l006':
-          '{0}, erkläre deinen Job nur mit Handbewegungen. Keiner rät nach 30s? Trinke 3 Schlucke.',
+          '🖐️ {0}, erkläre deinen Job nur mit Handbewegungen. Keiner rät nach 30s? Trinke 3 Schlucke.',
+      'sd_card_l006_expl':
+          'Pantomime! Erkläre deine Arbeit ohne ein Wort zu sagen. Wenn deine Freunde zu ahnungslos sind, musst du trinken.',
       'sd_card_l007':
-          '{0}, erfinde ein neues Wort und nutze es überzeugend. Die Gruppe stimmt ab.',
+          '🆕 {0}, erfinde ein neues Wort und nutze es überzeugend. Die Gruppe stimmt ab.',
+      'sd_card_l007_expl':
+          'Denk dir ein Wort und eine Definition aus. Wenn die Gruppe findet, dass es echt klingt, bist du sicher.',
       'sd_card_l008':
-          'Schnellrunde: Nenne einen Film, ein Lied und eine Stadt mit dem Anfangsbuchstaben, den die Person links wählt.',
+          '🏙️ Schnellrunde: Nenne einen Film, ein Lied und eine Stadt mit dem Anfangsbuchstaben, den die Person links wählt.',
+      'sd_card_l008_expl':
+          'Dein linker Nachbar gibt dir einen Buchstaben (z.B. "B"). Du hast 10 Sekunden für alle drei Dinge. Sonst trinke 2.',
       'sd_card_l009':
-          '{0}, sprich für die nächsten 3 Runden in Zeitlupe oder trinke 3 Schlucke.',
+          '🐢 {0}, sprich für die nächsten 3 Runden in Zeitlupe oder trinke 3 Schlucke.',
+      'sd_card_l009_expl':
+          'Jedes... einzelne... Wort... extra... lang... ziehen... Wenn du normal sprichst, bevor die 3 Runden um sind: Trinke 3.',
     },
   };
 
