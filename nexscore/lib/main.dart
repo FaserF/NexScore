@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
+
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/i18n/app_localizations.dart';
 import 'core/presentation/environment_banner.dart';
 import 'features/settings/provider/settings_provider.dart';
+import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,34 +32,8 @@ class NexScoreApp extends ConsumerWidget {
     final themeMode = settings.themeMode;
     final locale = settings.locale;
 
-    final ThemeData lightTheme = FlexThemeData.light(
-      scheme: FlexScheme.flutterDash,
-      surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
-      blendLevel: 20,
-      appBarOpacity: 0.95,
-      subThemesData: const FlexSubThemesData(
-        blendOnLevel: 20,
-        blendOnColors: false,
-        defaultRadius: 16.0,
-      ),
-      visualDensity: FlexColorScheme.comfortablePlatformDensity,
-      useMaterial3: true,
-      swapLegacyOnMaterial3: true,
-    );
-
-    final ThemeData darkTheme = FlexThemeData.dark(
-      scheme: FlexScheme.flutterDash,
-      surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
-      blendLevel: 15,
-      appBarOpacity: 0.90,
-      subThemesData: const FlexSubThemesData(
-        blendOnLevel: 30,
-        defaultRadius: 16.0,
-      ),
-      visualDensity: FlexColorScheme.comfortablePlatformDensity,
-      useMaterial3: true,
-      swapLegacyOnMaterial3: true,
-    );
+    final ThemeData lightTheme = AppTheme.lightTheme;
+    final ThemeData darkTheme = AppTheme.darkTheme;
 
     final router = ref.watch(routerProvider);
 

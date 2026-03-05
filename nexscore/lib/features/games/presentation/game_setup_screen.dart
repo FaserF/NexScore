@@ -26,7 +26,7 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
       case 'arschloch':
         return 3;
       case 'sipdeck':
-        return 3;
+        return 2;
       default:
         return 2;
     }
@@ -160,40 +160,42 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
 
-    void submit() {
-      final name = controller.text.trim();
-      if (name.isNotEmpty) {
-        final newPlayer = Player(
-          id: const Uuid().v4(),
-          name: name,
-          avatarColor: '#2196F3',
-        );
-        ref.read(playersProvider.notifier).addPlayer(newPlayer);
-        setState(() {
-          _selectedPlayerIds.add(newPlayer.id);
-        });
-      }
-      Navigator.pop(context);
-    }
-
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.get('add_player')),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(hintText: l10n.get('player_name')),
-          autofocus: true,
-          onSubmitted: (_) => submit(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.get('cancel')),
+      builder: (dialogContext) {
+        void submit() {
+          final name = controller.text.trim();
+          if (name.isNotEmpty) {
+            final newPlayer = Player(
+              id: const Uuid().v4(),
+              name: name,
+              avatarColor: '#2196F3',
+            );
+            ref.read(playersProvider.notifier).addPlayer(newPlayer);
+            setState(() {
+              _selectedPlayerIds.add(newPlayer.id);
+            });
+          }
+          Navigator.pop(dialogContext);
+        }
+
+        return AlertDialog(
+          title: Text(l10n.get('add_player')),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: l10n.get('player_name')),
+            autofocus: true,
+            onSubmitted: (_) => submit(),
           ),
-          FilledButton(onPressed: submit, child: Text(l10n.get('add'))),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n.get('cancel')),
+            ),
+            FilledButton(onPressed: submit, child: Text(l10n.get('add'))),
+          ],
+        );
+      },
     );
   }
 }

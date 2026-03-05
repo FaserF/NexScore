@@ -1,5 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/models/player_model.dart';
@@ -219,7 +218,7 @@ class DartsScreen extends ConsumerWidget {
                           ),
                         _KeypadButton(
                           label: 'C',
-                          color: Colors.redAccent.withOpacity(0.1),
+                          color: Colors.redAccent.withValues(alpha: 0.1),
                           onPressed: () {
                             controller.clear();
                             focusNode.requestFocus();
@@ -236,7 +235,7 @@ class DartsScreen extends ConsumerWidget {
                         ),
                         _KeypadButton(
                           label: l10n.get('darts_bust'),
-                          color: Colors.orange.withOpacity(0.1),
+                          color: Colors.orange.withValues(alpha: 0.1),
                           onPressed: () {
                             final round = DartRound(
                               throws: [DartThrow(score: 0, multiplier: 1)],

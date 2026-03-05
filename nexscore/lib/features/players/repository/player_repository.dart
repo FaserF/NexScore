@@ -1,89 +1,142 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nexscore/core/error/failures.dart';
+import 'package:nexscore/core/error/result.dart';
 import 'package:nexscore/core/models/player_model.dart';
 import 'package:nexscore/core/storage/database_service.dart';
 
 final playerRepositoryProvider = Provider((ref) => PlayerRepository());
 
-// Provides a real-time stream of all non-deleted players
-final playersStreamProvider = StreamProvider<List<Player>>((ref) {
-  final repo = ref.watch(playerRepositoryProvider);
-  return Stream.periodic(
-    const Duration(seconds: 1),
-  ).asyncMap((_) => repo.getPlayers());
-  // Note: in a real app, sqflite doesn't natively support reactive streams without plugins (like sqlbrite).
-  // Polling or using a StateNotifier is better. For this 2026 standard offline app, we will use a StateNotifier.
-});
-
 // Using a StateNotifier for reactivity with SQFlite
 class PlayersNotifier extends AsyncNotifier<List<Player>> {
   @override
   Future<List<Player>> build() async {
-    return _repository.getPlayers();
+    final result = await _repository.getPlayers();
+    return result.fold(
+      (failure) => throw failure, // AsyncNotifier will catch this
+      (players) => players,
+    );
   }
 
   PlayerRepository get _repository => ref.read(playerRepositoryProvider);
 
   Future<void> addPlayer(Player player) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await _repository.insertPlayer(player);
-      return _repository.getPlayers();
-    });
+    final result = await _repository.insertPlayer(player);
+    result.fold(
+      (failure) => state = AsyncValue.error(failure, StackTrace.current),
+      (_) async {
+        final playersResult = await _repository.getPlayers();
+        state = playersResult.fold(
+          (f) => AsyncValue.error(f, StackTrace.current),
+          (p) => AsyncValue.data(p),
+        );
+      },
+    );
   }
 
   Future<void> updatePlayer(Player player) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await _repository.updatePlayer(player);
-      return _repository.getPlayers();
-    });
+    final result = await _repository.updatePlayer(player);
+    result.fold(
+      (failure) => state = AsyncValue.error(failure, StackTrace.current),
+      (_) async {
+        final playersResult = await _repository.getPlayers();
+        state = playersResult.fold(
+          (f) => AsyncValue.error(f, StackTrace.current),
+          (p) => AsyncValue.data(p),
+        );
+      },
+    );
   }
 
   Future<void> deletePlayer(String id) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await _repository.markDeleted(id);
-      return _repository.getPlayers();
-    });
+    final result = await _repository.markDeleted(id);
+    result.fold(
+      (failure) => state = AsyncValue.error(failure, StackTrace.current),
+      (_) async {
+        final playersResult = await _repository.getPlayers();
+        state = playersResult.fold(
+          (f) => AsyncValue.error(f, StackTrace.current),
+          (p) => AsyncValue.data(p),
+        );
+      },
+    );
   }
 }
 
 final playersProvider = AsyncNotifierProvider<PlayersNotifier, List<Player>>(
-  () {
-    return PlayersNotifier();
-  },
+  () => PlayersNotifier(),
 );
 
 class PlayerRepository {
-  Future<List<Player>> getPlayers() async {
-    final maps = await DatabaseService.instance.query(
-      'players',
-      where: 'isDeleted = ?',
-      whereArgs: [0],
-      orderBy: 'name ASC',
-    );
-    return maps.map((m) => Player.fromMap(m)).toList();
+  Future<Result<List<Player>>> getPlayers() async {
+    try {
+      final maps = await DatabaseService.instance.query(
+        'players',
+        where: 'isDeleted = ?',
+        whereArgs: [0],
+        orderBy: 'name ASC',
+      );
+      final players = maps.map((m) => Player.fromMap(m)).toList();
+      return Result.success(players);
+    } catch (e, stack) {
+      return Result.failure(
+        DatabaseFailure('Failed to fetch players', error: e, stackTrace: stack),
+      );
+    }
   }
 
-  Future<void> insertPlayer(Player player) async {
-    await DatabaseService.instance.insert('players', player.toMap());
+  Future<Result<void>> insertPlayer(Player player) async {
+    if (player.name.trim().isEmpty) {
+      return const Result.failure(
+        ValidationFailure('Player name cannot be empty'),
+      );
+    }
+    try {
+      await DatabaseService.instance.insert('players', player.toMap());
+      return const Result.success(null);
+    } catch (e, stack) {
+      return Result.failure(
+        DatabaseFailure('Failed to insert player', error: e, stackTrace: stack),
+      );
+    }
   }
 
-  Future<void> updatePlayer(Player player) async {
-    await DatabaseService.instance.update(
-      'players',
-      player.toMap(),
-      where: 'id = ?',
-      whereArgs: [player.id],
-    );
+  Future<Result<void>> updatePlayer(Player player) async {
+    if (player.name.trim().isEmpty) {
+      return const Result.failure(
+        ValidationFailure('Player name cannot be empty'),
+      );
+    }
+    try {
+      await DatabaseService.instance.update(
+        'players',
+        player.toMap(),
+        where: 'id = ?',
+        whereArgs: [player.id],
+      );
+      return const Result.success(null);
+    } catch (e, stack) {
+      return Result.failure(
+        DatabaseFailure('Failed to update player', error: e, stackTrace: stack),
+      );
+    }
   }
 
-  Future<void> markDeleted(String id) async {
-    await DatabaseService.instance.update(
-      'players',
-      {'isDeleted': 1},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<Result<void>> markDeleted(String id) async {
+    try {
+      await DatabaseService.instance.update(
+        'players',
+        {'isDeleted': 1},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      return const Result.success(null);
+    } catch (e, stack) {
+      return Result.failure(
+        DatabaseFailure('Failed to delete player', error: e, stackTrace: stack),
+      );
+    }
   }
 }

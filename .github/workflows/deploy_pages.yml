@@ -1,0 +1,45 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: nexscore
+
+      - name: Build Web App
+        run: flutter build web --release --base-href "/NexScore/"
+        working-directory: nexscore
+
+      - name: Prepare Deployment Directory
+        run: |
+          mkdir -p gh-pages-build
+          # Copy the built Flutter web app to the root
+          cp -R nexscore/build/web/* gh-pages-build/
+          # Copy the entire docs folder into a docs subdirectory
+          cp -R docs gh-pages-build/docs
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages-build
+          force_orphan: true

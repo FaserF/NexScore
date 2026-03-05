@@ -8,7 +8,7 @@ import '../../../core/i18n/app_localizations.dart';
 class HelpScreen extends StatelessWidget {
   const HelpScreen({super.key});
 
-  static const String _docsUrl = 'https://faserF.github.io/NexScore';
+  static const String _docsUrl = 'https://faserf.github.io/NexScore/docs/';
   static const String _bugUrl =
       'https://github.com/FaserF/NexScore/issues/new?template=bug_report.yml';
   static const String _featureUrl =

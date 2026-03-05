@@ -4,6 +4,8 @@ import 'package:uuid/uuid.dart';
 import '../../../core/i18n/app_localizations.dart';
 import '../../../core/models/player_model.dart';
 import '../repository/player_repository.dart';
+import '../../../core/theme/widgets/animated_scale_button.dart';
+import '../../../core/theme/widgets/glass_container.dart';
 
 class PlayersScreen extends ConsumerWidget {
   const PlayersScreen({super.key});
@@ -13,49 +15,156 @@ class PlayersScreen extends ConsumerWidget {
     final playersState = ref.watch(playersProvider);
     final l10n = AppLocalizations.of(context);
 
+    // Provide a consistent gradient based on color string
+    Color parseColor(String colorStr) {
+      try {
+        return Color(int.parse(colorStr.replaceFirst('#', '0xff')));
+      } catch (e) {
+        return Colors.blue;
+      }
+    }
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.get('players'))),
-      body: playersState.when(
-        data: (players) {
-          if (players.isEmpty) {
-            return Center(child: Text(l10n.get('no_players')));
-          }
-          return ListView.builder(
-            itemCount: players.length,
-            itemBuilder: (context, index) {
-              final player = players[index];
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Color(
-                    int.parse(player.avatarColor.replaceFirst('#', '0xff')),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            title: Text(
+              l10n.get('players'),
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: -1,
+              ),
+            ),
+            centerTitle: false,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            surfaceTintColor: Colors.transparent,
+          ),
+          playersState.when(
+            data: (players) {
+              if (players.isEmpty) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.group_outlined,
+                          size: 64,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.get('no_players'),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Text(
-                    player.name.isNotEmpty
+                );
+              }
+              return SliverPadding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 120),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final player = players[index];
+                    final playerColor = parseColor(player.avatarColor);
+                    final initial = player.name.isNotEmpty
                         ? player.name.substring(0, 1).toUpperCase()
-                        : '?',
-                  ),
-                ),
-                title: Text(player.name),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    _confirmDelete(context, ref, player);
-                  },
+                        : '?';
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: AnimatedScaleButton(
+                        onPressed: () {
+                          // Can add edit player modal logic here later
+                        },
+                        child: GlassContainer(
+                          borderRadius: 20,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      playerColor.withValues(alpha: 0.8),
+                                      playerColor,
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: playerColor.withValues(alpha: 0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    initial,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Text(
+                                  player.name,
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.delete_outline,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                                onPressed: () =>
+                                    _confirmDelete(context, ref, player),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }, childCount: players.length),
                 ),
               );
             },
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) =>
-            Center(child: Text(l10n.getWith('error_msg', [err.toString()]))),
+            loading: () => const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (err, stack) => SliverFillRemaining(
+              child: Center(
+                child: Text(l10n.getWith('error_msg', [err.toString()])),
+              ),
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          _showAddPlayerDialog(context, ref);
-        },
-        icon: const Icon(Icons.add),
-        label: Text(l10n.get('add_player')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddPlayerDialog(context, ref),
+        elevation: 4,
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -64,18 +173,18 @@ class PlayersScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(l10n.get('delete')),
         content: Text(l10n.getWith('players_delete_confirm', [player.name])),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(l10n.get('cancel')),
           ),
           TextButton(
             onPressed: () {
               ref.read(playersProvider.notifier).deletePlayer(player.id);
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
             },
             child: Text(l10n.get('delete')),
           ),
@@ -89,7 +198,7 @@ class PlayersScreen extends ConsumerWidget {
     final controller = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           title: Text(l10n.get('add_player')),
           content: TextField(
@@ -106,12 +215,12 @@ class PlayersScreen extends ConsumerWidget {
                 );
                 ref.read(playersProvider.notifier).addPlayer(newPlayer);
               }
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
             },
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text(l10n.get('cancel')),
             ),
             FilledButton(
@@ -125,7 +234,7 @@ class PlayersScreen extends ConsumerWidget {
                   );
                   ref.read(playersProvider.notifier).addPlayer(newPlayer);
                 }
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
               },
               child: Text(l10n.get('add')),
             ),

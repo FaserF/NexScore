@@ -249,7 +249,7 @@ class ArschlochScreen extends ConsumerWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: rankColor.withOpacity(0.15),
+                        color: rankColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(

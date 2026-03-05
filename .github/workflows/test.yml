@@ -20,8 +20,8 @@ jobs:
 
       - name: Install Dependencies
         run: flutter pub get
-        working-directory: score_play
+        working-directory: nexscore
 
       - name: Run Tests
         run: flutter test
-        working-directory: score_play
+        working-directory: nexscore

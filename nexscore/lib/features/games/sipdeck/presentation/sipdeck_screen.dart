@@ -94,42 +94,80 @@ class SipDeckScreen extends ConsumerWidget {
     List<Player> players,
     AppLocalizations l10n,
   ) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.local_bar, size: 80, color: Colors.pink),
-          const SizedBox(height: 24),
-          Text(
-            l10n.get('sipdeck_title'),
-            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.getWith('sipdeck_players_ready', [players.length.toString()]),
-            style: const TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.get('sipdeck_18_warning'),
-            style: const TextStyle(fontSize: 12, color: Colors.red),
-          ),
-          const SizedBox(height: 48),
-          FilledButton.icon(
-            onPressed: () =>
-                ref.read(sipDeckStateProvider.notifier).drawNextCard(players),
-            icon: const Icon(Icons.play_arrow),
-            label: Text(
-              l10n.get('sipdeck_start'),
-              style: const TextStyle(fontSize: 20),
+    return Column(
+      children: [
+        if (players.length == 2)
+          MaterialBanner(
+            backgroundColor: Theme.of(context).colorScheme.errorContainer,
+            content: Text(
+              l10n.getWith('error_msg', [
+                'SipDeck is best enjoyed with 3 or more players!',
+              ]), // Reusing a fallback or ideal text
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer,
+              ),
             ),
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-              backgroundColor: Colors.pink.shade700,
+            leading: Icon(
+              Icons.warning_amber_rounded,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () =>
+                    ScaffoldMessenger.of(context).hideCurrentMaterialBanner(),
+                child: Text(l10n.get('ok')),
+              ),
+            ],
+          ),
+        Expanded(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.local_bar, size: 80, color: Colors.pink),
+                const SizedBox(height: 24),
+                Text(
+                  l10n.get('sipdeck_title'),
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.getWith('sipdeck_players_ready', [
+                    players.length.toString(),
+                  ]),
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.get('sipdeck_18_warning'),
+                  style: const TextStyle(fontSize: 12, color: Colors.red),
+                ),
+                const SizedBox(height: 48),
+                FilledButton.icon(
+                  onPressed: () => ref
+                      .read(sipDeckStateProvider.notifier)
+                      .drawNextCard(players),
+                  icon: const Icon(Icons.play_arrow),
+                  label: Text(
+                    l10n.get('sipdeck_start'),
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 48,
+                      vertical: 16,
+                    ),
+                    backgroundColor: Colors.pink.shade700,
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

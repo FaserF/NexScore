@@ -1,7 +1,7 @@
 # NexScore Documentation
 
 > Full docs for the NexScore app — game rules, architecture, deployment, and contribution guide.
-> 🌐 **Live app:** [nexscore.fabiseitz.de](https://nexscore.fabiseitz.de) · 💻 **Source:** [github.com/FaserF/NexScore](https://github.com/FaserF/NexScore)
+> 🌐 **Live app:** [faserf.github.io/NexScore](https://faserf.github.io/NexScore/) · 💻 **Source:** [github.com/FaserF/NexScore](https://github.com/FaserF/NexScore)
 
 ---
 
@@ -278,7 +278,7 @@ docker run -p 8080:80 nexscore-web:local
 
 # Production (via GitHub Actions)
 # Image is pushed to: ghcr.io/faserf/nexscore:latest
-# Served at: https://nexscore.fabiseitz.de
+# Served at: https://faserf.github.io/NexScore/
 ```
 
 ---

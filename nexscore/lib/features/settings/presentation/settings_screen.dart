@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/i18n/app_localizations.dart';
 import '../../../core/storage/database_service.dart';
 import '../../history/repository/session_repository.dart';
 import '../../players/repository/player_repository.dart';
 import '../provider/settings_provider.dart';
+import '../../../core/theme/widgets/glass_container.dart';
+import '../../../core/theme/widgets/animated_scale_button.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -15,78 +18,174 @@ class SettingsScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.get('settings')),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: ListView(
-        children: [
-          _SectionHeader(title: l10n.get('settings_theme')),
-          ListTile(
-            leading: const Icon(Icons.brightness_medium),
-            title: Text(l10n.get('settings_theme')),
-            trailing: DropdownButton<ThemeMode>(
-              value: settings.themeMode,
-              onChanged: (mode) {
-                if (mode != null) {
-                  ref.read(settingsProvider.notifier).setThemeMode(mode);
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: ThemeMode.system,
-                  child: Text(l10n.get('settings_theme_system')),
-                ),
-                DropdownMenuItem(
-                  value: ThemeMode.light,
-                  child: Text(l10n.get('settings_theme_light')),
-                ),
-                DropdownMenuItem(
-                  value: ThemeMode.dark,
-                  child: Text(l10n.get('settings_theme_dark')),
-                ),
-              ],
-            ),
-          ),
-          const Divider(),
-          _SectionHeader(title: l10n.get('settings_language')),
-          ListTile(
-            leading: const Icon(Icons.language),
-            title: Text(l10n.get('settings_language')),
-            trailing: DropdownButton<String?>(
-              value: settings.locale?.languageCode,
-              onChanged: (code) {
-                final locale = code != null ? Locale(code) : null;
-                ref.read(settingsProvider.notifier).setLocale(locale);
-              },
-              items: [
-                DropdownMenuItem(
-                  value: null,
-                  child: Text(l10n.get('settings_theme_system')),
-                ),
-                DropdownMenuItem(
-                  value: 'en',
-                  child: Text(l10n.get('settings_language_en')),
-                ),
-                DropdownMenuItem(
-                  value: 'de',
-                  child: Text(l10n.get('settings_language_de')),
-                ),
-              ],
-            ),
-          ),
-          const Divider(),
-          _SectionHeader(title: l10n.get('settings_data')),
-          ListTile(
-            leading: const Icon(Icons.delete_forever, color: Colors.red),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
             title: Text(
-              l10n.get('settings_db_reset'),
-              style: const TextStyle(color: Colors.red),
+              l10n.get('settings'),
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: -1,
+              ),
             ),
-            onTap: () => _confirmReset(context, ref, l10n),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            surfaceTintColor: Colors.transparent,
+            leading: AnimatedScaleButton(
+              onPressed: () => context.pop(),
+              child: const Icon(Icons.arrow_back_ios_new),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                _SectionHeader(title: l10n.get('settings_theme')),
+                GlassContainer(
+                  borderRadius: 24,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.brightness_medium,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    title: Text(
+                      l10n.get('settings_theme'),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    trailing: DropdownButton<ThemeMode>(
+                      value: settings.themeMode,
+                      underline: const SizedBox(),
+                      icon: const Icon(Icons.keyboard_arrow_down),
+                      borderRadius: BorderRadius.circular(16),
+                      onChanged: (mode) {
+                        if (mode != null) {
+                          ref
+                              .read(settingsProvider.notifier)
+                              .setThemeMode(mode);
+                        }
+                      },
+                      items: [
+                        DropdownMenuItem(
+                          value: ThemeMode.system,
+                          child: Text(l10n.get('settings_theme_system')),
+                        ),
+                        DropdownMenuItem(
+                          value: ThemeMode.light,
+                          child: Text(l10n.get('settings_theme_light')),
+                        ),
+                        DropdownMenuItem(
+                          value: ThemeMode.dark,
+                          child: Text(l10n.get('settings_theme_dark')),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _SectionHeader(title: l10n.get('settings_language')),
+                GlassContainer(
+                  borderRadius: 24,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.tertiary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.language,
+                        color: Theme.of(context).colorScheme.tertiary,
+                      ),
+                    ),
+                    title: Text(
+                      l10n.get('settings_language'),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    trailing: DropdownButton<String?>(
+                      value: settings.locale?.languageCode,
+                      underline: const SizedBox(),
+                      icon: const Icon(Icons.keyboard_arrow_down),
+                      borderRadius: BorderRadius.circular(16),
+                      onChanged: (code) {
+                        final locale = code != null ? Locale(code) : null;
+                        ref.read(settingsProvider.notifier).setLocale(locale);
+                      },
+                      items: [
+                        DropdownMenuItem(
+                          value: null,
+                          child: Text(l10n.get('settings_theme_system')),
+                        ),
+                        DropdownMenuItem(
+                          value: 'en',
+                          child: Text(l10n.get('settings_language_en')),
+                        ),
+                        DropdownMenuItem(
+                          value: 'de',
+                          child: Text(l10n.get('settings_language_de')),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _SectionHeader(title: l10n.get('settings_data')),
+                AnimatedScaleButton(
+                  onPressed: () => _confirmReset(context, ref, l10n),
+                  child: GlassContainer(
+                    borderRadius: 24,
+                    color: Colors.red.withValues(alpha: 0.05),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.delete_forever,
+                          color: Colors.red,
+                        ),
+                      ),
+                      title: Text(
+                        l10n.get('settings_db_reset'),
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 48),
+              ]),
+            ),
           ),
         ],
       ),
@@ -139,14 +238,14 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: const EdgeInsets.only(left: 8, bottom: 12),
       child: Text(
-        title,
+        title.toUpperCase(),
         style: TextStyle(
           color: Theme.of(context).colorScheme.primary,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-          letterSpacing: 1.2,
+          fontWeight: FontWeight.w800,
+          fontSize: 13,
+          letterSpacing: 1.5,
         ),
       ),
     );

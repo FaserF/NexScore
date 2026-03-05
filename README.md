@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>A cross-platform score tracker for your favourite card and board games.</strong><br>
-  Available on <strong>Android</strong> · <strong>iOS</strong> · <strong>Web (PWA)</strong>
+  Available on <strong>Android</strong> · <strong>iOS</strong> · <strong><a href="https://faserf.github.io/NexScore/">Web (PWA)</a></strong>
 </p>
 
 <p align="center">
@@ -83,7 +83,7 @@ flutter build apk --release
 
 - 🐛 [Report a Bug](https://github.com/FaserF/NexScore/issues/new?template=bug_report.yml)
 - 💡 [Request a Feature](https://github.com/FaserF/NexScore/issues/new?template=feature_request.yml)
-- 📖 [Documentation](https://faserF.github.io/NexScore)
+- 📖 [Documentation](https://faserf.github.io/NexScore/docs/)
 - 💬 [Discussions](https://github.com/FaserF/NexScore/discussions)
 
 ## Legal

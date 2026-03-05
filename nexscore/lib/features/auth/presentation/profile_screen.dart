@@ -3,28 +3,107 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/i18n/app_localizations.dart';
+import '../../../core/utils/logger.dart';
+import '../../../core/error/failures.dart';
+import '../../../core/error/result.dart';
 
 /// Provider for the current Firebase Auth user (null = signed out / anonymous).
 final authUserProvider = StreamProvider<User?>((ref) {
-  return FirebaseAuth.instance.authStateChanges();
+  try {
+    return FirebaseAuth.instance.authStateChanges().handleError((error) {
+      debugPrint('FirebaseAuth Stream Error: $error');
+      // Yield null user on any error like Firebase not configured
+      return null;
+    });
+  } catch (e) {
+    debugPrint('FirebaseAuth Initial Error: $e');
+    return Stream.value(null);
+  }
 });
 
 /// Auth service encapsulating Google Sign-In and sign-out logic.
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<UserCredential?> signInWithGoogle() async {
-    final googleProvider = GoogleAuthProvider();
-    return await _auth.signInWithPopup(googleProvider);
+  Future<Result<UserCredential>> signInWithGoogle() async {
+    final stopwatch = Stopwatch()..start();
+    try {
+      final googleProvider = GoogleAuthProvider();
+      final credential = await _auth.signInWithPopup(googleProvider);
+      AppLogger.info(
+        'Google Sign-In (Popup) successful',
+        tag: 'Auth',
+        metadata: {
+          'duration': '${stopwatch.elapsedMilliseconds}ms',
+          'uid': credential.user?.uid,
+        },
+      );
+      return Result.success(credential);
+    } catch (e, stack) {
+      AppLogger.error(
+        'Google Sign-In (Popup) failed',
+        tag: 'Auth',
+        error: e,
+        stackTrace: stack,
+      );
+      return Result.failure(
+        AuthFailure('Sign-in failed', error: e, stackTrace: stack),
+      );
+    }
   }
 
-  Future<UserCredential?> signInWithGoogleNative() async {
-    final googleProvider = GoogleAuthProvider();
-    return await _auth.signInWithProvider(googleProvider);
+  Future<Result<UserCredential>> signInWithGoogleNative() async {
+    final stopwatch = Stopwatch()..start();
+    try {
+      final googleProvider = GoogleAuthProvider();
+      final credential = await _auth.signInWithProvider(googleProvider);
+      AppLogger.info(
+        'Google Sign-In (Native) successful',
+        tag: 'Auth',
+        metadata: {
+          'duration': '${stopwatch.elapsedMilliseconds}ms',
+          'uid': credential.user?.uid,
+        },
+      );
+      return Result.success(credential);
+    } catch (e, stack) {
+      AppLogger.error(
+        'Google Sign-In (Native) failed',
+        tag: 'Auth',
+        error: e,
+        stackTrace: stack,
+      );
+      if (e is FirebaseException && e.code == 'core/no-app') {
+        return Result.failure(
+          AuthFailure(
+            'Cloud sync is not configured for this app instance.',
+            error: e,
+            stackTrace: stack,
+          ),
+        );
+      }
+      return Result.failure(
+        AuthFailure('Sign-in failed', error: e, stackTrace: stack),
+      );
+    }
   }
 
-  Future<void> signOut() async {
-    await _auth.signOut();
+  Future<Result<void>> signOut() async {
+    try {
+      await _auth.signOut();
+      AppLogger.info('Sign-out successful', tag: 'Auth');
+      return const Result.success(null);
+    } catch (e, stack) {
+      AppLogger.error(
+        'Sign-out failed',
+        tag: 'Auth',
+        error: e,
+        stackTrace: stack,
+      );
+      return Result.failure(
+        AuthFailure('Sign-out failed', error: e, stackTrace: stack),
+      );
+    }
   }
 }
 
@@ -91,20 +170,21 @@ class _SignedOutView extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: () async {
                 final authService = ref.read(authServiceProvider);
-                try {
-                  await authService.signInWithGoogleNative();
-                } catch (e) {
+                final result = await authService.signInWithGoogleNative();
+                result.fold((failure) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          l10n.getWith('account_sign_in_error', [e.toString()]),
+                          l10n.getWith('account_sign_in_error', [
+                            failure.message,
+                          ]),
                         ),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
                   }
-                }
+                }, (_) {});
               },
               icon: const Icon(Icons.login),
               label: Text(l10n.get('account_sign_in_google')),
