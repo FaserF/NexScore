@@ -7,6 +7,11 @@ import '../../../../core/providers/active_players_provider.dart';
 import '../models/sipdeck_models.dart';
 import '../providers/sipdeck_provider.dart';
 
+// Local provider for banner dismissal
+final sipDeckBannerDismissedProvider = StateProvider.autoDispose<bool>(
+  (ref) => false,
+);
+
 class SipDeckScreen extends ConsumerWidget {
   const SipDeckScreen({super.key});
 
@@ -14,6 +19,7 @@ class SipDeckScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(sipDeckStateProvider);
     final players = ref.watch(activePlayersProvider);
+    final isBannerDismissed = ref.watch(sipDeckBannerDismissedProvider);
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -29,7 +35,7 @@ class SipDeckScreen extends ConsumerWidget {
       body: players.isEmpty
           ? Center(child: Text(l10n.get('sipdeck_no_players')))
           : state.playedCards.isEmpty
-          ? _buildStartScreen(context, ref, players, l10n)
+          ? _buildStartScreen(context, ref, players, isBannerDismissed, l10n)
           : _buildCardScreen(context, ref, state, players, l10n),
     );
   }
@@ -38,11 +44,12 @@ class SipDeckScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     List<Player> players,
+    bool isBannerDismissed,
     AppLocalizations l10n,
   ) {
     return Column(
       children: [
-        if (players.length == 2)
+        if (players.length == 2 && !isBannerDismissed)
           MaterialBanner(
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
             content: Text(
@@ -58,7 +65,8 @@ class SipDeckScreen extends ConsumerWidget {
             actions: [
               TextButton(
                 onPressed: () =>
-                    ScaffoldMessenger.of(context).hideCurrentMaterialBanner(),
+                    ref.read(sipDeckBannerDismissedProvider.notifier).state =
+                        true,
                 child: Text(l10n.get('ok')),
               ),
             ],
@@ -93,7 +101,7 @@ class SipDeckScreen extends ConsumerWidget {
                 FilledButton.icon(
                   onPressed: () => ref
                       .read(sipDeckStateProvider.notifier)
-                      .drawNextCard(players),
+                      .drawNextCard(players, l10n),
                   icon: const Icon(Icons.play_arrow),
                   label: Text(
                     l10n.get('sipdeck_start'),
@@ -107,7 +115,6 @@ class SipDeckScreen extends ConsumerWidget {
                     backgroundColor: Colors.pink.shade700,
                   ),
                 ),
-                const SizedBox(height: 120),
               ],
             ),
           ),
@@ -134,7 +141,9 @@ class SipDeckScreen extends ConsumerWidget {
         actions: <Type, Action<Intent>>{
           ActivateIntent: CallbackAction<ActivateIntent>(
             onInvoke: (intent) {
-              ref.read(sipDeckStateProvider.notifier).drawNextCard(players);
+              ref
+                  .read(sipDeckStateProvider.notifier)
+                  .drawNextCard(players, l10n);
               return null;
             },
           ),
@@ -142,91 +151,86 @@ class SipDeckScreen extends ConsumerWidget {
         child: Focus(
           autofocus: true,
           child: GestureDetector(
-            onTap: () =>
-                ref.read(sipDeckStateProvider.notifier).drawNextCard(players),
+            onTap: () => ref
+                .read(sipDeckStateProvider.notifier)
+                .drawNextCard(players, l10n),
             child: Container(
               width: double.infinity,
               color: currentCard.isVirus
                   ? Colors.deepOrange.shade800
                   : _colorForCategory(currentCard.category),
               padding: const EdgeInsets.fromLTRB(32, 32, 32, 32),
-              child: SafeArea(
-                bottom: true,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _labelForCategory(
-                        currentCard.category,
-                        l10n,
-                      ).toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        letterSpacing: 2,
-                        fontWeight: FontWeight.bold,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _labelForCategory(currentCard.category, l10n).toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      letterSpacing: 2,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                  Text(
+                    currentCard.text,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                  if (currentCard.sips > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Text(
+                        l10n.getWith('sipdeck_sips', [
+                          currentCard.sips.toString(),
+                        ]),
+                        style: const TextStyle(
+                          fontSize: 24,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 48),
-                    Text(
-                      currentCard.text,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        height: 1.4,
+                  if (currentCard.isVirus)
+                    Container(
+                      margin: const EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black38,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white30),
+                      ),
+                      child: const Text(
+                        '🦠 ONGOING RULE',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          letterSpacing: 1,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 48),
-                    if (currentCard.sips > 0)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black26,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          l10n.getWith('sipdeck_sips', [
-                            currentCard.sips.toString(),
-                          ]),
-                          style: const TextStyle(
-                            fontSize: 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    if (currentCard.isVirus)
-                      Container(
-                        margin: const EdgeInsets.only(top: 12),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black38,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white30),
-                        ),
-                        child: const Text(
-                          '🦠 ONGOING RULE',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                    const Spacer(),
-                    Text(
-                      l10n.get('sipdeck_tap_continue'),
-                      style: const TextStyle(color: Colors.white54),
-                    ),
-                  ],
-                ),
+                  const Spacer(),
+                  Text(
+                    l10n.get('sipdeck_tap_continue'),
+                    style: const TextStyle(color: Colors.white54),
+                  ),
+                ],
               ),
             ),
           ),
