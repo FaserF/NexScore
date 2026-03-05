@@ -94,9 +94,9 @@ We use GitHub Actions to automate testing and deployment. Merging code into `mai
 ### `deploy_pages.yml` (Continuous Deployment)
 **Triggers:** Push to `main` modifying `docs/**`, or manual `workflow_dispatch`.
 **Actions:**
-1. Compiles the Flutter Web app in `--release` mode, setting the basehref to `/NexScore/app/`.
+1. Compiles the Flutter Web app in `--release` mode, setting the basehref to `/NexScore/`.
 2. Builds the MkDocs static HTML site.
-3. Merges the two directories: The static MkDocs site lives at the root `/`, and the Flutter PWA is copied into an `/app/` subfolder.
+3. Merges the two directories: The Flutter PWA lives at the root `/`, and the static MkDocs site is copied into a `/docs/` subfolder.
 4. Uploads the combined artifact to GitHub Pages.
 
 **Note on Manual Deployments**: You can manually trigger this workflow from the GitHub Actions tab. It accepts inputs for `deploy_pwa` (boolean, forces the Flutter app to rebuild), `version_name` (string), and `is_beta` (boolean).

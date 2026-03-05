@@ -53,7 +53,7 @@ jobs:
         if: ${{ inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true) || github.event_name == 'push' }}
         run: |
           flutter pub get
-          flutter build web --release --base-href "/NexScore/app/" \
+          flutter build web --release --base-href "/NexScore/" \
             --dart-define=APP_VERSION=${{ inputs.version_name || 'latest' }} \
             --dart-define=IS_BETA=${{ inputs.is_beta || false }}
         working-directory: nexscore
@@ -73,21 +73,21 @@ jobs:
         run: |
           mkdir -p gh-pages-build
 
-          # 1. MkDocs output at root
-          if [ -d "site" ]; then
-            cp -R site/* gh-pages-build/
-          fi
-
-          # 2. PWA output at /app/
-          mkdir -p gh-pages-build/app
+          # 1. PWA output at root
           if [ -d "nexscore/build/web" ]; then
-            cp -R nexscore/build/web/* gh-pages-build/app/
+            cp -R nexscore/build/web/* gh-pages-build/
           fi
 
-          # 3. SPA Support for /app/
+          # 2. MkDocs output at /docs/
+          mkdir -p gh-pages-build/docs
+          if [ -d "site" ]; then
+            cp -R site/* gh-pages-build/docs/
+          fi
+
+          # 3. SPA Support for root
           touch gh-pages-build/.nojekyll
-          if [ -f "gh-pages-build/app/index.html" ]; then
-            cp gh-pages-build/app/index.html gh-pages-build/app/404.html
+          if [ -f "gh-pages-build/index.html" ]; then
+            cp gh-pages-build/index.html gh-pages-build/404.html
           fi
 
       - name: Setup Pages

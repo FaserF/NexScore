@@ -50,5 +50,5 @@ Our automation pipeline is powered entirely by **GitHub Actions** to ensure code
    - Compiles the Flutter app as a highly optimized Web release (`flutter build web --release`).
    - Injects the `APP_VERSION` and `IS_BETA` flags via `--dart-define` at compile time.
    - Builds the MkDocs documentation site.
-   - Merges both into a single cohesive artifact, deploying the documentation to the root URL and the PWA to `/app/`.
+   - Merges both into a single cohesive artifact, deploying the documentation to `/docs/` and the PWA to the root URL.
 3. **Dependency Management**: [Renovate Bot](https://github.com/renovatebot/renovate) continuously monitors `pubspec.yaml` and automatically creates PRs for dependency updates, ensuring the app never falls behind on security patches or performance improvements.
