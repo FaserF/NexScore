@@ -96,7 +96,28 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                   l10n.get('sipdeck_18_warning'),
                   style: const TextStyle(fontSize: 12, color: Colors.red),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+
+                // 2-Player Optimization Toggle (only show if 2 players)
+                if (players.length == 2)
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    child: SwitchListTile(
+                      title: Text(l10n.get('sipdeck_optimize_2players')),
+                      subtitle: Text(
+                        l10n.get('sipdeck_optimize_2players_desc'),
+                      ),
+                      value: state.filterMultiplayerOnly,
+                      onChanged: (val) {
+                        ref
+                            .read(sipDeckStateProvider.notifier)
+                            .toggleFilterMultiplayerOnly(val);
+                      },
+                    ),
+                  ),
+
+                if (players.length == 2) const SizedBox(height: 24),
+
                 // Category Selection Section
                 Text(
                   l10n.get('sipdeck_select_modes'),

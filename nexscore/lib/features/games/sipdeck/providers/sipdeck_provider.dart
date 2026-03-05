@@ -18,10 +18,23 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     state = state.copyWith(selectedCategories: cats);
   }
 
+  void toggleFilterMultiplayerOnly(bool value) {
+    state = state.copyWith(filterMultiplayerOnly: value);
+  }
+
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
-    final available = sipDeckDatabase
-        .where((c) => state.selectedCategories.contains(c.category))
-        .toList();
+    final available = sipDeckDatabase.where((c) {
+      final isCategorySelected = state.selectedCategories.contains(c.category);
+      if (!isCategorySelected) return false;
+
+      // Apply 2-player optimization filter
+      if (state.filterMultiplayerOnly && activePlayers.length <= 2) {
+        return c.minPlayers <= 2;
+      }
+
+      return true;
+    }).toList();
+
     if (available.isEmpty) return;
 
     final random = Random();

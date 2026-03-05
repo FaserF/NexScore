@@ -320,6 +320,9 @@ class AppLocalizations {
       'sipdeck_sips': '{0} Sips',
       'sipdeck_categories': 'Categories',
       'sipdeck_select_modes': 'Which modes do you want to play?',
+      'sipdeck_optimize_2players': '2-Player optimization',
+      'sipdeck_optimize_2players_desc':
+          'Hide cards that aren\'t fun with only two players.',
       'sipdeck_no_players': 'Add players first to play SipDeck.',
       'sipdeck_18_warning': 'Must be 18+ to play.',
       'sipdeck_2player_warning':
@@ -847,6 +850,9 @@ class AppLocalizations {
       'sipdeck_sips': '{0} Schlücke',
       'sipdeck_categories': 'Kategorien',
       'sipdeck_select_modes': 'Welche Modi möchtest du spielen?',
+      'sipdeck_optimize_2players': '2-Spieler Optimierung',
+      'sipdeck_optimize_2players_desc':
+          'Blende Karten aus, die zu zweit wenig Sinn machen.',
       'sipdeck_no_players': 'Füge zuerst Spieler hinzu, um SipDeck zu spielen.',
       'sipdeck_18_warning': 'Ab 18 Jahren freigegeben.',
       'sipdeck_2player_warning':

@@ -128,6 +128,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         'Group votes: who would survive a zombie apocalypse? Fewest votes = 2 sips.',
     sips: 2,
     category: SipDeckCategory.warmUp,
+    minPlayers: 3,
   ),
   SipDeckCard(
     id: 'w005',
@@ -178,6 +179,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: 'Rock Paper Scissors tournament. Last place takes 3 sips.',
     sips: 3,
     category: SipDeckCategory.warmUp,
+    minPlayers: 3,
   ),
   SipDeckCard(
     id: 'w012',
@@ -194,6 +196,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: 'Group vote: who talks the most? That person takes 2 sips.',
     sips: 2,
     category: SipDeckCategory.warmUp,
+    minPlayers: 3,
   ),
 
   // ─────── Wild Cards ───────
@@ -245,6 +248,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         'Telephone! {0} whispers a phrase, it goes around. Wrong at the end? Take 3 sips.',
     sips: 3,
     category: SipDeckCategory.wildCards,
+    minPlayers: 3,
   ),
   SipDeckCard(
     id: 'wc007',
@@ -285,6 +289,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         'Group challenge: plank position. Last one standing gives out 5 sips.',
     sips: 5,
     category: SipDeckCategory.wildCards,
+    minPlayers: 3,
   ),
 
   // ─────── Flirty (18+) ───────
@@ -319,6 +324,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         'Everyone votes: cutest smile in the room. That person gives out 3 sips.',
     sips: 3,
     category: SipDeckCategory.flirty,
+    minPlayers: 3,
   ),
   SipDeckCard(
     id: 'f005',
@@ -352,6 +358,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0} starts a toast. Everyone adds a sentence. Break the flow? Take 2 sips.',
     sips: 2,
     category: SipDeckCategory.barNight,
+    minPlayers: 3,
   ),
   SipDeckCard(
     id: 'b002',
@@ -384,6 +391,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         'Group: everyone stands and switches seats. Last to sit takes 2 sips.',
     sips: 2,
     category: SipDeckCategory.barNight,
+    minPlayers: 3,
   ),
   SipDeckCard(
     id: 'b006',
@@ -425,6 +433,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         'Everyone says the funniest word they know at the same time. Best word gives out 2 sips.',
     sips: 2,
     category: SipDeckCategory.laughs,
+    minPlayers: 3,
   ),
   SipDeckCard(
     id: 'l005',
