@@ -1,38 +1,43 @@
 # Account & Cloud Sync ☁️
 
-NexScore offers flexible options to keep your data safe and synchronized across all your devices.
+NexScore is designed as an **offline-first** application, meaning it works flawlessly without an internet connection. However, to keep your data safe, synchronize across multiple devices, and participate in global leaderboards, NexScore offers flexible cloud integration options.
 
-## Authentication Options
+## Authentication Providers
 
-We support two primary providers for authentication:
+We currently support two primary providers for authentication. You can access the sign-in options by navigating to the **Account/Profile** tab.
 
-### 1. Google Account
-- **Best for**: Most users, mobile devices, and seamless web entry.
-- **Technology**: Uses Firebase Authentication and Google Sign-In.
-- **Storage**: Data is securely stored in a private Firestore instance.
+### 1. Google Sign-In (Recommended)
+- **Best for**: The vast majority of users, seamless mobile experiences, and instant synchronization.
+- **How it works**: NexScore uses Firebase Authentication to securely verify your Google account.
+- **Storage**: Your game sessions, player data, and settings are securely synchronized to a private instance on Google Cloud Firestore in real-time. Changes made on your phone will instantly reflect on the Web App.
 
-### 2. GitHub Account
-- **Best for**: Developers and power users who want full ownership of their data.
-- **Technology**: Uses Firebase Authentication and GitHub OAuth.
-- **Storage**: In addition to standard cloud sync, GitHub users have access to **Gist Backup**.
+### 2. GitHub Sign-In (Power Users)
+- **Best for**: Developers, privacy advocates, and users who demand complete ownership and visibility over where their data lives.
+- **How it works**: NexScore uses Firebase Authentication combined with GitHub OAuth.
+- **Storage**: Instead of automatic real-time sync, GitHub users have exclusive access to the **Gist Backup Engine**.
 
-## GitHub Gist Backup 🛡️
+---
 
-NexScore provides a unique feature for GitHub users: **User-Owned Backups**.
+## The Gist Backup Engine 🛡️
 
-When you sign in with GitHub, NexScore can create a private [Gist](https://gist.github.com) on your behalf called `nexscore_backup.json`.
+NexScore provides a unique feature exclusively for users who sign in via GitHub: **User-Owned Private Backups**.
 
-### How it works:
-1. **Authorize**: Sign in with GitHub on the **Account** tab.
-2. **Backup**: Tap the **Upload** icon in the GitHub Gist tile. Your entire local database (players, sessions, settings) is serialized and uploaded to your private Gist.
-3. **Restore**: On a new device, sign in with the same GitHub account and tap the **Download** icon. Your data will be restored instantly.
+Rather than storing your data on our servers, NexScore can serialize your entire local database and save it as a private [Gist](https://gist.github.com) directly on your own GitHub account.
 
-!!! important "Privacy"
-    NexScore only requests the `gist` scope. We cannot see your other repositories or private data. The backup Gist is created as **private**, meaning only you can see it on GitHub.
+### How to use Gist Sync:
+1. **Authorize**: Sign in with GitHub on the **Account** tab. NexScore will request the `gist` OAuth scope.
+2. **Manual Backup**: Tap the **Upload/Backup** icon in the GitHub Gist tile. Your entire local SQLite database (all players, completed sessions, and app settings) is converted to a JSON file and uploaded as a private Gist named `nexscore_backup.json`.
+3. **Manual Restore**: On a new device (or after clearing your browser data), sign in with the same GitHub account and tap the **Download/Restore** icon. Your data will be fetched from GitHub and restored instantly, overwriting the empty local database.
 
-## Local-First Storage
+!!! important "Privacy & Security Guarantee"
+    NexScore ONLY requests the `gist` scope. We cannot read your private repositories, see your organization data, or access your code. Furthermore, the backup Gist is explicitly created as **private**, meaning only you (and the NexScore app while you are logged in) can view the file on GitHub.com.
 
-Even if you don't sign in, NexScore works perfectly! All data is stored in a local SQLite database on your device.
+---
 
-- **Offline Support**: You can record games without an internet connection.
-- **On-Demand Sync**: You can choose to sign in at any time to upload your existing local data to the cloud.
+## Local-First Storage (No Account)
+
+If you prefer not to create an account, that is completely fine! NexScore respects your privacy.
+
+- **100% Offline**: All data is stored in a highly optimized, local SQLite database directly on your device.
+- **No Feature Paywalls**: You still get full access to history, leaderboards, and all game types.
+- **On-Demand Upgrade**: You can use the app offline for months, and if you ever decide to get a new phone, you can simply sign in to Google or GitHub at that moment. NexScore will safely upload your existing local data to the cloud so you can transition devices seamlessly.

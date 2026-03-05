@@ -46,9 +46,7 @@ class SipDeckScreen extends ConsumerWidget {
           MaterialBanner(
             backgroundColor: Theme.of(context).colorScheme.errorContainer,
             content: Text(
-              l10n.getWith('error_msg', [
-                'SipDeck is best enjoyed with 3 or more players!',
-              ]), // Reusing a fallback or ideal text
+              l10n.get('sipdeck_2player_warning'),
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onErrorContainer,
               ),

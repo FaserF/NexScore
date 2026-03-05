@@ -217,7 +217,7 @@ class GamesListScreen extends StatelessWidget {
         route: '/games/setup/sipdeck',
         icon: Icons.local_bar,
         color: Colors.pink.shade700,
-        playerCount: '3+',
+        playerCount: '2+',
         tag: l10n.get('home_tag_party'),
         isAdult: true,
       ),

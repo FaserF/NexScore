@@ -309,6 +309,8 @@ class AppLocalizations {
       'sipdeck_categories': 'Categories',
       'sipdeck_no_players': 'Add players first to play SipDeck.',
       'sipdeck_18_warning': 'Must be 18+ to play.',
+      'sipdeck_2player_warning':
+          'SipDeck is best enjoyed with 3 or more players!',
       'sipdeck_cat_warmUp': 'Warm Up',
       'sipdeck_cat_wildCards': 'Wild Cards',
       'sipdeck_cat_flirty': 'Flirty (18+)',
@@ -635,6 +637,8 @@ class AppLocalizations {
       'sipdeck_categories': 'Kategorien',
       'sipdeck_no_players': 'Füge zuerst Spieler hinzu, um SipDeck zu spielen.',
       'sipdeck_18_warning': 'Ab 18 Jahren freigegeben.',
+      'sipdeck_2player_warning':
+          'SipDeck macht am meisten Spaß mit 3 oder mehr Spielern!',
       'sipdeck_cat_warmUp': 'Warm Up',
       'sipdeck_cat_wildCards': 'Wild Cards',
       'sipdeck_cat_flirty': 'Flirt (18+)',

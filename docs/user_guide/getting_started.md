@@ -4,11 +4,9 @@ NexScore is designed to be intuitive and fast. This guide will help you set up a
 
 ## Installation 📱
 
-NexScore is available on multiple platforms:
-
-- **Web**: Access the app directly at [https://faserf.github.io/NexScore/](https://faserf.github.io/NexScore/)
-- **Mobile**: Coming soon to the App Store and Google Play Store.
-- **Desktop**: Binary releases are available on our [GitHub Releases](https://github.com/FaserF/NexScore/releases) page for Windows, macOS, and Linux.
+- **Web & Desktop**: Access the app directly at [https://faserf.github.io/NexScore/](https://faserf.github.io/NexScore/). For the best desktop experience, please install NexScore as a PWA (Progressive Web App) directly from your browser. We do not provide native desktop applications.
+- **Android**: Currently, Android APK releases are available on our [GitHub Releases](https://github.com/FaserF/NexScore/releases) page for manual downloading and installation.
+- **iOS**: Available for beta testing via Apple TestFlight.
 
 ## First Steps 🚶‍♂️
 

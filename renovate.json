@@ -2,8 +2,13 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "config:best-practices",
-        ":dependencyDashboard"
+        ":dependencyDashboard",
+        ":preserveSemverRanges",
+        ":rebaseStalePrs",
+        "group:allNonMajor"
     ],
+    "timezone": "Europe/Berlin",
+    "ignoreTests": true,
     "baseBranches": [
         "main"
     ],
@@ -23,7 +28,6 @@
             ],
             "matchCurrentVersion": "/^v?[1-9]/",
             "automerge": true,
-            "autoclose": true,
             "platformAutomerge": true
         },
         {

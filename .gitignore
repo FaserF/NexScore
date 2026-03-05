@@ -143,3 +143,4 @@ $RECYCLE.BIN/
 *.log
 *.log.*
 logs/
+*.txt

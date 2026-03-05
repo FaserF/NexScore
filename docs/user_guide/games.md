@@ -21,6 +21,39 @@ Track your Qwixx game progress without needing a pen and paper.
 - **Misthrows**: Track up to 4 misthrows (-5 points each).
 - **Auto-Score**: Points are calculated based on the number of crosses in each row using the triangular number sequence (1, 3, 6, 10, ...).
 
+## 🍺 SipDeck (18+)
+A fun party game involving drinking challenges.
+- **Player Limits**: 2+ players (3+ recommended for maximum fun).
+- **Rules**: Follow the prompts and track the score!
+
+## 🍻 Schafkopf
+A traditional German trick-taking card game.
+- **Player Limits**: 4 players.
+
+## 🎲 Kniffel (Yahtzee)
+The classic dice game of probability and luck.
+- **Player Limits**: 2-8 players.
+- **Scorecard**: Comprehensive tracking for upper and lower sections.
+
+## 🃏 Phase 10
+The popular rummy-type card game.
+- **Player Limits**: 2-6 players.
+- **Phase Tracking**: Keep track of which phase each player is currently on.
+
+## 🎯 Darts (X01)
+Track your dart scores for standard X01 games (e.g., 301, 501).
+- **Player Limits**: 2-8 players.
+- **Checkout Tracking**: Monitor remaining scores and checkout combinations.
+
+## 🃏 Rommé (Rummy)
+The classic card melding game.
+- **Player Limits**: 2-6 players.
+
+## 👑 Arschloch (President)
+The popular hierarchical card game.
+- **Player Limits**: 3-8 players.
+- **Role Tracking**: Keep track of the President, Vice President, etc., across rounds.
+
 ## 📊 Generic Scoreboard
 
 For any other game, use the Generic scoreboard.
