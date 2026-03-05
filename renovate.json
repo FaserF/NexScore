@@ -9,7 +9,7 @@
     ],
     "timezone": "Europe/Berlin",
     "ignoreTests": true,
-    "baseBranches": [
+    "baseBranchPatterns": [
         "main"
     ],
     "labels": [
