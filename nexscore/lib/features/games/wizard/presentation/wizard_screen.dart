@@ -8,9 +8,16 @@ import '../models/wizard_models.dart';
 import '../providers/wizard_provider.dart';
 
 // Local provider for banner dismissal
-final wizardBannerDismissedProvider = StateProvider.autoDispose<bool>(
-  (ref) => false,
-);
+class WizardBannerDismissedNotifier extends AutoDisposeNotifier<bool> {
+  @override
+  bool build() => false;
+  void dismiss() => state = true;
+}
+
+final wizardBannerDismissedProvider =
+    NotifierProvider.autoDispose<WizardBannerDismissedNotifier, bool>(
+      WizardBannerDismissedNotifier.new,
+    );
 
 class WizardScreen extends ConsumerWidget {
   const WizardScreen({super.key});
