@@ -96,7 +96,7 @@ CREATE TABLE sessions (
         metadata: {
           'duration': '${stopwatch.elapsedMilliseconds}ms',
           'count': results.length,
-          if (where != null) 'where': where,
+          'where': ?where,
         },
       );
       return results;
@@ -168,7 +168,7 @@ CREATE TABLE sessions (
         tag: 'Database',
         metadata: {
           'duration': '${stopwatch.elapsedMilliseconds}ms',
-          if (where != null) 'where': where,
+          'where': ?where,
         },
       );
     } catch (e, stack) {
@@ -202,7 +202,7 @@ CREATE TABLE sessions (
         tag: 'Database',
         metadata: {
           'duration': '${stopwatch.elapsedMilliseconds}ms',
-          if (where != null) 'where': where,
+          'where': ?where,
         },
       );
     } catch (e, stack) {

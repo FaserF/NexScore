@@ -1,308 +1,114 @@
-# NexScore Documentation
+<p align="center">
+  <img src="../assets/logo.png" width="80" alt="NexScore Logo">
+</p>
 
-> Full docs for the NexScore app — game rules, architecture, deployment, and contribution guide.
-> 🌐 **Live app:** [faserf.github.io/NexScore](https://faserf.github.io/NexScore/) · 💻 **Source:** [github.com/FaserF/NexScore](https://github.com/FaserF/NexScore)
+# NexScore Technical Documentation
 
----
-
-## Contents
-
-1. [Getting Started](#getting-started)
-2. [Game Rules & Module Guide](#game-rules--module-guide)
-3. [Architecture](#architecture)
-4. [Internationalization](#internationalization)
-5. [CI/CD](#cicd)
-6. [Deployment (Docker)](#deployment-docker)
-7. [Contributing](#contributing)
-8. [Legal](#legal)
+Welcome to the official developer documentation for NexScore. This guide covers the system architecture, core backend patterns, game logic modules, and the automated CI/CD pipeline.
 
 ---
 
-## Getting Started
+## 🏗️ Architecture Overview
 
-### Prerequisites
+NexScore follows a **Feature-First Architecture** combined with a **Decoupled Business Logic Layer**. We prioritize clear separation of concerns to ensure the app remains scalable, testable, and robust.
 
-| Tool | Required version |
-|------|-----------------|
-| Flutter | stable channel, ≥ 3.29 |
-| Dart | ^3.11.1 |
-| Firebase CLI | optional (for Firestore / Auth) |
-
-### Local Setup
-
-```bash
-git clone https://github.com/FaserF/NexScore.git
-cd NexScore/nexscore
-flutter pub get
-flutter run              # runs on connected device or emulator
-```
-
-### Running Tests
-
-```bash
-flutter test             # 50+ unit tests
-flutter analyze          # static analysis (zero issues enforced)
-```
+### Core Philosophy: "Backend Profi"
+Our infrastructure is built on four pillars:
+1. **Efficiency**: Use of asynchronous processing and optimized DB queries.
+2. **Clarity**: Single-responsibility services and standardized response formats.
+3. **Robustness**: Explicit error handling and structured logging.
+4. **Standardization**: Unified patterns for state management and API interactions.
 
 ---
 
-## Game Rules & Module Guide
+## 🛠️ Backend Infrastructure
 
-### Wizard
+### 1. Standardized Error Handling (`Result<T>`)
+We avoid throwing exceptions for expected failures. Instead, we use a functional `Result` pattern located in `lib/core/error/result.dart`.
+- **`Success<T>`**: Contains the successful data.
+- **`Failure`**: Base class for structured errors:
+    - `DatabaseFailure`: SQL or persistence errors.
+    - `ValidationFailure`: User input or business rule violations.
+    - `AuthFailure`: Authentication and permission issues.
+    - `UnexpectedFailure`: Catch-all for unknown errors.
 
-**Players:** 2–6 (note: Amigo official minimum is 3)
-**Path:** `/games/wizard`
+### 2. Structured Logging (`AppLogger`)
+Located in `lib/core/utils/logger.dart`, the `AppLogger` provides a unified interface for tracing:
+- **Trace**: Fine-grained debugging.
+- **Info**: General operation tracking.
+- **Warning**: Potential issues that don't halt execution.
+- **Error**: Critical failures (automatically includes stack traces).
 
-Each round, players bid the number of tricks they will win. The round count equals the number of cards dealt (round 1 = 1 card, round 2 = 2 cards, ...).
-
-| Scoring Variant | Correct Bid | Wrong Bid |
-|----------------|-------------|-----------|
-| Standard | +20 + tricks × 10 | −10 × |bid−tricks| |
-| Lenient | +10 + tricks offset | proportional deduction |
-| Extreme | +30 + tricks × 10 | −2 × |bid−tricks| × 10 |
-
-Special cards: **Wizard** (always wins), **Jester** (always loses). Trump suit rotates each round.
-
----
-
-### Qwixx
-
-**Players:** 2–5 | **Path:** `/games/qwixx`
-
-Players cross out numbers left-to-right in four coloured rows (red/yellow ascending, blue/green descending). A row locks when 5+ crosses are made and the row's rightmost number is crossed. Locked rows are removed from play for all players. Fewest penalty points (−5 each for unused columns) + most crossed numbers wins.
+### 3. High-Performance Persistence
+The `DatabaseService` (`lib/core/storage/database_service.dart`) handles the local SQLite state.
+- **Optimized Queries**: All heavy reads use database indexes for $O(1)$ or $O(\log n)$ performance.
+- **Async Threading**: Database operations are strictly asynchronous to keep the UI at 60+ FPS.
 
 ---
 
-### Schafkopf
+## 🎮 Game Logic & State Management
 
-**Players:** 4 (fixed) | **Path:** `/games/schafkopf`
+Each game in NexScore is encapsulated within its own feature module using the **Notifier Pattern**.
 
-Bavarian trick-taking game with bidding. Supported game types and payout multipliers:
+### Pattern Structure
+- **Screen**: Stateless or ConsumerWidget handling the UI.
+- **Provider**: A `NotifierProvider` (from `riverpod_annotation`) that holds the game state.
+- **Logic**: The Notifier contains the business rules (e.g., scoring, trick validation).
 
-| Type | Base | Schneider | Schwarz |
-|------|------|----------|---------|
-| Sauspiel | 1× | +1× | +1× |
-| Solo | 3× | +1× | +1× |
-| Wenz | 3× | +1× | +1× |
-| Tout | 4× | — | — |
-
-**Laufende** (running trumps) add +1× each. Base value configurable in session setup.
-
----
-
-### Kniffel (Yahtzee)
-
-**Players:** 2–8 | **Path:** `/games/kniffel`
-
-Roll 5 dice up to 3 times. Fill each scoresheet category once. Upper section: sum of matching numbers (bonus of +35 if upper total ≥ 63). Lower section includes 3-of-a-kind, 4-of-a-kind, Full House (25), Small Straight (30), Large Straight (40), Yahtzee/Kniffel (50), and Chance.
+### Highlight: Wizard Scoring Engine
+The Wizard module (`lib/features/games/wizard/`) supports three distinct scoring variants, managed through a strategy-based logic selection:
+- **Standard**: +20 per correct bid, +10 per trick.
+- **Lenient**: Fixed reward with offset-based deductions.
+- **Extreme**: +30 per correct bid, high-stakes penalty multipliers.
 
 ---
 
-### Phase 10
+## 🤖 CI/CD & Versioning
 
-**Players:** 2–6 | **Path:** `/games/phase10`
+NexScore features one of the most advanced CI/CD pipelines for a Flutter project, orchestrating multi-platform releases with automated semver logic.
 
-Complete all 10 phases in order (Original) or in any order (Masters). First player to complete all phases wins; ties broken by lowest penalty score.
+### 1. Version Management (`version_manager.py`)
+Our custom Python script handles the complex transition between Stable, Beta, and Dev releases.
+- **Stable**: Formatted as `X.Y.Z`.
+- **Beta**: Formatted as `X.Y.ZbN` (e.g., `1.2.0b3`).
+- **Dev**: Formatted as `X.Y.Z-devN-sha` (e.g., `1.2.1-dev4-a7b2c9d`).
 
-**Phase descriptions:**
-1. 2 sets of 3 · 2. Set of 3 + run of 4 · 3. Set of 4 + run of 4 · 4. Run of 7
-5. Run of 8 · 6. Run of 9 · 7. 2 sets of 4 · 8. 7 cards of one colour
-9. Set of 5 + set of 2 · 10. Set of 5 + set of 3
+### 2. Release Orchestrator
+The workflow in `.github/workflows/release_orchestrator.yml` manages the entire deployment lifecycle:
+1. **Calculate**: Determines the next version name and Docker-safe tags.
+2. **Build**: Concurrent parallel builds for Android (APK), iOS (Unsigned IPA), and Docker.
+3. **Deploy**: Triggers a PWA deployment to GitHub Pages.
+4. **Release**: Creates a GitHub Release, attaches artifacts, and generates a **commit-based changelog**.
 
-**Penalty cards:** Number cards = face value; Skip = 15; Wild = 25.
-
-**Variants:**
-- **Original** – Complete phases 1–10 in fixed order
-- **Masters** – Choose any phase each round (free choice, can't repeat completed phases)
-- **Duel** – 2-player head-to-head with tactical phase selection
-
----
-
-### Darts X01
-
-**Players:** 2–8 | **Path:** `/games/darts`
-
-Supported starting scores: 301, 501, 701, 1001. Players subtract their dart score each turn. Must finish on a **double** (double-out). A turn that would reduce the score below 0 or exactly to 1 is a **bust** (score reverts). Checkout table is built into the screen.
+### 3. Docker Optimization
+Docker images are automatically tagged with sanitized, lowercase tags and pushed to the GitHub Container Registry (GHCR).
 
 ---
 
-### Rommé
+## 🌐 Web & PWA Deployment
 
-**Players:** 2–6 | **Path:** `/games/romme`
-
-Multi-round points tracker. Each round, the player who goes out first scores 0; others score the sum of their remaining hand cards. Player with the fewest total penalty points after the agreed number of rounds wins.
-
----
-
-### Arschloch / President
-
-**Players:** 3–8 | **Path:** `/games/arschloch`
-
-Traditional folk card game (also known as *President* or *Asshole*). Players try to shed all cards. Card values ascending: 3 < 4 < … < K < A < **2** (highest). Special rules:
-
-- **2** beats any single card or combination
-- **Bomb** (4 of a kind) can be played out of turn and beats everything except another Bomb
-- Players may **pass** if they cannot beat the current play
-- Trick winner leads next
-
-**Ranks** (determined by finish order):
-
-| Position | German | English | Points |
-|----------|--------|---------|--------|
-| 1st | Präsident | President | +2 |
-| 2nd | Vizepräsident | Vice President | +1 |
-| Middle | Bürger | Citizen | 0 |
-| 2nd-last | Vize-Arschloch | Vice Asshole | −1 |
-| Last | Arschloch | Asshole | −2 |
-
-**Card exchange (next round):** Arschloch gives 2 best cards to President. President gives 2 arbitrary cards back. (With 5+ players: Vize-Arschloch gives 1 best card to Vizepräsident.)
+NexScore is served as a PWA on GitHub Pages.
+- **SPA Support**: A custom `404.html` handles client-side routing redirects for GoRouter.
+- **Performance**: Built with `--release` flags and WebGL/CanvasKit support for smooth animations.
+- **Favicons**: Custom NexScore branding is integrated via the `web/index.html` and the deployment workflow.
 
 ---
 
-### SipDeck
+## 📈 Development Standards
 
-**Players:** 3+ | **Path:** `/games/sipdeck` | 🔞 18+ only
+### Commit Messages
+We follow a strict English-only commit policy with descriptive headers (e.g., `feat:`, `fix:`, `refactor:`, `docs:`).
 
-Party drinking card game with 50+ challenge cards across 5 categories:
-
-| Category | Description |
-|----------|-------------|
-| Warm Up | Easy icebreaker challenges |
-| Wild Cards | Dares and rule-setting challenges |
-| Flirty* | Playful, flirty challenges (18+) |
-| Bar Night | Bar-appropriate public challenges |
-| Laughs | Silly, absurd things to do or say |
-
-**Virus rules** are ongoing challenges that persist until a cure card is drawn. Card text uses `{0}` and `{1}` for dynamic player name injection.
-
-*All players must be 18+ for Flirty category.*
+### Linting & Testing
+- **Analysis**: `flutter analyze` must pass with zero issues.
+- **Tests**: `flutter test` covers core utility classes and i18n parity.
+- **Parity Check**: The `i18n_parity_test.dart` ensures all strings are translated in both English and German.
 
 ---
 
-## Architecture
+## ⚖️ Legal & Licensing
 
-### Tech Stack
+Created by **Fabian Seitz**.
+Distributed under the **MIT License**.
 
-| Layer | Technology |
-|-------|-----------|
-| UI / Mobile | Flutter 3.x (Dart) |
-| State | Riverpod 3.x (Notifier / AsyncNotifier) |
-| Navigation | GoRouter 17.x (StatefulShellRoute) |
-| Local storage | sqflite (offline-first) |
-| Cloud sync | Firebase Firestore (optional, behind Google Sign-In) |
-| Auth | Firebase Auth (Google Sign-In) |
-| Theming | FlexColorScheme 8.x (Material 3, Light/Dark) |
-| URL handling | url_launcher 6.x |
-
-### Folder Structure
-
-```
-nexscore/lib/
-├── core/
-│   ├── i18n/          # AppLocalizations (75+ keys, EN + DE)
-│   ├── models/        # Session, Player models
-│   ├── presentation/  # ScaffoldWithNavBar
-│   └── router/        # GoRouter config
-└── features/
-    ├── auth/          # Google Sign-In, ProfileScreen
-    ├── games/
-    │   ├── arschloch/ # Arschloch / President
-    │   ├── extras/    # Phase 10, Darts, Rommé
-    │   ├── kniffel/   # Kniffel / Yahtzee
-    │   ├── qwixx/     # Qwixx
-    │   ├── schafkopf/ # Schafkopf
-    │   ├── sipdeck/   # SipDeck (drinking game)
-    │   └── wizard/    # Wizard
-    ├── help/          # HelpScreen (links to docs + GitHub)
-    ├── history/       # Session history
-    ├── leaderboards/  # Rankings
-    └── players/       # Player management
-```
-
----
-
-## Internationalization
-
-NexScore ships with full **English** and **German** translations (75+ keys). The app auto-detects the system locale. Fallback is always English.
-
-The CI suite includes an **i18n parity test** (`test/core/i18n/i18n_parity_test.dart`) that:
-- Verifies both `en` and `de` locale maps have identical key sets
-- Fails the build if any translation is empty or missing
-- Verifies all 9 game name and description keys
-
----
-
-### CI/CD
-
-Four GitHub Actions workflows run automatically on every push to `main`:
-
-```
-.github/workflows/
-├── test.yml       → flutter test + flutter analyze
-├── build_apk.yml  → flutter build apk --release → GitHub Release
-├── build_ipa.yml  → flutter build ipa (unsigned) → GitHub Release
-└── build_web.yml  → docker build + push to ghcr.io
-```
-
-**Renovate Bot** is configured in `/renovate.json` to auto-merge minor/patch updates.
-
-### Manual Releases & Pre-releases
-The workflows support `workflow_dispatch` (manual trigger).
-- **Is Pre-release?**: Trigger a "Beta" release.
-- **IS_BETA Flag**: Passes `--dart-define=IS_BETA=true`, activating the **BETA banner** in-app.
-
----
-
-## Settings & Customization
-
-NexScore features a dedicated Settings view.
-
-| Feature | implementation | Persistence |
-|---------|----------------|-------------|
-| **Theme** | Light/Dark/System | `shared_preferences` |
-| **Language** | Manual EN/DE or System | `shared_preferences` |
-| **Data Reset** | Full wipe of storage | `DatabaseService` |
-
----
-
-## Deployment (Docker)
-
-The web app is built into a Docker image using a multi-stage Flutter web build:
-
-```bash
-# Build
-docker build -t nexscore-web:local .
-
-# Run – open http://localhost:8080
-docker run -p 8080:80 nexscore-web:local
-
-# Production (via GitHub Actions)
-# Image is pushed to: ghcr.io/faserf/nexscore:latest
-# Served at: https://faserf.github.io/NexScore/
-```
-
----
-
-## Contributing
-
-Contributions are welcome!
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Commit your changes (all commit messages in **English**)
-4. Run `flutter test` and `flutter analyze` (must pass with 0 issues)
-5. Open a Pull Request
-
-**Issue templates** (GitHub UI variant):
-- 🐛 [Bug Report](.github/ISSUE_TEMPLATE/bug_report.yml)
-- 💡 [Feature Request](.github/ISSUE_TEMPLATE/feature_request.yml)
-
----
-
-## Legal
-
-**Attribution:** Created by [Fabian Seitz (FaserF)](https://fabiseitz.de)
-
-**Trademark Notice:** Wizard® is a trademark of Amigo. Qwixx® is a trademark of Nürnberger Spielkarten. Kniffel® is a trademark of MB Spiele (Hasbro). Phase 10® is a trademark of Mattel. NexScore is not affiliated with any of these companies. SipDeck is an original game concept by the author. Arschloch / President is a traditional public-domain folk card game.
-
-MIT License — see [LICENSE](../LICENSE).
+Referenced trademarks (Wizard, Qwixx, etc.) belong to their respective publishers. NexScore is a non-commercial utility project.

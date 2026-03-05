@@ -21,6 +21,10 @@ class AuthFailure extends Failure {
   const AuthFailure(super.message, {super.error, super.stackTrace});
 }
 
+class SyncFailure extends Failure {
+  const SyncFailure(super.message, {super.error, super.stackTrace});
+}
+
 class UnexpectedFailure extends Failure {
   const UnexpectedFailure(super.message, {super.error, super.stackTrace});
 }

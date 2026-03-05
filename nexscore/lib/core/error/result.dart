@@ -28,7 +28,7 @@ class Result<T> {
     if (isFailure) {
       return onFailure(_failure!);
     } else {
-      return onSuccess(_value!);
+      return onSuccess(_value as T);
     }
   }
 }

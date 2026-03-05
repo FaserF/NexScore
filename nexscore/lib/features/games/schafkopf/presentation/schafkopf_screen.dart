@@ -6,25 +6,7 @@ import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/schafkopf_models.dart';
 
-class SchafkopfStateNotifier extends Notifier<List<SchafkopfRound>> {
-  @override
-  List<SchafkopfRound> build() => [];
-
-  void addRound(SchafkopfRound round) {
-    state = [...state, round];
-  }
-
-  void removeLastRound() {
-    if (state.isNotEmpty) {
-      state = state.sublist(0, state.length - 1);
-    }
-  }
-}
-
-final schafkopfStateProvider =
-    NotifierProvider<SchafkopfStateNotifier, List<SchafkopfRound>>(
-      SchafkopfStateNotifier.new,
-    );
+import '../providers/schafkopf_provider.dart';
 
 class SchafkopfScreen extends ConsumerWidget {
   const SchafkopfScreen({super.key});

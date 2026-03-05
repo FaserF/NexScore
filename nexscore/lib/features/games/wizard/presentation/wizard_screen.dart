@@ -5,18 +5,7 @@ import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/wizard_models.dart';
-
-class WizardGameStateNotifier extends Notifier<WizardGameState> {
-  @override
-  WizardGameState build() => const WizardGameState();
-
-  void updateState(WizardGameState newState) => state = newState;
-}
-
-final wizardStateProvider =
-    NotifierProvider<WizardGameStateNotifier, WizardGameState>(
-      WizardGameStateNotifier.new,
-    );
+import '../providers/wizard_provider.dart';
 
 class WizardScreen extends ConsumerWidget {
   const WizardScreen({super.key});
@@ -410,8 +399,12 @@ class WizardScreen extends ConsumerWidget {
       },
     );
 
-    for (var c in bidControllers.values) c.dispose();
-    for (var c in trickControllers.values) c.dispose();
+    for (var c in bidControllers.values) {
+      c.dispose();
+    }
+    for (var c in trickControllers.values) {
+      c.dispose();
+    }
   }
 
   void _saveRound(

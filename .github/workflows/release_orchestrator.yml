@@ -1,45 +1,58 @@
-# Professional Release Orchestrator for NexScore
-# Builds APK, IPA, and Docker Web Image. Creates a single consolidated GitHub Release.
-
 name: Release Orchestrator
 
 on:
   workflow_dispatch:
     inputs:
-      is_prerelease:
-        description: 'Is this a pre-release (Beta)?'
+      release_type:
+        description: 'Release Type'
         required: true
-        type: boolean
-        default: false
-      version_name:
-        description: 'Version Name (e.g., 0.1.0)'
+        type: choice
+        options:
+          - stable
+          - beta
+          - dev
+        default: 'stable'
+      bump_type:
+        description: 'Version Bump'
         required: true
-        type: string
-        default: '0.1.0'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - none
+        default: 'patch'
 
 permissions:
   contents: write
   packages: write
+  pages: write
+  id-token: write
 
 jobs:
-  test:
-    name: Run Unit Tests
+  version-calc:
+    name: Calculate Next Version
     runs-on: ubuntu-latest
+    outputs:
+      version_name: ${{ steps.calc.outputs.VERSION_NAME }}
+      tag_name: ${{ steps.calc.outputs.TAG_NAME }}
+      docker_tag: ${{ steps.calc.outputs.DOCKER_TAG }}
+      is_prerelease: ${{ steps.calc.outputs.IS_PRERELEASE }}
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          cache: true
-      - name: Install dependencies
-        run: flutter pub get
-        working-directory: nexscore
-      - name: Run tests
-        run: flutter test
-        working-directory: nexscore
+          fetch-depth: 0 # Needed for tags
+
+      - name: Run Version Manager
+        id: calc
+        run: |
+          python3 scripts/version_manager.py \
+            --release-type ${{ github.event.inputs.release_type }} \
+            --bump-type ${{ github.event.inputs.bump_type }} \
+            --commit-sha ${{ github.sha }} >> $GITHUB_OUTPUT
 
   build-android:
-    needs: test
+    needs: version-calc
     name: Build Android APK
     runs-on: ubuntu-latest
     outputs:
@@ -57,11 +70,9 @@ jobs:
           java-version: '17'
       - name: Build APK
         run: |
-          DART_DEFINES=""
-          if [ "${{ github.event.inputs.is_prerelease }}" = "true" ]; then
-            DART_DEFINES="--dart-define=IS_BETA=true"
-          fi
-          flutter build apk --release $DART_DEFINES
+          flutter build apk --release \
+            --build-name=${{ needs.version-calc.outputs.version_name }} \
+            --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }}
         working-directory: nexscore
       - name: Generate SHA256
         id: generate_sha
@@ -77,7 +88,7 @@ jobs:
           path: nexscore/build/app/outputs/flutter-apk/app-release.apk*
 
   build-ios:
-    needs: test
+    needs: version-calc
     name: Build iOS IPA
     runs-on: macos-latest
     steps:
@@ -88,11 +99,9 @@ jobs:
           cache: true
       - name: Build IPA (Unsigned)
         run: |
-          DART_DEFINES=""
-          if [ "${{ github.event.inputs.is_prerelease }}" = "true" ]; then
-            DART_DEFINES="--dart-define=IS_BETA=true"
-          fi
-          flutter build ipa --no-codesign --release $DART_DEFINES
+          flutter build ipa --no-codesign --release \
+            --build-name=${{ needs.version-calc.outputs.version_name }} \
+            --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }}
         working-directory: nexscore
       - name: Upload IPA (Artifacts)
         uses: actions/upload-artifact@v4
@@ -101,9 +110,11 @@ jobs:
           path: nexscore/build/ios/archive/*.xcarchive
 
   build-web:
-    needs: test
+    needs: version-calc
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    outputs:
+      image_name: ${{ steps.image_name.outputs.IMAGE_NAME }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
@@ -114,47 +125,79 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare Image Name
+        id: image_name
+        run: |
+          IMAGE_NAME=$(echo "ghcr.io/${{ github.repository_owner }}/nexscore" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: ./nexscore
           push: true
           build-args: |
-            IS_BETA=${{ github.event.inputs.is_prerelease }}
+            APP_VERSION=${{ needs.version-calc.outputs.version_name }}
           tags: |
-            ghcr.io/${{ github.repository_owner }}/nexscore:latest
-            ghcr.io/${{ github.repository_owner }}/nexscore:${{ github.event.inputs.version_name }}
+            ${{ steps.image_name.outputs.IMAGE_NAME }}:latest
+            ${{ steps.image_name.outputs.IMAGE_NAME }}:${{ needs.version-calc.outputs.docker_tag }}
+
+  deploy-pwa:
+    needs: version-calc
+    name: Deploy PWA to GitHub Pages
+    uses: ./.github/workflows/deploy_pages.yml
+    with:
+      deploy_pwa: true
+      version_name: ${{ needs.version-calc.outputs.version_name }}
 
   create-release:
-    needs: [build-android, build-ios, build-web]
+    needs: [version-calc, build-android, build-ios, build-web, deploy-pwa]
     name: Create GitHub Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+
       - name: Prepare Release Assets
         run: |
           mkdir release_assets
-          cp artifacts/NexScore-Android/app-release.apk release_assets/NexScore-v${{ github.event.inputs.version_name }}.apk
-          cp artifacts/NexScore-Android/app-release.apk.sha256 release_assets/NexScore-v${{ github.event.inputs.version_name }}.apk.sha256
+          cp artifacts/NexScore-Android/app-release.apk release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk
+          cp artifacts/NexScore-Android/app-release.apk.sha256 release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk.sha256
+
+      - name: Generate Changelog
+        id: changelog
+        uses: metcalfc/changelog-generator@v4.3.1
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.event.inputs.version_name }}${{ github.event.inputs.is_prerelease == 'true' && '-beta' || '' }}
-          name: NexScore v${{ github.event.inputs.version_name }}${{ github.event.inputs.is_prerelease == 'true' && ' (Beta)' || '' }}
-          prerelease: ${{ github.event.inputs.is_prerelease }}
+          tag_name: ${{ needs.version-calc.outputs.tag_name }}
+          name: NexScore ${{ needs.version-calc.outputs.version_name }}
+          prerelease: ${{ needs.version-calc.outputs.is_prerelease == 'true' }}
           files: release_assets/*
           body: |
-            ## 🚀 NexScore v${{ github.event.inputs.version_name }}
+            ## 🚀 NexScore ${{ needs.version-calc.outputs.version_name }}
+
+            ### 🌐 Live PWA
+            Available at: https://faserf.github.io/NexScore/
 
             ### 📦 Downloads & Artifacts
             | Platform | File | SHA256 Checksum |
             |----------|------|-----------------|
-            | **Android** | [NexScore.apk](https://github.com/${{ github.repository }}/releases/download/v${{ github.event.inputs.version_name }}${{ github.event.inputs.is_prerelease == 'true' && '-beta' || '' }}/NexScore-v${{ github.event.inputs.version_name }}.apk) | `${{ needs.build-android.outputs.sha256 }}` |
-            | **Web** | `docker pull ghcr.io/${{ github.repository_owner }}/nexscore:${{ github.event.inputs.version_name }}` | _Container Image_ |
+            | **Android** | [NexScore.apk](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk) | `${{ needs.build-android.outputs.sha256 }}` |
+            | **Web (Docker)** | `docker pull ${{ needs.build-web.outputs.image_name }}:${{ needs.version-calc.outputs.docker_tag }}` | _Container Image_ |
+            | **Docs** | [Documentation](https://faserf.github.io/NexScore/docs/) | _Online_ |
+
+            ### 📝 Changes
+            ${{ steps.changelog.outputs.changelog }}
 
             ---
             *Released by Orchestrator on $(date +'%Y-%m-%d %H:%M:%S')*

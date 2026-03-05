@@ -2,44 +2,86 @@ name: Deploy to GitHub Pages
 
 on:
   push:
+    paths:
+      - 'docs/**'
     branches:
       - main
+  workflow_call:
+    inputs:
+      deploy_pwa:
+        required: true
+        type: boolean
+        default: false
+      version_name:
+        required: false
+        type: string
+        default: 'latest'
   workflow_dispatch:
+    inputs:
+      deploy_pwa:
+        description: 'Force PWA deployment?'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Flutter
+        if: ${{ inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true) }}
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
 
-      - name: Install dependencies
-        run: flutter pub get
-        working-directory: nexscore
-
-      - name: Build Web App
-        run: flutter build web --release --base-href "/NexScore/"
+      - name: Build Web App (PWA)
+        if: ${{ inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true) }}
+        run: |
+          flutter pub get
+          flutter build web --release --base-href "/NexScore/" --dart-define=APP_VERSION=${{ inputs.version_name }}
         working-directory: nexscore
 
       - name: Prepare Deployment Directory
         run: |
           mkdir -p gh-pages-build
-          # Copy the built Flutter web app to the root
-          cp -R nexscore/build/web/* gh-pages-build/
-          # Copy the entire docs folder into a docs subdirectory
+
+          # 1. Handle PWA (only if built)
+          if [ -d "nexscore/build/web" ]; then
+            cp -R nexscore/build/web/* gh-pages-build/
+          fi
+
+          # 2. Handle Docs (always)
           cp -R docs gh-pages-build/docs
+          # 3. Handle branding assets
+          cp -R assets gh-pages-build/assets
+          # Create a simple index.html in docs if missing to prevent 404
+          echo '<!DOCTYPE html><html><head><title>NexScore Documentation</title><link rel="icon" type="image/png" href="../assets/favicon.png"><meta http-equiv="refresh" content="0; url=README.md"></head><body>Redirecting to <a href="README.md">README.md</a></body></html>' > gh-pages-build/docs/index.html
+
+          # 4. SPA Support
+          touch gh-pages-build/.nojekyll
+          if [ -f "gh-pages-build/index.html" ]; then
+            cp gh-pages-build/index.html gh-pages-build/404.html
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './gh-pages-build'
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./gh-pages-build
-          force_orphan: true
+        id: deployment
+        uses: actions/deploy-pages@v4

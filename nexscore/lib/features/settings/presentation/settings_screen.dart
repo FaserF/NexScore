@@ -8,6 +8,7 @@ import '../../players/repository/player_repository.dart';
 import '../provider/settings_provider.dart';
 import '../../../core/theme/widgets/glass_container.dart';
 import '../../../core/theme/widgets/animated_scale_button.dart';
+import '../../../core/utils/app_version.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -181,6 +182,45 @@ class SettingsScreen extends ConsumerWidget {
                         color: Colors.red,
                       ),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        'NexScore v${const String.fromEnvironment('APP_VERSION', defaultValue: '0.1.0+1')}',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.outline,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (AppVersion.isPreRelease)
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.orange.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: const Text(
+                            'BETA',
+                            style: TextStyle(
+                              color: Colors.orange,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 48),

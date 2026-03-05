@@ -1,7 +1,11 @@
+<p align="center">
+  <img src="assets/logo.png" width="120" alt="NexScore Logo">
+</p>
+
 # NexScore
 
 <p align="center">
-  <strong>A cross-platform score tracker for your favourite card and board games.</strong><br>
+  <strong>A professional, high-performance cross-platform score tracker for your favorite card and board games.</strong><br>
   Available on <strong>Android</strong> · <strong>iOS</strong> · <strong><a href="https://faserf.github.io/NexScore/">Web (PWA)</a></strong>
 </p>
 
@@ -13,83 +17,83 @@
 
 ---
 
-### 🚀 Version 0.1.0 (Beta)
-NexScore is now in its official Beta phase.
+## 🚀 Overview
 
-## Features
+NexScore is built with a focus on **Efficiency, Clarity, and Robustness**. It's not just a score tracker; it's a premium gaming companion designed with a "Backend Profi" philosophy—standardized architecture, high-performance logic, and a stunning glassmorphism UI.
 
-- **9 Games Supported:** Wizard · Qwixx · Schafkopf · Kniffel · Phase 10 · Darts X01 · Rommé · **SipDeck** (18+) · **Arschloch**
-- **Settings & Customization:** Dynamic Theme (Light/Dark/System), Language (DE/EN), and Database Management.
-- **Environment Banners:** Automatic "DEV" and "BETA" indicators to clarify build state.
-- **Universal Support:** Full compatibility with Web (WASM), Android (APK), and iOS (IPA).
-- **Offline First:** Track scores fully offline without an account
-- **Optional Sync:** Sign in with Google to backup and sync match history via Firestore
-- **Leaderboards:** Automatically calculated global leaderboards by win rate
-- **Match History:** Browse and share previous game sessions
-- **Help Screen:** In-app links to documentation, bug reports and feature requests
+### Key Highlights
+- **Clean Architecture**: Decoupled game logic using Riverpod Notifiers for reactive, predictable state management.
+- **Profi Backend**: Unified `Result<T>` error handling, structured `AppLogger`, and optimized SQLite with database indexes.
+- **Advanced CI/CD**: Fully automated semver versioning (`Stable`, `Beta`, `Dev`) for Android, iOS, Docker, and PWA.
+- **18+ Content**: Dedicated support for drinking games like **SipDeck** with safety warnings and age verification.
 
-## Supported Games
+---
 
-| Game | Players | Notable Features |
-|------|---------|-----------------|
-| Wizard® | 2–6 | Standard / Lenient / Extreme scoring, Amigo 2-player warning |
-| Qwixx® | 2–5 | Coloured rows, lock logic, full scoresheet |
-| Schafkopf | 4 | Sauspiel, Solo, Wenz, Laufende, Schneider, Schwarz payout |
-| Kniffel® (Yahtzee) | 2–8 | Full scoresheet with upper-section bonus |
-| Phase 10® | 2–6 | Original / Masters / Duel variants, phase legend |
-| Darts X01 | 2–8 | 301/501/701/1001, bust detection, keypad input |
-| Rommé | 2–6 | Multi-round penalty tracking, live totals |
-| Arschloch / President | 3–8 | Rank tracking, card exchange instructions, point mode |
-| SipDeck | 3+ | 50+ challenge cards, 5 categories, virus rules (18+) |
+## 🎮 Supported Games
 
-## Quick Start
+NexScore supports a wide variety of card, dice, and strategy games with specialized logic for each:
 
+- **Wizard®**: Comprehensive trick bidding with multiple scoring variants (Standard/Lenient/Extreme).
+- **Qwixx®**: Digital scoresheet with locked-row logic and automated penalty calculation.
+- **Schafkopf**: Bavarian trick-taking with Sauspiel, Solo, and Wenz support.
+- **Kniffel®**: Full Yahtzee scoresheet with automated upper-section bonus calculation.
+- **Phase 10®**: Original, Masters, and Duel variants with phase tracking.
+- **Darts X01**: Fast-pass scoring board for 301/501/701/1001 with bust detection.
+- **Rommé**: Multi-round penalty tracking for 2–6 players.
+- **Arschloch / President**: Rank tracking with automated card exchange instructions.
+- **SipDeck (18+)**: Dynamic drinking game with 50+ challenges and virus rules.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+- **Framework**: [Flutter 3.x](https://flutter.dev) (Multi-platform WASM, Mobile)
+- **State Management**: [Riverpod](https://riverpod.dev) (AsyncNotifiers, Providers)
+- **Storage**: [sqflite](https://pub.dev/packages/sqflite) (Offline-first, performance indexed)
+- **Cloud**: [Firebase](https://firebase.google.com) (Auth, Firestore Sync)
+- **Design System**: Glassmorphism with Material 3 & [FlexColorScheme](https://pub.dev/packages/flex_color_scheme)
+- **CI/CD Orchestration**: Automated with Python semantic versioning and GitHub Actions
+
+For deep technical details, see our **[Documentation Guide](docs/README.md)**.
+
+---
+
+## 📦 Deployment & Releases
+
+### Release Channels
+We maintain three release streams:
+- **Stable**: For general use.
+- **Beta**: Feature-complete previews of the next release.
+- **Dev**: Bleeding-edge builds directly from the `main` branch.
+
+### Manual Build (Local)
 ```bash
-git clone https://github.com/FaserF/NexScore.git
-cd NexScore/nexscore
-flutter pub get
-flutter run
+# Web (Docker)
+docker build -t nexscore-web .
+docker run -p 8080:80 nexscore-web
+
+# Android
+flutter build apk --release --dart-define=APP_VERSION=1.0.0
+
+# iOS (Unsigned)
+flutter build ipa --no-codesign --release
 ```
 
-## Web (Docker)
+---
 
-```bash
-# Build the Docker image
-docker build -t nexscore-web:local .
+## 🤝 Contributing
 
-# Run locally – open http://localhost:8080 in your browser
-docker run -p 8080:80 nexscore-web:local
-```
+We follow a high-standard "Clean Code" policy.
+1. [Report a Bug](https://github.com/FaserF/NexScore/issues/new?template=bug_report.yml)
+2. [Request a Feature](https://github.com/FaserF/NexScore/issues/new?template=feature_request.yml)
+3. Check the **[Developer Guide](docs/README.md#contributing)** before submitting PRs.
 
-## Build APK (Android)
+---
 
-```bash
-flutter build apk --release
-# Output: build/app/outputs/flutter-apk/app-release.apk
-```
+## 📜 Legal & Attribution
 
-## CI/CD
+**Created by [FaserF](https://fabiseitz.de)**
 
-| Workflow | Runner | Output |
-|----------|--------|--------|
-| `test.yml` | ubuntu-latest | `flutter test` (50+ tests) |
-| `build_apk.yml` | ubuntu-latest | Release `.apk` → GitHub Release |
-| `build_ipa.yml` | macos-latest | Unsigned `.ipa` → GitHub Release |
-| `build_web.yml` | ubuntu-latest | Docker image pushed to `ghcr.io` |
+*NexScore is an independent project and is not affiliated with, authorized, or endorsed by the official publishers of Wizard®, Qwixx®, Kniffel®, or Phase 10® or any other mentioned game in here. All trademarks are property of their respective owners.*
 
-**Renovate Bot** auto-merges minor/patch updates for Dart packages, GitHub Actions, and Docker weekly.
-
-## Contributing
-
-- 🐛 [Report a Bug](https://github.com/FaserF/NexScore/issues/new?template=bug_report.yml)
-- 💡 [Request a Feature](https://github.com/FaserF/NexScore/issues/new?template=feature_request.yml)
-- 📖 [Documentation](https://faserf.github.io/NexScore/docs/)
-- 💬 [Discussions](https://github.com/FaserF/NexScore/discussions)
-
-## Legal
-
-**Attribution:** Created by [Fabian Seitz (FaserF)](https://fabiseitz.de) — [github.com/FaserF/NexScore](https://github.com/FaserF/NexScore)
-
-**Trademark Notice:** NexScore holds no copyright or trademark over any referenced physical games. Wizard® (Amigo), Qwixx® (Nürnberger Spielkarten), Kniffel® (MB Spiele), Phase 10® (Mattel), and others are property of their respective owners. SipDeck is an original concept. Arschloch / President is a traditional public-domain folk card game.
-
-This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
+Licensed under [MIT](LICENSE).

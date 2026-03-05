@@ -21,7 +21,7 @@
                 "minor",
                 "patch"
             ],
-            "matchCurrentVersion": "!/^0/",
+            "matchCurrentVersion": "/^v?[1-9]/",
             "automerge": true,
             "autoclose": true,
             "platformAutomerge": true

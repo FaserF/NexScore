@@ -5,28 +5,7 @@ import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 
-class KniffelStateNotifier extends Notifier<Map<String, YahtzeePlayerSheet>> {
-  @override
-  Map<String, YahtzeePlayerSheet> build() => {};
-
-  void initPlayers(List<String> playerIds) {
-    state = {for (final id in playerIds) id: const YahtzeePlayerSheet()};
-  }
-
-  void updateScore(String playerId, YahtzeeCategory category, int value) {
-    final updatedMap = Map<String, YahtzeePlayerSheet>.from(state);
-    final sheet = updatedMap[playerId] ?? const YahtzeePlayerSheet();
-    final newScores = Map<YahtzeeCategory, int>.from(sheet.scores);
-    newScores[category] = value;
-    updatedMap[playerId] = sheet.copyWith(scores: newScores);
-    state = updatedMap;
-  }
-}
-
-final kniffelStateProvider =
-    NotifierProvider<KniffelStateNotifier, Map<String, YahtzeePlayerSheet>>(
-      KniffelStateNotifier.new,
-    );
+import '../providers/kniffel_provider.dart';
 
 class KniffelScreen extends ConsumerWidget {
   const KniffelScreen({super.key});

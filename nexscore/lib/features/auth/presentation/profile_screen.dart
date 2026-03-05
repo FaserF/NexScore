@@ -6,6 +6,7 @@ import '../../../core/i18n/app_localizations.dart';
 import '../../../core/utils/logger.dart';
 import '../../../core/error/failures.dart';
 import '../../../core/error/result.dart';
+import '../../../core/sync/gist_sync_service.dart';
 
 /// Provider for the current Firebase Auth user (null = signed out / anonymous).
 final authUserProvider = StreamProvider<User?>((ref) {
@@ -88,6 +89,36 @@ class AuthService {
     }
   }
 
+  Future<Result<UserCredential>> signInWithGithub() async {
+    final stopwatch = Stopwatch()..start();
+    try {
+      final githubProvider = GithubAuthProvider();
+      githubProvider.addScope('gist');
+      githubProvider.setCustomParameters({'allow_signup': 'false'});
+
+      final credential = await _auth.signInWithPopup(githubProvider);
+      AppLogger.info(
+        'GitHub Sign-In (Popup) successful',
+        tag: 'Auth',
+        metadata: {
+          'duration': '${stopwatch.elapsedMilliseconds}ms',
+          'uid': credential.user?.uid,
+        },
+      );
+      return Result.success(credential);
+    } catch (e, stack) {
+      AppLogger.error(
+        'GitHub Sign-In (Popup) failed',
+        tag: 'Auth',
+        error: e,
+        stackTrace: stack,
+      );
+      return Result.failure(
+        AuthFailure('GitHub Sign-in failed', error: e, stackTrace: stack),
+      );
+    }
+  }
+
   Future<Result<void>> signOut() async {
     try {
       await _auth.signOut();
@@ -108,6 +139,9 @@ class AuthService {
 }
 
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
+final gistSyncServiceProvider = Provider<GistSyncService>(
+  (ref) => GistSyncService(),
+);
 
 /// Profile / Account settings screen shown from settings or a dedicated tab.
 class ProfileScreen extends ConsumerWidget {
@@ -190,6 +224,41 @@ class _SignedOutView extends StatelessWidget {
               label: Text(l10n.get('account_sign_in_google')),
               style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
             ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () async {
+                final authService = ref.read(authServiceProvider);
+                final result = await authService.signInWithGithub();
+                result.fold(
+                  (failure) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            l10n.getWith('account_sign_in_error', [
+                              failure.message,
+                            ]),
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
+                  },
+                  (credential) {
+                    // Capture GitHub OAuth access-token for Gist API calls
+                    final oauthCred = credential.credential as OAuthCredential?;
+                    if (oauthCred?.accessToken != null) {
+                      ref
+                          .read(gistSyncServiceProvider)
+                          .setAccessToken(oauthCred!.accessToken!);
+                    }
+                  },
+                );
+              },
+              icon: const Icon(Icons.code),
+              label: Text(l10n.get('account_sign_in_github')),
+              style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
+            ),
             const SizedBox(height: 48),
             Text(
               l10n.get('account_data_stay_note'),
@@ -208,9 +277,16 @@ class _SignedInView extends StatelessWidget {
   final User user;
   final WidgetRef ref;
 
+  /// Returns true when the current user signed in via GitHub.
+  bool get _isGitHubProvider {
+    return user.providerData.any((info) => info.providerId == 'github.com');
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isGitHub = _isGitHubProvider;
+
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -234,17 +310,45 @@ class _SignedInView extends StatelessWidget {
           Text(user.email ?? '', style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 8),
           Chip(
-            label: Text(l10n.get('account_sync_active')),
-            avatar: const Icon(Icons.cloud_done, size: 16),
+            label: Text(
+              isGitHub
+                  ? l10n.get('account_sync_github')
+                  : l10n.get('account_sync_active'),
+            ),
+            avatar: Icon(isGitHub ? Icons.code : Icons.cloud_done, size: 16),
             backgroundColor: Colors.green.shade100,
           ),
           const SizedBox(height: 48),
-          ListTile(
-            leading: const Icon(Icons.cloud_sync),
-            title: const Text('Firestore Sync'),
-            subtitle: Text(l10n.get('account_sync_desc')),
-            trailing: const Icon(Icons.check_circle, color: Colors.green),
-          ),
+
+          // ── Provider-specific sync tile ──
+          if (isGitHub) ...[
+            ListTile(
+              leading: const Icon(Icons.backup),
+              title: const Text('GitHub Gist Backup'),
+              subtitle: const Text('Backup your data to a private Gist'),
+              trailing: IconButton(
+                icon: const Icon(Icons.cloud_upload),
+                onPressed: () => _backupToGist(context),
+              ),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.cloud_download),
+              title: const Text('Restore from Gist'),
+              subtitle: const Text('Download your data from GitHub'),
+              trailing: IconButton(
+                icon: const Icon(Icons.download),
+                onPressed: () => _restoreFromGist(context),
+              ),
+            ),
+          ] else ...[
+            ListTile(
+              leading: const Icon(Icons.cloud_sync),
+              title: const Text('Google Cloud Sync'),
+              subtitle: Text(l10n.get('account_sync_active')),
+              trailing: const Icon(Icons.check_circle, color: Colors.green),
+            ),
+          ],
           const Divider(),
           ListTile(
             leading: const Icon(Icons.settings_outlined),
@@ -267,6 +371,48 @@ class _SignedInView extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ── Gist helpers ──────────────────────────────────────────
+
+  Future<void> _backupToGist(BuildContext context) async {
+    final gistService = ref.read(gistSyncServiceProvider);
+    final result = await gistService.backup();
+    if (!context.mounted) return;
+    result.fold(
+      (failure) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Backup failed: ${failure.message}'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      ),
+      (_) => ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Backup to GitHub Gist complete ✓'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _restoreFromGist(BuildContext context) async {
+    final gistService = ref.read(gistSyncServiceProvider);
+    final result = await gistService.restore();
+    if (!context.mounted) return;
+    result.fold(
+      (failure) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Restore failed: ${failure.message}'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      ),
+      (_) => ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Restore from GitHub Gist complete ✓'),
+          behavior: SnackBarBehavior.floating,
+        ),
       ),
     );
   }

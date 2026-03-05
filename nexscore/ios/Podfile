@@ -10,21 +10,36 @@ project 'Runner', {
   'Release' => :release,
 }
 
-def flutter_install_all_ios_pods(main_target_path)
-  return unless File.exist?(main_target_path)
-  system('cd', File.dirname(main_target_path), '&&', 'flutter', 'pub', 'get')
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('Flutter', 'Generated.xcconfig'), File.dirname(__FILE__))
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "Generated.xcconfig not found. [Reason: flutter pub get was not run?]"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/\AFLUTTER_ROOT=(.*)\z/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in Generated.xcconfig. [Reason: flutter pub get was not run?]"
 end
+
+# Find the absolute path to the Flutter SDK
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
 
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
+  # Install all Flutter pods
   flutter_install_all_ios_pods File.expand_path(File.join('..', '..'), __FILE__)
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
+    # Integrate Flutter build settings
     flutter_additional_ios_build_settings(target)
+
+    # Ensure iOS 15.0 is used for all targets (needed for cloud_firestore)
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
     end

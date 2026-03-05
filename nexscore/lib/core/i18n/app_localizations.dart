@@ -317,11 +317,13 @@ class AppLocalizations {
       'account_title': 'Account',
       'account_signed_out_title': 'Sign in to sync',
       'account_signed_out_body':
-          'Sign in with Google to backup and sync your match history across all your devices.',
+          'Sign in to backup and sync your match history across all your devices. We support Google Cloud and GitHub Gist.',
       'account_offline_note':
           'NexScore works fully offline without an account.',
       'account_sign_in_google': 'Sign in with Google',
+      'account_sign_in_github': 'Sign in with GitHub (Gist)',
       'account_sync_active': 'Sync active',
+      'account_sync_github': 'Gist Sync active',
       'account_sign_out': 'Sign Out',
       'account_sign_in_error': 'Sign-in failed: {0}',
     },
@@ -637,11 +639,13 @@ class AppLocalizations {
       'account_title': 'Konto',
       'account_signed_out_title': 'Anmelden zum Synchronisieren',
       'account_signed_out_body':
-          'Mit Google anmelden, um deine Spielhistorie auf allen Geräten zu sichern und zu synchronisieren.',
+          'Melde dich an, um deine Spielhistorie auf allen Geräten zu sichern und zu synchronisieren. Wir unterstützen Google Cloud und GitHub Gist.',
       'account_offline_note':
           'NexScore funktioniert vollständig offline ohne Konto.',
       'account_sign_in_google': 'Mit Google anmelden',
+      'account_sign_in_github': 'Mit GitHub anmelden (Gist)',
       'account_sync_active': 'Sync aktiv',
+      'account_sync_github': 'Gist Sync aktiv',
       'account_sign_out': 'Abmelden',
       'account_sign_in_error': 'Anmeldung fehlgeschlagen: {0}',
     },
