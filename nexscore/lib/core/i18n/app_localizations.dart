@@ -147,6 +147,9 @@ class AppLocalizations {
       'wizard_end_game': 'End Game',
       'wizard_end_game_confirm': 'Are you sure you want to end the game early?',
       'wizard_error_tricks': 'Tricks sum ({0}) must equal round number ({1}).',
+      'wizard_bombs': 'Played Bombs',
+      'wizard_error_tricks_extreme':
+          'Sum of won tricks ({0}) + bombs ({1}) must be equal to round number ({2}).',
       'wizard_history': 'Round History ({0} rounds)',
       'wizard_scoring_standard': 'Standard – correct bid = +20 + tricks×10',
       'wizard_scoring_lenient': 'Lenient – tricks offset against bids',
@@ -572,6 +575,9 @@ class AppLocalizations {
           'Bist du sicher, dass du das Spiel vorzeitig beenden willst?',
       'wizard_error_tricks':
           'Stichsumme ({0}) muss der Rundenzahl ({1}) entsprechen.',
+      'wizard_bombs': 'Gespielte Bomben',
+      'wizard_error_tricks_extreme':
+          'Summe der gewonnenen Stiche ({0}) + Bomben ({1}) muss der Rundenzahl ({2}) entsprechen.',
       'wizard_history': 'Rundenverlauf ({0} Runden)',
       'wizard_scoring_standard': 'Standard – richtiges Gebot = +20 + Stiche×10',
       'wizard_scoring_lenient':
