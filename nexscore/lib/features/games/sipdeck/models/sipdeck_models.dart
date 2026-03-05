@@ -23,6 +23,8 @@ class SipDeckCard {
     this.isVirus = false,
   });
 
+  String get key => 'sd_card_$id';
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'text': text,

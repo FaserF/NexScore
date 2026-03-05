@@ -92,7 +92,6 @@ class ArschlochScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 120),
           ],
         ),
       ),
@@ -234,20 +233,17 @@ class ArschlochScreen extends ConsumerWidget {
             },
           ),
         ),
-        SafeArea(
-          bottom: true,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            child: FilledButton.icon(
-              onPressed: () =>
-                  _showRoundEntryDialog(context, ref, players, gameState, l10n),
-              icon: const Icon(Icons.add),
-              label: Text(
-                '${l10n.get('wizard_round')} ${gameState.rounds.length + 1}',
-              ),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-              ),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: FilledButton.icon(
+            onPressed: () =>
+                _showRoundEntryDialog(context, ref, players, gameState, l10n),
+            icon: const Icon(Icons.add),
+            label: Text(
+              '${l10n.get('wizard_round')} ${gameState.rounds.length + 1}',
+            ),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(double.infinity, 52),
             ),
           ),
         ),

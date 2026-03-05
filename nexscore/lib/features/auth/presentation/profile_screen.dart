@@ -251,22 +251,21 @@ class _SignedOutView extends StatelessWidget {
           const SizedBox(height: 40),
           OutlinedButton.icon(
             onPressed: () async {
+              debugPrint('Auth: Google Sign-In requested');
               final authService = ref.read(authServiceProvider);
               final result = await authService.signInWithGoogleNative();
-              result.fold((failure) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        l10n.getWith('account_sign_in_error', [
-                          failure.message,
-                        ]),
-                      ),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              }, (_) {});
+              debugPrint('Auth: Result received: ${result.isSuccess}');
+              result.fold(
+                (failure) {
+                  debugPrint('Auth: Failure: ${failure.message}');
+                  if (context.mounted) {
+                    _showError(context, l10n, failure.message);
+                  }
+                },
+                (_) {
+                  debugPrint('Auth: Success');
+                },
+              );
             },
             icon: const Icon(Icons.login),
             label: Text(l10n.get('account_sign_in_google')),
@@ -275,24 +274,19 @@ class _SignedOutView extends StatelessWidget {
           const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: () async {
+              debugPrint('Auth: GitHub Sign-In requested');
               final authService = ref.read(authServiceProvider);
               final result = await authService.signInWithGithub();
+              debugPrint('Auth: Result received: ${result.isSuccess}');
               result.fold(
                 (failure) {
+                  debugPrint('Auth: Failure: ${failure.message}');
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          l10n.getWith('account_sign_in_error', [
-                            failure.message,
-                          ]),
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
+                    _showError(context, l10n, failure.message);
                   }
                 },
                 (credential) {
+                  debugPrint('Auth: Success');
                   // Capture GitHub OAuth access-token for Gist API calls
                   final oauthCred = credential.credential as OAuthCredential?;
                   if (oauthCred?.accessToken != null) {
@@ -314,6 +308,33 @@ class _SignedOutView extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 140),
+        ],
+      ),
+    );
+  }
+
+  void _showError(BuildContext context, AppLocalizations l10n, String message) {
+    // Show SnackBar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.getWith('account_sign_in_error', [message])),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 10),
+      ),
+    );
+
+    // Also show a Dialog as a fallback
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('error')),
+        content: Text(l10n.getWith('account_sign_in_error', [message])),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('ok')),
+          ),
         ],
       ),
     );

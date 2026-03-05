@@ -19,34 +19,28 @@ class PlayersNotifier extends AsyncNotifier<List<Player>> {
 
   PlayerRepository get _repository => ref.read(playerRepositoryProvider);
 
-  Future<void> addPlayer(Player player) async {
-    state = const AsyncValue.loading();
+  Future<Result<void>> addPlayer(Player player) async {
     final result = await _repository.insertPlayer(player);
-    result.fold(
-      (failure) => state = AsyncValue.error(failure, StackTrace.current),
-      (_) async {
-        final playersResult = await _repository.getPlayers();
-        state = playersResult.fold(
-          (f) => AsyncValue.error(f, StackTrace.current),
-          (p) => AsyncValue.data(p),
-        );
-      },
-    );
+    if (result.isSuccess) {
+      final playersResult = await _repository.getPlayers();
+      state = playersResult.fold(
+        (f) => AsyncValue.error(f, StackTrace.current),
+        (p) => AsyncValue.data(p),
+      );
+    }
+    return result;
   }
 
-  Future<void> updatePlayer(Player player) async {
-    state = const AsyncValue.loading();
+  Future<Result<void>> updatePlayer(Player player) async {
     final result = await _repository.updatePlayer(player);
-    result.fold(
-      (failure) => state = AsyncValue.error(failure, StackTrace.current),
-      (_) async {
-        final playersResult = await _repository.getPlayers();
-        state = playersResult.fold(
-          (f) => AsyncValue.error(f, StackTrace.current),
-          (p) => AsyncValue.data(p),
-        );
-      },
-    );
+    if (result.isSuccess) {
+      final playersResult = await _repository.getPlayers();
+      state = playersResult.fold(
+        (f) => AsyncValue.error(f, StackTrace.current),
+        (p) => AsyncValue.data(p),
+      );
+    }
+    return result;
   }
 
   Future<void> deletePlayer(String id) async {
@@ -88,12 +82,23 @@ class PlayerRepository {
   }
 
   Future<Result<void>> insertPlayer(Player player) async {
-    if (player.name.trim().isEmpty) {
+    final trimmedName = player.name.trim();
+    if (trimmedName.isEmpty) {
       return const Result.failure(
         ValidationFailure('Player name cannot be empty'),
       );
     }
     try {
+      // Check for duplicate names (case-insensitive)
+      final existing = await DatabaseService.instance.query(
+        'players',
+        where: 'LOWER(name) = ? AND isDeleted = ?',
+        whereArgs: [trimmedName.toLowerCase(), 0],
+      );
+      if (existing.isNotEmpty) {
+        return const Result.failure(ValidationFailure('error_name_taken'));
+      }
+
       await DatabaseService.instance.insert('players', player.toMap());
       return const Result.success(null);
     } catch (e, stack) {
@@ -104,12 +109,23 @@ class PlayerRepository {
   }
 
   Future<Result<void>> updatePlayer(Player player) async {
-    if (player.name.trim().isEmpty) {
+    final trimmedName = player.name.trim();
+    if (trimmedName.isEmpty) {
       return const Result.failure(
         ValidationFailure('Player name cannot be empty'),
       );
     }
     try {
+      // Check for duplicate names (excluding current player)
+      final existing = await DatabaseService.instance.query(
+        'players',
+        where: 'LOWER(name) = ? AND id != ? AND isDeleted = ?',
+        whereArgs: [trimmedName.toLowerCase(), player.id, 0],
+      );
+      if (existing.isNotEmpty) {
+        return const Result.failure(ValidationFailure('error_name_taken'));
+      }
+
       await DatabaseService.instance.update(
         'players',
         player.toMap(),

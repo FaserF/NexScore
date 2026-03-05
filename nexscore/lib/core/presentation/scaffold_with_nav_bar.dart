@@ -11,7 +11,8 @@ class ScaffoldWithNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, // critical for the floating effect
+      extendBody:
+          false, // Prevents content from being obscured by the bottom nav bar
       body: navigationShell,
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0),

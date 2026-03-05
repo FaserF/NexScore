@@ -97,19 +97,16 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
                     ),
                   ),
                 ),
-              SafeArea(
-                bottom: true,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-                  child: FilledButton(
-                    onPressed: _selectedPlayerIds.length >= _minPlayers
-                        ? () => _startGame(context, players)
-                        : null,
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 52),
-                    ),
-                    child: Text(l10n.get('game_setup_start')),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: FilledButton(
+                  onPressed: _selectedPlayerIds.length >= _minPlayers
+                      ? () => _startGame(context, players)
+                      : null,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
                   ),
+                  child: Text(l10n.get('game_setup_start')),
                 ),
               ),
             ],
@@ -118,15 +115,9 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
-      floatingActionButton: SafeArea(
-        bottom: true,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 72.0),
-          child: FloatingActionButton(
-            onPressed: () => _showAddPlayerDialog(context, ref),
-            child: const Icon(Icons.person_add),
-          ),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddPlayerDialog(context, ref),
+        child: const Icon(Icons.person_add),
       ),
     );
   }

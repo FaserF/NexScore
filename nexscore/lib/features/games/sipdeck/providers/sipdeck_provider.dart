@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/sipdeck_models.dart';
 import '../../../../core/models/player_model.dart';
+import '../../../../core/i18n/app_localizations.dart';
 
 class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
   @override
@@ -17,7 +18,7 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     state = state.copyWith(selectedCategories: cats);
   }
 
-  void drawNextCard(List<Player> activePlayers) {
+  void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
     final available = sipDeckDatabase
         .where((c) => state.selectedCategories.contains(c.category))
         .toList();
@@ -26,7 +27,13 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     final random = Random();
     final card = available[random.nextInt(available.length)];
 
-    String hydratedText = card.text;
+    // Use localization key if available, otherwise fallback to original text
+    String baseText = l10n.get(card.key);
+    if (baseText == card.key) {
+      baseText = card.text;
+    }
+
+    String hydratedText = baseText;
     if (activePlayers.isNotEmpty) {
       final p1 = activePlayers[random.nextInt(activePlayers.length)].name;
       hydratedText = hydratedText.replaceAll('{0}', p1);

@@ -121,26 +121,23 @@ class SchafkopfScreen extends ConsumerWidget {
                           },
                         ),
                 ),
-                SafeArea(
-                  bottom: true,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-                    child: FilledButton.icon(
-                      onPressed: () => _showAddRoundDialog(
-                        context,
-                        ref,
-                        players,
-                        rounds.length,
-                      ),
-                      icon: const Icon(Icons.add),
-                      label: Text(
-                        l10n.getWith('wizard_next_round', [
-                          (rounds.length + 1).toString(),
-                        ]),
-                      ),
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 50),
-                      ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: FilledButton.icon(
+                    onPressed: () => _showAddRoundDialog(
+                      context,
+                      ref,
+                      players,
+                      rounds.length,
+                    ),
+                    icon: const Icon(Icons.add),
+                    label: Text(
+                      l10n.getWith('wizard_next_round', [
+                        (rounds.length + 1).toString(),
+                      ]),
+                    ),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 52),
                     ),
                   ),
                 ),
