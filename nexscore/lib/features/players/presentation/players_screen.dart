@@ -236,11 +236,14 @@ class PlayersScreen extends ConsumerWidget {
       builder: (dialogContext) {
         return AlertDialog(
           title: Text(l10n.get('add_player')),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(hintText: l10n.get('player_name')),
-            autofocus: true,
-            onSubmitted: (_) => submit(),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(hintText: l10n.get('player_name')),
+              autofocus: true,
+              onSubmitted: (_) => submit(),
+            ),
           ),
           actions: [
             TextButton(
@@ -286,11 +289,14 @@ class PlayersScreen extends ConsumerWidget {
       builder: (dialogContext) {
         return AlertDialog(
           title: Text(l10n.get('edit_player')),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(hintText: l10n.get('player_name')),
-            autofocus: true,
-            onSubmitted: (_) => submit(),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(hintText: l10n.get('player_name')),
+              autofocus: true,
+              onSubmitted: (_) => submit(),
+            ),
           ),
           actions: [
             TextButton(
