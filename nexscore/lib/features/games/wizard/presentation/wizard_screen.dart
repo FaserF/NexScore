@@ -47,12 +47,12 @@ class WizardScreen extends ConsumerWidget {
           const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => _showSettingsDialog(context, ref, state),
+            onPressed: () => _showSettingsDialog(context),
             tooltip: l10n.get('settings'),
           ),
           IconButton(
             icon: const Icon(Icons.exit_to_app),
-            onPressed: () => _showEndGameDialog(context, ref),
+            onPressed: () => _showEndGameDialog(context),
             tooltip: l10n.get('wizard_end_game'),
           ),
         ],
@@ -224,130 +224,108 @@ class WizardScreen extends ConsumerWidget {
     );
   }
 
-  void _showSettingsDialog(
-    BuildContext context,
-    WidgetRef ref,
-    WizardGameState state,
-  ) {
-    final l10n = AppLocalizations.of(context);
+  void _showSettingsDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(l10n.get('settings')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                l10n.get('settings_data'), // Reusing for variants
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              ...WizardScoringVariant.values.map((v) {
-                final label = v == WizardScoringVariant.standard
-                    ? l10n.get('wizard_scoring_standard')
-                    : v == WizardScoringVariant.lenient
-                    ? l10n.get('wizard_scoring_lenient')
-                    : l10n.get('wizard_scoring_extreme');
-                final isSelected = state.scoringVariant == v;
-                return ListTile(
-                  leading: Icon(
-                    isSelected
-                        ? Icons.radio_button_checked
-                        : Icons.radio_button_off,
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
+        return Consumer(
+          builder: (context, ref, _) {
+            final state = ref.watch(wizardStateProvider);
+            final l10n = AppLocalizations.of(context);
+            return AlertDialog(
+              title: Text(l10n.get('settings')),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    l10n.get('settings_data'),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  title: Text(
-                    v.name[0].toUpperCase() + v.name.substring(1),
-                    style: TextStyle(
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                    ),
-                  ),
-                  subtitle: Text(label, style: const TextStyle(fontSize: 11)),
-                  selected: isSelected,
-                  onTap: () {
-                    ref
-                        .read(wizardStateProvider.notifier)
-                        .updateState(state.copyWith(scoringVariant: v));
-                    Navigator.pop(context);
-                  },
-                );
-              }),
-              const Divider(),
-              SwitchListTile(
-                title: Text(l10n.get('wizard_rule_stiche')),
-                subtitle: Text(l10n.get('wizard_rule_stiche_desc')),
-                value: state.ruleSticheDuertenNichtAufgehen,
-                onChanged: (val) {
-                  ref
-                      .read(wizardStateProvider.notifier)
-                      .updateState(
-                        state.copyWith(ruleSticheDuertenNichtAufgehen: val),
-                      );
-                  Navigator.pop(context);
-                },
-              ),
-              const Divider(),
-              ListTile(
-                title: Text(l10n.get('wizard_start_round')),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove),
-                      onPressed: state.customStartRound > 1
-                          ? () {
-                              ref
-                                  .read(wizardStateProvider.notifier)
-                                  .updateState(
-                                    state.copyWith(
-                                      customStartRound:
-                                          state.customStartRound - 1,
-                                    ),
-                                  );
-                            }
-                          : null,
-                    ),
-                    Text(
-                      state.customStartRound.toString(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 8),
+                  ...WizardScoringVariant.values.map((v) {
+                    final label = v == WizardScoringVariant.standard
+                        ? l10n.get('wizard_scoring_standard')
+                        : v == WizardScoringVariant.lenient
+                        ? l10n.get('wizard_scoring_lenient')
+                        : l10n.get('wizard_scoring_extreme');
+                    final isSelected = state.scoringVariant == v;
+                    return ListTile(
+                      leading: Icon(
+                        isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_off,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () {
+                      title: Text(label),
+                      onTap: () {
                         ref
                             .read(wizardStateProvider.notifier)
-                            .updateState(
-                              state.copyWith(
-                                customStartRound: state.customStartRound + 1,
-                              ),
-                            );
+                            .updateState(state.copyWith(scoringVariant: v));
                       },
+                    );
+                  }),
+                  const Divider(),
+                  ListTile(
+                    title: Text(l10n.get('wizard_start_round')),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: state.customStartRound > 1
+                              ? () {
+                                  ref
+                                      .read(wizardStateProvider.notifier)
+                                      .updateState(
+                                        state.copyWith(
+                                          customStartRound:
+                                              state.customStartRound - 1,
+                                        ),
+                                      );
+                                }
+                              : null,
+                        ),
+                        Text(
+                          state.customStartRound.toString(),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            ref
+                                .read(wizardStateProvider.notifier)
+                                .updateState(
+                                  state.copyWith(
+                                    customStartRound:
+                                        state.customStartRound + 1,
+                                  ),
+                                );
+                          },
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.get('close')),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.get('close')),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
 
-  void _showEndGameDialog(BuildContext context, WidgetRef ref) {
+  void _showEndGameDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
@@ -361,6 +339,7 @@ class WizardScreen extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () {
+              Navigator.pop(context);
               context.go('/games');
             },
             child: Text(l10n.get('ok')),
@@ -462,6 +441,7 @@ class WizardScreen extends ConsumerWidget {
     final Map<String, TextEditingController> trickControllers = {
       for (var p in players) p.id: TextEditingController(text: '0'),
     };
+    final bombController = TextEditingController(text: '0');
 
     await showDialog(
       context: context,
@@ -477,6 +457,8 @@ class WizardScreen extends ConsumerWidget {
                 final currentTricksSum = trickControllers.values
                     .map((c) => int.tryParse(c.text) ?? 0)
                     .fold(0, (a, b) => a + b);
+                final currentBombs = int.tryParse(bombController.text) ?? 0;
+                final totalSum = currentTricksSum + currentBombs;
 
                 return Column(
                   mainAxisSize: MainAxisSize.min,
@@ -490,16 +472,36 @@ class WizardScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        'Total Tricks: $currentTricksSum / $roundIndex',
+                        state.scoringVariant == WizardScoringVariant.extreme
+                            ? 'Tricks: $currentTricksSum + Bombs: $currentBombs = $totalSum / $roundIndex'
+                            : 'Total Tricks: $currentTricksSum / $roundIndex',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: currentTricksSum == roundIndex
+                          color: totalSum == roundIndex
                               ? Colors.green
                               : Theme.of(context).colorScheme.error,
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
+                    if (state.scoringVariant ==
+                        WizardScoringVariant.extreme) ...[
+                      TextField(
+                        controller: bombController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: l10n.get('wizard_bombs'),
+                          prefixIcon: const Icon(
+                            Icons.emergency_share,
+                            size: 20,
+                          ),
+                          border: const OutlineInputBorder(),
+                        ),
+                        onChanged: (_) => setDialogState(() {}),
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(),
+                    ],
                     ...players.map((p) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -560,6 +562,7 @@ class WizardScreen extends ConsumerWidget {
                 players,
                 roundIndex,
                 trickControllers,
+                bombController,
                 l10n,
               ),
               child: Text(l10n.get('wizard_save_round')),
@@ -572,6 +575,7 @@ class WizardScreen extends ConsumerWidget {
     for (var c in trickControllers.values) {
       c.dispose();
     }
+    bombController.dispose();
   }
 
   void _saveResults(
@@ -581,6 +585,7 @@ class WizardScreen extends ConsumerWidget {
     List<Player> players,
     int roundIndex,
     Map<String, TextEditingController> trickControllers,
+    TextEditingController bombController,
     AppLocalizations l10n,
   ) {
     final Map<String, int> tricks = {
@@ -589,15 +594,22 @@ class WizardScreen extends ConsumerWidget {
     };
 
     final tricksSum = tricks.values.fold<int>(0, (sum, val) => sum + val);
+    final bombTricks = int.tryParse(bombController.text) ?? 0;
 
-    if (tricksSum != roundIndex) {
+    if (tricksSum + bombTricks != roundIndex) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            l10n.getWith('wizard_error_tricks', [
-              tricksSum.toString(),
-              roundIndex.toString(),
-            ]),
+            state.scoringVariant == WizardScoringVariant.extreme
+                ? l10n.getWith('wizard_error_tricks_extreme', [
+                    tricksSum.toString(),
+                    bombTricks.toString(),
+                    roundIndex.toString(),
+                  ])
+                : l10n.getWith('wizard_error_tricks', [
+                    tricksSum.toString(),
+                    roundIndex.toString(),
+                  ]),
           ),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
@@ -609,6 +621,7 @@ class WizardScreen extends ConsumerWidget {
       roundIndex: roundIndex,
       bids: state.currentRoundBids ?? {},
       tricks: tricks,
+      blownTricks: bombTricks,
     );
 
     ref
