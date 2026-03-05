@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/i18n/app_localizations.dart';
+import '../../../core/providers/favorites_provider.dart';
 import '../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../core/theme/widgets/glass_container.dart';
 import '../../../core/utils/app_version.dart';
 
 /// The main game selection screen shown at app start.
 /// Displays all supported games as rich cards with name, icon, and description.
-class GamesListScreen extends StatelessWidget {
+class GamesListScreen extends ConsumerWidget {
   const GamesListScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final games = _gameEntries(context, l10n);
+    final allGames = _gameEntries(context, l10n);
+    final favorites = ref.watch(favoritesProvider);
+
+    // Split games into favorites and others
+    final favGames = allGames.where((g) => favorites.contains(g.id)).toList();
+    final otherGames = allGames
+        .where((g) => !favorites.contains(g.id))
+        .toList();
+
+    // Combine them with favorites first
+    final games = [...favGames, ...otherGames];
 
     return Scaffold(
       body: CustomScrollView(
@@ -127,7 +139,17 @@ class GamesListScreen extends StatelessWidget {
                   );
                 }
                 final game = games[index - 1];
-                return _GameCard(entry: game);
+                final isFavorite = favorites.contains(game.id);
+
+                return _GameCard(
+                  entry: game,
+                  isFavorite: isFavorite,
+                  onToggleFavorite: () {
+                    ref
+                        .read(favoritesProvider.notifier)
+                        .toggleFavorite(game.id);
+                  },
+                );
               }, childCount: games.length + 1),
             ),
           ),
@@ -140,6 +162,7 @@ class GamesListScreen extends StatelessWidget {
     final cs = Theme.of(ctx).colorScheme;
     return [
       _GameEntry(
+        id: 'wizard',
         name: l10n.get('game_wizard'),
         description: l10n.get('desc_wizard'),
         route: '/games/setup/wizard',
@@ -149,6 +172,7 @@ class GamesListScreen extends StatelessWidget {
         tag: l10n.get('home_tag_card'),
       ),
       _GameEntry(
+        id: 'qwixx',
         name: l10n.get('game_qwixx'),
         description: l10n.get('desc_qwixx'),
         route: '/games/setup/qwixx',
@@ -158,6 +182,7 @@ class GamesListScreen extends StatelessWidget {
         tag: l10n.get('home_tag_dice'),
       ),
       _GameEntry(
+        id: 'schafkopf',
         name: l10n.get('game_schafkopf'),
         description: l10n.get('desc_schafkopf'),
         route: '/games/setup/schafkopf',
@@ -167,6 +192,7 @@ class GamesListScreen extends StatelessWidget {
         tag: l10n.get('home_tag_card'),
       ),
       _GameEntry(
+        id: 'kniffel',
         name: l10n.get('game_kniffel'),
         description: l10n.get('desc_kniffel'),
         route: '/games/setup/kniffel',
@@ -176,6 +202,7 @@ class GamesListScreen extends StatelessWidget {
         tag: l10n.get('home_tag_dice'),
       ),
       _GameEntry(
+        id: 'phase10',
         name: l10n.get('game_phase10'),
         description: l10n.get('desc_phase10'),
         route: '/games/setup/phase10',
@@ -185,6 +212,7 @@ class GamesListScreen extends StatelessWidget {
         tag: l10n.get('home_tag_card'),
       ),
       _GameEntry(
+        id: 'darts',
         name: l10n.get('game_darts'),
         description: l10n.get('desc_darts'),
         route: '/games/setup/darts',
@@ -194,6 +222,7 @@ class GamesListScreen extends StatelessWidget {
         tag: l10n.get('home_tag_sport'),
       ),
       _GameEntry(
+        id: 'romme',
         name: l10n.get('game_romme'),
         description: l10n.get('desc_romme'),
         route: '/games/setup/romme',
@@ -203,6 +232,7 @@ class GamesListScreen extends StatelessWidget {
         tag: l10n.get('home_tag_card'),
       ),
       _GameEntry(
+        id: 'arschloch',
         name: l10n.get('game_arschloch'),
         description: l10n.get('desc_arschloch'),
         route: '/games/setup/arschloch',
@@ -212,6 +242,7 @@ class GamesListScreen extends StatelessWidget {
         tag: l10n.get('home_tag_card'),
       ),
       _GameEntry(
+        id: 'sipdeck',
         name: l10n.get('game_sipdeck'),
         description: l10n.get('desc_sipdeck'),
         route: '/games/setup/sipdeck',
@@ -221,11 +252,23 @@ class GamesListScreen extends StatelessWidget {
         tag: l10n.get('home_tag_party'),
         isAdult: true,
       ),
+      _GameEntry(
+        id: 'buzztap',
+        name: l10n.get('game_buzztap'),
+        description: l10n.get('desc_buzztap'),
+        route: '/games/setup/buzztap',
+        icon: Icons.touch_app,
+        color: Colors.amber.shade700,
+        playerCount: '2+',
+        tag: l10n.get('home_tag_party'),
+        isAdult: true,
+      ),
     ];
   }
 }
 
 class _GameEntry {
+  final String id;
   final String name;
   final String description;
   final String route;
@@ -236,6 +279,7 @@ class _GameEntry {
   final bool isAdult;
 
   const _GameEntry({
+    required this.id,
     required this.name,
     required this.description,
     required this.route,
@@ -249,8 +293,14 @@ class _GameEntry {
 
 class _GameCard extends StatelessWidget {
   final _GameEntry entry;
+  final bool isFavorite;
+  final VoidCallback onToggleFavorite;
 
-  const _GameCard({required this.entry});
+  const _GameCard({
+    required this.entry,
+    required this.isFavorite,
+    required this.onToggleFavorite,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -351,12 +401,28 @@ class _GameCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Center(
-                child: Icon(
-                  Icons.arrow_forward_ios,
-                  size: 16,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.3),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.star : Icons.star_border,
+                        color: isFavorite
+                            ? Colors.amber
+                            : Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.3),
+                      ),
+                      onPressed: onToggleFavorite,
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.3),
+                    ),
+                  ],
                 ),
               ),
             ],

@@ -77,6 +77,7 @@ class AppLocalizations {
           'President card game. Shed all your cards first to become President.',
       'desc_sipdeck':
           'Party card game for adults (18+). 50+ challenges across five categories.',
+      'desc_buzztap': 'Dynamic challenges and drinking prompts for your party.',
 
       // ── Players
       'players': 'Players',
@@ -120,6 +121,7 @@ class AppLocalizations {
       'game_arschloch': 'Arschloch / President',
       'game_arschloch_desc':
           'Classic President card game. Shed all cards first to become President. Track ranks, card exchange rules and cumulative points.',
+      'game_buzztap': 'BuzzTap',
 
       // ── Help screen
       'help_title': 'Help & Feedback',
@@ -324,6 +326,14 @@ class AppLocalizations {
       'sipdeck_optimize_2players_desc':
           'Hide cards that aren\'t fun with only two players.',
       'sipdeck_no_players': 'Add players first to play SipDeck.',
+
+      // ── BuzzTap
+      'buzztap_title': 'BuzzTap',
+      'buzztap_cat_warmup': 'Warmup',
+      'buzztap_cat_party': 'Party',
+      'buzztap_cat_hot': 'Hot',
+      'buzztap_cat_extreme': 'Extreme',
+      'buzztap_start': 'Let\'s Buzz!',
       'sipdeck_18_warning': 'Must be 18+ to play.',
       'sipdeck_2player_warning':
           'SipDeck is best enjoyed with 3 or more players!',
@@ -642,6 +652,9 @@ class AppLocalizations {
       'game_arschloch': 'Arschloch / Präsident',
       'game_arschloch_desc':
           'Das klassische Präsidenten-Kartenspiel. Werde zuerst alle Karten los. Ränge, Kartentausch und kumulative Punkte über mehrere Runden.',
+      'game_buzztap': 'BuzzTap',
+      'desc_buzztap':
+          'Dynamische challenges und Trinkaufgaben für deine Party.',
 
       // ── Help screen (added for in-app help feature)
       'help_title': 'Hilfe & Feedback',
@@ -854,6 +867,14 @@ class AppLocalizations {
       'sipdeck_optimize_2players_desc':
           'Blende Karten aus, die zu zweit wenig Sinn machen.',
       'sipdeck_no_players': 'Füge zuerst Spieler hinzu, um SipDeck zu spielen.',
+
+      // ── BuzzTap
+      'buzztap_title': 'BuzzTap',
+      'buzztap_cat_warmup': 'Aufwärmen',
+      'buzztap_cat_party': 'Party',
+      'buzztap_cat_hot': 'Heiß',
+      'buzztap_cat_extreme': 'Extrem',
+      'buzztap_start': 'Ab geht\'s!',
       'sipdeck_18_warning': 'Ab 18 Jahren freigegeben.',
       'sipdeck_2player_warning':
           'SipDeck macht am meisten Spaß mit 3 oder mehr Spielern!',
