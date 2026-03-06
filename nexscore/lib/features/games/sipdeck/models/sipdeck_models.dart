@@ -7,6 +7,13 @@ enum SipDeckCategory {
   laughs, // Silly and absurd things to do or say
 }
 
+enum SipTargetType {
+  single, // Card targets {0}
+  dual, // Card targets {0} and {1}
+  everyone, // Card targets everyone
+  manual, // Targets determined by external logic or group
+}
+
 /// A single SipDeck challenge card.
 class SipDeckCard {
   final String id;
@@ -17,6 +24,8 @@ class SipDeckCard {
   final SipDeckCategory category;
   final bool isVirus; // Ongoing rule that persists until "cured"
   final int minPlayers; // Minimum players required for this card to make sense
+  final List<String> targetIds; // Resolved player IDs for this card instance
+  final SipTargetType targetType; // Type of target for automatic scoring
 
   const SipDeckCard({
     required this.id,
@@ -27,6 +36,8 @@ class SipDeckCard {
     required this.category,
     this.isVirus = false,
     this.minPlayers = 2,
+    this.targetIds = const [],
+    this.targetType = SipTargetType.manual,
   });
 
   String get key => 'sd_card_$id';
@@ -96,6 +107,9 @@ class SipDeckGameState {
       playerSips: playerSips ?? this.playerSips,
     );
   }
+
+  SipDeckCard? get currentCard =>
+      playedCards.isNotEmpty ? playedCards.last : null;
 }
 
 /// The full SipDeck card database – 50+ cards across all categories.

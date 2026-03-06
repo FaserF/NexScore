@@ -152,6 +152,7 @@ class ArschlochGameState {
   /// Derive rank from finish position given total player count.
   static ArschlochRank rankFromPosition(int position, int totalPlayers) {
     if (position == 1) return ArschlochRank.president;
+    if (position == 2 && totalPlayers == 2) return ArschlochRank.arschloch;
     if (position == 2 && totalPlayers >= 4) return ArschlochRank.vicePresident;
     if (position == totalPlayers) return ArschlochRank.arschloch;
     if (position == totalPlayers - 1 && totalPlayers >= 3) {
@@ -182,7 +183,7 @@ class ArschlochGameState {
     Map<String, String> playerNames,
     int totalPlayers,
   ) {
-    if (totalPlayers < 3) return [];
+    if (totalPlayers < 2) return [];
     final sorted = lastFinishOrder.entries.toList()
       ..sort((a, b) => a.value.compareTo(b.value));
 

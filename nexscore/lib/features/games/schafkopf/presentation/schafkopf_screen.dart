@@ -41,6 +41,11 @@ class SchafkopfScreen extends ConsumerWidget {
               onPressed: () =>
                   ref.read(schafkopfStateProvider.notifier).removeLastRound(),
             ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
+          ),
         ],
       ),
       body: players.length < 4
@@ -436,6 +441,36 @@ class SchafkopfScreen extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(schafkopfStateProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

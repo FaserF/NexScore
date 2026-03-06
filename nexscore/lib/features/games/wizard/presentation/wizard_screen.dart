@@ -68,6 +68,11 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
             onPressed: () => _showEndGameDialog(context),
             tooltip: l10n.get('wizard_end_game'),
           ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
+          ),
         ],
       ),
       body: Column(
@@ -690,5 +695,35 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
           state.copyWith(rounds: [...state.rounds, newRound], resetBids: true),
         );
     Navigator.pop(context);
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(wizardStateProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

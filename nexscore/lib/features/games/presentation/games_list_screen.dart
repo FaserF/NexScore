@@ -474,28 +474,6 @@ class _GameCard extends StatelessWidget {
                                 ),
                           ),
                         ),
-                        if (entry.isAdult)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.red.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: Colors.red.withValues(alpha: 0.3),
-                              ),
-                            ),
-                            child: const Text(
-                              '18+',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -511,6 +489,30 @@ class _GameCard extends StatelessWidget {
                     const SizedBox(height: 16),
                     Row(
                       children: [
+                        if (entry.isAdult) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: Colors.red.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: const Text(
+                              '18+',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
                         _Chip(label: entry.tag, color: entry.color),
                         const SizedBox(width: 8),
                         _Chip(

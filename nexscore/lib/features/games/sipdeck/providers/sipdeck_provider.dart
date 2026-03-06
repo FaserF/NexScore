@@ -53,30 +53,57 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
 
     String hydratedText = baseText;
     String hydratedExpl = baseExpl;
+    final List<String> targetIds = [];
+    SipTargetType targetType = SipTargetType.manual;
 
     if (activePlayers.isNotEmpty) {
-      final p1 = activePlayers[random.nextInt(activePlayers.length)].name;
-      hydratedText = hydratedText.replaceAll('{0}', p1);
-      hydratedExpl = hydratedExpl.replaceAll('{0}', p1);
+      final p1Index = random.nextInt(activePlayers.length);
+      final p1 = activePlayers[p1Index];
+      hydratedText = hydratedText.replaceAll('{0}', p1.name);
+      hydratedExpl = hydratedExpl.replaceAll('{0}', p1.name);
 
-      if (activePlayers.length > 1) {
-        String p2 = activePlayers[random.nextInt(activePlayers.length)].name;
-        while (p2 == p1) {
-          p2 = activePlayers[random.nextInt(activePlayers.length)].name;
+      if (hydratedText.contains('{1}') || hydratedExpl.contains('{1}')) {
+        if (activePlayers.length > 1) {
+          int p2Index = random.nextInt(activePlayers.length);
+          while (p2Index == p1Index) {
+            p2Index = random.nextInt(activePlayers.length);
+          }
+          final p2 = activePlayers[p2Index];
+          hydratedText = hydratedText.replaceAll('{1}', p2.name);
+          hydratedExpl = hydratedExpl.replaceAll('{1}', p2.name);
+          targetIds.addAll([p1.id, p2.id]);
+          targetType = SipTargetType.dual;
+        } else {
+          // Fallback if {1} is requested but only 1 player available
+          targetIds.add(p1.id);
+          targetType = SipTargetType.single;
         }
-        hydratedText = hydratedText.replaceAll('{1}', p2);
-        hydratedExpl = hydratedExpl.replaceAll('{1}', p2);
+      } else {
+        targetIds.add(p1.id);
+        targetType = SipTargetType.single;
       }
+    }
+
+    // Detect "Everyone" tasks
+    if (baseText.toLowerCase().contains('everyone') ||
+        baseText.toLowerCase().contains('last place') ||
+        baseText.toLowerCase().contains('group vote') ||
+        baseText.toLowerCase().contains('group challenge')) {
+      targetIds.clear();
+      targetIds.addAll(activePlayers.map((p) => p.id));
+      targetType = SipTargetType.everyone;
     }
 
     final hydratedCard = SipDeckCard(
       id: card.id,
       text: hydratedText,
       explanation: hydratedExpl.isNotEmpty ? hydratedExpl : null,
-      emoji: card.emoji, // Primary emoji stays from DB or could be in l10n too
+      emoji: card.emoji,
       category: card.category,
       sips: card.sips,
       isVirus: card.isVirus,
+      targetIds: targetIds,
+      targetType: targetType,
     );
 
     state = state.copyWith(playedCards: [...state.playedCards, hydratedCard]);
@@ -97,6 +124,26 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
       sips[playerId] = 0;
     }
     state = state.copyWith(playerSips: sips);
+  }
+
+  void completeCard(bool skipped) {
+    if (state.currentCard == null) return;
+
+    final card = state.currentCard!;
+    if (!skipped && card.sips > 0) {
+      final sips = Map<String, int>.from(state.playerSips);
+      for (final pid in card.targetIds) {
+        sips[pid] = (sips[pid] ?? 0) + card.sips;
+      }
+      state = state.copyWith(playerSips: sips);
+    }
+    // We don't advance the card automatically here as the UI handles the "Tap to continue" or "Next"
+    // But we might want to flag it as "resolved" if sips are handled.
+    // For now, let's just update the sips. The UI will call drawNextCard to continue.
+  }
+
+  void resetGame() {
+    state = state.copyWith(playedCards: [], playerSips: {});
   }
 }
 

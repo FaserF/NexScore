@@ -22,6 +22,10 @@ class Phase10StateNotifier extends Notifier<Phase10GameState> {
     state = newState;
   }
 
+  void resetGame() {
+    state = const Phase10GameState();
+  }
+
   void advancePhase(String playerId) {
     final currentState =
         state.playerStates[playerId] ?? const Phase10PlayerState();
@@ -131,6 +135,11 @@ class Phase10Screen extends ConsumerWidget {
             onPressed: () => _showVariantDialog(context, ref, gameState, l10n),
             tooltip: l10n.get('phase10_variant'),
           ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
+          ),
         ],
       ),
       body: Column(
@@ -170,7 +179,8 @@ class Phase10Screen extends ConsumerWidget {
                     leaders.last == p.id &&
                     players.length > 1;
 
-                final phase = Phase10Phase.values[pState.currentPhase - 1];
+                final phaseNum = pState.currentPhase;
+                final phase = Phase10Phase.values[phaseNum - 1];
                 final phaseTitle = _labelForPhase(phase, l10n, isTitle: true);
                 final phaseDesc = _labelForPhase(phase, l10n, isTitle: false);
 
@@ -518,12 +528,42 @@ class Phase10Screen extends ConsumerWidget {
     );
   }
 
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(phase10StateProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _labelForPhase(
     Phase10Phase phase,
     AppLocalizations l10n, {
     required bool isTitle,
   }) {
-    final num = phase.index + 1;
+    final num = phase.number;
     if (isTitle) {
       return l10n.get('phase10_p${num}_title');
     } else {

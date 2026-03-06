@@ -6,6 +6,13 @@ enum BuzzTapCategory {
   extreme, // Extreme challenges
 }
 
+enum BuzzTapTargetType {
+  single, // Card targets {0}
+  dual, // Card targets {0} and {1}
+  everyone, // Card targets everyone
+  manual, // Targets determined by external logic or group
+}
+
 /// A single BuzzTap challenge card.
 class BuzzTapCard {
   final String id;
@@ -15,6 +22,8 @@ class BuzzTapCard {
   final int sips; // Number of sips
   final BuzzTapCategory category;
   final int minPlayers;
+  final List<String> targetIds; // Resolved player IDs for this card instance
+  final BuzzTapTargetType targetType; // Type of target for automatic scoring
 
   const BuzzTapCard({
     required this.id,
@@ -24,6 +33,8 @@ class BuzzTapCard {
     this.sips = 1,
     required this.category,
     this.minPlayers = 2,
+    this.targetIds = const [],
+    this.targetType = BuzzTapTargetType.manual,
   });
 
   String get key => 'bt_card_$id';
@@ -85,6 +96,9 @@ class BuzzTapGameState {
           optimizeForTwoPlayers ?? this.optimizeForTwoPlayers,
     );
   }
+
+  BuzzTapCard? get currentCard =>
+      playedCards.isNotEmpty ? playedCards.last : null;
 }
 
 /// The BuzzTap card database.

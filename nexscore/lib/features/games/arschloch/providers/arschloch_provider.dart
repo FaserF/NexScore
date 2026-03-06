@@ -41,6 +41,10 @@ class ArschlochStateNotifier extends Notifier<ArschlochGameState> {
     };
     state = ArschlochGameState(playerStates: states, rounds: const []);
   }
+
+  void resetGame() {
+    state = const ArschlochGameState();
+  }
 }
 
 final arschlochStateProvider =

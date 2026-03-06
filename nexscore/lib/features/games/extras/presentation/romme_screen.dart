@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
@@ -13,6 +12,10 @@ class RommeStateNotifier extends Notifier<RommeGameState> {
 
   void addRound(RommeRound round) {
     state = state.copyWith(rounds: [...state.rounds, round]);
+  }
+
+  void resetGame() {
+    state = const RommeGameState();
   }
 }
 
@@ -56,15 +59,9 @@ class RommeScreen extends ConsumerWidget {
         leading: BackButton(onPressed: () => context.go('/games')),
         actions: [
           IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () {
-              launchUrl(
-                Uri.parse(
-                  'https://faserf.github.io/NexScore/docs/user_guide/games/#romme-rummy',
-                ),
-              );
-            },
-            tooltip: l10n.get('nav_help'),
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
           ),
         ],
       ),
@@ -247,6 +244,36 @@ class RommeScreen extends ConsumerWidget {
     for (final c in controllers.values) {
       c.dispose();
     }
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(rommeStateProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

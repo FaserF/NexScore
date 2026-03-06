@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexscore/core/i18n/app_localizations.dart';
@@ -96,6 +97,46 @@ void main() {
       ]);
       expect(result, contains('Dave'));
       expect(result, contains('Alice'));
+    });
+    test('all keys used in codebase are defined in AppLocalizations', () {
+      final libDir = Directory('lib');
+      final getRegex = RegExp(r"l10n\.get\(['\"]([^'\"{}]+)['\"]\)");
+      final getWithRegex = RegExp(r"l10n\.getWith\(['\"]([^'\"{}]+)['\"]");
+
+      final usedKeys = <String>{};
+      final files = libDir.listSync(recursive: true).whereType<File>();
+
+      for (final file in files) {
+        if (file.path.endsWith('.dart') &&
+            !file.path.contains('app_localizations.dart')) {
+          final content = file.readAsStringSync();
+          for (final match in getRegex.allMatches(content)) {
+            usedKeys.add(match.group(1)!);
+          }
+          for (final match in getWithRegex.allMatches(content)) {
+            usedKeys.add(match.group(1)!);
+          }
+        }
+      }
+
+      final enKeys = AppLocalizations.localizedValues['en']!.keys.toSet();
+      final deKeys = AppLocalizations.localizedValues['de']!.keys.toSet();
+
+      final missingInEn = usedKeys.difference(enKeys);
+      final missingInDe = usedKeys.difference(deKeys);
+
+      expect(
+        missingInEn,
+        isEmpty,
+        reason:
+            'These keys are used in code but missing from EN localization: $missingInEn',
+      );
+      expect(
+        missingInDe,
+        isEmpty,
+        reason:
+            'These keys are used in code but missing from DE localization: $missingInDe',
+      );
     });
   });
 }

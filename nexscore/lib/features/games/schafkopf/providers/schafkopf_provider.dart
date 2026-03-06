@@ -14,6 +14,10 @@ class SchafkopfStateNotifier extends Notifier<List<SchafkopfRound>> {
       state = state.sublist(0, state.length - 1);
     }
   }
+
+  void resetGame() {
+    state = [];
+  }
 }
 
 final schafkopfStateProvider =

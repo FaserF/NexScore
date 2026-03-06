@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../models/kniffel_models.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
@@ -40,15 +39,9 @@ class KniffelScreen extends ConsumerWidget {
           title: Text(l10n.get('game_kniffel')),
           actions: [
             IconButton(
-              icon: const Icon(Icons.help_outline),
-              onPressed: () {
-                launchUrl(
-                  Uri.parse(
-                    'https://faserf.github.io/NexScore/docs/user_guide/games/#kniffel-yahtzee',
-                  ),
-                );
-              },
-              tooltip: l10n.get('help_title'),
+              icon: const Icon(Icons.refresh),
+              onPressed: () => _confirmReset(context, ref, l10n),
+              tooltip: l10n.get('game_reset'),
             ),
           ],
           bottom: TabBar(
@@ -62,6 +55,36 @@ class KniffelScreen extends ConsumerWidget {
             return _buildPlayerSheet(context, ref, p, sheet, l10n);
           }).toList(),
         ),
+      ),
+    );
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(kniffelStateProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
       ),
     );
   }

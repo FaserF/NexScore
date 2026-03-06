@@ -38,6 +38,11 @@ class ArschlochScreen extends ConsumerWidget {
             onPressed: () => _showRulesDialog(context, l10n),
             tooltip: l10n.get('arschloch_rules'),
           ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
+          ),
         ],
       ),
       body: players.isEmpty
@@ -78,7 +83,15 @@ class ArschlochScreen extends ConsumerWidget {
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 48),
-            if (players.length < 3)
+            if (players.length < 2)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(
+                  l10n.get('arschloch_min_3_players'),
+                  style: const TextStyle(color: Colors.orange),
+                ),
+              )
+            else if (players.length == 2)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Text(
@@ -87,7 +100,7 @@ class ArschlochScreen extends ConsumerWidget {
                 ),
               ),
             FilledButton.icon(
-              onPressed: players.length >= 3
+              onPressed: players.length >= 2
                   ? () => ref
                         .read(arschlochStateProvider.notifier)
                         .initPlayers(players.map((p) => p.id).toList())
@@ -452,5 +465,35 @@ class ArschlochScreen extends ConsumerWidget {
       case ArschlochRank.arschloch:
         return l10n.get('arschloch_rank_arschloch');
     }
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(arschlochStateProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

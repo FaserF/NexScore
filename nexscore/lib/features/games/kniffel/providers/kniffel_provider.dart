@@ -17,6 +17,10 @@ class KniffelStateNotifier extends Notifier<Map<String, YahtzeePlayerSheet>> {
     updatedMap[playerId] = sheet.copyWith(scores: newScores);
     state = updatedMap;
   }
+
+  void resetGame() {
+    state = {};
+  }
 }
 
 final kniffelStateProvider =

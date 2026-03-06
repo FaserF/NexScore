@@ -54,6 +54,11 @@ class QwixxScreen extends ConsumerWidget {
               },
               tooltip: l10n.get('nav_help'),
             ),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () => _confirmReset(context, ref, l10n),
+              tooltip: l10n.get('game_reset'),
+            ),
           ],
           bottom: TabBar(
             isScrollable: players.length > 3,
@@ -74,6 +79,36 @@ class QwixxScreen extends ConsumerWidget {
             );
           }).toList(),
         ),
+      ),
+    );
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(qwixxStateProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
       ),
     );
   }

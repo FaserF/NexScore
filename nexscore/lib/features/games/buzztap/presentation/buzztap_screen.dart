@@ -21,6 +21,7 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
+  bool _isBannerDismissed = false;
 
   @override
   void initState() {
@@ -32,6 +33,15 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
+
+    // Initial auto-toggle based on player count
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final players = ref.read(activePlayersProvider);
+      ref
+          .read(buzzTapStateProvider.notifier)
+          .toggle2PlayerOptimization(players.length == 2);
+    });
   }
 
   @override
@@ -45,6 +55,17 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
     final state = ref.watch(buzzTapStateProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
+
+    // Auto-toggle optimization based on player count
+    ref.listen<List<Player>>(activePlayersProvider, (previous, next) {
+      if (next.length == 2 && previous?.length != 2) {
+        ref.read(buzzTapStateProvider.notifier).toggle2PlayerOptimization(true);
+      } else if (next.length != 2 && previous?.length == 2) {
+        ref
+            .read(buzzTapStateProvider.notifier)
+            .toggle2PlayerOptimization(false);
+      }
+    });
 
     // Force dark theme experience for BuzzTap regardless of system settings
     return Theme(
@@ -91,8 +112,7 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
             ),
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: () =>
-                  ref.read(buzzTapStateProvider.notifier).resetGame(),
+              onPressed: () => _confirmReset(context, ref, l10n),
             ),
           ],
         ),
@@ -124,149 +144,190 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
           ],
         ),
       ),
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ScaleTransition(
-                scale: _pulseAnimation,
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.amber.withValues(alpha: 0.2),
-                        blurRadius: 40,
-                        spreadRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.bolt, size: 100, color: Colors.amber),
+      child: Column(
+        children: [
+          if (players.length == 2 && !_isBannerDismissed)
+            MaterialBanner(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              content: Text(
+                l10n.get('buzztap_2player_warning'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onErrorContainer,
                 ),
               ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    l10n.get('sipdeck_select_modes'), // Reuse wording
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.help_outline,
-                      size: 20,
-                      color: Colors.grey,
-                    ),
-                    onPressed: () => _showCategoryHelpDialog(context, l10n),
-                  ),
-                ],
+              leading: Icon(
+                Icons.warning_amber_rounded,
+                color: Theme.of(context).colorScheme.error,
               ),
-              const SizedBox(height: 32),
-              ...BuzzTapCategory.values.map((cat) {
-                final isSelected = state.selectedCategories.contains(cat);
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: AnimatedScaleButton(
-                    onPressed: () => ref
-                        .read(buzzTapStateProvider.notifier)
-                        .toggleCategory(cat),
-                    child: GlassContainer(
-                      padding: const EdgeInsets.all(16),
-                      borderRadius: 16,
-                      color: isSelected
-                          ? Colors.amber.withValues(alpha: 0.2)
-                          : Colors.white.withValues(alpha: 0.05),
-                      child: Row(
-                        children: [
-                          Icon(
-                            _iconForCategory(cat),
-                            color: isSelected ? Colors.amber : Colors.white54,
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              _labelForCategory(cat, l10n),
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: isSelected ? Colors.amber : Colors.white,
-                              ),
-                            ),
-                          ),
-                          if (isSelected)
-                            const Icon(
-                              Icons.check_circle,
-                              color: Colors.amber,
-                              size: 20,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }),
-              if (players.length == 2) ...[
-                const SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: SwitchListTile(
-                    title: Text(
-                      l10n.get('sipdeck_optimize_2players'),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    subtitle: Text(
-                      l10n.get('sipdeck_optimize_2players_desc'),
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-                    value: state.optimizeForTwoPlayers,
-                    activeThumbColor: Colors.amber,
-                    onChanged: (val) {
-                      ref
-                          .read(buzzTapStateProvider.notifier)
-                          .toggle2PlayerOptimization(val);
-                    },
-                    secondary: const Icon(
-                      Icons.people_outline,
-                      color: Colors.amber,
-                    ),
-                  ),
+              actions: [
+                TextButton(
+                  onPressed: () => setState(() => _isBannerDismissed = true),
+                  child: Text(l10n.get('ok')),
                 ),
               ],
-              const SizedBox(height: 48),
-              FilledButton(
-                onPressed: () => ref
-                    .read(buzzTapStateProvider.notifier)
-                    .drawNextCard(players, l10n),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.amber,
-                  foregroundColor: Colors.black,
-                  minimumSize: const Size(double.infinity, 64),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+            ),
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 32,
                 ),
-                child: const Text(
-                  'GO!',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ScaleTransition(
+                      scale: _pulseAnimation,
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.amber.withValues(alpha: 0.2),
+                              blurRadius: 40,
+                              spreadRadius: 10,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.bolt,
+                          size: 100,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          l10n.get('sipdeck_select_modes'), // Reuse wording
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.help_outline,
+                            size: 20,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () =>
+                              _showCategoryHelpDialog(context, l10n),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    ...BuzzTapCategory.values.map((cat) {
+                      final isSelected = state.selectedCategories.contains(cat);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: AnimatedScaleButton(
+                          onPressed: () => ref
+                              .read(buzzTapStateProvider.notifier)
+                              .toggleCategory(cat),
+                          child: GlassContainer(
+                            padding: const EdgeInsets.all(16),
+                            borderRadius: 16,
+                            color: isSelected
+                                ? Colors.amber.withValues(alpha: 0.2)
+                                : Colors.white.withValues(alpha: 0.05),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _iconForCategory(cat),
+                                  color: isSelected
+                                      ? Colors.amber
+                                      : Colors.white54,
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Text(
+                                    _labelForCategory(cat, l10n),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      color: isSelected
+                                          ? Colors.amber
+                                          : Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                if (isSelected)
+                                  const Icon(
+                                    Icons.check_circle,
+                                    color: Colors.amber,
+                                    size: 20,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                    if (players.length == 2) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: SwitchListTile(
+                          title: Text(
+                            l10n.get('sipdeck_optimize_2players'),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text(
+                            l10n.get('sipdeck_optimize_2players_desc'),
+                            style: const TextStyle(color: Colors.white70),
+                          ),
+                          value: state.optimizeForTwoPlayers,
+                          activeThumbColor: Colors.amber,
+                          onChanged: (val) {
+                            ref
+                                .read(buzzTapStateProvider.notifier)
+                                .toggle2PlayerOptimization(val);
+                          },
+                          secondary: const Icon(
+                            Icons.people_outline,
+                            color: Colors.amber,
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 48),
+                    FilledButton(
+                      onPressed: () => ref
+                          .read(buzzTapStateProvider.notifier)
+                          .drawNextCard(players, l10n),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.amber,
+                        foregroundColor: Colors.black,
+                        minimumSize: const Size(double.infinity, 64),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Text(
+                        'GO!',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -281,10 +342,14 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
     final currentCard = state.playedCards.last;
 
     return GestureDetector(
-      onTap: () {
-        HapticFeedback.mediumImpact();
-        ref.read(buzzTapStateProvider.notifier).drawNextCard(players, l10n);
-      },
+      onTap: (currentCard.sips == 0)
+          ? () {
+              HapticFeedback.mediumImpact();
+              ref
+                  .read(buzzTapStateProvider.notifier)
+                  .drawNextCard(players, l10n);
+            }
+          : null,
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -363,11 +428,173 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
               ),
             const Spacer(),
             _buildInlineSipCounter(state, players),
-            const SizedBox(height: 16),
-            Text(
-              l10n.get('sipdeck_tap_continue'),
-              style: const TextStyle(color: Colors.white38, letterSpacing: 1),
-            ),
+            const SizedBox(height: 24),
+            // Action Area
+            if (currentCard.sips > 0)
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (currentCard.targetType == BuzzTapTargetType.single ||
+                          currentCard.targetType == BuzzTapTargetType.everyone)
+                        Expanded(
+                          child: AnimatedScaleButton(
+                            onPressed: () {
+                              HapticFeedback.vibrate();
+                              ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .completeCard(false);
+                              ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .drawNextCard(players, l10n);
+                            },
+                            child: GlassContainer(
+                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              borderRadius: 20,
+                              color: Colors.amber,
+                              child: Text(
+                                currentCard.targetType ==
+                                        BuzzTapTargetType.everyone
+                                    ? l10n.get('game_drink_everyone')
+                                    : l10n.getWith('game_drink_single', [
+                                        players
+                                            .firstWhere(
+                                              (p) =>
+                                                  p.id ==
+                                                  currentCard.targetIds.first,
+                                              orElse: () => players.first,
+                                            )
+                                            .name,
+                                      ]),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (currentCard.targetType == BuzzTapTargetType.dual) ...[
+                        Expanded(
+                          child: AnimatedScaleButton(
+                            onPressed: () {
+                              HapticFeedback.mediumImpact();
+                              ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .incrementSips(
+                                    currentCard.targetIds.first,
+                                    currentCard.sips,
+                                  );
+                              ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .drawNextCard(players, l10n);
+                            },
+                            child: GlassContainer(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              borderRadius: 16,
+                              color: Colors.white.withValues(alpha: 0.1),
+                              child: Text(
+                                players
+                                    .firstWhere(
+                                      (p) =>
+                                          p.id == currentCard.targetIds.first,
+                                    )
+                                    .name,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AnimatedScaleButton(
+                            onPressed: () {
+                              HapticFeedback.mediumImpact();
+                              ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .incrementSips(
+                                    currentCard.targetIds.last,
+                                    currentCard.sips,
+                                  );
+                              ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .drawNextCard(players, l10n);
+                            },
+                            child: GlassContainer(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              borderRadius: 16,
+                              color: Colors.white.withValues(alpha: 0.1),
+                              child: Text(
+                                players
+                                    .firstWhere(
+                                      (p) => p.id == currentCard.targetIds.last,
+                                    )
+                                    .name,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      if (currentCard.targetType == BuzzTapTargetType.manual)
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              HapticFeedback.lightImpact();
+                              ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .drawNextCard(players, l10n);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              side: const BorderSide(color: Colors.amber),
+                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: Text(l10n.get('sipdeck_tap_continue')),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      ref
+                          .read(buzzTapStateProvider.notifier)
+                          .completeCard(true);
+                      ref
+                          .read(buzzTapStateProvider.notifier)
+                          .drawNextCard(players, l10n);
+                    },
+                    child: Text(
+                      l10n.get('game_skip'),
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            else
+              Text(
+                l10n.get('sipdeck_tap_continue'),
+                style: const TextStyle(color: Colors.white38, letterSpacing: 1),
+              ),
           ],
         ),
       ),
@@ -624,6 +851,36 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
           Text(
             desc,
             style: const TextStyle(fontSize: 14, color: Colors.white70),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(buzzTapStateProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),

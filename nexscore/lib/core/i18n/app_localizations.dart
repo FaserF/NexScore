@@ -60,6 +60,11 @@ class AppLocalizations {
       'settings_db_reset_confirm':
           'Are you sure? All players, history and leaderboards will be permanently deleted.',
       'settings_db_reset_success': 'Database has been reset.',
+      'game_reset_confirm':
+          'Are you sure you want to reset the current game? All progress will be lost.',
+      'game_drink_single': '{0} Drinks',
+      'game_drink_everyone': 'Everyone Drinks!',
+      'game_skip': 'Skip',
       'back': 'Back',
 
       // ── Game Descriptions
@@ -170,8 +175,16 @@ class AppLocalizations {
       'game_no_players': 'No players selected.',
       'game_setup_title': 'Game Setup',
       'game_setup_choose_players': 'Choose players for {0}',
-      'game_setup_start': 'Start Game',
       'game_setup_min_players': 'Please select at least {0} players.',
+
+      // ── Qwixx
+      'qwixx_title': 'Qwixx',
+      'qwixx_score_label': 'Total Score: {0}',
+      'qwixx_red': 'Red',
+      'qwixx_yellow': 'Yellow',
+      'qwixx_green': 'Green',
+      'qwixx_blue': 'Blue',
+      'qwixx_penalties': 'Penalties',
 
       // ── Schafkopf
       'schafkopf_title': 'Schafkopf',
@@ -214,7 +227,7 @@ class AppLocalizations {
       'arschloch_finish_order': 'Finish Order',
       'arschloch_ranked': 'Ranked:',
       'arschloch_tap_to_rank': 'Tap to rank:',
-      'arschloch_min_3_players': '⚠ Arschloch requires at least 3 players.',
+      'arschloch_min_3_players': 'At least 2 players required (3+ recommended)',
       'arschloch_goal': 'Goal',
       'arschloch_goal_desc':
           'Be the first to shed all cards → President. Last with cards = Asshole.',
@@ -344,6 +357,8 @@ class AppLocalizations {
       'sipdeck_18_warning': 'Must be 18+ to play.',
       'sipdeck_2player_warning':
           'SipDeck is best enjoyed with 3 or more players!',
+      'buzztap_2player_warning':
+          'BuzzTap is best enjoyed with 3 or more players!',
       'sipdeck_cat_warmUp': 'Warm Up',
       'sipdeck_cat_wildCards': 'Wild Cards',
       'sipdeck_cat_flirty': 'Flirty (18+)',
@@ -625,6 +640,12 @@ class AppLocalizations {
       'settings_theme_light': 'Hell',
       'settings_theme_dark': 'Dunkel',
       'settings_theme_system': 'Systemvorgabe',
+      'game_reset': 'Spiel zurücksetzen',
+      'game_reset_confirm':
+          'Bist du sicher, dass du das aktuelle Spiel zurücksetzen möchtest? Alle Fortschritte gehen verloren.',
+      'game_drink_single': '{0} trinkt',
+      'game_drink_everyone': 'Alle trinken!',
+      'game_skip': 'Überspringen',
       'settings_language': 'Sprache',
       'settings_language_en': 'Englisch',
       'settings_language_de': 'Deutsch',
@@ -825,9 +846,16 @@ class AppLocalizations {
           'Hinweis: Amigo unterstützt Wizard mit nur 2 Spielern offiziell nicht.',
       'game_no_players': 'Keine Spieler ausgewählt.',
       'game_setup_title': 'Spiel-Setup',
-      'game_setup_choose_players': 'Wähle Spieler für {0}',
-      'game_setup_start': 'Spiel starten',
       'game_setup_min_players': 'Bitte wähle mindestens {0} Spieler aus.',
+
+      // ── Qwixx
+      'qwixx_title': 'Qwixx',
+      'qwixx_score_label': 'Gesamtpunktzahl: {0}',
+      'qwixx_red': 'Rot',
+      'qwixx_yellow': 'Gelb',
+      'qwixx_green': 'Grün',
+      'qwixx_blue': 'Blau',
+      'qwixx_penalties': 'Fehlwürfe',
 
       // ── Schafkopf
       'schafkopf_title': 'Schafkopf',
@@ -870,7 +898,8 @@ class AppLocalizations {
       'arschloch_finish_order': 'Reihenfolge',
       'arschloch_ranked': 'Platziert:',
       'arschloch_tap_to_rank': 'Tippe zum Platzieren:',
-      'arschloch_min_3_players': '⚠ Arschloch benötigt mindestens 3 Spieler.',
+      'arschloch_min_3_players':
+          'Mindestens 2 Spieler erforderlich (3+ empfohlen)',
       'arschloch_goal': 'Ziel',
       'arschloch_goal_desc':
           'Als Erster alle Karten ablegen → Präsident. Letzter mit Karten = Arschloch.',
@@ -993,6 +1022,8 @@ class AppLocalizations {
       'sipdeck_18_warning': 'Ab 18 Jahren freigegeben.',
       'sipdeck_2player_warning':
           'SipDeck macht am meisten Spaß mit 3 oder mehr Spielern!',
+      'buzztap_2player_warning':
+          'BuzzTap macht am meisten Spaß mit 3 oder mehr Spielern!',
       'sipdeck_cat_warmUp': 'Warm Up',
       'sipdeck_cat_wildCards': 'Wild Cards',
       'sipdeck_cat_flirty': 'Flirt (18+)',

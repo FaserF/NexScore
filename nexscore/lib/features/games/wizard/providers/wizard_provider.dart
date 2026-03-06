@@ -10,6 +10,10 @@ class WizardGameStateNotifier extends Notifier<WizardGameState> {
   void addRound(WizardRound round) {
     state = state.copyWith(rounds: [...state.rounds, round]);
   }
+
+  void resetGame() {
+    state = const WizardGameState();
+  }
 }
 
 final wizardStateProvider =

@@ -28,6 +28,10 @@ class DartsStateNotifier extends Notifier<DartsGameState> {
     // Reset all local player states when changing game type
     state = DartsGameState(targetScore: score, playerStates: {});
   }
+
+  void resetGame() {
+    state = DartsGameState(targetScore: state.targetScore, playerStates: {});
+  }
 }
 
 final dartsStateProvider = NotifierProvider<DartsStateNotifier, DartsGameState>(
@@ -89,6 +93,11 @@ class DartsScreen extends ConsumerWidget {
               const PopupMenuItem(value: 701, child: Text('701')),
               const PopupMenuItem(value: 1001, child: Text('1001')),
             ],
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
           ),
         ],
       ),
@@ -183,8 +192,8 @@ class DartsScreen extends ConsumerWidget {
                   TextField(
                     controller: controller,
                     focusNode: focusNode,
-                    autofocus: true,
-                    keyboardType: TextInputType.number,
+                    readOnly: true,
+                    showCursor: true,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -226,7 +235,6 @@ class DartsScreen extends ConsumerWidget {
                             label: '$i',
                             onPressed: () {
                               controller.text = '${controller.text}$i';
-                              focusNode.requestFocus();
                             },
                           ),
                         _KeypadButton(
@@ -234,7 +242,6 @@ class DartsScreen extends ConsumerWidget {
                           color: Colors.redAccent.withValues(alpha: 0.1),
                           onPressed: () {
                             controller.clear();
-                            focusNode.requestFocus();
                           },
                         ),
                         _KeypadButton(
@@ -243,7 +250,6 @@ class DartsScreen extends ConsumerWidget {
                             if (controller.text.isNotEmpty) {
                               controller.text = '${controller.text}0';
                             }
-                            focusNode.requestFocus();
                           },
                         ),
                         _KeypadButton(
@@ -293,6 +299,36 @@ class DartsScreen extends ConsumerWidget {
 
     controller.dispose();
     focusNode.dispose();
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(dartsStateProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

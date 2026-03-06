@@ -16,6 +16,10 @@ class QwixxStateNotifier extends Notifier<QwixxGameState> {
     updated[playerId] = newSheet;
     state = QwixxGameState(sheets: updated);
   }
+
+  void resetGame() {
+    state = const QwixxGameState();
+  }
 }
 
 final qwixxStateProvider = NotifierProvider<QwixxStateNotifier, QwixxGameState>(
