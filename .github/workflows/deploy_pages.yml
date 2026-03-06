@@ -52,9 +52,16 @@ jobs:
       - name: Build Web App (PWA)
         if: ${{ inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true) || github.event_name == 'push' }}
         run: |
+          if [ "${{ inputs.version_name || 'latest' }}" == "latest" ]; then
+            APP_VERSION=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)
+            DEPLOY_VERSION="v${APP_VERSION}-Pages-${GITHUB_REF_NAME}"
+          else
+            DEPLOY_VERSION="${{ inputs.version_name }}"
+          fi
+
           flutter pub get
           flutter build web --release --base-href "/NexScore/" \
-            --dart-define=APP_VERSION=${{ inputs.version_name || 'latest' }} \
+            --dart-define=APP_VERSION=${DEPLOY_VERSION} \
             --dart-define=IS_BETA=${{ inputs.is_beta || false }} \
             --dart-define=FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
             --dart-define=FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }} \

@@ -195,6 +195,10 @@ Add the following lines **before** the `<script src="flutter_bootstrap.js">` tag
 > [!WARNING]
 > The `apiKey` is **not a secret** – it's a public identifier. However, the project should have proper Firebase Security Rules to prevent unauthorized access to data.
 
+> [!NOTE]
+> **GitHub & Google Login via Firebase**
+> Notice that you do not need a separate SDK or script tag for GitHub on the web. The single Firebase initialization block handles OAuth flows for both Google and GitHub out of the box.
+
 #### Step 2: Authorized JavaScript Origins
 
 Firebase Console → **Authentication** → **Settings** → **Authorized domains** must include your GitHub Pages domain:

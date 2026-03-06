@@ -81,6 +81,23 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
 
     state = state.copyWith(playedCards: [...state.playedCards, hydratedCard]);
   }
+
+  void incrementSips(String playerId, int amount) {
+    final sips = Map<String, int>.from(state.playerSips);
+    sips[playerId] = (sips[playerId] ?? 0) + amount;
+    state = state.copyWith(playerSips: sips);
+  }
+
+  void decrementSips(String playerId, int amount) {
+    final sips = Map<String, int>.from(state.playerSips);
+    final current = sips[playerId] ?? 0;
+    if (current >= amount) {
+      sips[playerId] = current - amount;
+    } else {
+      sips[playerId] = 0;
+    }
+    state = state.copyWith(playerSips: sips);
+  }
 }
 
 final sipDeckStateProvider =

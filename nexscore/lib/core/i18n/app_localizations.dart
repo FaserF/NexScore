@@ -41,6 +41,17 @@ class AppLocalizations {
       'settings_theme_light': 'Light',
       'settings_theme_dark': 'Dark',
       'settings_theme_system': 'System Default',
+
+      // ── Home / Games List
+      'home_choose_game': 'Choose a Game',
+      'home_search_games': 'Search games...',
+      'home_filter_all': 'All',
+      'home_tag_card': 'Card Game',
+      'home_tag_dice': 'Dice Game',
+      'home_tag_board': 'Board Game',
+      'home_tag_sport': 'Sport',
+      'home_tag_party': 'Drinking Game',
+
       'settings_language': 'Language',
       'settings_language_en': 'English',
       'settings_language_de': 'German',
@@ -50,13 +61,6 @@ class AppLocalizations {
           'Are you sure? All players, history and leaderboards will be permanently deleted.',
       'settings_db_reset_success': 'Database has been reset.',
       'back': 'Back',
-
-      // ── Home / Games List
-      'home_choose_game': 'Choose a game to track scores',
-      'home_tag_card': 'Card Game',
-      'home_tag_dice': 'Dice Game',
-      'home_tag_sport': 'Sport',
-      'home_tag_party': '18+ Party',
 
       // ── Game Descriptions
       'desc_wizard':
@@ -158,6 +162,8 @@ class AppLocalizations {
       'wizard_scoring_lenient': 'Lenient – tricks offset against bids',
       'wizard_scoring_extreme': 'Extreme – correct = +30, wrong = ‒2× penalty',
       'wizard_rule_stiche': 'Stiche dürfen nicht aufgehen',
+      'wizard_rule_uneven_error':
+          'Tricks cannot exactly match the round count for {0}.',
       'wizard_rule_stiche_desc': 'Last player cannot force a tie.',
       'wizard_2player_warning':
           'Note: Amigo does not officially support Wizard with only 2 players.',
@@ -334,6 +340,7 @@ class AppLocalizations {
       'buzztap_cat_hot': 'Hot',
       'buzztap_cat_extreme': 'Extreme',
       'buzztap_start': 'Let\'s Buzz!',
+      'sip_tracker': 'Sips Tracker',
       'sipdeck_18_warning': 'Must be 18+ to play.',
       'sipdeck_2player_warning':
           'SipDeck is best enjoyed with 3 or more players!',
@@ -342,6 +349,53 @@ class AppLocalizations {
       'sipdeck_cat_flirty': 'Flirty (18+)',
       'sipdeck_cat_barNight': 'Bar Night',
       'sipdeck_cat_laughs': 'Laughs',
+      'category_help_title': 'Category Descriptions',
+      'buzztap_help_warmup': 'Light icebreakers to get everyone in the mood.',
+      'buzztap_help_party': 'General party challenges for everyone.',
+      'buzztap_help_hot': 'Daring and flirty tasks (18+).',
+      'buzztap_help_extreme': 'Extreme and crazy challenges! Brace yourselves.',
+      'sipdeck_help_warmup': 'Easy icebreaker challenges, fun for everyone.',
+      'sipdeck_help_wildcards': 'Advanced dares and creative rules.',
+      'sipdeck_help_flirty': 'Playful, flirty challenges (18+).',
+      'sipdeck_help_barnight': 'Suitable for any public bar setting.',
+      'sipdeck_help_laughs': 'Silly and absurd things to do or say.',
+
+      // ── BuzzTap Cards (EN)
+      'bt_card_w001':
+          '👋 {0}, introduce yourself with a fake stage name. The group chooses if it fits.',
+      'bt_card_w002':
+          '🍹 Everyone who has a drink in their hand right now takes a sip.',
+      'bt_card_w003':
+          '📱 {0}, show the group your last saved photo. Embarrassing? 2 sips.',
+      'bt_card_w004':
+          '👂 {0}, tell a secret about {1}. If {1} denies it, you drink 3.',
+      'bt_card_w005': '🕒 Last person to arrive at this party takes 2 sips.',
+      'bt_card_p001':
+          '🔥 Hot Seat! {0} has 30 seconds to answer any questions from the group. One skip = 1 sip.',
+      'bt_card_p002':
+          '💃 {0}, show us your best dance move. If nobody joins in, take 3 sips.',
+      'bt_card_p003':
+          '🎤 Karaoke Time! {0} must sing the chorus of a popular song. Group votes on the quality.',
+      'bt_card_p004': '🤫 Quiet Game: The next person to speak takes 3 sips.',
+      'bt_card_p005':
+          '🍻 Cheers! Everyone chooses a partner and toasts to something they like about them.',
+      'bt_card_h001':
+          '👀 {0}, who here is the most attractive? That person gives out 3 sips.',
+      'bt_card_h002':
+          '💋 {0} and {1}, 10 seconds of intense eye contact. First to look away drinks 3.',
+      'bt_card_h003':
+          '🔞 {0}, what is your weirdest turn-on? Don\'t want to say? Drink 5.',
+      'bt_card_h004':
+          '💘 {0}, text your ex "I miss you". Refuse? Finish your drink.',
+      'bt_card_h005':
+          '🖤 Truth or Drink: {0} asks {1} a spicy question. Either {1} answers or drinks 4.',
+      'bt_card_e001': '🧨 Shot Time! {0} chooses someone to take a shot with.',
+      'bt_card_e002':
+          '💀 {0}, let {1} post anything they want on your social media story.',
+      'bt_card_e003':
+          '🌪️ Swapped! {0} and {1} must swap an item of clothing for the next 3 rounds.',
+      'bt_card_e004':
+          '🤡 {0}, let the group draw a small mustache on you with a marker.',
 
       // ── Account / Auth
       'account_title': 'Account',
@@ -656,6 +710,69 @@ class AppLocalizations {
       'desc_buzztap':
           'Dynamische challenges und Trinkaufgaben für deine Party.',
 
+      // ── BuzzTap
+      'buzztap_title': 'BuzzTap',
+      'buzztap_cat_warmup': 'Aufwärmen',
+      'buzztap_cat_party': 'Party',
+      'buzztap_cat_hot': 'Heiß',
+      'buzztap_cat_extreme': 'Extrem',
+      'buzztap_start': 'Los geht\'s!',
+      'sip_tracker': 'Schluckzähler',
+      'category_help_title': 'Kategoriebeschreibungen',
+      'buzztap_help_warmup':
+          'Leichte Icebreaker, um alle in Stimmung zu bringen.',
+      'buzztap_help_party': 'Allgemeine Party-Herausforderungen für alle.',
+      'buzztap_help_hot': 'Gewagte und flirty Aufgaben (18+).',
+      'buzztap_help_extreme':
+          'Extreme und verrückte Herausforderungen! Macht euch auf was gefasst.',
+      'sipdeck_help_warmup':
+          'Leichte Icebreaker-Herausforderungen, Spaß für jeden.',
+      'sipdeck_help_wildcards': 'Anspruchsvolle Mutproben und kreative Regeln.',
+      'sipdeck_help_flirty': 'Verspielte, flirty Herausforderungen (18+).',
+      'sipdeck_help_barnight': 'Geeignet für jede Bar.',
+      'sipdeck_help_laughs':
+          'Alberne und absurde Dinge, die man tun oder sagen muss.',
+
+      // ── BuzzTap Cards (DE)
+      'bt_card_w001':
+          '👋 {0}, stelle dich mit einem falschen Künstlernamen vor. Die Gruppe entscheidet, ob er passt.',
+      'bt_card_w002':
+          '🍹 Jeder, der gerade ein Getränk in der Hand hat, nimmt einen Schluck.',
+      'bt_card_w003':
+          '📱 {0}, zeige der Gruppe dein zuletzt gespeichertes Foto. Peinlich? 2 Schlücke.',
+      'bt_card_w004':
+          '👂 {0}, erzähle ein Geheimnis über {1}. Wenn {1} es leugnet, trinkst du 3.',
+      'bt_card_w005':
+          '🕒 Die letzte Person, die auf dieser Party angekommen ist, nimmt 2 Schlücke.',
+      'bt_card_p001':
+          '🔥 Heißer Stuhl! {0} hat 30 Sekunden Zeit, um alle Fragen der Gruppe zu beantworten. Einmal passen = 1 Schluck.',
+      'bt_card_p002':
+          '💃 {0}, zeig uns deinen besten Tanzmove. Wenn niemand mitmacht, nimm 3 Schlücke.',
+      'bt_card_p003':
+          '🎤 Karaoke-Zeit! {0} muss den Refrain eines bekannten Liedes singen. Die Gruppe bewertet.',
+      'bt_card_p004':
+          '🤫 Schweige-Spiel: Die nächste Person, die spricht, nimmt 3 Schlücke.',
+      'bt_card_p005':
+          '🍻 Prost! Jeder wählt einen Partner und stößt auf etwas an, das er an ihm mag.',
+      'bt_card_h001':
+          '👀 {0}, wer hier ist am attraktivsten? Diese Person verteilt 3 Schlücke.',
+      'bt_card_h002':
+          '💋 {0} und {1}, 10 Sekunden intensiver Augenkontakt. Wer zuerst wegschaut, trinkt 3.',
+      'bt_card_h003':
+          '🔞 {0}, was macht dich auf seltsame Weise an? Willst du es nicht sagen? Trink 5.',
+      'bt_card_h004':
+          '💘 {0}, schreibe deinem Ex "Ich vermisse dich". Du weigerst dich? Ex dein Getränk.',
+      'bt_card_h005':
+          '🖤 Wahrheit oder Trinken: {0} stellt {1} eine pikante Frage. Entweder {1} antwortet oder trinkt 4.',
+      'bt_card_e001':
+          '🧨 Shot-Zeit! {0} wählt jemanden aus, um gemeinsam einen Shot zu trinken.',
+      'bt_card_e002':
+          '💀 {0}, lass {1} posten was er will in deiner Social-Media-Story.',
+      'bt_card_e003':
+          '🌪️ Getauscht! {0} und {1} müssen für die nächsten 3 Runden ein Kleidungsstück tauschen.',
+      'bt_card_e004':
+          '🤡 {0}, lass die Gruppe dir mit einem Edding einen kleinen Schnurrbart malen.',
+
       // ── Help screen (added for in-app help feature)
       'help_title': 'Hilfe & Feedback',
       'help_docs': 'NexScore Dokumentation',
@@ -695,8 +812,10 @@ class AppLocalizations {
       'wizard_scoring_lenient':
           'Lenient – Stiche werden mit Geboten verrechnet',
       'wizard_scoring_extreme':
-          'Extreme – nur exaktes Gebot, falsch = ‑2× Stiche',
+          'Extreme – richtig = +30, falsch = doppelte Strafe',
       'wizard_rule_stiche': 'Stiche dürfen nicht aufgehen',
+      'wizard_rule_uneven_error':
+          'Die Stiche dürfen für {0} nicht genau aufgehen.',
       'wizard_rule_stiche_desc':
           'Der letzte Spieler kann keinen Gleichstand erzwingen.',
       'wizard_2player_warning':
@@ -868,13 +987,6 @@ class AppLocalizations {
           'Blende Karten aus, die zu zweit wenig Sinn machen.',
       'sipdeck_no_players': 'Füge zuerst Spieler hinzu, um SipDeck zu spielen.',
 
-      // ── BuzzTap
-      'buzztap_title': 'BuzzTap',
-      'buzztap_cat_warmup': 'Aufwärmen',
-      'buzztap_cat_party': 'Party',
-      'buzztap_cat_hot': 'Heiß',
-      'buzztap_cat_extreme': 'Extrem',
-      'buzztap_start': 'Ab geht\'s!',
       'sipdeck_18_warning': 'Ab 18 Jahren freigegeben.',
       'sipdeck_2player_warning':
           'SipDeck macht am meisten Spaß mit 3 oder mehr Spielern!',

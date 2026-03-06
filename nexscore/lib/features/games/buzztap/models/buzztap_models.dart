@@ -58,6 +58,8 @@ class BuzzTapCard {
 class BuzzTapGameState {
   final List<BuzzTapCategory> selectedCategories;
   final List<BuzzTapCard> playedCards;
+  final Map<String, int> playerSips;
+  final bool optimizeForTwoPlayers;
 
   const BuzzTapGameState({
     this.selectedCategories = const [
@@ -65,15 +67,22 @@ class BuzzTapGameState {
       BuzzTapCategory.party,
     ],
     this.playedCards = const [],
+    this.playerSips = const {},
+    this.optimizeForTwoPlayers = false,
   });
 
   BuzzTapGameState copyWith({
     List<BuzzTapCategory>? selectedCategories,
     List<BuzzTapCard>? playedCards,
+    Map<String, int>? playerSips,
+    bool? optimizeForTwoPlayers,
   }) {
     return BuzzTapGameState(
       selectedCategories: selectedCategories ?? this.selectedCategories,
       playedCards: playedCards ?? this.playedCards,
+      playerSips: playerSips ?? this.playerSips,
+      optimizeForTwoPlayers:
+          optimizeForTwoPlayers ?? this.optimizeForTwoPlayers,
     );
   }
 }
@@ -88,6 +97,7 @@ const List<BuzzTapCard> buzzTapDatabase = [
         '{0}, introduce yourself with a fake stage name. The group chooses if it fits.',
     sips: 2,
     category: BuzzTapCategory.warmup,
+    minPlayers: 3,
   ),
   BuzzTapCard(
     id: 'w002',
@@ -95,6 +105,7 @@ const List<BuzzTapCard> buzzTapDatabase = [
     text: 'Everyone who has a drink in their hand right now takes a sip.',
     sips: 1,
     category: BuzzTapCategory.warmup,
+    minPlayers: 3,
   ),
   BuzzTapCard(
     id: 'w003',
@@ -116,6 +127,7 @@ const List<BuzzTapCard> buzzTapDatabase = [
     text: 'Last person to arrive at this party takes 2 sips.',
     sips: 2,
     category: BuzzTapCategory.warmup,
+    minPlayers: 3,
   ),
 
   // ─── Party ───
@@ -126,6 +138,7 @@ const List<BuzzTapCard> buzzTapDatabase = [
         'Hot Seat! {0} has 30 seconds to answer any questions from the group. One skip = 1 sip.',
     sips: 1,
     category: BuzzTapCategory.party,
+    minPlayers: 3,
   ),
   BuzzTapCard(
     id: 'p002',
@@ -141,6 +154,7 @@ const List<BuzzTapCard> buzzTapDatabase = [
         'Karaoke Time! {0} must sing the chorus of a popular song. Group votes on the quality.',
     sips: 2,
     category: BuzzTapCategory.party,
+    minPlayers: 3,
   ),
   BuzzTapCard(
     id: 'p004',
@@ -165,6 +179,7 @@ const List<BuzzTapCard> buzzTapDatabase = [
     text: '{0}, who here is the most attractive? That person gives out 3 sips.',
     sips: 0,
     category: BuzzTapCategory.hot,
+    minPlayers: 3,
   ),
   BuzzTapCard(
     id: 'h002',
@@ -226,5 +241,6 @@ const List<BuzzTapCard> buzzTapDatabase = [
     text: '{0}, let the group draw a small mustache on you with a marker.',
     sips: 0,
     category: BuzzTapCategory.extreme,
+    minPlayers: 3,
   ),
 ];

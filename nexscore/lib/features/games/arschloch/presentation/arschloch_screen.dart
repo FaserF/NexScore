@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
@@ -23,6 +24,17 @@ class ArschlochScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              launchUrl(
+                Uri.parse(
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#arschloch-president',
+                ),
+              );
+            },
+            tooltip: l10n.get('help_title'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.menu_book),
             onPressed: () => _showRulesDialog(context, l10n),
             tooltip: l10n.get('arschloch_rules'),
           ),

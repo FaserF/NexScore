@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/providers/active_players_provider.dart';
@@ -46,6 +47,17 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
             backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           ),
           const SizedBox(width: 4),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              launchUrl(
+                Uri.parse(
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#wizard',
+                ),
+              );
+            },
+            tooltip: l10n.get('nav_help'),
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => _showSettingsDialog(context),
@@ -280,6 +292,18 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                     );
                   }),
                   const Divider(),
+                  SwitchListTile(
+                    title: Text(l10n.get('wizard_rule_stiche')),
+                    value: state.ruleSticheDuertenNichtAufgehen,
+                    onChanged: (val) {
+                      ref
+                          .read(wizardStateProvider.notifier)
+                          .updateState(
+                            state.copyWith(ruleSticheDuertenNichtAufgehen: val),
+                          );
+                    },
+                  ),
+                  const Divider(),
                   ListTile(
                     title: Text(l10n.get('wizard_start_round')),
                     trailing: Row(
@@ -427,6 +451,29 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                   for (var p in players)
                     p.id: int.tryParse(bidControllers[p.id]!.text) ?? 0,
                 };
+
+                // Validation for Uneven Tricks Setting
+                if (state.ruleSticheDuertenNichtAufgehen) {
+                  final bidsSum = bids.values.fold<int>(
+                    0,
+                    (sum, val) => sum + val,
+                  );
+                  if (bidsSum == roundIndex) {
+                    final lastPlayer = players.last;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          l10n.getWith('wizard_rule_uneven_error', [
+                            lastPlayer.name,
+                          ]),
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                      ),
+                    );
+                    return; // Prevent saving
+                  }
+                }
+
                 ref
                     .read(wizardStateProvider.notifier)
                     .updateState(state.copyWith(currentRoundBids: bids));

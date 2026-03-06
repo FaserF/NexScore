@@ -67,6 +67,7 @@ class SipDeckGameState {
   final List<SipDeckCard> activeViruses;
   final bool
   filterMultiplayerOnly; // If true, cards with minPlayers > 2 are hidden when only 2 play
+  final Map<String, int> playerSips;
 
   const SipDeckGameState({
     this.activePlayerIds = const [],
@@ -74,6 +75,7 @@ class SipDeckGameState {
     this.playedCards = const [],
     this.activeViruses = const [],
     this.filterMultiplayerOnly = true,
+    this.playerSips = const {},
   });
 
   SipDeckGameState copyWith({
@@ -82,6 +84,7 @@ class SipDeckGameState {
     List<SipDeckCard>? playedCards,
     List<SipDeckCard>? activeViruses,
     bool? filterMultiplayerOnly,
+    Map<String, int>? playerSips,
   }) {
     return SipDeckGameState(
       activePlayerIds: activePlayerIds ?? this.activePlayerIds,
@@ -90,6 +93,7 @@ class SipDeckGameState {
       activeViruses: activeViruses ?? this.activeViruses,
       filterMultiplayerOnly:
           filterMultiplayerOnly ?? this.filterMultiplayerOnly,
+      playerSips: playerSips ?? this.playerSips,
     );
   }
 }

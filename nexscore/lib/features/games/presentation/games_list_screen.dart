@@ -1,31 +1,87 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/i18n/app_localizations.dart';
 import '../../../core/providers/favorites_provider.dart';
 import '../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../core/theme/widgets/glass_container.dart';
 import '../../../core/utils/app_version.dart';
+import '../../../core/pwa/pwa_prompt.dart' as pwa;
 
 /// The main game selection screen shown at app start.
 /// Displays all supported games as rich cards with name, icon, and description.
-class GamesListScreen extends ConsumerWidget {
+class GamesListScreen extends ConsumerStatefulWidget {
   const GamesListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GamesListScreen> createState() => _GamesListScreenState();
+}
+
+class _GamesListScreenState extends ConsumerState<GamesListScreen> {
+  String _searchQuery = '';
+  String? _selectedTag;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPwaInstallPrompt();
+  }
+
+  Future<void> _checkPwaInstallPrompt() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final hasShownPrompt = prefs.getBool('pwa_prompt_shown') ?? false;
+
+      if (!hasShownPrompt) {
+        // We wait a few seconds so the app can render and user is slightly engaged
+        await Future.delayed(const Duration(seconds: 3));
+        if (mounted) {
+          final shown = await pwa.showInstallPrompt();
+          if (shown) {
+            await prefs.setBool('pwa_prompt_shown', true);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error checking PWA prompt: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final l10n = AppLocalizations.of(context);
     final allGames = _gameEntries(context, l10n);
     final favorites = ref.watch(favoritesProvider);
 
+    // Sort alphabetically
+    allGames.sort(
+      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+    );
+
+    // Apply Filters
+    final filteredGames = allGames.where((g) {
+      final matchesSearch =
+          g.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          g.description.toLowerCase().contains(_searchQuery.toLowerCase());
+      final matchesTag = _selectedTag == null || g.tag == _selectedTag;
+      return matchesSearch && matchesTag;
+    }).toList();
+
     // Split games into favorites and others
-    final favGames = allGames.where((g) => favorites.contains(g.id)).toList();
-    final otherGames = allGames
+    final favGames = filteredGames
+        .where((g) => favorites.contains(g.id))
+        .toList();
+    final otherGames = filteredGames
         .where((g) => !favorites.contains(g.id))
         .toList();
 
     // Combine them with favorites first
     final games = [...favGames, ...otherGames];
+
+    // Extract all unique tags for the filter chips
+    final availableTags = allGames.map((g) => g.tag).toSet().toList()..sort();
 
     return Scaffold(
       body: CustomScrollView(
@@ -128,13 +184,80 @@ class GamesListScreen extends ConsumerWidget {
               delegate: SliverChildBuilderDelegate((context, index) {
                 if (index == 0) {
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(4, 0, 4, 24),
-                    child: Text(
-                      l10n.get('home_choose_game'),
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    padding: const EdgeInsets.fromLTRB(4, 0, 4, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.get('home_choose_game'),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          onChanged: (val) =>
+                              setState(() => _searchQuery = val),
+                          decoration: InputDecoration(
+                            hintText: l10n.get('home_search_games'),
+                            prefixIcon: const Icon(Icons.search),
+                            filled: true,
+                            fillColor: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest
+                                .withValues(alpha: 0.3),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: FilterChip(
+                                  label: Text(l10n.get('home_filter_all')),
+                                  selected: _selectedTag == null,
+                                  onSelected: (selected) {
+                                    if (selected) {
+                                      setState(() => _selectedTag = null);
+                                    }
+                                  },
+                                ),
+                              ),
+                              ...availableTags.map((tag) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: FilterChip(
+                                    label: Text(tag),
+                                    selected: _selectedTag == tag,
+                                    onSelected: (selected) {
+                                      setState(
+                                        () => _selectedTag = selected
+                                            ? tag
+                                            : null,
+                                      );
+                                    },
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                     ),
                   );
                 }

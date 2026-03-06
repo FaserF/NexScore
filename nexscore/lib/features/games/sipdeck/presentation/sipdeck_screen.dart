@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
@@ -27,6 +28,21 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
       appBar: AppBar(
         title: Text(l10n.get('sipdeck_title')),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              launchUrl(
+                Uri.parse(
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#sipdeck-18',
+                ),
+              );
+            },
+            tooltip: l10n.get('nav_help'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.local_drink),
+            onPressed: () => _showSipsModal(context, ref, state, players, l10n),
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => _showCategoriesModal(context, ref, state, l10n),
@@ -119,12 +135,22 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                 if (players.length == 2) const SizedBox(height: 24),
 
                 // Category Selection Section
-                Text(
-                  l10n.get('sipdeck_select_modes'),
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.get('sipdeck_select_modes'),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.help_outline, size: 20),
+                      onPressed: () => _showCategoryHelpDialog(context, l10n),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 ConstrainedBox(
@@ -350,6 +376,8 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                       ),
                     ),
                   const Spacer(),
+                  _buildInlineSipCounter(state, players),
+                  const SizedBox(height: 16),
                   // Interactive hint
                   Column(
                     children: [
@@ -369,6 +397,57 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInlineSipCounter(SipDeckGameState state, List<Player> players) {
+    if (players.every((p) => (state.playerSips[p.id] ?? 0) == 0)) {
+      return const SizedBox.shrink();
+    }
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: players.map((p) {
+          final sips = state.playerSips[p.id] ?? 0;
+          if (sips == 0) return const SizedBox.shrink();
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.black38,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white30),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    radius: 10,
+                    backgroundColor: Color(
+                      int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+                    ),
+                    child: Text(
+                      p.name.substring(0, 1).toUpperCase(),
+                      style: const TextStyle(fontSize: 10, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '$sips',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -418,6 +497,72 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
     }
   }
 
+  void _showSipsModal(
+    BuildContext context,
+    WidgetRef ref,
+    SipDeckGameState state,
+    List<Player> players,
+    AppLocalizations l10n,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final currentState = ref.watch(sipDeckStateProvider);
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Text(
+                  l10n.get('sip_tracker'),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ...players.map((p) {
+                  final sips = currentState.playerSips[p.id] ?? 0;
+                  return ListTile(
+                    title: Text(p.name, style: const TextStyle(fontSize: 18)),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle_outline),
+                          onPressed: () => ref
+                              .read(sipDeckStateProvider.notifier)
+                              .decrementSips(p.id, 1),
+                        ),
+                        SizedBox(
+                          width: 40,
+                          child: Text(
+                            '$sips',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline),
+                          onPressed: () => ref
+                              .read(sipDeckStateProvider.notifier)
+                              .incrementSips(p.id, 1),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _showCategoriesModal(
     BuildContext context,
     WidgetRef ref,
@@ -458,6 +603,68 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
           ],
         );
       },
+    );
+  }
+
+  void _showCategoryHelpDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(l10n.get('category_help_title')),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHelpRow(
+                  l10n.get('sipdeck_cat_warmUp'),
+                  l10n.get('sipdeck_help_warmup'),
+                ),
+                _buildHelpRow(
+                  l10n.get('sipdeck_cat_wildCards'),
+                  l10n.get('sipdeck_help_wildcards'),
+                ),
+                _buildHelpRow(
+                  l10n.get('sipdeck_cat_flirty'),
+                  l10n.get('sipdeck_help_flirty'),
+                ),
+                _buildHelpRow(
+                  l10n.get('sipdeck_cat_barNight'),
+                  l10n.get('sipdeck_help_barnight'),
+                ),
+                _buildHelpRow(
+                  l10n.get('sipdeck_cat_laughs'),
+                  l10n.get('sipdeck_help_laughs'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.get('ok')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildHelpRow(String title, String desc) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(height: 4),
+          Text(desc, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+        ],
+      ),
     );
   }
 }

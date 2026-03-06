@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
@@ -22,6 +23,17 @@ class SchafkopfScreen extends ConsumerWidget {
         title: Text(l10n.get('game_schafkopf')),
         leading: BackButton(onPressed: () => context.go('/games')),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              launchUrl(
+                Uri.parse(
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#schafkopf',
+                ),
+              );
+            },
+            tooltip: l10n.get('nav_help'),
+          ),
           if (rounds.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.undo),

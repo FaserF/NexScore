@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
@@ -73,6 +74,22 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
           ),
           actions: [
             IconButton(
+              icon: const Icon(Icons.help_outline),
+              onPressed: () {
+                launchUrl(
+                  Uri.parse(
+                    'https://faserf.github.io/NexScore/docs/user_guide/games/#buzztap-18',
+                  ),
+                );
+              },
+              tooltip: l10n.get('nav_help'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.local_drink),
+              onPressed: () =>
+                  _showSipsModal(context, ref, state, players, l10n),
+            ),
+            IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () =>
                   ref.read(buzzTapStateProvider.notifier).resetGame(),
@@ -131,13 +148,27 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                 ),
               ),
               const SizedBox(height: 32),
-              Text(
-                l10n.get('sipdeck_select_modes'), // Reuse wording
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    l10n.get('sipdeck_select_modes'), // Reuse wording
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.help_outline,
+                      size: 20,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () => _showCategoryHelpDialog(context, l10n),
+                  ),
+                ],
               ),
               const SizedBox(height: 32),
               ...BuzzTapCategory.values.map((cat) {
@@ -185,6 +216,36 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                   ),
                 );
               }),
+              if (players.length == 2) ...[
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: SwitchListTile(
+                    title: Text(
+                      l10n.get('sipdeck_optimize_2players'),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Text(
+                      l10n.get('sipdeck_optimize_2players_desc'),
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    value: state.optimizeForTwoPlayers,
+                    activeThumbColor: Colors.amber,
+                    onChanged: (val) {
+                      ref
+                          .read(buzzTapStateProvider.notifier)
+                          .toggle2PlayerOptimization(val);
+                    },
+                    secondary: const Icon(
+                      Icons.people_outline,
+                      color: Colors.amber,
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 48),
               FilledButton(
                 onPressed: () => ref
@@ -300,13 +361,66 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                   ),
                 ),
               ),
-            const SizedBox(height: 64),
+            const Spacer(),
+            _buildInlineSipCounter(state, players),
+            const SizedBox(height: 16),
             Text(
               l10n.get('sipdeck_tap_continue'),
               style: const TextStyle(color: Colors.white38, letterSpacing: 1),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInlineSipCounter(BuzzTapGameState state, List<Player> players) {
+    if (players.every((p) => (state.playerSips[p.id] ?? 0) == 0)) {
+      return const SizedBox.shrink();
+    }
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: players.map((p) {
+          final sips = state.playerSips[p.id] ?? 0;
+          if (sips == 0) return const SizedBox.shrink();
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    radius: 12,
+                    backgroundColor: Color(
+                      int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+                    ),
+                    child: Text(
+                      p.name.substring(0, 1).toUpperCase(),
+                      style: const TextStyle(fontSize: 10, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '$sips',
+                    style: const TextStyle(
+                      color: Colors.amber,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -349,5 +463,170 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
       case BuzzTapCategory.extreme:
         return Colors.red;
     }
+  }
+
+  void _showSipsModal(
+    BuildContext context,
+    WidgetRef ref,
+    BuzzTapGameState state,
+    List<Player> players,
+    AppLocalizations l10n,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final currentState = ref.watch(buzzTapStateProvider);
+            // Inside BuzzTap, we use the dark theme specifically
+            return Theme(
+              data: ThemeData.dark().copyWith(
+                colorScheme: ColorScheme.fromSeed(
+                  seedColor: Colors.amber,
+                  brightness: Brightness.dark,
+                  surface: const Color(0xFF121212),
+                ),
+              ),
+              child: Container(
+                color: const Color(0xFF121212),
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    Text(
+                      l10n.get('sip_tracker'),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ...players.map((p) {
+                      final sips = currentState.playerSips[p.id] ?? 0;
+                      return ListTile(
+                        title: Text(
+                          p.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.remove_circle_outline,
+                                color: Colors.amber,
+                              ),
+                              onPressed: () => ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .decrementSips(p.id, 1),
+                            ),
+                            SizedBox(
+                              width: 40,
+                              child: Text(
+                                '$sips',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.add_circle_outline,
+                                color: Colors.amber,
+                              ),
+                              onPressed: () => ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .incrementSips(p.id, 1),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showCategoryHelpDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            l10n.get('category_help_title'),
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: const Color(0xFF1E1E1E), // Dark theme match
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHelpRow(
+                  l10n.get('buzztap_cat_warmup'),
+                  l10n.get('buzztap_help_warmup'),
+                ),
+                _buildHelpRow(
+                  l10n.get('buzztap_cat_party'),
+                  l10n.get('buzztap_help_party'),
+                ),
+                _buildHelpRow(
+                  l10n.get('buzztap_cat_hot'),
+                  l10n.get('buzztap_help_hot'),
+                ),
+                _buildHelpRow(
+                  l10n.get('buzztap_cat_extreme'),
+                  l10n.get('buzztap_help_extreme'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                l10n.get('ok'),
+                style: const TextStyle(color: Colors.amber),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildHelpRow(String title, String desc) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: Colors.amber,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            desc,
+            style: const TextStyle(fontSize: 14, color: Colors.white70),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -127,19 +127,26 @@ class AuthService {
       githubProvider.addScope('gist');
       githubProvider.setCustomParameters({'allow_signup': 'false'});
 
-      final credential = await _auth.signInWithPopup(githubProvider);
+      UserCredential credential;
+      if (kIsWeb) {
+        // Use popup on web for better reliability on GitHub Pages
+        credential = await _auth.signInWithPopup(githubProvider);
+      } else {
+        credential = await _auth.signInWithProvider(githubProvider);
+      }
       AppLogger.info(
-        'GitHub Sign-In (Popup) successful',
+        'GitHub Sign-In successful',
         tag: 'Auth',
         metadata: {
           'duration': '${stopwatch.elapsedMilliseconds}ms',
           'uid': credential.user?.uid,
+          'platform': kIsWeb ? 'web' : 'native',
         },
       );
       return Result.success(credential);
     } catch (e, stack) {
       AppLogger.error(
-        'GitHub Sign-In (Popup) failed',
+        'GitHub Sign-In failed',
         tag: 'Auth',
         error: e,
         stackTrace: stack,
@@ -219,9 +226,17 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-class _SignedOutView extends StatelessWidget {
+class _SignedOutView extends ConsumerStatefulWidget {
   const _SignedOutView({required this.ref});
   final WidgetRef ref;
+
+  @override
+  ConsumerState<_SignedOutView> createState() => _SignedOutViewState();
+}
+
+class _SignedOutViewState extends ConsumerState<_SignedOutView> {
+  bool _isGoogleLoading = false;
+  bool _isGithubLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -250,54 +265,77 @@ class _SignedOutView extends StatelessWidget {
           ),
           const SizedBox(height: 40),
           OutlinedButton.icon(
-            onPressed: () async {
-              debugPrint('Auth: Google Sign-In requested');
-              final authService = ref.read(authServiceProvider);
-              final result = await authService.signInWithGoogleNative();
-              debugPrint('Auth: Result received: ${result.isSuccess}');
-              result.fold(
-                (failure) {
-                  debugPrint('Auth: Failure: ${failure.message}');
-                  if (context.mounted) {
-                    _showError(context, l10n, failure.message);
-                  }
-                },
-                (_) {
-                  debugPrint('Auth: Success');
-                },
-              );
-            },
-            icon: const Icon(Icons.login),
+            onPressed: _isGoogleLoading || _isGithubLoading
+                ? null
+                : () async {
+                    setState(() => _isGoogleLoading = true);
+                    final messenger = ScaffoldMessenger.of(context);
+                    debugPrint('Auth: Google Sign-In requested');
+                    final authService = ref.read(authServiceProvider);
+                    final result = await authService.signInWithGoogleNative();
+                    debugPrint('Auth: Result received: ${result.isSuccess}');
+                    if (mounted) {
+                      setState(() => _isGoogleLoading = false);
+                      result.fold(
+                        (failure) {
+                          debugPrint('Auth: Failure: ${failure.message}');
+                          _showError(context, l10n, failure.message, messenger);
+                        },
+                        (_) {
+                          debugPrint('Auth: Success');
+                        },
+                      );
+                    }
+                  },
+            icon: _isGoogleLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.login),
             label: Text(l10n.get('account_sign_in_google')),
             style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
           ),
           const SizedBox(height: 12),
           OutlinedButton.icon(
-            onPressed: () async {
-              debugPrint('Auth: GitHub Sign-In requested');
-              final authService = ref.read(authServiceProvider);
-              final result = await authService.signInWithGithub();
-              debugPrint('Auth: Result received: ${result.isSuccess}');
-              result.fold(
-                (failure) {
-                  debugPrint('Auth: Failure: ${failure.message}');
-                  if (context.mounted) {
-                    _showError(context, l10n, failure.message);
-                  }
-                },
-                (credential) {
-                  debugPrint('Auth: Success');
-                  // Capture GitHub OAuth access-token for Gist API calls
-                  final oauthCred = credential.credential as OAuthCredential?;
-                  if (oauthCred?.accessToken != null) {
-                    ref
-                        .read(gistSyncServiceProvider)
-                        .setAccessToken(oauthCred!.accessToken!);
-                  }
-                },
-              );
-            },
-            icon: const Icon(Icons.code),
+            onPressed: _isGoogleLoading || _isGithubLoading
+                ? null
+                : () async {
+                    setState(() => _isGithubLoading = true);
+                    final messenger = ScaffoldMessenger.of(context);
+                    debugPrint('Auth: GitHub Sign-In requested');
+                    final authService = ref.read(authServiceProvider);
+                    final result = await authService.signInWithGithub();
+                    debugPrint('Auth: Result received: ${result.isSuccess}');
+                    if (mounted) {
+                      setState(() => _isGithubLoading = false);
+                      result.fold(
+                        (failure) {
+                          debugPrint('Auth: Failure: ${failure.message}');
+                          _showError(context, l10n, failure.message, messenger);
+                        },
+                        (credential) {
+                          debugPrint('Auth: Success');
+                          // Capture GitHub OAuth access-token for Gist API calls
+                          final oauthCred =
+                              credential.credential as OAuthCredential?;
+                          if (oauthCred?.accessToken != null) {
+                            ref
+                                .read(gistSyncServiceProvider)
+                                .setAccessToken(oauthCred!.accessToken!);
+                          }
+                        },
+                      );
+                    }
+                  },
+            icon: _isGithubLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.code),
             label: Text(l10n.get('account_sign_in_github')),
             style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
           ),
@@ -313,9 +351,14 @@ class _SignedOutView extends StatelessWidget {
     );
   }
 
-  void _showError(BuildContext context, AppLocalizations l10n, String message) {
+  void _showError(
+    BuildContext context,
+    AppLocalizations l10n,
+    String message,
+    ScaffoldMessengerState messenger,
+  ) {
     // Show SnackBar
-    ScaffoldMessenger.of(context).showSnackBar(
+    messenger.showSnackBar(
       SnackBar(
         content: Text(l10n.getWith('account_sign_in_error', [message])),
         behavior: SnackBarBehavior.floating,

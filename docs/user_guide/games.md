@@ -24,7 +24,14 @@ Track your Qwixx game progress without needing a pen and paper.
 ## 🍺 SipDeck (18+)
 A fun party game involving drinking challenges.
 - **Player Limits**: 2+ players (3+ recommended for maximum fun).
-- **Rules**: Follow the prompts and track the score!
+- **Rules**: Follow the prompts, complete the challenges, and track the sips!
+- **Differences from BuzzTap**: SipDeck acts as a structured virtual deck of cards. It is a **turn-based game** where players select categories, draw cards, and follow specific wildcards or dares. If you want a structured card game experience, play SipDeck.
+
+## 👆 BuzzTap (18+)
+A dynamic, high-energy party game.
+- **Player Limits**: 2+ players.
+- **Rules**: Fast-paced digital tapping and prompt-based challenges. Keep the energy high!
+- **Differences from SipDeck**: Unlike SipDeck's turn-based card reading, BuzzTap is designed to be a **fast-paced, chaotic tapping experience**. Players react quickly to prompts on the screen, making it a very action-oriented party game rather than a sit-down card game.
 
 ## 🍻 Schafkopf
 A traditional German trick-taking card game.

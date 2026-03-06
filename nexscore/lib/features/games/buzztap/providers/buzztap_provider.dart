@@ -19,9 +19,14 @@ class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
   }
 
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
-    final available = buzzTapDatabase
+    var available = buzzTapDatabase
         .where((c) => state.selectedCategories.contains(c.category))
         .toList();
+
+    if (state.optimizeForTwoPlayers) {
+      available = available.where((c) => c.minPlayers <= 2).toList();
+    }
+
     if (available.isEmpty) return;
 
     final random = Random();
@@ -61,8 +66,29 @@ class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
     state = state.copyWith(playedCards: [...state.playedCards, hydratedCard]);
   }
 
+  void incrementSips(String playerId, int amount) {
+    final sips = Map<String, int>.from(state.playerSips);
+    sips[playerId] = (sips[playerId] ?? 0) + amount;
+    state = state.copyWith(playerSips: sips);
+  }
+
+  void decrementSips(String playerId, int amount) {
+    final sips = Map<String, int>.from(state.playerSips);
+    final current = sips[playerId] ?? 0;
+    if (current >= amount) {
+      sips[playerId] = current - amount;
+    } else {
+      sips[playerId] = 0;
+    }
+    state = state.copyWith(playerSips: sips);
+  }
+
   void resetGame() {
-    state = state.copyWith(playedCards: []);
+    state = state.copyWith(playedCards: [], playerSips: {});
+  }
+
+  void toggle2PlayerOptimization(bool value) {
+    state = state.copyWith(optimizeForTwoPlayers: value);
   }
 }
 

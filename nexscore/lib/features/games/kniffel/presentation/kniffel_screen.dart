@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/kniffel_models.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
@@ -37,6 +38,19 @@ class KniffelScreen extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(l10n.get('game_kniffel')),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.help_outline),
+              onPressed: () {
+                launchUrl(
+                  Uri.parse(
+                    'https://faserf.github.io/NexScore/docs/user_guide/games/#kniffel-yahtzee',
+                  ),
+                );
+              },
+              tooltip: l10n.get('help_title'),
+            ),
+          ],
           bottom: TabBar(
             isScrollable: true,
             tabs: players.map((p) => Tab(text: p.name)).toList(),
