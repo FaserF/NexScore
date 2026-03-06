@@ -40,8 +40,10 @@ NexScore supports a wide variety of card, dice, and strategy games with speciali
 - **Phase 10®**: Original, Masters, and Duel variants with phase tracking.
 - **Darts X01**: Fast-pass scoring board for 301/501/701/1001 with bust detection.
 - **Rommé**: Multi-round penalty tracking for 2–6 players.
-- **Arschloch / President**: Rank tracking with automated card exchange instructions.
-- **SipDeck (18+)**: Dynamic drinking game with 50+ challenges and virus rules.
+- **Arschloch / President**: Rank tracking with automated card exchange instructions. Supports 2–8 players.
+- **SipDeck (18+)**: Dynamic drinking game with 50+ challenges and automated sip tracking.
+- **BuzzTap (18+)**: High-energy, fast-paced tapping party game with automated sip tracking.
+- **WayQuest**: Entertaining questions and road challenges for long car rides.
 
 ---
 

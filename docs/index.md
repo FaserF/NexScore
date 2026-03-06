@@ -7,7 +7,7 @@ Welcome to the official documentation for **NexScore**, a premium, cross-platfor
 NexScore isn't just another score counter. It's a comprehensive tool to manage your gaming history, track player performance, and sync your data across all your devices.
 
 - **Vibrant & Modern Design**: Built with a "premium first" mindset, featuring glassmorphism effects and smooth animations.
-- **Support for 9 Specific Games**: Dedicated scoreboards and customized logic for **Wizard, Qwixx, Schafkopf, Kniffel, Phase 10, Darts (X01), Rommé, Arschloch (President)**, and the **SipDeck** party game! Plus a generic scoreboard for anything else!
+- **Support for 11 Specific Games**: Dedicated scoreboards and customized logic for **Wizard, Qwixx, Schafkopf, Kniffel, Phase 10, Darts (X01), Rommé, Arschloch (President), SipDeck, BuzzTap**, and **WayQuest**! Plus a generic scoreboard for anything else!
 - **Complete History**: Every session is saved. See who won that heated game of Wizard three months ago.
 - **Global Leaderboards**: Automatically computed stats for all players. Who is truly the MVP of your game nights?
 - **Cloud Sync**: Sign in with **Google** or **GitHub** to keep your data synced. GitHub users can even back up to their own private Gists!

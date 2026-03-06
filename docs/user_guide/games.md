@@ -25,13 +25,15 @@ Track your Qwixx game progress without needing a pen and paper.
 A fun party game involving drinking challenges.
 - **Player Limits**: 2+ players (3+ recommended for maximum fun).
 - **Rules**: Follow the prompts, complete the challenges, and track the sips!
-- **Differences from BuzzTap**: SipDeck acts as a structured virtual deck of cards. It is a **turn-based game** where players select categories, draw cards, and follow specific wildcards or dares. If you want a structured card game experience, play SipDeck.
+- **Automated Sips**: The app automatically tracks sips for each player. Use the **Drink** button to record sips or **Skip** to pass without penalty.
+- **Differences from BuzzTap**: SipDeck acts as a structured virtual deck of cards. It is a **turn-based game** where players select categories, draw cards, and follow specific wildcards or dares.
 
 ## 👆 BuzzTap (18+)
 A dynamic, high-energy party game.
 - **Player Limits**: 2+ players.
 - **Rules**: Fast-paced digital tapping and prompt-based challenges. Keep the energy high!
-- **Differences from SipDeck**: Unlike SipDeck's turn-based card reading, BuzzTap is designed to be a **fast-paced, chaotic tapping experience**. Players react quickly to prompts on the screen, making it a very action-oriented party game rather than a sit-down card game.
+- **Automated Sips**: Like SipDeck, BuzzTap tracks sips automatically with **Drink** and **Skip** buttons.
+- **Differences from SipDeck**: Unlike SipDeck's turn-based card reading, BuzzTap is designed to be a **fast-paced, chaotic tapping experience**.
 
 ## 🍻 Schafkopf
 A traditional German trick-taking card game.
@@ -58,8 +60,9 @@ The classic card melding game.
 
 ## 👑 Arschloch (President)
 The popular hierarchical card game.
-- **Player Limits**: 3-8 players.
+- **Player Limits**: 2-8 players (3+ recommended for more fun).
 - **Role Tracking**: Keep track of the President, Vice President, etc., across rounds.
+- **Card Exchange**: Automatic instructions for card exchanges between rounds based on the last round's ranks.
 
 ## 📊 Generic Scoreboard
 
@@ -68,6 +71,14 @@ For any other game, use the Generic scoreboard.
 - **Round-based**: Add points after each round.
 - **Quick Entry**: Just enter the final scores if you only want to record the winner.
 - **Flexibility**: Works for everything from Uno to Monopoly.
+
+## 🚗 WayQuest
+
+WayQuest is the perfect companion for long car rides, offering entertainment for all passengers.
+
+- **Player Limits**: 2+ players.
+- **Categories**: Deep Talks, Would You Rather, Road Challenges, Hypotheticals, and Story Starters.
+- **Interaction**: Simply tap to progress through randomized questions and tasks designed to pass the time.
 
 ---
 

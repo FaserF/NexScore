@@ -2,6 +2,13 @@
 
 NexScore is designed to be a complete companion for your game nights. This guide overviews the core sections of the application beyond just the individual game scoreboards.
 
+## ⭐ Game Favorites
+
+With an ever-growing list of games, you can keep your most-played ones at the top.
+
+- **One-Tap Favorites**: Use the star icon on any game card in the library to mark it as a favorite.
+- **Top of List**: Favorite games are automatically moved to the top of the Home screen for quick access.
+
 ## 👥 Players Management
 
 The foundation of tracking scores is managing your crew. The **Players** tab allows you to:
@@ -33,6 +40,15 @@ The Settings profile (accessible from the top right of the Home screen or within
 - **Theme Control**: Override system settings to force Light Mode, Dark Mode, or stick to System Default.
 - **Language**: Switch between supported languages (currently English and German).
 - **Beta Features**: Manage experimental features if you are on a pre-release build.
+
+## 🍺 Automated Sip Tracking (18+)
+
+For our party games (SipDeck & BuzzTap), we've integrated a smart sip counting system.
+
+- **No Manual Counting**: The app calculates who needs to drink based on the card or prompt.
+- **Drink Button**: Confirm you've taken your sips to automatically increment your total in the session.
+- **Skip Button**: Allows players to opt-out of a challenge without affecting their score.
+- **Real-time Counter**: See the current sip tally for all players directly within the game screen.
 
 ## ☁️ Account & Backup
 
