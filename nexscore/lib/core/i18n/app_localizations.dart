@@ -60,6 +60,7 @@ class AppLocalizations {
       'settings_db_reset_confirm':
           'Are you sure? All players, history and leaderboards will be permanently deleted.',
       'settings_db_reset_success': 'Database has been reset.',
+      'game_reset': 'Reset Game',
       'game_reset_confirm':
           'Are you sure you want to reset the current game? All progress will be lost.',
       'game_drink_single': '{0} Drinks',
@@ -174,8 +175,11 @@ class AppLocalizations {
           'Note: Amigo does not officially support Wizard with only 2 players.',
       'game_no_players': 'No players selected.',
       'game_setup_title': 'Game Setup',
+      'game_setup_start': 'Start Game',
       'game_setup_choose_players': 'Choose players for {0}',
       'game_setup_min_players': 'Please select at least {0} players.',
+      'add_round': 'Add Round',
+      'clear': 'Clear',
 
       // ── Qwixx
       'qwixx_title': 'Qwixx',
@@ -828,6 +832,13 @@ class AppLocalizations {
       'game_phase10': 'Phase 10',
       'game_phase10_desc':
           'Schließe alle 10 Phasen ab, bevor es jemand anderes tut. Verfolge deine aktuelle Phase und Strafpunkte.',
+      'game_no_players': 'Keine Spieler ausgewählt.',
+      'game_setup_title': 'Spiel-Setup',
+      'game_setup_start': 'Spiel starten',
+      'game_setup_choose_players': 'Wähle Spieler für {0}',
+      'game_setup_min_players': 'Bitte wähle mindestens {0} Spieler aus.',
+      'add_round': 'Runde hinzufügen',
+      'clear': 'Leeren',
       'game_darts': 'Darts X01',
       'game_darts_desc':
           'Klassisches X01-Darts-Scoring. Unterstützt 301, 501, 701 und 1001. Checkout auf Doppel.',
@@ -956,9 +967,6 @@ class AppLocalizations {
           'Der letzte Spieler kann keinen Gleichstand erzwingen.',
       'wizard_2player_warning':
           'Hinweis: Amigo unterstützt Wizard mit nur 2 Spielern offiziell nicht.',
-      'game_no_players': 'Keine Spieler ausgewählt.',
-      'game_setup_title': 'Spiel-Setup',
-      'game_setup_min_players': 'Bitte wähle mindestens {0} Spieler aus.',
 
       // ── Qwixx
       'qwixx_title': 'Qwixx',
