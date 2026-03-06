@@ -1,5 +1,5 @@
-/// WayQuest card data.
-/// The text property should be the localized key if the card is in the database.
+// WayQuest card data.
+// The text property should be the localized key if the card is in the database.
 import '../models/wayquest_models.dart';
 
 const List<WayQuestCard> wayQuestDatabase = [
