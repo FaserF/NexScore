@@ -186,6 +186,118 @@ class AppLocalizations {
       'qwixx_blue': 'Blue',
       'qwixx_penalties': 'Penalties',
 
+      // ── WayQuest
+      'game_wayquest': 'WayQuest',
+      'wayquest_title': 'WayQuest',
+      'wayquest_categories': 'Select Categories',
+      'wayquest_cat_deepTalks': 'Deep Talks',
+      'wayquest_cat_wouldYouRather': 'Would You Rather',
+      'wayquest_cat_roadChallenges': 'Road Challenges',
+      'wayquest_cat_hypotheticals': 'Hypotheticals',
+      'wayquest_cat_storyStarters': 'Story Starters',
+      'wayquest_start': 'START VOYAGE',
+      'wayquest_tap_continue': 'Tap for next quest',
+      'desc_wayquest':
+          'Entertaining questions and challenges for long car rides.',
+      'home_tag_travel': 'Travel',
+
+      // Deep Talks (WQ)
+      'wq_card_dt001':
+          'If you could go back in time, which moment would you relive?',
+      'wq_card_dt002': 'What is a piece of advice that changed your life?',
+      'wq_card_dt003': 'What are you most grateful for right now?',
+      'wq_card_dt004':
+          'If you could have dinner with any historical figure, who would it be?',
+      'wq_card_dt005': 'What is your proudest accomplishment so far?',
+      'wq_card_dt006': 'What does your "perfect day" look like?',
+      'wq_card_dt007':
+          'If you could master any skill overnight, what would it be?',
+      'wq_card_dt008': 'What is one thing you want to be remembered for?',
+      'wq_card_dt009': 'What is the most beautiful place you have ever been?',
+      'wq_card_dt010': 'What is a "small thing" that always makes you happy?',
+
+      // Would You Rather (WQ)
+      'wq_card_wyr001':
+          'Would you rather always have to sing instead of speaking or always have to dance instead of walking?',
+      'wq_card_wyr002': 'Would you rather be able to fly or be invisible?',
+      'wq_card_wyr003':
+          'Would you rather live 100 years in the past or 100 years in the future?',
+      'wq_card_wyr004':
+          'Would you rather always be 10 minutes late or 20 minutes early?',
+      'wq_card_wyr005':
+          'Would you rather be the smartest person in the world or the funniest?',
+      'wq_card_wyr006':
+          'Would you rather explore the deep ocean or outer space?',
+      'wq_card_wyr007': 'Would you rather have a giant nose or giant ears?',
+      'wq_card_wyr008':
+          'Would you rather speak all human languages or speak to animals?',
+      'wq_card_wyr009':
+          'Would you rather never eat chocolate again or never eat pizza again?',
+      'wq_card_wyr010':
+          'Would you rather be a famous actor or a famous scientist?',
+
+      // Road Challenges (WQ)
+      'wq_card_rc001':
+          'First one to spot a yellow car gets to pick the next song!',
+      'wq_card_rc002':
+          'Everyone: find a license plate that starts with the same letter as your name.',
+      'wq_card_rc003':
+          'Count how many wind turbines we pass in the next 5 minutes.',
+      'wq_card_rc004': 'The next person to see a cow gets to tell a joke.',
+      'wq_card_rc005':
+          'Alphabet Game! Find words on road signs starting with A, then B, and so on.',
+      'wq_card_rc006':
+          'Spot a car from a different country/state. Bonus points for far-away ones!',
+      'wq_card_rc007': 'First one to see a red bridge wins 10 virtual points.',
+      'wq_card_rc008':
+          'Everyone: guess how many minutes until the next gas station.',
+      'wq_card_rc009':
+          'Point out the most interesting-looking tree in the next minute.',
+      'wq_card_rc010': 'See if you can spot a cloud that looks like an animal.',
+
+      // Hypotheticals (WQ)
+      'wq_card_hyp001':
+          'If we were stranded on a desert island, what is the one object we would wish we had brought?',
+      'wq_card_hyp002':
+          'If you could have any superpower for just one hour, which one would it be?',
+      'wq_card_hyp003':
+          'If you won the lottery tomorrow, what is the first thing you would buy?',
+      'wq_card_hyp004':
+          'If you could live in any fictional world (book/movie), which would it be?',
+      'wq_card_hyp005':
+          'If you could swap lives with anyone for a day, who would it be?',
+      'wq_card_hyp006':
+          'If you could talk to your 8-year-old self, what would you say?',
+      'wq_card_hyp007':
+          'If you found a magic lamp, what would be your three wishes?',
+      'wq_card_hyp008':
+          'If you could invent a new holiday, what would it celebrate?',
+      'wq_card_hyp009': 'If animals could talk, which one would be the rudest?',
+      'wq_card_hyp010':
+          'If you could build a house anywhere, where would it be?',
+
+      // Story Starters (WQ)
+      'wq_card_ss001':
+          'Once upon a time, in a car driving through a mysterious forest...',
+      'wq_card_ss002':
+          'Imagine we find a hidden door in the trunk of this car. Where does it lead?',
+      'wq_card_ss003':
+          'A giant bird suddenly lands on the roof of the car. What happens next?',
+      'wq_card_ss004':
+          'The radio starts playing a song from the year 3000. What is it about?',
+      'wq_card_ss005':
+          'We realize that we are actually in a movie. What is the title of our movie?',
+      'wq_card_ss006':
+          'The car starts talking back to us. What is the first thing it says?',
+      'wq_card_ss007':
+          'Every time we cross a bridge, we enter a different dimension. Where are we now?',
+      'wq_card_ss008':
+          'We find a map in the glovebox that leads to a secret treasure. What is it?',
+      'wq_card_ss009':
+          'A squirrel is following our car on a tiny motorcycle. Why?',
+      'wq_card_ss010':
+          'Suddenly, everybody in the world can only speak in rhymes. Start!',
+
       // ── Schafkopf
       'schafkopf_title': 'Schafkopf',
       'schafkopf_payouts': 'Total Payouts (€)',
@@ -856,6 +968,124 @@ class AppLocalizations {
       'qwixx_green': 'Grün',
       'qwixx_blue': 'Blau',
       'qwixx_penalties': 'Fehlwürfe',
+
+      // ── WayQuest
+      'game_wayquest': 'WayQuest',
+      'wayquest_title': 'WayQuest',
+      'wayquest_categories': 'Kategorien wählen',
+      'wayquest_cat_deepTalks': 'Deep Talks',
+      'wayquest_cat_wouldYouRather': 'Würdest du eher',
+      'wayquest_cat_roadChallenges': 'Auto-Challenges',
+      'wayquest_cat_hypotheticals': 'Hypothetisch',
+      'wayquest_cat_storyStarters': 'Geschichten-Starter',
+      'wayquest_start': 'REISE STARTEN',
+      'wayquest_tap_continue': 'Tippen für die nächste Quest',
+      'desc_wayquest':
+          'Unterhaltsame Fragen und Challenges für lange Autofahrten.',
+      'home_tag_travel': 'Reise',
+
+      // Deep Talks (DE)
+      'wq_card_dt001':
+          'Wenn du in der Zeit zurückreisen könntest, welchen Moment würdest du noch mal erleben?',
+      'wq_card_dt002': 'Was war ein Ratschlag, der dein Leben verändert hat?',
+      'wq_card_dt003': 'Wofür bist du gerade in diesem Moment am dankbarsten?',
+      'wq_card_dt004':
+          'Wenn du mit einer historischen Figur Abendessen könntest, wer wäre das?',
+      'wq_card_dt005':
+          'Auf welche Leistung in deinem Leben bist du besonders stolz?',
+      'wq_card_dt006': 'Wie sieht dein "perfekter Tag" aus?',
+      'wq_card_dt007':
+          'Wenn du über Nacht eine Fähigkeit meistern könntest, welche wäre das?',
+      'wq_card_dt008': 'Wofür möchtest du einmal in Erinnerung bleiben?',
+      'wq_card_dt009': 'Was ist der schönste Ort, an dem du jemals warst?',
+      'wq_card_dt010':
+          'Was ist eine "Kleinigkeit", die dich immer glücklich macht?',
+
+      // Would You Rather (DE)
+      'wq_card_wyr001':
+          'Würdest du eher immer singen müssen statt zu reden, oder immer tanzen statt zu gehen?',
+      'wq_card_wyr002': 'Würdest du eher fliegen können oder unsichtbar sein?',
+      'wq_card_wyr003':
+          'Würdest du eher 100 Jahre in der Vergangenheit oder 100 Jahre in der Zukunft leben?',
+      'wq_card_wyr004':
+          'Wärst du lieber immer 10 Minuten zu spät oder immer 20 Minuten zu früh?',
+      'wq_card_wyr005':
+          'Wärst du lieber der klügste Mensch der Welt oder der lustigste?',
+      'wq_card_wyr006':
+          'Würdest du lieber die Tiefsee erforschen oder das Weltall?',
+      'wq_card_wyr007':
+          'Hättest du lieber eine riesige Nase oder riesige Ohren?',
+      'wq_card_wyr008':
+          'Würdest du lieber alle Sprachen der Welt sprechen oder mit Tieren reden können?',
+      'wq_card_wyr009':
+          'Würdest du eher nie wieder Schokolade essen oder nie wieder Pizza?',
+      'wq_card_wyr010':
+          'Wärst du lieber ein berühmter Schauspieler oder ein berühmter Wissenschaftler?',
+
+      // Road Challenges (DE)
+      'wq_card_rc001':
+          'Wer zuerst ein gelbes Auto sieht, darf das nächste Lied wählen!',
+      'wq_card_rc002':
+          'Alle: Findet ein Nummernschild, das mit dem gleichen Buchstaben wie euer Name beginnt.',
+      'wq_card_rc003':
+          'Zählt, wie viele Windräder wir in den nächsten 5 Minuten passieren.',
+      'wq_card_rc004':
+          'Die nächste Person, die eine Kuh sieht, darf einen Witz erzählen.',
+      'wq_card_rc005':
+          'Alphabet-Spiel! Findet Wörter auf Schildern von A bis Z.',
+      'wq_card_rc006':
+          'Entdecke ein Auto aus einem anderen Bundesland/Land. Extrapunkte für weite Distanzen!',
+      'wq_card_rc007':
+          'Wer zuerst eine rote Brücke sieht, gewinnt 10 virtuelle Punkte.',
+      'wq_card_rc008':
+          'Alle: Ratet, wie viele Minuten es bis zur nächsten Tankstelle dauert.',
+      'wq_card_rc009':
+          'Zeig auf den interessantesten Baum in der nächsten Minute.',
+      'wq_card_rc010':
+          'Schaut, ob ihr eine Wolke findet, die wie ein Tier aussieht.',
+
+      // Hypotheticals (DE)
+      'wq_card_hyp001':
+          'Wenn wir auf einer einsamen Insel stranden würden, welchen Gegenstand hätten wir gerne dabei?',
+      'wq_card_hyp002':
+          'Wenn du für eine Stunde eine Superkraft hättest, welche wäre das?',
+      'wq_card_hyp003':
+          'Wenn du morgen im Lotto gewinnen würdest, was wäre das Erste, was du kaufst?',
+      'wq_card_hyp004':
+          'In welcher fiktiven Welt (Buch/Film) würdest du gerne leben?',
+      'wq_card_hyp005': 'Mit wem würdest du für einen Tag das Leben tauschen?',
+      'wq_card_hyp006':
+          'Wenn du mit deinem 8-jährigen Ich sprechen könntest, was würdest du sagen?',
+      'wq_card_hyp007':
+          'Wenn du eine Wunderlampe fändest, was wären deine drei Wünsche?',
+      'wq_card_hyp008':
+          'Wenn du einen neuen Feiertag erfinden könntest, was würde man feiern?',
+      'wq_card_hyp009':
+          'Wenn Tiere sprechen könnten, welches wäre am unhöflichsten?',
+      'wq_card_hyp010':
+          'Wenn du überall auf der Welt ein Haus bauen könntest, wo wäre das?',
+
+      // Story Starters (DE)
+      'wq_card_ss001':
+          'Es war einmal, in einem Auto, das durch einen geheimnisvollen Wald fuhr...',
+      'wq_card_ss002':
+          'Stell dir vor, wir finden eine versteckte Tür im Kofferraum. Wohin führt sie?',
+      'wq_card_ss003':
+          'Ein riesiger Vogel landet plötzlich auf dem Dach des Autos. Was passiert als Nächstes?',
+      'wq_card_ss004':
+          'Das Radio spielt plötzlich ein Lied aus dem Jahr 3000. Wovon handelt es?',
+      'wq_card_ss005':
+          'Wir merken, dass wir eigentlich in einem Film sind. Wie heißt unser Film?',
+      'wq_card_ss006':
+          'Das Auto fängt plötzlich an, mit uns zu sprechen. Was ist das Erste, was es sagt?',
+      'wq_card_ss007':
+          'Jedes Mal, wenn wir eine Brücke überqueren, landen wir in einer anderen Dimension. Wo sind wir?',
+      'wq_card_ss008':
+          'Wir finden eine Karte im Handschuhfach, die zu einem Piratenschatz führt. Was ist das für ein Schatz?',
+      'wq_card_ss009':
+          'Ein Eichhörnchen verfolgt unser Auto auf einem winzigen Motorrad. Warum?',
+      'wq_card_ss010':
+          'Plötzlich kann jeder auf der Welt nur noch in Reimen sprechen. Los geht\'s!',
 
       // ── Schafkopf
       'schafkopf_title': 'Schafkopf',

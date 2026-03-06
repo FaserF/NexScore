@@ -13,8 +13,8 @@ import '../../features/games/sipdeck/presentation/sipdeck_screen.dart';
 import '../../features/games/extras/presentation/phase10_screen.dart';
 import '../../features/games/extras/presentation/darts_screen.dart';
 import '../../features/games/extras/presentation/romme_screen.dart';
-import '../../features/games/arschloch/presentation/arschloch_screen.dart';
 import '../../features/games/buzztap/presentation/buzztap_screen.dart';
+import '../../features/games/wayquest/presentation/wayquest_screen.dart';
 import '../../features/leaderboards/presentation/leaderboard_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/help/presentation/help_screen.dart';
@@ -84,12 +84,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                     builder: (context, state) => const RommeScreen(),
                   ),
                   GoRoute(
-                    path: 'arschloch',
-                    builder: (context, state) => const ArschlochScreen(),
-                  ),
-                  GoRoute(
                     path: 'buzztap',
                     builder: (context, state) => const BuzzTapScreen(),
+                  ),
+                  GoRoute(
+                    path: 'wayquest',
+                    builder: (context, state) => const WayQuestScreen(),
                   ),
                 ],
               ),

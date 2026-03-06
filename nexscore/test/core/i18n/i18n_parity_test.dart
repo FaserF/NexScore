@@ -58,6 +58,7 @@ void main() {
         'game_romme',
         'game_arschloch',
         'game_sipdeck',
+        'game_wayquest',
       ];
       for (final key in gameKeys) {
         expect(en.containsKey(key), true, reason: 'Missing EN key: $key');
@@ -100,8 +101,8 @@ void main() {
     });
     test('all keys used in codebase are defined in AppLocalizations', () {
       final libDir = Directory('lib');
-      final getRegex = RegExp(r"l10n\.get\(['\"]([^'\"{}]+)['\"]\)");
-      final getWithRegex = RegExp(r"l10n\.getWith\(['\"]([^'\"{}]+)['\"]");
+      final getRegex = RegExp(r"l10n\.get\(['\\]?([^'\\]+)['\\]?\)");
+      final getWithRegex = RegExp(r"l10n\.getWith\(['\\]?([^'\\]+)['\\]?");
 
       final usedKeys = <String>{};
       final files = libDir.listSync(recursive: true).whereType<File>();

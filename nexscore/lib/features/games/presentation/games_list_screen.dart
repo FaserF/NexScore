@@ -386,6 +386,16 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
         tag: l10n.get('home_tag_party'),
         isAdult: true,
       ),
+      _GameEntry(
+        id: 'wayquest',
+        name: l10n.get('game_wayquest'),
+        description: l10n.get('desc_wayquest'),
+        route: '/games/wayquest',
+        icon: Icons.directions_car,
+        color: Colors.blueAccent.shade700,
+        playerCount: '2+',
+        tag: l10n.get('home_tag_travel'),
+      ),
     ];
   }
 }
