@@ -1,0 +1,86 @@
+name: NEX CI Orchestrator
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+      docs: ${{ steps.filter.outputs.docs }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'nexscore/**'
+              - 'scripts/**'
+              - 'pubspec.yaml'
+            docs:
+              - 'docs/**'
+              - 'mkdocs.yml'
+            workflows:
+              - '.github/workflows/**'
+
+  validate:
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' }}
+    name: 1. Validate (Test & Analyze)
+    uses: ./.github/workflows/validation.yml
+
+  build-android-web:
+    needs: [changes, validate]
+    if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' }}
+    name: 2. Build Android & Web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - name: Build Web
+        run: flutter build web --release --base-href "/"
+        working-directory: nexscore
+      - name: Build Android APK
+        run: flutter build apk --release
+        working-directory: nexscore
+      - name: Build Docker Image
+        run: docker build -t nexscore-web:latest -f Dockerfile .
+        working-directory: nexscore
+
+  build-ios:
+    needs: [changes, validate]
+    if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' }}
+    name: 3. Build iOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - name: Build iOS IPA (Unsigned)
+        run: flutter build ios --release --no-codesign
+        working-directory: nexscore
+
+  deploy-docs:
+    needs: changes
+    if: ${{ needs.changes.outputs.docs == 'true' || needs.changes.outputs.workflows == 'true' }}
+    name: 4. Deploy Docs & PWA
+    uses: ./.github/workflows/deploy_pages.yml
+    with:
+      deploy_pwa: ${{ needs.changes.outputs.code == 'true' }}
+      version_name: 'latest'
+      is_beta: false
