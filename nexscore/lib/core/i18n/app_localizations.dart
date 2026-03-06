@@ -637,10 +637,13 @@ class AppLocalizations {
 
       // ── Home / Games List
       'home_choose_game': 'Wähle ein Spiel zum Punkte-Tracking',
+      'home_search_games': 'Spiele suchen...',
+      'home_filter_all': 'Alle',
       'home_tag_card': 'Kartenspiel',
       'home_tag_dice': 'Würfelspiel',
+      'home_tag_board': 'Brettspiel',
       'home_tag_sport': 'Sport',
-      'home_tag_party': '18+ Party',
+      'home_tag_party': 'Trinkspiel',
 
       // ── Game Descriptions
       'desc_wizard':

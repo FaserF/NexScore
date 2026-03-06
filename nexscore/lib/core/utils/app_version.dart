@@ -12,5 +12,6 @@ class AppVersion {
         current.contains('rc');
   }
 
-  static String get displayVersion => 'v$current';
+  static String get displayVersion =>
+      current.startsWith('v') ? current : 'v$current';
 }

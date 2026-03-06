@@ -54,7 +54,7 @@ jobs:
         run: |
           if [ "${{ inputs.version_name || 'latest' }}" == "latest" ]; then
             APP_VERSION=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)
-            DEPLOY_VERSION="v${APP_VERSION}-Pages-${GITHUB_REF_NAME}"
+            DEPLOY_VERSION="${APP_VERSION}-Pages-${GITHUB_REF_NAME}"
           else
             DEPLOY_VERSION="${{ inputs.version_name }}"
           fi

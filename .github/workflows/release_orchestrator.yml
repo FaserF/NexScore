@@ -30,9 +30,13 @@ permissions:
   id-token: write
 
 jobs:
+  validate:
+    uses: ./.github/workflows/validation.yml
+
   version-calc:
     name: Calculate Next Version
     runs-on: ubuntu-latest
+    needs: validate
     outputs:
       version_name: ${{ steps.calc.outputs.VERSION_NAME }}
       tag_name: ${{ steps.calc.outputs.TAG_NAME }}
