@@ -29,6 +29,10 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     uses: ./.github/workflows/validation.yml
@@ -59,10 +63,13 @@ jobs:
     needs: version-calc
     name: Build Android APK
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     outputs:
       sha256: ${{ steps.generate_sha.outputs.sha256 }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
@@ -95,8 +102,11 @@ jobs:
     needs: version-calc
     name: Build iOS IPA
     runs-on: macos-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
@@ -117,10 +127,13 @@ jobs:
     needs: version-calc
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     outputs:
       image_name: ${{ steps.image_name.outputs.IMAGE_NAME }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -164,10 +177,11 @@ jobs:
     needs: [version-calc, build-android, build-ios, build-web, deploy-pwa]
     name: Create GitHub Release
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Need history for changelog
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4

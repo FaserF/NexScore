@@ -28,6 +28,10 @@ on:
         type: boolean
         default: false
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pages: write
@@ -39,8 +43,11 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Set up Flutter
         if: ${{ inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true) || github.event_name == 'push' }}

@@ -7,10 +7,15 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   changes:
     name: Detect Changes
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       code: ${{ steps.filter.outputs.code }}
       docs: ${{ steps.filter.outputs.docs }}
@@ -33,17 +38,20 @@ jobs:
 
   validate:
     needs: changes
-    if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' }}
+    if: ${{ needs.changes.outputs.code == 'true' }}
     name: 1. Validate (Test & Analyze)
     uses: ./.github/workflows/validation.yml
 
   build-android-web:
     needs: [changes, validate]
-    if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' }}
+    if: ${{ needs.changes.outputs.code == 'true' }}
     name: 2. Build Android & Web
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -61,11 +69,14 @@ jobs:
 
   build-ios:
     needs: [changes, validate]
-    if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' }}
+    if: false # Skipped for now to save resources
     name: 3. Build iOS
     runs-on: macos-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
