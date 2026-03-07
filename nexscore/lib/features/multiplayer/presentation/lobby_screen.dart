@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/i18n/app_localizations.dart';
 import '../../../core/multiplayer/providers/multiplayer_provider.dart';
+import '../../settings/provider/settings_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class LobbyScreen extends ConsumerStatefulWidget {
@@ -24,14 +25,13 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
   Future<void> _initLobby() async {
     if (!widget.isHostingStart) return;
-    final l10n = AppLocalizations.of(context);
     setState(() => _isHosting = true);
     try {
+      final settings = ref.read(settingsProvider);
       final service = ref.read(multiplayerServiceProvider);
-      // For now, hardcode host name, later we can fetch from a generic profile/settings provider
       await service.hostLobby(
-        hostName: 'Host Player',
-        hostAvatarColor: '#FFD700', // Gold for host
+        hostName: settings.hostName,
+        hostAvatarColor: settings.hostColor,
       );
       if (mounted) {
         setState(() {
@@ -40,6 +40,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         String message = e.toString();
         if (message.contains('FIREBASE_NOT_CONFIGURED')) {
           showDialog(
@@ -48,6 +49,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             builder: (context) => AlertDialog(
               title: Text(l10n.get('multiplayer_firebase_missing')),
               content: Text(l10n.get('multiplayer_firebase_missing_desc')),
+
               actions: [
                 TextButton(
                   onPressed: () {

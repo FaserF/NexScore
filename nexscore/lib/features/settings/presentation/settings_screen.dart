@@ -256,6 +256,85 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                _SectionHeader(title: 'Multiplayer Host Profile'),
+                GlassContainer(
+                  borderRadius: 24,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: TextEditingController(
+                          text: settings.hostName,
+                        ),
+                        onChanged: (val) => ref
+                            .read(settingsProvider.notifier)
+                            .setHostName(val),
+                        decoration: InputDecoration(
+                          labelText: 'Host Name',
+                          prefixIcon: const Icon(Icons.person),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const Text(
+                            'Host Color',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          const Spacer(),
+                          ...[
+                            '#4287f5',
+                            '#f54242',
+                            '#42f560',
+                            '#f5d142',
+                            '#a142f5',
+                          ].map((colorStr) {
+                            final color = Color(
+                              int.parse(colorStr.replaceFirst('#', '0xff')),
+                            );
+                            final isSelected = settings.hostColor == colorStr;
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: GestureDetector(
+                                onTap: () => ref
+                                    .read(settingsProvider.notifier)
+                                    .setHostColor(colorStr),
+                                child: Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: color,
+                                    shape: BoxShape.circle,
+                                    border: isSelected
+                                        ? Border.all(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                            width: 2,
+                                          )
+                                        : null,
+                                  ),
+                                  child: isSelected
+                                      ? const Icon(
+                                          Icons.check,
+                                          size: 16,
+                                          color: Colors.white,
+                                        )
+                                      : null,
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
                 Center(
                   child: Column(
                     children: [

@@ -3,15 +3,16 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Auth Documentation Tests', () {
-    test('AUTH_SETUP.md contains exact GitHub callback CAUTION warning', () {
-      // Find the docs directory relative to the current working directory which is usually the project root in tests or `nexscore` directory
+    test('firebase_setup.md contains exact GitHub callback CAUTION warning', () {
+      // Find the docs directory relative to the current working directory
       final d = Directory.current.path;
       String filePath;
 
       if (d.endsWith('nexscore')) {
-        filePath = '${Directory.current.parent.path}/docs/AUTH_SETUP.md';
+        filePath =
+            '${Directory.current.parent.path}/docs/dev_guide/firebase_setup.md';
       } else {
-        filePath = '$d/docs/AUTH_SETUP.md';
+        filePath = '$d/docs/dev_guide/firebase_setup.md';
       }
 
       final file = File(filePath);
