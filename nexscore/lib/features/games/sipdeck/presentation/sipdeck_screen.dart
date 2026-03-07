@@ -8,6 +8,7 @@ import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/sipdeck_models.dart';
 import '../providers/sipdeck_provider.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class SipDeckScreen extends ConsumerStatefulWidget {
   const SipDeckScreen({super.key});
@@ -80,11 +81,13 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
           ),
         ],
       ),
-      body: players.isEmpty
-          ? Center(child: Text(l10n.get('sipdeck_no_players')))
-          : state.playedCards.isEmpty
-          ? _buildStartScreen(context, ref, state, players, l10n)
-          : _buildCardScreen(context, ref, state, players, l10n),
+      body: MultiplayerClientOverlay(
+        child: players.isEmpty
+            ? Center(child: Text(l10n.get('sipdeck_no_players')))
+            : state.playedCards.isEmpty
+            ? _buildStartScreen(context, ref, state, players, l10n)
+            : _buildCardScreen(context, ref, state, players, l10n),
+      ),
     );
   }
 

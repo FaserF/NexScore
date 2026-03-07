@@ -6,6 +6,7 @@ import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/darts_models.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class DartsStateNotifier extends Notifier<DartsGameState> {
   @override
@@ -107,76 +108,78 @@ class DartsScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.only(bottom: 16),
-        itemCount: players.length,
-        separatorBuilder: (context, index) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          final p = players[index];
-          final pState =
-              gameState.playerStates[p.id] ??
-              DartPlayerState(
-                startingScore: gameState.targetScore,
-                finishType: gameState.finishType,
-                startType: gameState.startType,
-              );
-          final currentScore = pState.currentScore;
-          final isWinner = currentScore == 0;
+      body: MultiplayerClientOverlay(
+        child: ListView.separated(
+          padding: const EdgeInsets.only(bottom: 16),
+          itemCount: players.length,
+          separatorBuilder: (context, index) => const Divider(height: 1),
+          itemBuilder: (context, index) {
+            final p = players[index];
+            final pState =
+                gameState.playerStates[p.id] ??
+                DartPlayerState(
+                  startingScore: gameState.targetScore,
+                  finishType: gameState.finishType,
+                  startType: gameState.startType,
+                );
+            final currentScore = pState.currentScore;
+            final isWinner = currentScore == 0;
 
-          return ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12.0,
-            ),
-            leading: CircleAvatar(
-              backgroundColor: Color(
-                int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+            return ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
               ),
-              child: isWinner
-                  ? const Icon(Icons.emoji_events, color: Colors.amber)
-                  : Text(p.name.substring(0, 1).toUpperCase()),
-            ),
-            title: Text(
-              p.name,
-              style: TextStyle(
-                fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
-                color: isWinner ? Colors.green : null,
+              leading: CircleAvatar(
+                backgroundColor: Color(
+                  int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+                ),
+                child: isWinner
+                    ? const Icon(Icons.emoji_events, color: Colors.amber)
+                    : Text(p.name.substring(0, 1).toUpperCase()),
               ),
-            ),
-            subtitle: Text(
-              '${l10n.getWith('darts_avg', [pState.averagePerDart.toStringAsFixed(1)])} | ${l10n.getWith('darts_thrown', [(pState.rounds.length * 3).toString()])}',
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '$currentScore',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: isWinner
-                        ? Colors.green
-                        : Theme.of(context).colorScheme.primary,
+              title: Text(
+                p.name,
+                style: TextStyle(
+                  fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
+                  color: isWinner ? Colors.green : null,
+                ),
+              ),
+              subtitle: Text(
+                '${l10n.getWith('darts_avg', [pState.averagePerDart.toStringAsFixed(1)])} | ${l10n.getWith('darts_thrown', [(pState.rounds.length * 3).toString()])}',
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '$currentScore',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: isWinner
+                          ? Colors.green
+                          : Theme.of(context).colorScheme.primary,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                IconButton.filledTonal(
-                  icon: const Icon(Icons.add),
-                  onPressed: isWinner
-                      ? null
-                      : () => _showPointsDialog(
-                          context,
-                          ref,
-                          p,
-                          pState,
-                          gameState,
-                          l10n,
-                        ),
-                ),
-              ],
-            ),
-          );
-        },
+                  const SizedBox(width: 16),
+                  IconButton.filledTonal(
+                    icon: const Icon(Icons.add),
+                    onPressed: isWinner
+                        ? null
+                        : () => _showPointsDialog(
+                            context,
+                            ref,
+                            p,
+                            pState,
+                            gameState,
+                            l10n,
+                          ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

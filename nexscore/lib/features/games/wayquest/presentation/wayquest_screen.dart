@@ -5,6 +5,7 @@ import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/wayquest_models.dart';
 import '../providers/wayquest_provider.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class WayQuestScreen extends ConsumerWidget {
   const WayQuestScreen({super.key});
@@ -26,9 +27,11 @@ class WayQuestScreen extends ConsumerWidget {
             ),
         ],
       ),
-      body: state.playedCards.isEmpty
-          ? _WayQuestSetup(l10n: l10n)
-          : _WayQuestGame(l10n: l10n, state: state),
+      body: MultiplayerClientOverlay(
+        child: state.playedCards.isEmpty
+            ? _WayQuestSetup(l10n: l10n)
+            : _WayQuestGame(l10n: l10n, state: state),
+      ),
     );
   }
 

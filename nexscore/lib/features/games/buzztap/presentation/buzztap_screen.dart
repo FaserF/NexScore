@@ -10,6 +10,7 @@ import '../models/buzztap_models.dart';
 import '../providers/buzztap_provider.dart';
 import '../../../../core/theme/widgets/glass_container.dart';
 import '../../../../core/theme/widgets/animated_scale_button.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class BuzzTapScreen extends ConsumerStatefulWidget {
   const BuzzTapScreen({super.key});
@@ -117,11 +118,13 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
             ),
           ],
         ),
-        body: players.isEmpty
-            ? Center(child: Text(l10n.get('sipdeck_no_players')))
-            : state.playedCards.isEmpty
-            ? _buildStartScreen(context, ref, state, players, l10n)
-            : _buildCardScreen(context, ref, state, players, l10n),
+        body: MultiplayerClientOverlay(
+          child: players.isEmpty
+              ? Center(child: Text(l10n.get('sipdeck_no_players')))
+              : state.playedCards.isEmpty
+              ? _buildStartScreen(context, ref, state, players, l10n)
+              : _buildCardScreen(context, ref, state, players, l10n),
+        ),
       ),
     );
   }

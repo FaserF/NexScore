@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../firestore_multiplayer_impl.dart';
 import '../models/lobby.dart';
 import '../multiplayer_service.dart';
+import '../sync_engine.dart';
 import '../../models/player_model.dart';
 import '../../providers/active_players_provider.dart';
 
@@ -55,4 +56,18 @@ final lobbyPlayerSyncProvider = Provider<void>((ref) {
       });
     }
   });
+});
+
+/// Provides a SyncEngine instance for the current multiplayer session
+final syncEngineProvider = Provider<SyncEngine>((ref) {
+  final service = ref.watch(multiplayerServiceProvider);
+  final engine = SyncEngine(service);
+  ref.onDispose(() => engine.dispose());
+  return engine;
+});
+
+/// Stream provider for clients to receive the host's game state in real-time
+final gameStateSyncProvider = StreamProvider<Map<String, dynamic>>((ref) {
+  final engine = ref.watch(syncEngineProvider);
+  return engine.gameStateStream;
 });
