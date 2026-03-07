@@ -35,7 +35,9 @@ class SchafkopfRound {
   /// - Each Laufende (runner) adds +0.10 per player.
   /// - In Sauspiel (team play), active player + partner each earn `gameValue`; each opponent loses `gameValue`.
   /// - In Solo variants, the solo player earns `gameValue * 3`; each of the 3 opponents loses `gameValue`.
-  Map<String, double> calculatePayouts() {
+  /// Calculates the payout for each of the 4 players involved in this round.
+  /// The resulting map will contain values for all players in `allPlayerIds`.
+  Map<String, double> calculatePayouts(List<String> allPlayerIds) {
     double gameValue = baseTariff;
 
     if (gameType != SchafkopfGameType.sauspiel) {
@@ -44,32 +46,44 @@ class SchafkopfRound {
     }
     if (schneider) gameValue += baseTariff;
     if (schwarz) gameValue += baseTariff;
-    // Laufende (runners): official rule – only count if ≥3 consecutive trumps.
-    // With runner count ≥ 3, each runner adds baseTariff.
-    // With 1–2 runners, laufende are NOT scored (they are simply not Laufende).
     if (runners >= 3) {
       gameValue += (runners * baseTariff);
     }
 
-    final bool activeWon =
-        (points[activePlayerId] ?? 0) + (points[partnerPlayerId] ?? 0) > 60;
+    final int activeTeamPoints =
+        (points[activePlayerId] ?? 0) + (points[partnerPlayerId] ?? 0);
+    final bool activeWon = activeTeamPoints > 60;
 
-    final Map<String, double> payouts = {};
+    final Map<String, double> payouts = {for (var id in allPlayerIds) id: 0.0};
 
     if (gameType == SchafkopfGameType.sauspiel) {
       // Sauspiel: two-vs-two team game
-      // Active player and partner split the win/loss
-      final double teamValue = activeWon ? gameValue : -gameValue;
-      payouts[activePlayerId] = teamValue;
+      final double perPlayerValue = activeWon ? gameValue : -gameValue;
+      payouts[activePlayerId] = perPlayerValue;
       if (partnerPlayerId != null) {
-        payouts[partnerPlayerId!] = teamValue;
+        payouts[partnerPlayerId!] = perPlayerValue;
       }
-      // Opponents (not tracked individually here, handled in screen layer)
+
+      // Opponents lose what winners gain
+      final opponents = allPlayerIds
+          .where((id) => id != activePlayerId && id != partnerPlayerId)
+          .toList();
+      for (final opId in opponents) {
+        payouts[opId] = -perPlayerValue;
+      }
     } else {
       // Solo variant: one player against three opponents
-      // Solo player earns 3× gameValue (one unit from each opponent)
       final double soloTotal = gameValue * 3;
-      payouts[activePlayerId] = activeWon ? soloTotal : -soloTotal;
+      final double winAmount = activeWon ? soloTotal : -soloTotal;
+      payouts[activePlayerId] = winAmount;
+
+      // Each opponent pays 1/3 of the solo total
+      final opponents = allPlayerIds
+          .where((id) => id != activePlayerId)
+          .toList();
+      for (final opId in opponents) {
+        payouts[opId] = -(winAmount / 3);
+      }
     }
 
     return payouts;

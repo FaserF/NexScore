@@ -52,8 +52,10 @@ void main() {
         startingScore: 301,
         rounds: [
           DartRound(throws: [const DartThrow(score: 100)]), // 201
-          DartRound(throws: [const DartThrow(score: 150)]), // 51
-          DartRound(throws: [const DartThrow(score: 51)]), // 0 (win)
+          DartRound(throws: [const DartThrow(score: 151)]), // 50
+          DartRound(
+            throws: [const DartThrow(score: 25, multiplier: 2)],
+          ), // 0 (win on D25/Bull)
         ],
       );
       expect(state.currentScore, 0);
@@ -78,24 +80,44 @@ void main() {
       final state = DartPlayerState(
         startingScore: 301,
         rounds: [
-          DartRound(throws: [const DartThrow(score: 300)]), // 1
+          DartRound(throws: [const DartThrow(score: 299)]), // 2
           DartRound(
             throws: [const DartThrow(score: 1)],
-          ), // Bust (would leave 0 but no double, model treats as bust by leaving 0)
+          ), // Bust (would leave 1)
         ],
       );
-      // Model: reaching exactly 0 is allowed (checkout)
-      expect(state.currentScore, 0);
+      expect(state.currentScore, 2);
     });
 
-    test('501 starting score works', () {
+    test('bust: reaching exactly 0 but no double is a bust', () {
+      final state = DartPlayerState(
+        startingScore: 301,
+        rounds: [
+          DartRound(
+            throws: [const DartThrow(score: 301, multiplier: 1)],
+          ), // Bust
+        ],
+      );
+      expect(state.currentScore, 301);
+    });
+
+    test('501 starting score works with double finish', () {
       final state = DartPlayerState(
         startingScore: 501,
         rounds: [
-          DartRound(throws: [const DartThrow(score: 501)]),
+          // Impossible in one round but for testing model logic:
+          DartRound(
+            throws: [
+              const DartThrow(score: 20, multiplier: 3), // 60
+              const DartThrow(score: 20, multiplier: 3), // 120
+            ],
+          ), // 381
+          DartRound(
+            throws: [const DartThrow(score: 25, multiplier: 2)],
+          ), // Not zero yet, just testing rounds
         ],
       );
-      expect(state.currentScore, 0);
+      expect(state.currentScore, 331);
     });
 
     test('average per dart calculated correctly', () {

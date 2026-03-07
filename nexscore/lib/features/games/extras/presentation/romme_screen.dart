@@ -17,6 +17,14 @@ class RommeStateNotifier extends Notifier<RommeGameState> {
   void resetGame() {
     state = const RommeGameState();
   }
+
+  void removeLastRound() {
+    if (state.rounds.isNotEmpty) {
+      state = state.copyWith(
+        rounds: state.rounds.sublist(0, state.rounds.length - 1),
+      );
+    }
+  }
 }
 
 final rommeStateProvider = NotifierProvider<RommeStateNotifier, RommeGameState>(
@@ -58,6 +66,13 @@ class RommeScreen extends ConsumerWidget {
         title: Text(l10n.get('romme_title')),
         leading: BackButton(onPressed: () => context.go('/games')),
         actions: [
+          if (gameState.rounds.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () =>
+                  ref.read(rommeStateProvider.notifier).removeLastRound(),
+              tooltip: l10n.get('schafkopf_undo'),
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
@@ -125,7 +140,8 @@ class RommeScreen extends ConsumerWidget {
       ),
       floatingActionButton: leaders.isNotEmpty
           ? FloatingActionButton.extended(
-              onPressed: null,
+              onPressed: () =>
+                  _showScoreBreakdown(context, players, gameState, l10n),
               label: Text(
                 l10n.getWith('romme_leader', [
                   players
@@ -244,6 +260,77 @@ class RommeScreen extends ConsumerWidget {
     for (final c in controllers.values) {
       c.dispose();
     }
+  }
+
+  void _showScoreBreakdown(
+    BuildContext context,
+    List<Player> players,
+    RommeGameState gameState,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final sortedPlayers = List<Player>.from(players)
+          ..sort(
+            (a, b) => gameState
+                .getPlayerScore(a.id)
+                .compareTo(gameState.getPlayerScore(b.id)),
+          );
+
+        return AlertDialog(
+          title: Text(l10n.get('romme_breakdown')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...sortedPlayers.map((p) {
+                final score = gameState.getPlayerScore(p.id);
+                final isLeader =
+                    score == gameState.getPlayerScore(sortedPlayers.first.id);
+
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Color(
+                      int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+                    ),
+                    child: Text(
+                      p.name.substring(0, 1).toUpperCase(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  title: Text(p.name),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isLeader)
+                        const Icon(
+                          Icons.emoji_events,
+                          color: Colors.amber,
+                          size: 20,
+                        ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '$score',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.get('close')),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _confirmReset(

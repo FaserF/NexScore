@@ -171,123 +171,252 @@ class DartsScreen extends ConsumerWidget {
     DartPlayerState pState,
     AppLocalizations l10n,
   ) async {
-    final controller = TextEditingController();
-    final focusNode = FocusNode();
+    final List<DartThrow> currentThrows = [];
+    int multiplier = 1;
 
     await showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
+            int previewScore = pState.currentScore;
+            bool isBust = false;
+
+            // Calculate preview
+            for (final t in currentThrows) {
+              final newScore = previewScore - t.total;
+              if (newScore > 1) {
+                previewScore = newScore;
+              } else if (newScore == 0 && t.multiplier == 2) {
+                previewScore = 0;
+                break;
+              } else {
+                isBust = true;
+                break;
+              }
+            }
+
             return AlertDialog(
-              title: Text(l10n.getWith('darts_enter_score', [player.name])),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
+              title: Row(
                 children: [
-                  Text(
-                    l10n.get('darts_input_desc'),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    readOnly: true,
-                    showCursor: true,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Color(
+                      int.parse(player.avatarColor.replaceFirst('#', '0xff')),
                     ),
-                    decoration: InputDecoration(
-                      hintText: '0',
-                      border: OutlineInputBorder(
+                    child: Text(
+                      player.name.substring(0, 1).toUpperCase(),
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(player.name)),
+                ],
+              ),
+              content: SizedBox(
+                width: 320,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Preview Row
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isBust
+                            ? Colors.red.withValues(alpha: 0.1)
+                            : Theme.of(context).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      suffixText: l10n.get('history_pts'),
-                    ),
-                    onSubmitted: (val) {
-                      final score = int.tryParse(val) ?? 0;
-                      if (score <= 180) {
-                        final round = DartRound(
-                          throws: [DartThrow(score: score, multiplier: 1)],
-                        );
-                        ref
-                            .read(dartsStateProvider.notifier)
-                            .addRound(player.id, round);
-                        Navigator.pop(context);
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: 300,
-                    child: GridView.count(
-                      crossAxisCount: 3,
-                      shrinkWrap: true,
-                      childAspectRatio: 1.5,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: [
-                        for (int i = 1; i <= 9; i++)
-                          _KeypadButton(
-                            label: '$i',
-                            onPressed: () {
-                              controller.text = '${controller.text}$i';
-                            },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.get('darts_remaining'),
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                              Text(
+                                isBust
+                                    ? l10n.get('darts_bust')
+                                    : '$previewScore',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: isBust ? Colors.red : null,
+                                    ),
+                              ),
+                              if (!isBust &&
+                                  previewScore <= 170 &&
+                                  ![
+                                    159,
+                                    162,
+                                    163,
+                                    165,
+                                    166,
+                                    168,
+                                    169,
+                                  ].contains(previewScore))
+                                Text(
+                                  l10n.get('darts_checkout_possible'),
+                                  style: const TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
                           ),
-                        _KeypadButton(
-                          label: 'C',
-                          color: Colors.redAccent.withValues(alpha: 0.1),
-                          onPressed: () {
-                            controller.clear();
-                          },
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                l10n.get('history_pts'),
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                              Text(
+                                '${currentThrows.fold(0, (sum, t) => sum + t.total)}',
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineSmall,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Current Throws Bubbles
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(3, (index) {
+                        final hasThrow = index < currentThrows.length;
+                        final t = hasThrow ? currentThrows[index] : null;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Chip(
+                            label: Text(
+                              t == null
+                                  ? '-'
+                                  : '${t.multiplier == 3
+                                        ? 'T'
+                                        : t.multiplier == 2
+                                        ? 'D'
+                                        : 'S'}${t.score}',
+                            ),
+                            backgroundColor: hasThrow
+                                ? Theme.of(
+                                    context,
+                                  ).colorScheme.secondaryContainer
+                                : null,
+                          ),
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 16),
+                    // Multiplier Switcher
+                    SegmentedButton<int>(
+                      segments: const [
+                        ButtonSegment(value: 1, label: Text('S')),
+                        ButtonSegment(value: 2, label: Text('D')),
+                        ButtonSegment(value: 3, label: Text('T')),
+                      ],
+                      selected: {multiplier},
+                      onSelectionChanged: (val) {
+                        setState(() => multiplier = val.first);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    // Board Numbers Grid
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        ...List.generate(20, (i) => i + 1).map((n) {
+                          return _BoardButton(
+                            label: '$n',
+                            onPressed: currentThrows.length < 3 && !isBust
+                                ? () {
+                                    setState(() {
+                                      currentThrows.add(
+                                        DartThrow(
+                                          score: n,
+                                          multiplier: multiplier,
+                                        ),
+                                      );
+                                      multiplier = 1; // Reset to single
+                                    });
+                                  }
+                                : null,
+                          );
+                        }),
+                        _BoardButton(
+                          label: '25',
+                          onPressed:
+                              currentThrows.length < 3 &&
+                                  !isBust &&
+                                  multiplier < 3
+                              ? () {
+                                  setState(() {
+                                    currentThrows.add(
+                                      DartThrow(
+                                        score: 25,
+                                        multiplier: multiplier,
+                                      ),
+                                    );
+                                    multiplier = 1;
+                                  });
+                                }
+                              : null,
                         ),
-                        _KeypadButton(
+                        _BoardButton(
                           label: '0',
-                          onPressed: () {
-                            if (controller.text.isNotEmpty) {
-                              controller.text = '${controller.text}0';
-                            }
-                          },
-                        ),
-                        _KeypadButton(
-                          label: l10n.get('darts_bust'),
-                          color: Colors.orange.withValues(alpha: 0.1),
-                          onPressed: () {
-                            final round = DartRound(
-                              throws: [DartThrow(score: 0, multiplier: 1)],
-                            );
-                            ref
-                                .read(dartsStateProvider.notifier)
-                                .addRound(player.id, round);
-                            Navigator.pop(context);
-                          },
+                          onPressed: currentThrows.length < 3 && !isBust
+                              ? () {
+                                  setState(() {
+                                    currentThrows.add(
+                                      const DartThrow(score: 0, multiplier: 1),
+                                    );
+                                    multiplier = 1;
+                                  });
+                                }
+                              : null,
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(l10n.get('cancel')),
-                ),
-                FilledButton(
                   onPressed: () {
-                    final score = int.tryParse(controller.text) ?? 0;
-                    if (score <= 180) {
-                      final round = DartRound(
-                        throws: [DartThrow(score: score, multiplier: 1)],
-                      );
-                      ref
-                          .read(dartsStateProvider.notifier)
-                          .addRound(player.id, round);
+                    if (currentThrows.isNotEmpty) {
+                      setState(() => currentThrows.removeLast());
+                      isBust = false; // Recalculated next build
+                    } else {
                       Navigator.pop(context);
                     }
                   },
+                  child: Text(
+                    currentThrows.isEmpty
+                        ? l10n.get('cancel')
+                        : l10n.get('darts_remove_last'),
+                  ),
+                ),
+                FilledButton(
+                  onPressed: currentThrows.isNotEmpty || isBust
+                      ? () {
+                          final round = DartRound(throws: currentThrows);
+                          ref
+                              .read(dartsStateProvider.notifier)
+                              .addRound(player.id, round);
+                          Navigator.pop(context);
+                        }
+                      : null,
                   child: Text(l10n.get('add')),
                 ),
               ],
@@ -296,9 +425,6 @@ class DartsScreen extends ConsumerWidget {
         );
       },
     );
-
-    controller.dispose();
-    focusNode.dispose();
   }
 
   void _confirmReset(
@@ -332,30 +458,28 @@ class DartsScreen extends ConsumerWidget {
   }
 }
 
-class _KeypadButton extends StatelessWidget {
+class _BoardButton extends StatelessWidget {
   final String label;
-  final VoidCallback onPressed;
-  final Color? color;
+  final VoidCallback? onPressed;
 
-  const _KeypadButton({
-    required this.label,
-    required this.onPressed,
-    this.color,
-  });
+  const _BoardButton({required this.label, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton.tonal(
-      style: FilledButton.styleFrom(
-        backgroundColor:
-            color ?? Theme.of(context).colorScheme.surfaceContainerHighest,
-        foregroundColor: color != null
-            ? Colors.white
-            : Theme.of(context).colorScheme.onSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    return SizedBox(
+      width: 48,
+      height: 40,
+      child: FilledButton.tonal(
+        style: FilledButton.styleFrom(
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        onPressed: onPressed,
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        ),
       ),
-      onPressed: onPressed,
-      child: Text(label, style: const TextStyle(fontSize: 18)),
     );
   }
 }

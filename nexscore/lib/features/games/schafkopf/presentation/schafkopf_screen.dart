@@ -70,7 +70,9 @@ class SchafkopfScreen extends ConsumerWidget {
                           separatorBuilder: (_, _) => const Divider(height: 1),
                           itemBuilder: (context, index) {
                             final round = rounds[index];
-                            final payouts = round.calculatePayouts();
+                            final payouts = round.calculatePayouts(
+                              players.map((p) => p.id).toList(),
+                            );
                             final activePlayer = players.firstWhere(
                               (p) => p.id == round.activePlayerId,
                               orElse: () => Player(
@@ -170,7 +172,7 @@ class SchafkopfScreen extends ConsumerWidget {
   ) {
     final Map<String, double> totals = {for (var p in players) p.id: 0.0};
     for (final r in rounds) {
-      r.calculatePayouts().forEach((pid, val) {
+      r.calculatePayouts(players.map((p) => p.id).toList()).forEach((pid, val) {
         if (totals.containsKey(pid)) totals[pid] = totals[pid]! + val;
       });
     }

@@ -386,7 +386,10 @@ class AppLocalizations {
       'darts_thrown': 'Darts thrown: {0}',
       'darts_bust': 'Bust',
       'darts_enter_score': 'Score for {0}',
-      'darts_input_desc': 'Enter total score of 3 darts',
+      'darts_input_desc': 'Enter each throw (Value & Multiplier)',
+      'darts_remaining': 'Remaining',
+      'darts_remove_last': 'Remove last throw',
+      'darts_checkout_possible': 'Checkout possible!',
 
       // ── Phase 10
       'phase10_variant': 'Phase 10 Variant',
@@ -426,6 +429,8 @@ class AppLocalizations {
       'romme_no_rounds': 'No rounds yet. Tap + to add.',
       'romme_leader': 'Leader: {0}',
       'romme_penalty_title': 'Round {0} – Enter Penalty Points',
+      'romme_breakdown': 'Score Breakdown',
+      'romme_total_points': 'Total Points',
 
       // ── History
       'history': 'History',
@@ -1180,7 +1185,10 @@ class AppLocalizations {
       'darts_thrown': 'Darts geworfen: {0}',
       'darts_bust': 'Bust',
       'darts_enter_score': 'Score für {0}',
-      'darts_input_desc': 'Gesamtpunktzahl von 3 Darts eingeben',
+      'darts_input_desc': 'Einzelne Würfe eingeben (Wert & Multiplikator)',
+      'darts_remaining': 'Restlich',
+      'darts_remove_last': 'Letzten Wurf entfernen',
+      'darts_checkout_possible': 'Checkout möglich!',
 
       // ── Phase 10
       'phase10_variant': 'Phase 10 Variante',
@@ -1221,6 +1229,8 @@ class AppLocalizations {
       'romme_no_rounds': 'Noch keine Runden. Tippe auf + zum Hinzufügen.',
       'romme_leader': 'Führender: {0}',
       'romme_penalty_title': 'Runde {0} – Strafpunkte eingeben',
+      'romme_breakdown': 'Punktübersicht',
+      'romme_total_points': 'Gesamtpunkte',
 
       // ── History
       'history': 'Verlauf',

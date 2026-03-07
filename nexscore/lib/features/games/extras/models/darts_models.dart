@@ -42,19 +42,34 @@ class DartPlayerState {
 
   const DartPlayerState({required this.startingScore, this.rounds = const []});
 
-  /// Calculates the current score based on X01 rules (Double out not strictly enforced yet, just absolute 0)
+  /// Calculates the current score based on X01 rules with Double Out.
   int get currentScore {
     int score = startingScore;
     for (final round in rounds) {
-      final newScore = score - round.roundTotal;
-      if (newScore > 0) {
-        score = newScore;
-      } else if (newScore == 0) {
-        // Double out condition would go here (last throw must have multiplier == 2)
-        score = 0;
-      } else {
-        // Bust! Score doesn't change for this round.
+      int roundRemaining = score;
+      bool bust = false;
+
+      for (int i = 0; i < round.throws.length; i++) {
+        final t = round.throws[i];
+        final newScore = roundRemaining - t.total;
+
+        if (newScore > 1) {
+          roundRemaining = newScore;
+        } else if (newScore == 0 && t.multiplier == 2) {
+          // Double Out!
+          roundRemaining = 0;
+          break; // Game ends for this player
+        } else {
+          // Bust! (Below 0, or exactly 1, or exactly 0 without a double)
+          bust = true;
+          break;
+        }
       }
+
+      if (!bust) {
+        score = roundRemaining;
+      }
+      if (score == 0) break;
     }
     return score;
   }
