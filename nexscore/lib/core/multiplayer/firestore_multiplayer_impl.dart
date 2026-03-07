@@ -80,7 +80,11 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     bool isUnique = false;
     while (!isUnique) {
       roomCode = _generateRoomCode();
-      final doc = await _firestore.collection('lobbies').doc(roomCode).get();
+      final doc = await _firestore
+          .collection('lobbies')
+          .doc(roomCode)
+          .get()
+          .timeout(const Duration(seconds: 10));
       if (!doc.exists) {
         isUnique = true;
       }
@@ -103,7 +107,11 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
       createdAt: DateTime.now(),
     );
 
-    await _firestore.collection('lobbies').doc(roomCode).set(lobby.toMap());
+    await _firestore
+        .collection('lobbies')
+        .doc(roomCode)
+        .set(lobby.toMap())
+        .timeout(const Duration(seconds: 10));
     _listenToLobby(roomCode);
 
     return roomCode;
@@ -120,7 +128,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     roomCode = roomCode.toUpperCase();
 
     final docRef = _firestore.collection('lobbies').doc(roomCode);
-    final docSnap = await docRef.get();
+    final docSnap = await docRef.get().timeout(const Duration(seconds: 10));
 
     if (!docSnap.exists) {
       throw Exception('Lobby not found');
@@ -143,7 +151,9 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     );
 
     // Atomic update to add the user
-    await docRef.update({'users.$uid': joinUser.toMap()});
+    await docRef
+        .update({'users.$uid': joinUser.toMap()})
+        .timeout(const Duration(seconds: 10));
 
     _listenToLobby(roomCode);
   }

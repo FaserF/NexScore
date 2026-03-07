@@ -61,6 +61,32 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ],
             ),
           );
+        } else if (message.contains('unavailable')) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.get('multiplayer_firebase_missing')),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.get('multiplayer_diagnostics_desc')),
+                  const SizedBox(height: 12),
+                  Text('• ${l10n.get('multiplayer_adblock_title')}'),
+                  Text('• ${l10n.get('multiplayer_domains_title')}'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
         } else {
           ScaffoldMessenger.of(
             context,

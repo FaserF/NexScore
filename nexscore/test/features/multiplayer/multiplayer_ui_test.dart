@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nexscore/features/multiplayer/presentation/multiplayer_hub_screen.dart';
 import 'package:nexscore/features/multiplayer/presentation/lobby_screen.dart';
-import 'package:nexscore/features/settings/provider/settings_provider.dart';
 import 'package:nexscore/core/i18n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../mocks/mock_multiplayer_service.dart';
