@@ -41,6 +41,7 @@ class AppLocalizations {
       'settings_theme_light': 'Light',
       'settings_theme_dark': 'Dark',
       'settings_theme_system': 'System Default',
+      'qwixx_variant_original': 'Original',
 
       // ── Home / Games List
       'home_choose_game': 'Choose a Game',
@@ -132,6 +133,9 @@ class AppLocalizations {
       'game_arschloch_desc':
           'Classic President card game. Shed all cards first to become President. Track ranks, card exchange rules and cumulative points.',
       'game_buzztap': 'BuzzTap',
+      'game_settings': 'Game Settings',
+      'winner': 'Winner',
+      'home_tag_ext': 'Extra',
 
       // ── Help screen
       'help_title': 'Help & Feedback',
@@ -349,6 +353,7 @@ class AppLocalizations {
           'Be the first to shed all cards → President. Last with cards = Asshole.',
       'arschloch_ranks_desc':
           '1. President | 2. Vice-President | Mid: Citizen | 2nd-to-last: Vice-Asshole | Last: Asshole',
+      'arschloch_no_rank': 'No Rank',
       'arschloch_rules_exchange_p':
           'Asshole gives 2 best cards to President. President gives 2 cards back.',
       'arschloch_rules_exchange_vp':
@@ -379,6 +384,9 @@ class AppLocalizations {
       'kniffel_cat_chance': 'Chance',
       'kniffel_multiple_yahtzee': 'Multiple Yahtzees Bonus (+50)',
       'kniffel_yahtzee_joker': 'Yahtzee Joker used',
+      'kniffel_enter_score': 'Enter score for {0}',
+      'kniffel_yahtzee_bonus': 'Yahtzee Bonus',
+      'kniffel_yahtzee_bonus_desc': '+50 points for multiple Yahtzees',
 
       // ── Darts
       'darts_title': 'Darts (X01)',
@@ -801,6 +809,7 @@ class AppLocalizations {
           'Bist du sicher? Alle Spieler, der Verlauf und die Ranglisten werden permanent gelöscht.',
       'settings_db_reset_success': 'Datenbank wurde zurückgesetzt.',
       'back': 'Zurück',
+      'qwixx_variant_original': 'Original',
 
       // ── Home / Games List
       'home_choose_game': 'Wähle ein Spiel zum Punkte-Tracking',
@@ -884,6 +893,9 @@ class AppLocalizations {
       'game_arschloch_desc':
           'Das klassische Präsidenten-Kartenspiel. Werde zuerst alle Karten los. Ränge, Kartentausch und kumulative Punkte über mehrere Runden.',
       'game_buzztap': 'BuzzTap',
+      'game_settings': 'Spiel-Einstellungen',
+      'winner': 'Gewinner',
+      'home_tag_ext': 'Extra',
       'desc_buzztap':
           'Dynamische challenges und Trinkaufgaben für deine Party.',
 
@@ -1156,6 +1168,7 @@ class AppLocalizations {
       'arschloch_rank_neutral': 'Bürger',
       'arschloch_rank_vice_arschloch': 'Vize-Arschloch',
       'arschloch_rank_arschloch': 'Arschloch',
+      'arschloch_no_rank': 'Kein Rang',
       'arschloch_rounds': 'Runden: Präs {0} | Arsch {1}',
       'arschloch_exchange_title': 'Kartentausch für nächste Runde:',
       'arschloch_exchange_p_to_a':
@@ -1203,6 +1216,8 @@ class AppLocalizations {
       'kniffel_cat_chance': 'Chance',
       'kniffel_multiple_yahtzee': 'Mehrfach-Kniffel Bonus (+50)',
       'kniffel_yahtzee_joker': 'Kniffel-Joker genutzt',
+      'kniffel_yahtzee_bonus': 'Kniffel Bonus',
+      'kniffel_yahtzee_bonus_desc': '+50 Punkte für weitere Kniffel',
       'kniffel_enter_score': 'Punkte eingeben für {0}',
 
       // ── Darts

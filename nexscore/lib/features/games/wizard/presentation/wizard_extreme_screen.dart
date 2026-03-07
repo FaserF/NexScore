@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/models/player_model.dart';
@@ -219,7 +218,8 @@ class WizardExtremeScreen extends ConsumerWidget {
               }).toList(),
             ),
           ),
-          ButtonBar(
+          OverflowBar(
+            alignment: MainAxisAlignment.end,
             children: [
               TextButton(
                 onPressed: () => _confirmDeleteRound(context, ref, index, l10n),

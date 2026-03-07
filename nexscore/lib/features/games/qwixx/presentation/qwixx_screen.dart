@@ -120,7 +120,9 @@ class QwixxScreen extends ConsumerWidget {
             return RadioListTile<QwixxVariant>(
               title: Text(label),
               value: v,
+              // ignore: deprecated_member_use
               groupValue: current,
+              // ignore: deprecated_member_use
               onChanged: (newV) {
                 if (newV != null) {
                   ref.read(qwixxStateProvider.notifier).setVariant(newV);

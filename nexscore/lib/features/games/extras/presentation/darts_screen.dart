@@ -242,14 +242,15 @@ class DartsScreen extends ConsumerWidget {
                   }
                   if (next == 0) {
                     bool valid = false;
-                    if (gameState.finishType == DartsFinishType.single)
+                    if (gameState.finishType == DartsFinishType.single) {
                       valid = true;
-                    else if (gameState.finishType == DartsFinishType.double &&
-                        t.multiplier == 2)
+                    } else if (gameState.finishType == DartsFinishType.double &&
+                        t.multiplier == 2) {
                       valid = true;
-                    else if (gameState.finishType == DartsFinishType.master &&
-                        (t.multiplier == 2 || t.multiplier == 3))
+                    } else if (gameState.finishType == DartsFinishType.master &&
+                        (t.multiplier == 2 || t.multiplier == 3)) {
                       valid = true;
+                    }
 
                     if (!valid) isBust = true;
                     break;

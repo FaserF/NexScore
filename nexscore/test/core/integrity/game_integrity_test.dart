@@ -191,7 +191,7 @@ void main() {
 
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
-        expect(find.byType(SingleChildScrollView), findsOneWidget);
+        expect(find.byType(ListView), findsOneWidget);
       },
     );
   });

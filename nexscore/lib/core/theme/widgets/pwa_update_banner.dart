@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../i18n/app_localizations.dart';
-import '../pwa/pwa_update_service.dart';
+import '../../pwa/pwa_update_service.dart';
 
 class PwaUpdateBanner extends ConsumerWidget {
   const PwaUpdateBanner({super.key});

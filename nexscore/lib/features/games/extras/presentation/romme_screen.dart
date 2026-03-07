@@ -202,7 +202,7 @@ class RommeScreen extends ConsumerWidget {
                       labelText: l10n.get('winner'),
                       border: const OutlineInputBorder(),
                     ),
-                    value: selectedWinnerId,
+                    initialValue: selectedWinnerId,
                     onChanged: (val) => setState(() => selectedWinnerId = val!),
                     items: players
                         .map(

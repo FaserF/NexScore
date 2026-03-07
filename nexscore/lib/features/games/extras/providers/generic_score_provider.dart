@@ -3,17 +3,24 @@ import '../../../../core/providers/active_players_provider.dart';
 import '../models/generic_score_models.dart';
 
 final genericScoreProvider =
-    StateNotifierProvider<GenericScoreNotifier, GenericScoreState>((ref) {
-      final activePlayers = ref.watch(activePlayersProvider);
-      return GenericScoreNotifier(activePlayers.map((p) => p.id).toList());
+    NotifierProvider<GenericScoreNotifier, GenericScoreState>(() {
+      return GenericScoreNotifier();
     });
 
-class GenericScoreNotifier extends StateNotifier<GenericScoreState> {
-  GenericScoreNotifier(List<String> playerIds)
-    : super(GenericScoreState(playerIds: playerIds)) {
-    if (playerIds.isNotEmpty && state.rounds.isEmpty) {
-      addRound();
-    }
+class GenericScoreNotifier extends Notifier<GenericScoreState> {
+  @override
+  GenericScoreState build() {
+    final activePlayers = ref.watch(activePlayersProvider);
+    final playerIds = activePlayers.map((p) => p.id).toList();
+
+    // Initialize with one round if empty
+    return GenericScoreState(
+      playerIds: playerIds,
+      rounds: playerIds.isNotEmpty
+          ? [List<int>.filled(playerIds.length, 0)]
+          : [],
+      playerTotals: {for (var id in playerIds) id: 0},
+    );
   }
 
   void addRound() {
@@ -51,7 +58,13 @@ class GenericScoreNotifier extends StateNotifier<GenericScoreState> {
   }
 
   void reset() {
-    state = GenericScoreState(playerIds: state.playerIds);
-    addRound();
+    final playerIds = state.playerIds;
+    state = GenericScoreState(
+      playerIds: playerIds,
+      rounds: playerIds.isNotEmpty
+          ? [List<int>.filled(playerIds.length, 0)]
+          : [],
+      playerTotals: {for (var id in playerIds) id: 0},
+    );
   }
 }

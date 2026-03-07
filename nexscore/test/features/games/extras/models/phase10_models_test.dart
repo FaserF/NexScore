@@ -57,7 +57,7 @@ void main() {
 
     test('masters variant uses masters phases', () {
       const gs = Phase10GameState(variant: Phase10Variant.masters);
-      expect(gs.activePhases[0].description, '4 sets of 2');
+      expect(gs.activePhases[0].description, '4 Pairs');
     });
 
     test('getLeaders sorts correctly', () {

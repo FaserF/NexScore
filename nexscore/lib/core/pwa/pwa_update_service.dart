@@ -1,35 +1,44 @@
-import 'dart:async';
-import 'dart:js' as js;
+import 'dart:js_interop';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final pwaUpdateProvider = StateNotifierProvider<PwaUpdateNotifier, bool>((ref) {
+@JS()
+external void flutterReloadApp();
+
+@JS('window.flutterUpdateAvailable')
+external JSBoolean? get _flutterUpdateAvailable;
+
+@JS('window.onFlutterUpdateAvailable')
+external set _onFlutterUpdateAvailable(JSFunction value);
+
+final pwaUpdateProvider = NotifierProvider<PwaUpdateNotifier, bool>(() {
   return PwaUpdateNotifier();
 });
 
-class PwaUpdateNotifier extends StateNotifier<bool> {
-  PwaUpdateNotifier() : super(false) {
+class PwaUpdateNotifier extends Notifier<bool> {
+  @override
+  bool build() {
     if (kIsWeb) {
       _init();
     }
+    return false;
   }
 
   void _init() {
     // Check initial state
-    final isUpdateAvailable = js.context['flutterUpdateAvailable'];
-    if (isUpdateAvailable == true) {
+    if (_flutterUpdateAvailable?.toDart == true) {
       state = true;
     }
 
     // Register callback for future updates
-    js.context['onFlutterUpdateAvailable'] = () {
+    _onFlutterUpdateAvailable = (() {
       state = true;
-    };
+    }).toJS;
   }
 
   void reloadApp() {
     if (kIsWeb) {
-      js.context.callMethod('flutterReloadApp');
+      flutterReloadApp();
     }
   }
 }

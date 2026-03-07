@@ -99,13 +99,22 @@ void main() {
       expect(result, contains('Dave'));
       expect(result, contains('Alice'));
     });
+
     test('all keys used in codebase are defined in AppLocalizations', () {
       final libDir = Directory('lib');
-      final getRegex = RegExp(r"l10n\.get\(['\\]?([^'\\]+)['\\]?\)");
-      final getWithRegex = RegExp(r"l10n\.getWith\(['\\]?([^'\\]+)['\\]?");
-
       final usedKeys = <String>{};
       final files = libDir.listSync(recursive: true).whereType<File>();
+
+      // Combined regex for l10n.get and l10n.getWith
+      final getRegex = RegExp(
+        r"l10n\.get(?:With)?\(\s*['"
+                '"' +
+            "']([^'"
+                '"' +
+            "']+)['"
+                '"' +
+            "']",
+      );
 
       for (final file in files) {
         if (file.path.endsWith('.dart') &&
@@ -114,17 +123,21 @@ void main() {
           for (final match in getRegex.allMatches(content)) {
             usedKeys.add(match.group(1)!);
           }
-          for (final match in getWithRegex.allMatches(content)) {
-            usedKeys.add(match.group(1)!);
-          }
         }
       }
 
       final enKeys = AppLocalizations.localizedValues['en']!.keys.toSet();
       final deKeys = AppLocalizations.localizedValues['de']!.keys.toSet();
 
-      final missingInEn = usedKeys.difference(enKeys);
-      final missingInDe = usedKeys.difference(deKeys);
+      // Filter out dynamic keys that use string interpolation templates
+      final missingInEn = usedKeys
+          .difference(enKeys)
+          .where((k) => !k.contains(r'${'))
+          .toSet();
+      final missingInDe = usedKeys
+          .difference(deKeys)
+          .where((k) => !k.contains(r'${'))
+          .toSet();
 
       expect(
         missingInEn,
