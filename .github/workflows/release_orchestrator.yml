@@ -79,6 +79,11 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+      - name: Decode google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > nexscore/android/app/google-services.json
+        if: env.HAS_ANDROID_SECRET == 'true'
+        env:
+          HAS_ANDROID_SECRET: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 != '' }}
       - name: Build APK
         run: |
           flutter build apk --release \
@@ -111,6 +116,11 @@ jobs:
         with:
           channel: 'stable'
           cache: true
+      - name: Decode GoogleService-Info.plist
+        run: echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" | base64 -d > nexscore/ios/Runner/GoogleService-Info.plist
+        if: env.HAS_IOS_SECRET == 'true'
+        env:
+          HAS_IOS_SECRET: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_BASE64 != '' }}
       - name: Build IPA (Unsigned)
         run: |
           flutter build ipa --no-codesign --release \
@@ -160,6 +170,12 @@ jobs:
           build-args: |
             APP_VERSION=${{ needs.version-calc.outputs.version_name }}
             IS_BETA=${{ github.event.inputs.release_type == 'beta' }}
+            FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
+            FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }}
+            FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
+            FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}
+            FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+            FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
           tags: |
             ${{ steps.image_name.outputs.IMAGE_NAME }}:latest
             ${{ steps.image_name.outputs.IMAGE_NAME }}:${{ needs.version-calc.outputs.docker_tag }}

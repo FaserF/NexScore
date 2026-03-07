@@ -57,3 +57,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase configuration files (managed via GitHub Secrets in CI/CD)
+google-services.json
+GoogleService-Info.plist
+ios/Runner/google-services.json
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json

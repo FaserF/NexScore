@@ -66,6 +66,13 @@ jobs:
             DEPLOY_VERSION="${{ inputs.version_name }}"
           fi
 
+          # Inject Firebase Secrets into index.html
+          if [ -f "web/index.html" ]; then
+            sed -i "s/PLACEHOLDER_FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY }}/g" web/index.html
+            sed -i "s/PLACEHOLDER_FIREBASE_APP_ID/${{ secrets.FIREBASE_APP_ID }}/g" web/index.html
+            sed -i "s/PLACEHOLDER_FIREBASE_MEASUREMENT_ID/${{ secrets.FIREBASE_MEASUREMENT_ID }}/g" web/index.html
+          fi
+
           flutter pub get
           flutter build web --release --base-href "/NexScore/" \
             --dart-define=APP_VERSION=${DEPLOY_VERSION} \

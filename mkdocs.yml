@@ -51,7 +51,7 @@ nav:
       - Architecture: dev_guide/architecture.md
       - Tech Stack: dev_guide/tech_stack.md
       - Setup & CI/CD: dev_guide/setup.md
-      - Authentication Setup: AUTH_SETUP.md
+      - Authentication Setup: dev_guide/firebase_setup.md
   - Release Notes: release_notes.md
   - Community:
       - Discussions: https://github.com/FaserF/NexScore/discussions

@@ -155,6 +155,31 @@
       return false;
     };
   </script>
+
+  <!-- Firebase SDKs & Analytics -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-analytics.js";
+
+    // These values should be injected at build time or handled via Dart
+    const firebaseConfig = {
+      apiKey: "PLACEHOLDER_FIREBASE_API_KEY",
+      authDomain: "nexscore-app.firebaseapp.com",
+      projectId: "nexscore-app",
+      storageBucket: "nexscore-app.firebasestorage.app",
+      messagingSenderId: "96410867697",
+      appId: "PLACEHOLDER_FIREBASE_APP_ID",
+      measurementId: "PLACEHOLDER_FIREBASE_MEASUREMENT_ID"
+    };
+
+    // Initialize Firebase only if placeholders are replaced
+    if (firebaseConfig.apiKey !== "PLACEHOLDER_FIREBASE_API_KEY") {
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      console.log("Firebase Analytics initialized");
+    }
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 

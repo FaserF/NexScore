@@ -50,7 +50,7 @@ NexScore supports two cloud backup methods via Firebase Authentication:
 - **Google Sign-In** → Cloud Firestore sync (planned).
 - **GitHub Sign-In** → Private **GitHub Gist** backup/restore via `GistSyncService` (`lib/core/sync/gist_sync_service.dart`).
 
-> For detailed setup instructions, see [AUTH_SETUP.md](AUTH_SETUP.md).
+> For detailed setup instructions, see [firebase_setup.md](dev_guide/firebase_setup.md).
 
 ---
 

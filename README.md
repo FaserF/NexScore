@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/FaserF/NexScore/actions?query=workflow%3Atest"><img alt="Tests" src="https://github.com/FaserF/NexScore/actions/workflows/test.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/FaserF/NexScore/actions/workflows/ci_orchestrator.yml"><img alt="Tests" src="https://github.com/FaserF/NexScore/actions/workflows/ci_orchestrator.yml/badge.svg"></a>
   <a href="https://github.com/FaserF/NexScore/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/FaserF/NexScore"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
 </p>
