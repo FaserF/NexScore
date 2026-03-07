@@ -169,6 +169,15 @@ class AppLocalizations {
       'settings_pwa_install': 'Install NexScore',
       'settings_pwa_install_desc':
           'Install NexScore on your home screen for a better experience and offline access.',
+      'settings_pwa_guide_title': 'Installation Guide',
+      'settings_pwa_guide_msg':
+          'Your device or browser doesn\'t support automatic installation. You can still add NexScore to your home screen manually:',
+      'settings_pwa_guide_ios':
+          'Safari: Tap the Share button [icon] and then "Add to Home Screen".',
+      'settings_pwa_guide_android':
+          'Chrome: Tap the menu button (three dots) and then "Install App".',
+      'settings_pwa_guide_windows':
+          'Edge/Chrome: Tap the Install icon in the address bar or the "..." menu and then "Install NexScore".',
       'multiplayer_firebase_missing': 'Firebase not configured',
       'multiplayer_firebase_missing_desc':
           'Multiplayer requires Firebase. Please configure environment variables or secrets.',
@@ -189,6 +198,7 @@ class AppLocalizations {
       'multiplayer_domains_title': 'Authorized Domains',
       'multiplayer_domains_desc':
           'Ensure your current domain is added to Firebase Authorized Domains.',
+      'multiplayer_diagnostics_timeout': '• Connection timed out (10s)',
 
       // ── Wizard
       'wizard_title': 'Wizard',
@@ -635,6 +645,9 @@ class AppLocalizations {
       'account_sign_in_github': 'Sign in with GitHub (Gist)',
       'account_sync_active': 'Sync active',
       'account_sync_github': 'Gist Sync active',
+      'account_guest': 'Guest',
+      'account_guest_status': 'Guest Session',
+      'account_guest_sync_label': 'Sync inactive (Local only)',
       'account_sign_out': 'Sign Out',
       'account_sign_in_error': 'Sign-in failed: {0}',
       'account_data_stay_note':
@@ -1339,6 +1352,15 @@ class AppLocalizations {
       'settings_pwa_install': 'NexScore installieren',
       'settings_pwa_install_desc':
           'Installiere NexScore auf deinem Startbildschirm für eine bessere Erfahrung und Offline-Zugriff.',
+      'settings_pwa_guide_title': 'Installations-Anleitung',
+      'settings_pwa_guide_msg':
+          'Dein Gerät oder Browser unterstützt keine automatische Installation. Du kannst NexScore manuell zum Startbildschirm hinzufügen:',
+      'settings_pwa_guide_ios':
+          'Safari: Tippe auf den Teilen-Button [icon] und wähle "Zum Home-Bildschirm".',
+      'settings_pwa_guide_android':
+          'Chrome: Tippe auf das Drei-Punkte-Menü und wähle "App installieren".',
+      'settings_pwa_guide_windows':
+          'Edge/Chrome: Klicke auf das Installations-Symbol in der Adressleiste oder wähle "App installieren" im Menü.',
       'multiplayer_firebase_missing': 'Firebase nicht konfiguriert',
       'multiplayer_firebase_missing_desc':
           'Multiplayer erfordert Firebase. Bitte konfiguriere Umgebungsvariablen oder Secrets.',
@@ -1359,6 +1381,7 @@ class AppLocalizations {
       'multiplayer_domains_title': 'Autorisierte Domains',
       'multiplayer_domains_desc':
           'Stelle sicher, dass deine aktuelle Domain in der Firebase Console unter "Authorized Domains" hinterlegt ist.',
+      'multiplayer_diagnostics_timeout': '• Zeitüberschreitung (10s)',
 
       // ── Wizard
       'wizard_title': 'Wizard',
@@ -1756,10 +1779,13 @@ class AppLocalizations {
       'account_sign_in_github': 'Mit GitHub anmelden (Gist)',
       'account_sync_active': 'Sync aktiv',
       'account_sync_github': 'Gist Sync aktiv',
+      'account_guest': 'Gast',
+      'account_guest_status': 'Gast-Sitzung',
+      'account_guest_sync_label': 'Sync inaktiv (Nur lokal)',
       'account_sign_out': 'Abmelden',
       'account_sign_in_error': 'Anmeldung fehlgeschlagen: {0}',
       'account_data_stay_note':
-          'Deine lokalen Daten bleiben auf diesem Gerät gespeichert, wenn du dich abmeldest.',
+          'Deine lokalen Daten bleiben beim Abmelden auf diesem Gerät gespeichert.',
       'error_name_taken': 'Ein Spieler mit diesem Namen existiert bereits.',
 
       // ── SipDeck Cards (DE)

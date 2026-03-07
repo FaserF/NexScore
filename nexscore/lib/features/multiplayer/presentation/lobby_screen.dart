@@ -61,11 +61,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ],
             ),
           );
-        } else if (message.contains('unavailable')) {
+        } else if (message.contains('unavailable') ||
+            message.contains('firestore_timeout')) {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text(l10n.get('multiplayer_firebase_missing')),
+              title: Text(l10n.get('multiplayer_diagnostics')),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,6 +75,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   const SizedBox(height: 12),
                   Text('• ${l10n.get('multiplayer_adblock_title')}'),
                   Text('• ${l10n.get('multiplayer_domains_title')}'),
+                  const SizedBox(height: 12),
+                  Text(l10n.get('multiplayer_diagnostics_timeout')),
                 ],
               ),
               actions: [

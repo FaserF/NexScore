@@ -63,7 +63,8 @@ jobs:
           cache: true
 
       - name: Build Web App (PWA)
-        if: ${{ inputs.web_artifact_name == '' && (inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true) || github.event_name == 'push') }}
+        # ONLY build if no pre-built artifact is provided AND deployment is requested
+        if: ${{ (inputs.web_artifact_name == '' || inputs.web_artifact_name == null) && (inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true)) }}
         run: |
           if [ "${{ inputs.version_name || 'latest' }}" == "latest" ]; then
             APP_VERSION=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)
@@ -80,7 +81,7 @@ jobs:
           fi
 
           flutter pub get
-          flutter build web --release --base-href "/NexScore/" \
+          flutter build web --release --no-pub --base-href "/NexScore/" \
             --dart-define=APP_VERSION=${DEPLOY_VERSION} \
             --dart-define=IS_BETA=${{ inputs.is_beta || false }} \
             --dart-define=FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \

@@ -1,5 +1,8 @@
 # Authentication & Data Sync – Setup Guide
 
+> [!IMPORTANT]
+> This guide is for developers. For automated deployment and secret management, please refer to the **[CI/CD Architecture Guide](ci_cd.md)**.
+
 Complete developer guide for configuring **Google Sign-In** (Firestore) and **GitHub Sign-In** (Gist Backup) across all NexScore platforms.
 
 ---

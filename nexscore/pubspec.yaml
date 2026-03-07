@@ -34,6 +34,13 @@ dependencies:
   appinio_swiper: ^2.1.1
   confetti: ^0.8.0
 
+dependency_overrides:
+  _fe_analyzer_shared: 97.0.0
+  analyzer: 11.0.0
+  analyzer_buffer: 0.3.1
+  dart_style: 3.1.7
+  meta: 1.18.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

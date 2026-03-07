@@ -80,13 +80,19 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     bool isUnique = false;
     while (!isUnique) {
       roomCode = _generateRoomCode();
-      final doc = await _firestore
-          .collection('lobbies')
-          .doc(roomCode)
-          .get()
-          .timeout(const Duration(seconds: 10));
-      if (!doc.exists) {
-        isUnique = true;
+      try {
+        final doc = await _firestore
+            .collection('lobbies')
+            .doc(roomCode)
+            .get()
+            .timeout(const Duration(seconds: 10));
+        if (!doc.exists) {
+          isUnique = true;
+        }
+      } on TimeoutException {
+        throw Exception('firestore_timeout');
+      } catch (e) {
+        rethrow;
       }
     }
 
@@ -107,11 +113,15 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
       createdAt: DateTime.now(),
     );
 
-    await _firestore
-        .collection('lobbies')
-        .doc(roomCode)
-        .set(lobby.toMap())
-        .timeout(const Duration(seconds: 10));
+    try {
+      await _firestore
+          .collection('lobbies')
+          .doc(roomCode)
+          .set(lobby.toMap())
+          .timeout(const Duration(seconds: 10));
+    } on TimeoutException {
+      throw Exception('firestore_timeout');
+    }
     _listenToLobby(roomCode);
 
     return roomCode;
@@ -128,7 +138,12 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     roomCode = roomCode.toUpperCase();
 
     final docRef = _firestore.collection('lobbies').doc(roomCode);
-    final docSnap = await docRef.get().timeout(const Duration(seconds: 10));
+    final DocumentSnapshot docSnap;
+    try {
+      docSnap = await docRef.get().timeout(const Duration(seconds: 10));
+    } on TimeoutException {
+      throw Exception('firestore_timeout');
+    }
 
     if (!docSnap.exists) {
       throw Exception('Lobby not found');
@@ -151,9 +166,13 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     );
 
     // Atomic update to add the user
-    await docRef
-        .update({'users.$uid': joinUser.toMap()})
-        .timeout(const Duration(seconds: 10));
+    try {
+      await docRef
+          .update({'users.$uid': joinUser.toMap()})
+          .timeout(const Duration(seconds: 10));
+    } on TimeoutException {
+      throw Exception('firestore_timeout');
+    }
 
     _listenToLobby(roomCode);
   }
@@ -165,13 +184,21 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     final roomCode = _currentLobby!.id;
     final docRef = _firestore.collection('lobbies').doc(roomCode);
 
-    if (isHost) {
-      // Host leaves -> destroy lobby or close it
-      await docRef.update({'state': LobbyState.closed.name});
-      // Optionally delete the document entirely: await docRef.delete();
-    } else {
-      // Client leaves -> remove from users
-      await docRef.update({'users.$_uid': FieldValue.delete()});
+    try {
+      if (isHost) {
+        // Host leaves -> destroy lobby or close it
+        await docRef
+            .update({'state': LobbyState.closed.name})
+            .timeout(const Duration(seconds: 5));
+      } else {
+        // Client leaves -> remove from users
+        await docRef
+            .update({'users.$_uid': FieldValue.delete()})
+            .timeout(const Duration(seconds: 5));
+      }
+    } catch (e) {
+      debugPrint('Error leaving lobby: $e');
+      // Silently fail leave or log it, but don't block user if they are just quitting
     }
 
     await _lobbySubscription?.cancel();

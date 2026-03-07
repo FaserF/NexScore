@@ -51,6 +51,7 @@ nav:
       - Architecture: dev_guide/architecture.md
       - Tech Stack: dev_guide/tech_stack.md
       - Setup & CI/CD: dev_guide/setup.md
+      - CI/CD Architecture: dev_guide/ci_cd.md
       - Authentication Setup: dev_guide/firebase_setup.md
   - Release Notes: release_notes.md
   - Community:

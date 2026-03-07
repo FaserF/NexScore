@@ -7,7 +7,7 @@ import 'package:nexscore/core/i18n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:nexscore/features/players/repository/player_repository.dart';
 import 'package:nexscore/features/history/repository/session_repository.dart';
-import 'package:nexscore/features/auth/presentation/profile_screen.dart';
+import 'package:nexscore/features/auth/providers/auth_providers.dart';
 import 'package:nexscore/core/models/player_model.dart';
 import 'package:nexscore/core/models/session_model.dart';
 import '../../mocks/mock_multiplayer_service.dart';

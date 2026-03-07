@@ -11,6 +11,8 @@ import '../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../core/utils/app_version.dart';
 
 import '../../../core/pwa/pwa_prompt.dart' as pwa;
+import '../../../core/pwa/pwa_install_dialog.dart';
+import '../../auth/providers/auth_providers.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -40,6 +42,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final l10n = AppLocalizations.of(context);
     final settings = ref.watch(settingsProvider);
     final canInstall = pwa.canShowInstallPrompt();
+    final authUser = ref.watch(authUserProvider).asData?.value;
 
     return Scaffold(
       body: CustomScrollView(
@@ -174,8 +177,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _SectionHeader(title: l10n.get('settings_pwa_install')),
                   AnimatedScaleButton(
                     onPressed: () async {
-                      final accepted = await pwa.showInstallPrompt();
-                      if (accepted && mounted) {
+                      final handled = await pwa.showInstallPrompt();
+                      if (!handled && mounted) {
+                        // If prompt wasn't shown (e.g. iOS or prompt blocked), show the guide
+                        PWAInstallDialog.show(context);
+                      } else if (mounted) {
                         setState(() {});
                       }
                     },
@@ -333,7 +339,62 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ],
                   ),
                 ),
-
+                if (authUser != null) ...[
+                  const SizedBox(height: 24),
+                  AnimatedScaleButton(
+                    onPressed: () async {
+                      await ref.read(authServiceProvider).signOut();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.get('account_sign_out')),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: GlassContainer(
+                      borderRadius: 24,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.error.withValues(alpha: 0.05),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.error.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.logout,
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        title: Text(
+                          l10n.get('account_sign_out'),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 24),
                 Center(
                   child: Column(

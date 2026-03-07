@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,7 +49,10 @@ class SettingsNotifier extends Notifier<Settings> {
     // Initial state is system theme and default locale.
     // _loadSettings will update this asynchronously.
     _loadSettings();
-    return const Settings(themeMode: ThemeMode.system);
+    return Settings(
+      themeMode: ThemeMode.system,
+      hostName: _generateDefaultName(),
+    );
   }
 
   Future<void> _loadSettings() async {
@@ -62,7 +66,7 @@ class SettingsNotifier extends Notifier<Settings> {
     final localeCode = prefs.getString(_localeKey);
     final locale = localeCode != null ? Locale(localeCode) : null;
 
-    final hostName = prefs.getString(_hostNameKey) ?? 'Player';
+    final hostName = prefs.getString(_hostNameKey) ?? _generateDefaultName();
     final hostColor = prefs.getString(_hostColorKey) ?? '#4287f5';
 
     state = Settings(
@@ -71,6 +75,12 @@ class SettingsNotifier extends Notifier<Settings> {
       hostName: hostName,
       hostColor: hostColor,
     );
+  }
+
+  String _generateDefaultName() {
+    final random = math.Random();
+    final number = 10000 + random.nextInt(90000); // 5-digit random number
+    return 'Player#$number';
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {

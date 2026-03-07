@@ -1,182 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../core/i18n/app_localizations.dart';
-import '../../../core/utils/logger.dart';
-import '../../../core/error/failures.dart';
-import '../../../core/error/result.dart';
+import '../providers/auth_providers.dart';
 import '../../../core/sync/gist_sync_service.dart';
 
-/// Provider for the current Firebase Auth user (null = signed out / anonymous).
-final authUserProvider = StreamProvider<User?>((ref) {
-  try {
-    return FirebaseAuth.instance.authStateChanges().handleError((error) {
-      debugPrint('FirebaseAuth Stream Error: $error');
-      // Yield null user on any error like Firebase not configured
-      return null;
-    });
-  } catch (e) {
-    debugPrint('FirebaseAuth Initial Error: $e');
-    return Stream.value(null);
-  }
-});
-
-/// Auth service encapsulating Google Sign-In and sign-out logic.
-class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  Future<Result<UserCredential>> signInWithGoogle() async {
-    final stopwatch = Stopwatch()..start();
-    try {
-      final googleProvider = GoogleAuthProvider();
-      final credential = await _auth.signInWithPopup(googleProvider);
-      AppLogger.info(
-        'Google Sign-In (Popup) successful',
-        tag: 'Auth',
-        metadata: {
-          'duration': '${stopwatch.elapsedMilliseconds}ms',
-          'uid': credential.user?.uid,
-        },
-      );
-      return Result.success(credential);
-    } catch (e, stack) {
-      AppLogger.error(
-        'Google Sign-In (Popup) failed',
-        tag: 'Auth',
-        error: e,
-        stackTrace: stack,
-      );
-      return Result.failure(
-        AuthFailure('Sign-in failed', error: e, stackTrace: stack),
-      );
-    }
-  }
-
-  Future<Result<UserCredential>> signInWithGoogleNative() async {
-    final stopwatch = Stopwatch()..start();
-    try {
-      // Check if Firebase is available
-      try {
-        Firebase.app();
-      } catch (_) {
-        return Result.failure(
-          const AuthFailure(
-            'Firebase not initialized. Check your Web configuration/Secrets.',
-          ),
-        );
-      }
-
-      final googleProvider = GoogleAuthProvider();
-      UserCredential credential;
-      if (kIsWeb) {
-        // Use popup on web for better reliability on GitHub Pages
-        credential = await _auth.signInWithPopup(googleProvider);
-      } else {
-        credential = await _auth.signInWithProvider(googleProvider);
-      }
-      AppLogger.info(
-        'Google Sign-In successful',
-        tag: 'Auth',
-        metadata: {
-          'duration': '${stopwatch.elapsedMilliseconds}ms',
-          'uid': credential.user?.uid,
-          'platform': kIsWeb ? 'web' : 'native',
-        },
-      );
-      return Result.success(credential);
-    } catch (e, stack) {
-      AppLogger.error(
-        'Google Sign-In failed',
-        tag: 'Auth',
-        error: e,
-        stackTrace: stack,
-      );
-      if (e is FirebaseException && e.code == 'core/no-app') {
-        return Result.failure(
-          AuthFailure(
-            'Cloud sync is not configured for this app instance.',
-            error: e,
-            stackTrace: stack,
-          ),
-        );
-      }
-      return Result.failure(
-        AuthFailure('Sign-in failed', error: e, stackTrace: stack),
-      );
-    }
-  }
-
-  Future<Result<UserCredential>> signInWithGithub() async {
-    final stopwatch = Stopwatch()..start();
-    try {
-      // Check if Firebase is available
-      try {
-        Firebase.app();
-      } catch (_) {
-        return Result.failure(
-          const AuthFailure(
-            'Firebase not initialized. Check your Web configuration/Secrets.',
-          ),
-        );
-      }
-
-      final githubProvider = GithubAuthProvider();
-      githubProvider.addScope('gist');
-      githubProvider.setCustomParameters({'allow_signup': 'false'});
-
-      UserCredential credential;
-      if (kIsWeb) {
-        // Use popup on web for better reliability on GitHub Pages
-        credential = await _auth.signInWithPopup(githubProvider);
-      } else {
-        credential = await _auth.signInWithProvider(githubProvider);
-      }
-      AppLogger.info(
-        'GitHub Sign-In successful',
-        tag: 'Auth',
-        metadata: {
-          'duration': '${stopwatch.elapsedMilliseconds}ms',
-          'uid': credential.user?.uid,
-          'platform': kIsWeb ? 'web' : 'native',
-        },
-      );
-      return Result.success(credential);
-    } catch (e, stack) {
-      AppLogger.error(
-        'GitHub Sign-In failed',
-        tag: 'Auth',
-        error: e,
-        stackTrace: stack,
-      );
-      return Result.failure(
-        AuthFailure('GitHub Sign-in failed', error: e, stackTrace: stack),
-      );
-    }
-  }
-
-  Future<Result<void>> signOut() async {
-    try {
-      await _auth.signOut();
-      AppLogger.info('Sign-out successful', tag: 'Auth');
-      return const Result.success(null);
-    } catch (e, stack) {
-      AppLogger.error(
-        'Sign-out failed',
-        tag: 'Auth',
-        error: e,
-        stackTrace: stack,
-      );
-      return Result.failure(
-        AuthFailure('Sign-out failed', error: e, stackTrace: stack),
-      );
-    }
-  }
-}
-
-final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 final gistSyncServiceProvider = Provider<GistSyncService>(
   (ref) => GistSyncService(),
 );
@@ -398,6 +227,7 @@ class _SignedInView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isGitHub = _isGitHubProvider;
+    final isGuest = user.isAnonymous;
 
     return Padding(
       padding: const EdgeInsets.all(24.0),
@@ -407,33 +237,52 @@ class _SignedInView extends StatelessWidget {
           const SizedBox(height: 24),
           CircleAvatar(
             radius: 48,
-            backgroundImage: user.photoURL != null
+            backgroundColor: isGuest ? Colors.grey.shade200 : null,
+            backgroundImage: !isGuest && user.photoURL != null
                 ? NetworkImage(user.photoURL!)
                 : null,
-            child: user.photoURL == null
-                ? const Icon(Icons.person, size: 48)
+            child: isGuest || user.photoURL == null
+                ? Icon(isGuest ? Icons.person_outline : Icons.person, size: 48)
                 : null,
           ),
           const SizedBox(height: 16),
           Text(
-            user.displayName ?? 'NexScore User',
+            isGuest
+                ? l10n.get('account_guest')
+                : (user.displayName ?? 'NexScore User'),
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
-          Text(user.email ?? '', style: const TextStyle(color: Colors.grey)),
+          if (!isGuest)
+            Text(user.email ?? '', style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 8),
           Chip(
             label: Text(
-              isGitHub
-                  ? l10n.get('account_sync_github')
-                  : l10n.get('account_sync_active'),
+              isGuest
+                  ? l10n.get('account_guest_sync_label')
+                  : (isGitHub
+                        ? l10n.get('account_sync_github')
+                        : l10n.get('account_sync_active')),
             ),
-            avatar: Icon(isGitHub ? Icons.code : Icons.cloud_done, size: 16),
-            backgroundColor: Colors.green.shade100,
+            avatar: Icon(
+              isGuest
+                  ? Icons.cloud_off
+                  : (isGitHub ? Icons.code : Icons.cloud_done),
+              size: 16,
+            ),
+            backgroundColor: isGuest
+                ? Colors.orange.shade100
+                : Colors.green.shade100,
           ),
           const SizedBox(height: 48),
 
           // ── Provider-specific sync tile ──
-          if (isGitHub) ...[
+          if (isGuest) ...[
+            ListTile(
+              leading: const Icon(Icons.info_outline, color: Colors.orange),
+              title: Text(l10n.get('account_guest_status')),
+              subtitle: Text(l10n.get('account_signed_out_body')),
+            ),
+          ] else if (isGitHub) ...[
             ListTile(
               leading: const Icon(Icons.backup),
               title: const Text('GitHub Gist Backup'),

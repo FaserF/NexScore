@@ -139,9 +139,9 @@
     });
 
     window.flutterCanShowInstallPrompt = () => {
-      // Return true if we have a prompt and we're not already standalone
+      // Return true if we're on web and not already standalone
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-      return !!deferredPrompt && !isStandalone;
+      return !isStandalone;
     };
 
     window.flutterShowInstallPrompt = async () => {
