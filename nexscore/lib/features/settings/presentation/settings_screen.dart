@@ -178,11 +178,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   AnimatedScaleButton(
                     onPressed: () async {
                       final handled = await pwa.showInstallPrompt();
-                      if (!handled && mounted) {
-                        // If prompt wasn't shown (e.g. iOS or prompt blocked), show the guide
-                        PWAInstallDialog.show(context);
-                      } else if (mounted) {
-                        setState(() {});
+                      if (context.mounted) {
+                        if (!handled) {
+                          // If prompt wasn't shown (e.g. iOS or prompt blocked), show the guide
+                          PWAInstallDialog.show(context);
+                        } else {
+                          setState(() {});
+                        }
                       }
                     },
                     child: GlassContainer(
@@ -343,9 +345,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: 24),
                   AnimatedScaleButton(
                     onPressed: () async {
+                      final messenger = ScaffoldMessenger.of(context);
                       await ref.read(authServiceProvider).signOut();
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           SnackBar(
                             content: Text(l10n.get('account_sign_out')),
                             behavior: SnackBarBehavior.floating,
@@ -448,6 +451,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     WidgetRef ref,
     AppLocalizations l10n,
   ) async {
+    final messenger = ScaffoldMessenger.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -474,7 +478,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ref.invalidate(sessionsProvider);
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(content: Text(l10n.get('settings_db_reset_success'))),
         );
       }

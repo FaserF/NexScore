@@ -56,7 +56,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     Navigator.of(context).pop(); // Pop dialog
                     context.pop(); // Go back from lobby screen
                   },
-                  child: const Text('OK'),
+                  child: Text(l10n.get('ok')),
                 ),
               ],
             ),
@@ -85,15 +85,19 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     Navigator.of(context).pop();
                     context.pop();
                   },
-                  child: const Text('OK'),
+                  child: Text(l10n.get('ok')),
                 ),
               ],
             ),
           );
         } else {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error hosting lobby: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                l10n.getWith('multiplayer_error_host', [e.toString()]),
+              ),
+            ),
+          );
           context.pop();
         }
       }
@@ -117,64 +121,72 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       ),
       body: _isHosting
           ? const Center(child: CircularProgressIndicator())
-          : lobby == null
-          ? const Center(child: Text('Lobby closed.'))
           : Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(32),
-                  width: double.infinity,
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: Column(
-                    children: [
-                      Text(
-                        l10n.get('multiplayer_room_code').toUpperCase(),
-                        style: const TextStyle(letterSpacing: 2),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        lobby.id,
-                        style: Theme.of(context).textTheme.displayLarge
-                            ?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 8,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: lobby.users.length,
-                    itemBuilder: (context, index) {
-                      final user = lobby.users.values.elementAt(index);
-                      return ListTile(
-                        leading: const CircleAvatar(child: Icon(Icons.person)),
-                        title: Text(user.name),
-                        trailing: user.isHost
-                            ? const Icon(Icons.star, color: Colors.amber)
-                            : null,
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: FilledButton(
-                    onPressed: lobby.users.length > 1
-                        ? () {
-                            // Start Game logic
-                          }
-                        : null,
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 60),
+                if (lobby == null)
+                  Expanded(
+                    child: Center(
+                      child: Text(l10n.get('multiplayer_lobby_closed')),
                     ),
-                    child: Text(
-                      l10n.get('home_choose_game'),
-                      style: const TextStyle(fontSize: 18),
+                  )
+                else ...[
+                  Container(
+                    padding: const EdgeInsets.all(32),
+                    width: double.infinity,
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    child: Column(
+                      children: [
+                        Text(
+                          l10n.get('multiplayer_room_code').toUpperCase(),
+                          style: const TextStyle(letterSpacing: 2),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          lobby.id,
+                          style: Theme.of(context).textTheme.displayLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 8,
+                              ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: lobby.users.length,
+                      itemBuilder: (context, index) {
+                        final user = lobby.users.values.elementAt(index);
+                        return ListTile(
+                          leading: const CircleAvatar(
+                            child: Icon(Icons.person),
+                          ),
+                          title: Text(user.name),
+                          trailing: user.isHost
+                              ? const Icon(Icons.star, color: Colors.amber)
+                              : null,
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: FilledButton(
+                      onPressed: lobby.users.length > 1
+                          ? () {
+                              // Start Game logic
+                            }
+                          : null,
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 60),
+                      ),
+                      child: Text(
+                        l10n.get('home_choose_game'),
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
     );

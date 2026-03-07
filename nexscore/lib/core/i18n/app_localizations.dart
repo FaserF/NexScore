@@ -199,6 +199,8 @@ class AppLocalizations {
       'multiplayer_domains_desc':
           'Ensure your current domain is added to Firebase Authorized Domains.',
       'multiplayer_diagnostics_timeout': '• Connection timed out (10s)',
+      'multiplayer_lobby_closed': 'Lobby closed.',
+      'multiplayer_error_host': 'Error hosting lobby: {0}',
 
       // ── Wizard
       'wizard_title': 'Wizard',
@@ -649,6 +651,11 @@ class AppLocalizations {
       'account_guest_status': 'Guest Session',
       'account_guest_sync_label': 'Sync inactive (Local only)',
       'account_sign_out': 'Sign Out',
+      'account_default_name': 'NexScore User',
+      'account_gist_backup_title': 'GitHub Gist Backup',
+      'account_gist_backup_desc': 'Backup your data to a private Gist',
+      'account_gist_restore_title': 'Restore from Gist',
+      'account_gist_restore_desc': 'Download your data from GitHub',
       'account_sign_in_error': 'Sign-in failed: {0}',
       'account_data_stay_note':
           'Your local data remains on this device when you sign out.',
@@ -1382,6 +1389,8 @@ class AppLocalizations {
       'multiplayer_domains_desc':
           'Stelle sicher, dass deine aktuelle Domain in der Firebase Console unter "Authorized Domains" hinterlegt ist.',
       'multiplayer_diagnostics_timeout': '• Zeitüberschreitung (10s)',
+      'multiplayer_lobby_closed': 'Lobby geschlossen.',
+      'multiplayer_error_host': 'Fehler beim Erstellen der Lobby: {0}',
 
       // ── Wizard
       'wizard_title': 'Wizard',
@@ -1783,6 +1792,11 @@ class AppLocalizations {
       'account_guest_status': 'Gast-Sitzung',
       'account_guest_sync_label': 'Sync inaktiv (Nur lokal)',
       'account_sign_out': 'Abmelden',
+      'account_default_name': 'NexScore Nutzer',
+      'account_gist_backup_title': 'GitHub Gist Backup',
+      'account_gist_backup_desc': 'Sichere deine Daten in einem privaten Gist',
+      'account_gist_restore_title': 'Wiederherstellen von Gist',
+      'account_gist_restore_desc': 'Lade deine Daten von GitHub herunter',
       'account_sign_in_error': 'Anmeldung fehlgeschlagen: {0}',
       'account_data_stay_note':
           'Deine lokalen Daten bleiben beim Abmelden auf diesem Gerät gespeichert.',

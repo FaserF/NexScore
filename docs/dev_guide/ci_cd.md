@@ -50,6 +50,12 @@ If the Web app doesn't update on GitHub Pages:
 1.  Check the `Deploy Docs & PWA` step in the CI Orchestrator logs.
 2.  Ensure the `web_artifact_name` matches the name used in the `Upload Web Artifact` step.
 3.  Verify that the `firebase_options_web.dart` contains valid credentials or that the appropriate GitHub Secrets are set.
+### Android Build Stability (AGP 9+ Issues)
+Flutter plugins often lag behind the "bleeding edge" versions of the Android Gradle Plugin (AGP). To ensure stable builds:
+1.  **Gradle**: Standardized on version `8.10.2` in `gradle-wrapper.properties`. Avoid `9.x` until Flutter plugin compatibility is confirmed.
+2.  **AGP**: Standardized on version `8.7.3` in `settings.gradle.kts`.
+3.  **Kotlin**: Explicitly apply `org.jetbrains.kotlin.android` version `2.1.10` in both `settings.gradle.kts` and `app/build.gradle.kts` to satisfy newer AGP requirements while maintaining compatibility.
+4.  **Java/JVM**: The pipeline is configured for **Java 17** (`jvmToolchain(17)`).
 
 ---
 *Last updated: 2026-03-08*

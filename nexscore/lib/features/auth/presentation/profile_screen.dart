@@ -249,7 +249,7 @@ class _SignedInView extends StatelessWidget {
           Text(
             isGuest
                 ? l10n.get('account_guest')
-                : (user.displayName ?? 'NexScore User'),
+                : (user.displayName ?? l10n.get('account_default_name')),
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           if (!isGuest)
@@ -285,8 +285,8 @@ class _SignedInView extends StatelessWidget {
           ] else if (isGitHub) ...[
             ListTile(
               leading: const Icon(Icons.backup),
-              title: const Text('GitHub Gist Backup'),
-              subtitle: const Text('Backup your data to a private Gist'),
+              title: Text(l10n.get('account_gist_backup_title')),
+              subtitle: Text(l10n.get('account_gist_backup_desc')),
               trailing: IconButton(
                 icon: const Icon(Icons.cloud_upload),
                 onPressed: () => _backupToGist(context),
@@ -295,8 +295,8 @@ class _SignedInView extends StatelessWidget {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.cloud_download),
-              title: const Text('Restore from Gist'),
-              subtitle: const Text('Download your data from GitHub'),
+              title: Text(l10n.get('account_gist_restore_title')),
+              subtitle: Text(l10n.get('account_gist_restore_desc')),
               trailing: IconButton(
                 icon: const Icon(Icons.download),
                 onPressed: () => _restoreFromGist(context),
