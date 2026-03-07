@@ -17,6 +17,7 @@ class HelpScreen extends StatelessWidget {
   static const String _discussUrl =
       'https://github.com/FaserF/NexScore/discussions';
   static const String _repoUrl = 'https://github.com/FaserF/NexScore';
+  static const String _multiplayerUrl = '${_docsUrl}user_guide/multiplayer/';
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +64,13 @@ class HelpScreen extends StatelessWidget {
                   title: l10n.get('help_settings'),
                   subtitle: l10n.get('settings'),
                   onTap: () => context.push('/profile/settings'),
+                ),
+                const SizedBox(height: 8),
+                _HelpTile(
+                  icon: Icons.people_outline,
+                  title: l10n.get('help_multiplayer'),
+                  subtitle: l10n.get('help_multiplayer_desc'),
+                  url: _multiplayerUrl,
                 ),
                 const SizedBox(height: 16),
                 _SectionHeader(

@@ -164,6 +164,8 @@ class AppLocalizations {
       'help_source': 'Source Code',
       'help_source_desc': 'NexScore is open source on GitHub.',
       'help_settings': 'App Settings',
+      'help_multiplayer': 'Multiplayer Guide',
+      'help_multiplayer_desc': 'Learn how to host and join games with friends.',
 
       // ── Wizard
       'wizard_title': 'Wizard',
@@ -503,19 +505,35 @@ class AppLocalizations {
       'sipdeck_ready': 'Ready to play?',
       'sipdeck_players_ready': '{0} players ready',
       'sipdeck_start': 'START GAME',
-      'sipdeck_tap_continue': 'Tap anywhere for next card',
+      'sipdeck_tap_continue': 'Tap anywhere for the next card',
       'sipdeck_sips': '{0} Sips',
       'sipdeck_categories': 'Categories',
       'sipdeck_select_modes': 'Which modes do you want to play?',
-      'sipdeck_optimize_2players': '2-Player optimization',
+      'sipdeck_optimize_2players': '2-Player Optimization',
       'sipdeck_optimize_2players_desc':
-          'Hide cards that aren\'t fun with only two players.',
+          'Hide cards that make little sense with only two players.',
       'sipdeck_no_players': 'Add players first to play SipDeck.',
       'sipdeck_filters': 'Task Filters',
       'sipdeck_tag_dare': 'Dares',
-      'sipdeck_tag_social': 'Social',
-      'sipdeck_tag_messaging': 'Messaging',
-      'sipdeck_tag_physical': 'Physical',
+      'sipdeck_tag_social': 'Social Interaction',
+      'sipdeck_tag_messaging': 'Messaging People',
+      'sipdeck_tag_physical': 'Physical Activity',
+      'sipdeck_tag_help_title': 'Task Filter Details',
+      'sipdeck_tag_help_dare':
+          'Dares: Activities where you have to prove yourself or perform specific actions.',
+      'sipdeck_tag_help_social':
+          'Social: Challenges involving interaction with the group or strangers.',
+      'sipdeck_tag_help_messaging':
+          'Messaging: Tasks requiring you to send texts or social media messages.',
+      'sipdeck_tag_help_physical':
+          'Physical: Activities that require physical movement like pushups or jumping.',
+
+      'sipdeck_settings': 'SipDeck Settings',
+      'sipdeck_enable_hydration': 'Hydration Cards',
+      'sipdeck_enable_hydration_desc':
+          'Occasionally inject water breaks into the game.',
+      'sipdeck_hydration_card_text':
+          '💧 Stay Hydrated! Everyone drinks a big sip of water.',
 
       // ── BuzzTap
       'buzztap_title': 'BuzzTap',
@@ -1292,6 +1310,9 @@ class AppLocalizations {
       'help_source': 'Quellcode',
       'help_source_desc': 'NexScore ist Open Source auf GitHub.',
       'help_settings': 'App-Einstellungen',
+      'help_multiplayer': 'Multiplayer-Anleitung',
+      'help_multiplayer_desc':
+          'Erfahre, wie du Spiele hostest und ihnen beitrittst.',
 
       // ── Wizard
       'wizard_title': 'Wizard',
@@ -1650,6 +1671,22 @@ class AppLocalizations {
       'sipdeck_tag_social': 'Soziale Interaktion',
       'sipdeck_tag_messaging': 'Personen anschreiben',
       'sipdeck_tag_physical': 'Körperliches',
+      'sipdeck_tag_help_title': 'Filter-Details',
+      'sipdeck_tag_help_dare':
+          'Pflichtaufgaben: Aufgaben, bei denen du dich beweisen oder bestimmte Aktionen ausführen musst.',
+      'sipdeck_tag_help_social':
+          'Soziale Interaktion: Herausforderungen, die Interaktion mit der Gruppe oder Fremden erfordern.',
+      'sipdeck_tag_help_messaging':
+          'Messaging: Aufgaben, bei denen du Nachrichten verschicken oder Postings machen musst.',
+      'sipdeck_tag_help_physical':
+          'Körperliches: Aktivitäten, die körperlichen Einsatz erfordern, wie Liegestütze oder Springen.',
+
+      'sipdeck_settings': 'SipDeck Einstellungen',
+      'sipdeck_enable_hydration': 'Hydratisierungs-Karten',
+      'sipdeck_enable_hydration_desc':
+          'Streut gelegentlich Wasserpausen in das Spiel ein.',
+      'sipdeck_hydration_card_text':
+          '💧 Hydratisieren! Alle trinken einen großen Schluck Wasser.',
 
       'sipdeck_18_warning': 'Ab 18 Jahren freigegeben.',
       'sipdeck_2player_warning':

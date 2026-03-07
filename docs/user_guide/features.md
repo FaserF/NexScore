@@ -49,15 +49,28 @@ For our party games (SipDeck & BuzzTap), we've integrated a smart sip counting s
 - **Drink Button**: Confirm you've taken your sips to automatically increment your total in the session.
 - **Skip Button**: Allows players to opt-out of a challenge without affecting their score.
 - **Real-time Counter**: Current sip tallies for all players are shown directly at the bottom of the game screen.
-- **Drink Button**: Confirm you've finished your sips. This is important for tracking long-term stats in the leaderboard.
-- **Skip Button**: If a player cannot or does not want to complete a task, the Skip button allows them to pass without an associated drink penalty.
 - **Granular Task Filters (SipDeck)**:
-    - You can now disable specific "flavors" of tasks before you start.
+    - You can disable specific "flavors" of tasks before you start. Use the **Help** button next to the filter title for detailed explanations.
     - Hate being the center of attention? Disable **Social Interaction**.
     - Don't want to text your ex? Disable **Messaging**.
     - Feeling lazy? Disable **Physical**.
+- **Hydration Cards (SipDeck)**:
+    - To ensure safety and fun, SipDeck includes optional **Hydration Cards**.
+    - These cards occasionally interrupt the game to remind everyone to drink water.
+    - Frequency adjusts automatically based on your chosen **Drink Intensity**.
 - **Smart 2-Player Optimization**:
-    - Many drinking games are built for groups. NexScore includes a toggle to hide "Group-only" cards when only 2 players are active, ensuring every card drawn is actually playable.
+    - Many drinking games are built for groups. NexScore includes a toggle to hide "Group-only" cards when only 2 players are active.
+
+## 🌐 Multiplayer & Remote Play
+
+NexScore isn't just for local games. You can play with friends across the room or across the globe.
+
+- **Host & Join**: One player hosts a session, and others join using a unique 6-digit game code.
+- **Real-time Sync**: Scores and game states are synced instantly across all connected devices.
+- **Remote Play**: Perfect for playing over Discord, Zoom, or just when sitting far apart.
+- **Cross-Platform**: Join from Android, iOS, or Web seamlessly.
+
+*(For detailed setup, see the [Multiplayer Guide](multiplayer.md))*
 
 ## ☁️ Account & Backup
 

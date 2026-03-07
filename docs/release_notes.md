@@ -1,38 +1,23 @@
-# Release Notes 📝
+# Release Notes 🚀
 
-Stay up to date with the latest changes and improvements in NexScore.
+Stay up to date with the latest improvements, game additions, and bug fixes for NexScore.
 
-## [v0.1.0] - 2026-03-05
-### Added
-- **GitHub Integration**: Sign in with GitHub and back up data to private Gists.
-- **Professional Documentation**: New MkDocs site with marketing, user, and developer guides.
-- **UI Unification**: Standardized headers and navigation across all main screens.
-- **Beta Program**: Added an optional environment banner for beta releases.
+## 📦 Latest Releases
 
-### Fixed
-- Navigation bar visibility when accessing Settings.
-- Translation of several labels in English and German.
-- Leaderboard title styling inconsistencies.
+To ensure you always have the most accurate and up-to-date information, we maintain our detailed release notes directly on GitHub.
 
-### Improved
-- Unified version display across Settings and Help screens.
-- Performance of session loading in the History screen.
+### [View all Releases on GitHub](https://github.com/FaserF/NexScore/releases)
 
 ---
 
-## [v0.0.5] - 2026-02-18
-### Added
-- **Qwixx Scoreboard**: Dedicated tracker for the Qwixx dice game.
-- **Wizard Scoreboard**: Automated point calculation for Wizard.
-- **Dark Mode Support**: Sleek slate-colored theme for night owls.
+## 🛠️ Release Channels
 
-### Fixed
-- SQLite initialization errors on certain Windows versions.
+If you want to try out features before they are officially released, you can switch to one of our pre-release channels:
+
+- **Stable**: The most reliable version, recommended for most users.
+- **Beta**: Feature-complete previews of the next major release.
+- **Dev**: The latest builds directly from our development branch.
 
 ---
 
-!!! info "Version Logic"
-    NexScore uses [Semantic Versioning](https://semver.org/).
-    - Major: Breaking changes or major launches.
-    - Minor: New features and significant UI updates.
-    - Patch: Bug fixes and minor polish.
+*For technical documentation and developer guides, please return to the [Home](../README.md).*

@@ -99,6 +99,7 @@ class SipDeckGameState {
   final Map<String, int> playerSips;
   final DrinkIntensity intensity;
   final double customIntensityMultiplier;
+  final bool enableHydrationCards;
 
   const SipDeckGameState({
     this.activePlayerIds = const [],
@@ -110,6 +111,7 @@ class SipDeckGameState {
     this.playerSips = const {},
     this.intensity = DrinkIntensity.normal,
     this.customIntensityMultiplier = 1.0,
+    this.enableHydrationCards = true,
   });
 
   SipDeckGameState copyWith({
@@ -122,6 +124,7 @@ class SipDeckGameState {
     Map<String, int>? playerSips,
     DrinkIntensity? intensity,
     double? customIntensityMultiplier,
+    bool? enableHydrationCards,
   }) {
     return SipDeckGameState(
       activePlayerIds: activePlayerIds ?? this.activePlayerIds,
@@ -135,6 +138,7 @@ class SipDeckGameState {
       intensity: intensity ?? this.intensity,
       customIntensityMultiplier:
           customIntensityMultiplier ?? this.customIntensityMultiplier,
+      enableHydrationCards: enableHydrationCards ?? this.enableHydrationCards,
     );
   }
 

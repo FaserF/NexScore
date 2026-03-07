@@ -61,6 +61,11 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     state = state.copyWith(customIntensityMultiplier: multiplier);
   }
 
+  void toggleHydrationCards(bool value) {
+    _pushState();
+    state = state.copyWith(enableHydrationCards: value);
+  }
+
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
     _pushState();
     final available = getSipDeckDatabase(l10n).where((c) {
@@ -83,6 +88,40 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     if (available.isEmpty) return;
 
     final random = Random();
+
+    // --- Hydration Card Logic ---
+    if (state.enableHydrationCards && state.playedCards.isNotEmpty) {
+      // Scale frequency based on intensity
+      double baseProbability = 0.08; // Normal (~1 in 12.5 cards)
+      if (state.intensity == DrinkIntensity.chill) {
+        baseProbability = 0.05; // ~1 in 20
+      } else if (state.intensity == DrinkIntensity.extreme) {
+        baseProbability = 0.15; // ~1 in 6.7
+      } else if (state.intensity == DrinkIntensity.custom) {
+        baseProbability = 0.08 * state.customIntensityMultiplier;
+      }
+
+      // Ensure we don't have hydration cards back-to-back
+      final lastCardWasHydration = state.playedCards.last.id == 'hydration';
+
+      if (!lastCardWasHydration && random.nextDouble() < baseProbability) {
+        final hydrationCard = SipDeckCard(
+          id: 'hydration',
+          text: l10n.get('sipdeck_hydration_card_text'),
+          emoji: '💧',
+          category: SipDeckCategory.warmUp,
+          sips: 0,
+          targetType: SipTargetType.everyone,
+          targetIds: activePlayers.map((p) => p.id).toList(),
+        );
+        state = state.copyWith(
+          playedCards: [...state.playedCards, hydrationCard],
+        );
+        return;
+      }
+    }
+    // ----------------------------
+
     final card = available[random.nextInt(available.length)];
 
     // Use localization key if available, otherwise fallback to original text

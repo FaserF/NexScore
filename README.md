@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/FaserF/NexScore/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/FaserF/NexScore/actions/workflows/test.yml/badge.svg"></a>
+  <a href="https://github.com/FaserF/NexScore/actions?query=workflow%3Atest"><img alt="Tests" src="https://github.com/FaserF/NexScore/actions/workflows/test.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/FaserF/NexScore/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/FaserF/NexScore"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
 </p>
@@ -25,7 +25,7 @@ NexScore is built with a focus on **Efficiency, Clarity, and Robustness**. It's 
 - **Clean Architecture**: Decoupled game logic using Riverpod Notifiers for reactive, predictable state management.
 - **Profi Backend**: Unified `Result<T>` error handling, structured `AppLogger`, and optimized SQLite with database indexes.
 - **Advanced CI/CD**: Fully automated semver versioning (`Stable`, `Beta`, `Dev`) for Android, iOS, Docker, and PWA.
-- **18+ Content**: Dedicated support for drinking games like **SipDeck** with safety warnings and age verification.
+- **18+ Content**: Dedicated support for drinking games like **SipDeck** with safety warnings and age-restricted content notices.
 
 ---
 

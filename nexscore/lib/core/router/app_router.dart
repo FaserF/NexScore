@@ -139,25 +139,25 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'phase10-digital',
                     builder: (context, state) => const Phase10DigitalScreen(),
                   ),
+                ],
+              ),
+              GoRoute(
+                path: '/multiplayer',
+                builder: (context, state) => const MultiplayerHubScreen(),
+                routes: [
                   GoRoute(
-                    path: 'multiplayer',
-                    builder: (context, state) => const MultiplayerHubScreen(),
-                    routes: [
-                      GoRoute(
-                        path: 'host',
-                        builder: (context, state) =>
-                            const LobbyScreen(isHostingStart: true),
-                      ),
-                      GoRoute(
-                        path: 'join',
-                        builder: (context, state) => const JoinLobbyScreen(),
-                      ),
-                      GoRoute(
-                        path: 'lobby',
-                        builder: (context, state) =>
-                            const LobbyScreen(isHostingStart: false),
-                      ),
-                    ],
+                    path: 'host',
+                    builder: (context, state) =>
+                        const LobbyScreen(isHostingStart: true),
+                  ),
+                  GoRoute(
+                    path: 'join',
+                    builder: (context, state) => const JoinLobbyScreen(),
+                  ),
+                  GoRoute(
+                    path: 'lobby',
+                    builder: (context, state) =>
+                        const LobbyScreen(isHostingStart: false),
                   ),
                 ],
               ),

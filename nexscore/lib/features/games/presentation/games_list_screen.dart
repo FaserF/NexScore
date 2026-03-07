@@ -132,7 +132,7 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: AnimatedScaleButton(
-                  onPressed: () => context.go('/games/multiplayer'),
+                  onPressed: () => context.go('/multiplayer'),
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
