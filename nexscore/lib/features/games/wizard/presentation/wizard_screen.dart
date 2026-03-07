@@ -37,6 +37,9 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
         ? l10n.get('wizard_scoring_lenient').split(' – ')[0]
         : l10n.get('wizard_scoring_extreme').split(' – ')[0];
 
+    final currentRoundNumber = state.rounds.length + state.customStartRound;
+    final totalRounds = state.customTotalRounds ?? (60 ~/ players.length);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.get('game_wizard')),
@@ -115,12 +118,23 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound}',
+                              '${l10n.get('wizard_round')} $currentRoundNumber / $totalRounds',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             Chip(label: Text(l10n.get('wizard_predictions'))),
                           ],
                         ),
+                        if (state.jesterTrumpRules)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              'Jester Trump Active',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         const SizedBox(height: 12),
                         Wrap(
                           spacing: 12,
@@ -150,7 +164,7 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                 ),
               ),
 
-            // Scoreboard (Changed from Expanded ListView to Column for scrollability)
+            // Scoreboard
             Column(
               children: players.map((p) {
                 final score = WizardGameState.calculatePlayerScore(
@@ -239,8 +253,8 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                 ),
                 label: Text(
                   state.currentRoundBids == null
-                      ? '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound} ${l10n.get('wizard_predictions')}'
-                      : '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound} ${l10n.get('wizard_actuals')}',
+                      ? '${l10n.get('wizard_round')} $currentRoundNumber ${l10n.get('wizard_predictions')}'
+                      : '${l10n.get('wizard_round')} $currentRoundNumber ${l10n.get('wizard_actuals')}',
                 ),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),
@@ -263,95 +277,169 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
             final l10n = AppLocalizations.of(context);
             return AlertDialog(
               title: Text(l10n.get('settings')),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    l10n.get('settings_data'),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  ...WizardScoringVariant.values.map((v) {
-                    final label = v == WizardScoringVariant.standard
-                        ? l10n.get('wizard_scoring_standard')
-                        : v == WizardScoringVariant.lenient
-                        ? l10n.get('wizard_scoring_lenient')
-                        : l10n.get('wizard_scoring_extreme');
-                    final isSelected = state.scoringVariant == v;
-                    return ListTile(
-                      leading: Icon(
-                        isSelected
-                            ? Icons.radio_button_checked
-                            : Icons.radio_button_off,
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : null,
-                      ),
-                      title: Text(label),
-                      onTap: () {
-                        ref
-                            .read(wizardStateProvider.notifier)
-                            .updateState(state.copyWith(scoringVariant: v));
-                      },
-                    );
-                  }),
-                  const Divider(),
-                  SwitchListTile(
-                    title: Text(l10n.get('wizard_rule_stiche')),
-                    value: state.ruleSticheDuertenNichtAufgehen,
-                    onChanged: (val) {
-                      ref
-                          .read(wizardStateProvider.notifier)
-                          .updateState(
-                            state.copyWith(ruleSticheDuertenNichtAufgehen: val),
-                          );
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: Text(l10n.get('wizard_start_round')),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove),
-                          onPressed: state.customStartRound > 1
-                              ? () {
-                                  ref
-                                      .read(wizardStateProvider.notifier)
-                                      .updateState(
-                                        state.copyWith(
-                                          customStartRound:
-                                              state.customStartRound - 1,
-                                        ),
-                                      );
-                                }
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n.get('settings_data'),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    ...WizardScoringVariant.values.map((v) {
+                      final label = v == WizardScoringVariant.standard
+                          ? l10n.get('wizard_scoring_standard')
+                          : v == WizardScoringVariant.lenient
+                          ? l10n.get('wizard_scoring_lenient')
+                          : l10n.get('wizard_scoring_extreme');
+                      final isSelected = state.scoringVariant == v;
+                      return ListTile(
+                        leading: Icon(
+                          isSelected
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_off,
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.primary
                               : null,
                         ),
-                        Text(
-                          state.customStartRound.toString(),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () {
-                            ref
-                                .read(wizardStateProvider.notifier)
-                                .updateState(
-                                  state.copyWith(
-                                    customStartRound:
-                                        state.customStartRound + 1,
-                                  ),
-                                );
-                          },
-                        ),
-                      ],
+                        title: Text(label),
+                        onTap: () {
+                          ref
+                              .read(wizardStateProvider.notifier)
+                              .updateState(state.copyWith(scoringVariant: v));
+                        },
+                      );
+                    }),
+                    const Divider(),
+                    SwitchListTile(
+                      title: Text(l10n.get('wizard_rule_stiche')),
+                      value: state.ruleSticheDuertenNichtAufgehen,
+                      onChanged: (val) {
+                        ref
+                            .read(wizardStateProvider.notifier)
+                            .updateState(
+                              state.copyWith(
+                                ruleSticheDuertenNichtAufgehen: val,
+                              ),
+                            );
+                      },
                     ),
-                  ),
-                ],
+                    SwitchListTile(
+                      title: const Text('Jester Trump Rules'),
+                      subtitle: const Text('Jester as trump = No Trump'),
+                      value: state.jesterTrumpRules,
+                      onChanged: (val) {
+                        ref
+                            .read(wizardStateProvider.notifier)
+                            .updateState(state.copyWith(jesterTrumpRules: val));
+                      },
+                    ),
+                    SwitchListTile(
+                      title: const Text('Anniversary Edition'),
+                      subtitle: const Text(
+                        'Include Dragon & Fairy (+/- 10 points)',
+                      ),
+                      value: state.anniversaryCards,
+                      onChanged: (val) {
+                        ref
+                            .read(wizardStateProvider.notifier)
+                            .updateState(state.copyWith(anniversaryCards: val));
+                      },
+                    ),
+                    const Divider(),
+                    ListTile(
+                      title: Text(l10n.get('wizard_start_round')),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.remove),
+                            onPressed: state.customStartRound > 1
+                                ? () {
+                                    ref
+                                        .read(wizardStateProvider.notifier)
+                                        .updateState(
+                                          state.copyWith(
+                                            customStartRound:
+                                                state.customStartRound - 1,
+                                          ),
+                                        );
+                                  }
+                                : null,
+                          ),
+                          Text(
+                            state.customStartRound.toString(),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: () {
+                              ref
+                                  .read(wizardStateProvider.notifier)
+                                  .updateState(
+                                    state.copyWith(
+                                      customStartRound:
+                                          state.customStartRound + 1,
+                                    ),
+                                  );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text('Total Rounds'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.remove),
+                            onPressed: (state.customTotalRounds ?? 1) > 1
+                                ? () {
+                                    ref
+                                        .read(wizardStateProvider.notifier)
+                                        .updateState(
+                                          state.copyWith(
+                                            customTotalRounds:
+                                                (state.customTotalRounds ??
+                                                    20) -
+                                                1,
+                                          ),
+                                        );
+                                  }
+                                : null,
+                          ),
+                          Text(
+                            (state.customTotalRounds ??
+                                    60 ~/
+                                        ref.read(activePlayersProvider).length)
+                                .toString(),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: () {
+                              ref
+                                  .read(wizardStateProvider.notifier)
+                                  .updateState(
+                                    state.copyWith(
+                                      customTotalRounds:
+                                          (state.customTotalRounds ?? 20) + 1,
+                                    ),
+                                  );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
               actions: [
                 TextButton(
@@ -506,6 +594,8 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
       for (var p in players) p.id: TextEditingController(text: '0'),
     };
     final bombController = TextEditingController(text: '0');
+    final Map<String, bool> playedDragon = {for (var p in players) p.id: false};
+    final Map<String, bool> playedFairy = {for (var p in players) p.id: false};
 
     await showDialog(
       context: context,
@@ -569,41 +659,73 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                     ...players.map((p) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
+                        child: Column(
                           children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        p.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${l10n.get('wizard_bid')}: ${state.currentRoundBids?[p.id] ?? 0}',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 80,
+                                  child: TextField(
+                                    controller: trickControllers[p.id],
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                      labelText: l10n.get('wizard_won'),
+                                      border: const OutlineInputBorder(),
+                                    ),
+                                    onChanged: (_) => setDialogState(() {}),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (state.anniversaryCards)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    p.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
+                                  FilterChip(
+                                    label: const Text(
+                                      'Dragon (+10)',
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                    selected: playedDragon[p.id]!,
+                                    onSelected: (val) => setDialogState(
+                                      () => playedDragon[p.id] = val,
                                     ),
                                   ),
-                                  Text(
-                                    '${l10n.get('wizard_bid')}: ${state.currentRoundBids?[p.id] ?? 0}',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall,
+                                  const SizedBox(width: 4),
+                                  FilterChip(
+                                    label: const Text(
+                                      'Fairy (-10)',
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                    selected: playedFairy[p.id]!,
+                                    onSelected: (val) => setDialogState(
+                                      () => playedFairy[p.id] = val,
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            SizedBox(
-                              width: 80,
-                              child: TextField(
-                                controller: trickControllers[p.id],
-                                keyboardType: TextInputType.number,
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  labelText: l10n.get('wizard_won'),
-                                  border: const OutlineInputBorder(),
-                                ),
-                                onChanged: (_) => setDialogState(() {}),
-                              ),
-                            ),
                           ],
                         ),
                       );
@@ -627,6 +749,8 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                 roundIndex,
                 trickControllers,
                 bombController,
+                playedDragon,
+                playedFairy,
                 l10n,
               ),
               child: Text(l10n.get('wizard_save_round')),
@@ -650,6 +774,8 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
     int roundIndex,
     Map<String, TextEditingController> trickControllers,
     TextEditingController bombController,
+    Map<String, bool> playedDragon,
+    Map<String, bool> playedFairy,
     AppLocalizations l10n,
   ) {
     final Map<String, int> tricks = {
@@ -678,7 +804,7 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
-      return;
+      return; // Prevent saving if tricks don't match round number
     }
 
     final newRound = WizardRound(
@@ -686,6 +812,8 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
       bids: state.currentRoundBids ?? {},
       tricks: tricks,
       blownTricks: bombTricks,
+      playedDragon: playedDragon,
+      playedFairy: playedFairy,
     );
 
     ref

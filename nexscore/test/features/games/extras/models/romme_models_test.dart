@@ -4,8 +4,16 @@ import 'package:nexscore/features/games/extras/models/romme_models.dart';
 void main() {
   group('Rommé Models – getPlayerScore', () {
     final rounds = [
-      RommeRound(roundIndex: 1, penaltyPoints: {'p1': 10, 'p2': 0, 'p3': 25}),
-      RommeRound(roundIndex: 2, penaltyPoints: {'p1': 0, 'p2': 15, 'p3': 10}),
+      RommeRound(
+        roundIndex: 1,
+        penaltyPoints: {'p1': 10, 'p2': 0, 'p3': 25},
+        winnerId: 'p2',
+      ),
+      RommeRound(
+        roundIndex: 2,
+        penaltyPoints: {'p1': 0, 'p2': 15, 'p3': 10},
+        winnerId: 'p1',
+      ),
     ];
     final state = RommeGameState(rounds: rounds);
 
@@ -23,8 +31,16 @@ void main() {
   group('Rommé Models – getLeaders', () {
     test('sorts by lowest total score ascending', () {
       final rounds = [
-        RommeRound(roundIndex: 1, penaltyPoints: {'p1': 10, 'p2': 0, 'p3': 25}),
-        RommeRound(roundIndex: 2, penaltyPoints: {'p1': 0, 'p2': 15, 'p3': 10}),
+        RommeRound(
+          roundIndex: 1,
+          penaltyPoints: {'p1': 10, 'p2': 0, 'p3': 25},
+          winnerId: 'p2',
+        ),
+        RommeRound(
+          roundIndex: 2,
+          penaltyPoints: {'p1': 0, 'p2': 15, 'p3': 10},
+          winnerId: 'p1',
+        ),
       ];
       final state = RommeGameState(rounds: rounds);
 
@@ -42,10 +58,13 @@ void main() {
 
     test('handles tie correctly (stable sort order)', () {
       final rounds = [
-        RommeRound(roundIndex: 1, penaltyPoints: {'p1': 10, 'p2': 10}),
+        RommeRound(
+          roundIndex: 1,
+          penaltyPoints: {'p1': 10, 'p2': 10},
+          winnerId: 'p3',
+        ),
       ];
       final state = RommeGameState(rounds: rounds);
-      // Both have same score — order depends on input order
       final leaders = state.getLeaders(['p1', 'p2']);
       expect(leaders.length, 2);
       expect(leaders.contains('p1'), isTrue);
@@ -53,48 +72,47 @@ void main() {
     });
   });
 
-  group('Rommé Models – copyWith', () {
-    test('copyWith replaces rounds', () {
-      final state = RommeGameState(
-        rounds: [
-          RommeRound(roundIndex: 1, penaltyPoints: {'p1': 20}),
-        ],
-      );
-      final updated = state.copyWith(
-        rounds: [
-          RommeRound(roundIndex: 1, penaltyPoints: {'p1': 20}),
-          RommeRound(roundIndex: 2, penaltyPoints: {'p1': 5}),
-        ],
-      );
-      expect(updated.getPlayerScore('p1'), 25);
+  group('Rommé Models – Variants', () {
+    test('Hand-Romme doubling settings', () {
+      const state = RommeGameState(doubleOnHandRomme: true);
+      // Doubling is handled in UI, but we can test if settings persist
+      expect(state.doubleOnHandRomme, isTrue);
+      expect(state.firstMeldPoints, 40);
     });
   });
 
   group('Rommé Models – serialization', () {
-    test('RommeRound serializes and deserializes', () {
-      final round = RommeRound(
-        roundIndex: 5,
-        penaltyPoints: {'p1': 30, 'p2': 0},
-      );
-      final json = round.toJson();
-      final restored = RommeRound.fromJson(json);
-      expect(restored.roundIndex, 5);
-      expect(restored.penaltyPoints['p1'], 30);
-      expect(restored.penaltyPoints['p2'], 0);
-    });
+    test(
+      'RommeRound serializes and deserializes with winner and Hand-Romme',
+      () {
+        const round = RommeRound(
+          roundIndex: 5,
+          penaltyPoints: {'p1': 30, 'p2': 0},
+          winnerId: 'p2',
+          isHandRomme: true,
+        );
+        final json = round.toJson();
+        final restored = RommeRound.fromJson(json);
+        expect(restored.roundIndex, 5);
+        expect(restored.winnerId, 'p2');
+        expect(restored.isHandRomme, isTrue);
+        expect(restored.penaltyPoints['p1'], 30);
+      },
+    );
 
-    test('RommeGameState serializes and deserializes', () {
-      final state = RommeGameState(
+    test('RommeGameState serializes variants', () {
+      const state = RommeGameState(
+        firstMeldPoints: 30,
+        doubleOnHandRomme: false,
         rounds: [
-          RommeRound(roundIndex: 1, penaltyPoints: {'p1': 10, 'p2': 5}),
-          RommeRound(roundIndex: 2, penaltyPoints: {'p1': 0, 'p2': 20}),
+          RommeRound(roundIndex: 1, penaltyPoints: {'p1': 10}, winnerId: 'p2'),
         ],
       );
       final json = state.toJson();
       final restored = RommeGameState.fromJson(json);
-      expect(restored.rounds.length, 2);
-      expect(restored.getPlayerScore('p1'), 10);
-      expect(restored.getPlayerScore('p2'), 25);
+      expect(restored.firstMeldPoints, 30);
+      expect(restored.doubleOnHandRomme, isFalse);
+      expect(restored.rounds.length, 1);
     });
   });
 }

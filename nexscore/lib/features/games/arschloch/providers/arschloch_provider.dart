@@ -35,15 +35,23 @@ class ArschlochStateNotifier extends Notifier<ArschlochGameState> {
     );
   }
 
+  void updateState(ArschlochGameState newState) => state = newState;
+
   void initPlayers(List<String> playerIds) {
     final states = <String, ArschlochPlayerState>{
       for (final id in playerIds) id: const ArschlochPlayerState(),
     };
-    state = ArschlochGameState(playerStates: states, rounds: const []);
+    state = state.copyWith(playerStates: states, rounds: const []);
   }
 
   void resetGame() {
-    state = const ArschlochGameState();
+    state = state.copyWith(
+      rounds: const [],
+      playerStates: {
+        for (final id in state.playerStates.keys)
+          id: const ArschlochPlayerState(),
+      },
+    );
   }
 }
 

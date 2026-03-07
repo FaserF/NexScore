@@ -18,6 +18,13 @@ class KniffelStateNotifier extends Notifier<Map<String, YahtzeePlayerSheet>> {
     state = updatedMap;
   }
 
+  void updateBonus(String playerId, int value) {
+    final updatedMap = Map<String, YahtzeePlayerSheet>.from(state);
+    final sheet = updatedMap[playerId] ?? const YahtzeePlayerSheet();
+    updatedMap[playerId] = sheet.copyWith(bonusYahtzees: value);
+    state = updatedMap;
+  }
+
   void resetGame() {
     state = {};
   }

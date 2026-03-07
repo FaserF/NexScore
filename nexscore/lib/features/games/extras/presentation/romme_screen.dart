@@ -15,7 +15,15 @@ class RommeStateNotifier extends Notifier<RommeGameState> {
   }
 
   void resetGame() {
-    state = const RommeGameState();
+    state = state.copyWith(rounds: []);
+  }
+
+  void updateSettings({int? firstMeldPoints, bool? doubleOnHandRomme}) {
+    state = state.copyWith(
+      firstMeldPoints: firstMeldPoints,
+      doubleOnHandRomme: doubleOnHandRomme,
+      rounds: [], // Reset on setting change
+    );
   }
 
   void removeLastRound() {
@@ -30,15 +38,6 @@ class RommeStateNotifier extends Notifier<RommeGameState> {
 final rommeStateProvider = NotifierProvider<RommeStateNotifier, RommeGameState>(
   RommeStateNotifier.new,
 );
-
-class RommePlayersNotifier extends Notifier<List<Player>> {
-  @override
-  List<Player> build() => [];
-
-  void setPlayers(List<Player> players) {
-    state = players;
-  }
-}
 
 final rommePlayersProvider = activePlayersProvider;
 
@@ -74,6 +73,11 @@ class RommeScreen extends ConsumerWidget {
               tooltip: l10n.get('schafkopf_undo'),
             ),
           IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => _showSettingsDialog(context, ref, gameState, l10n),
+            tooltip: l10n.get('romme_settings'),
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
             tooltip: l10n.get('game_reset'),
@@ -82,10 +86,8 @@ class RommeScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // Scoreboard header
           _RommeScoreHeader(players: players, gameState: gameState),
           const Divider(height: 1, thickness: 2),
-          // Rounds list
           Expanded(
             child: gameState.rounds.isEmpty
                 ? Center(child: Text(l10n.get('romme_no_rounds')))
@@ -98,6 +100,15 @@ class RommeScreen extends ConsumerWidget {
                         title: Text(
                           '${l10n.get('romme_round')} ${round.roundIndex}',
                         ),
+                        subtitle: round.isHandRomme
+                            ? Text(
+                                l10n.get('romme_hand_romme'),
+                                style: const TextStyle(
+                                  color: Colors.orange,
+                                  fontSize: 12,
+                                ),
+                              )
+                            : null,
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: players.map((p) {
@@ -127,6 +138,7 @@ class RommeScreen extends ConsumerWidget {
                 ref,
                 players,
                 gameState.rounds.length + 1,
+                gameState,
                 l10n,
               ),
               icon: const Icon(Icons.add),
@@ -163,96 +175,123 @@ class RommeScreen extends ConsumerWidget {
     WidgetRef ref,
     List<Player> players,
     int roundIndex,
+    RommeGameState gameState,
     AppLocalizations l10n,
   ) async {
     final penalties = <String, int>{for (var p in players) p.id: 0};
     final controllers = <String, TextEditingController>{
       for (var p in players) p.id: TextEditingController(text: '0'),
     };
+    String selectedWinnerId = players.first.id;
+    bool isHandRomme = false;
 
     await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            l10n.getWith('romme_penalty_title', [roundIndex.toString()]),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: players.map((p) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(p.name, style: const TextStyle(fontSize: 16)),
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: Text(
+              l10n.getWith('romme_penalty_title', [roundIndex.toString()]),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: l10n.get('winner'),
+                      border: const OutlineInputBorder(),
                     ),
-                    SizedBox(
-                      width: 80,
-                      child: TextField(
-                        controller: controllers[p.id],
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        textInputAction: p.id == players.last.id
-                            ? TextInputAction.done
-                            : TextInputAction.next,
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 8,
+                    value: selectedWinnerId,
+                    onChanged: (val) => setState(() => selectedWinnerId = val!),
+                    items: players
+                        .map(
+                          (p) => DropdownMenuItem(
+                            value: p.id,
+                            child: Text(p.name),
                           ),
-                          suffixText: l10n.get('history_pts'),
-                        ),
-                        onChanged: (val) {
-                          penalties[p.id] = int.tryParse(val) ?? 0;
-                        },
-                        onSubmitted: (_) {
-                          if (p.id == players.last.id) {
-                            // Save and close
-                            for (final player in players) {
-                              penalties[player.id] =
-                                  int.tryParse(controllers[player.id]!.text) ??
-                                  0;
-                            }
-                            final round = RommeRound(
-                              roundIndex: roundIndex,
-                              penaltyPoints: Map.from(penalties),
-                            );
-                            ref
-                                .read(rommeStateProvider.notifier)
-                                .addRound(round);
-                            Navigator.pop(context);
-                          }
-                        },
+                        )
+                        .toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    title: Text(l10n.get('romme_hand_romme')),
+                    subtitle: Text(l10n.get('romme_hand_romme_desc')),
+                    value: isHandRomme,
+                    onChanged: (val) => setState(() => isHandRomme = val),
+                  ),
+                  const Divider(height: 32),
+                  ...players.map((p) {
+                    final isWinner = p.id == selectedWinnerId;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              p.name,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: isWinner
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isWinner ? Colors.green : null,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 80,
+                            child: TextField(
+                              controller: controllers[p.id],
+                              enabled: !isWinner,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              decoration: InputDecoration(
+                                border: const OutlineInputBorder(),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
+                                suffixText: l10n.get('history_pts'),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
+                    );
+                  }),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.get('cancel')),
+              ),
+              FilledButton(
+                onPressed: () {
+                  for (final p in players) {
+                    int pts = int.tryParse(controllers[p.id]!.text) ?? 0;
+                    if (isHandRomme &&
+                        p.id != selectedWinnerId &&
+                        gameState.doubleOnHandRomme) {
+                      pts *= 2;
+                    }
+                    penalties[p.id] = pts;
+                  }
+                  final round = RommeRound(
+                    roundIndex: roundIndex,
+                    penaltyPoints: Map.from(penalties),
+                    winnerId: selectedWinnerId,
+                    isHandRomme: isHandRomme,
+                  );
+                  ref.read(rommeStateProvider.notifier).addRound(round);
+                  Navigator.pop(context);
+                },
+                child: Text(l10n.get('wizard_save_round')),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.get('cancel')),
-            ),
-            FilledButton(
-              onPressed: () {
-                // Read final values from controllers
-                for (final p in players) {
-                  penalties[p.id] = int.tryParse(controllers[p.id]!.text) ?? 0;
-                }
-                final round = RommeRound(
-                  roundIndex: roundIndex,
-                  penaltyPoints: Map.from(penalties),
-                );
-                ref.read(rommeStateProvider.notifier).addRound(round);
-                Navigator.pop(context);
-              },
-              child: Text(l10n.get('wizard_save_round')),
-            ),
-          ],
         );
       },
     );
@@ -330,6 +369,70 @@ class RommeScreen extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+
+  void _showSettingsDialog(
+    BuildContext context,
+    WidgetRef ref,
+    RommeGameState state,
+    AppLocalizations l10n,
+  ) {
+    int selectedMeld = state.firstMeldPoints;
+    bool doubleHand = state.doubleOnHandRomme;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text(l10n.get('romme_settings')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.get('romme_first_meld'),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              SegmentedButton<int>(
+                segments: const [
+                  ButtonSegment(value: 0, label: Text('0')),
+                  ButtonSegment(value: 30, label: Text('30')),
+                  ButtonSegment(value: 40, label: Text('40')),
+                ],
+                selected: {selectedMeld},
+                onSelectionChanged: (val) =>
+                    setState(() => selectedMeld = val.first),
+              ),
+              const Divider(height: 32),
+              SwitchListTile(
+                title: Text(l10n.get('romme_hand_romme')),
+                subtitle: const Text('x2 Points'),
+                value: doubleHand,
+                onChanged: (val) => setState(() => doubleHand = val),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.get('cancel')),
+            ),
+            FilledButton(
+              onPressed: () {
+                ref
+                    .read(rommeStateProvider.notifier)
+                    .updateSettings(
+                      firstMeldPoints: selectedMeld,
+                      doubleOnHandRomme: doubleHand,
+                    );
+                Navigator.pop(context);
+              },
+              child: Text(l10n.get('ok')),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

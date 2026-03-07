@@ -1,10 +1,36 @@
+enum QwixxVariant { original, mixedColors, mixedNumbers }
+
 class QwixxGameState {
   final Map<String, QwixxPlayerSheet> sheets; // PlayerId -> Sheet
+  final QwixxVariant variant;
 
-  const QwixxGameState({this.sheets = const {}});
+  static List<int> getRowNumbers(int rowIndex, QwixxVariant variant) {
+    if (variant == QwixxVariant.original) {
+      if (rowIndex < 2) return List.generate(11, (i) => i + 2);
+      return List.generate(11, (i) => 12 - i);
+    }
+    if (variant == QwixxVariant.mixedNumbers) {
+      const sequences = [
+        [5, 7, 11, 9, 12, 3, 8, 10, 2, 6, 4], // Red
+        [8, 2, 10, 5, 7, 3, 12, 11, 4, 9, 6], // Yellow
+        [11, 5, 9, 12, 3, 4, 8, 7, 2, 10, 6], // Green (desc-ish)
+        [6, 10, 3, 11, 4, 5, 8, 12, 9, 2, 7], // Blue (desc-ish)
+      ];
+      return sequences[rowIndex];
+    }
+    // mixedColors: numbers are same as original, but colors are mixed (handled in UI)
+    if (rowIndex < 2) return List.generate(11, (i) => i + 2);
+    return List.generate(11, (i) => 12 - i);
+  }
+
+  const QwixxGameState({
+    this.sheets = const {},
+    this.variant = QwixxVariant.original,
+  });
 
   Map<String, dynamic> toJson() => {
     'sheets': sheets.map((k, v) => MapEntry(k, v.toJson())),
+    'variant': variant.name,
   };
 
   factory QwixxGameState.fromJson(Map<String, dynamic> json) {
@@ -13,16 +39,30 @@ class QwixxGameState {
         (k, v) =>
             MapEntry(k, QwixxPlayerSheet.fromJson(v as Map<String, dynamic>)),
       ),
+      variant: QwixxVariant.values.firstWhere(
+        (v) => v.name == (json['variant'] as String? ?? 'original'),
+        orElse: () => QwixxVariant.original,
+      ),
+    );
+  }
+
+  QwixxGameState copyWith({
+    Map<String, QwixxPlayerSheet>? sheets,
+    QwixxVariant? variant,
+  }) {
+    return QwixxGameState(
+      sheets: sheets ?? this.sheets,
+      variant: variant ?? this.variant,
     );
   }
 }
 
 class QwixxPlayerSheet {
-  final List<int> red; // Crossed out numbers, e.g., [2, 3, 5]
+  final List<int> red;
   final List<int> yellow;
   final List<int> green;
   final List<int> blue;
-  final int penalties; // 0 to 4 (each -5 pts)
+  final int penalties;
 
   const QwixxPlayerSheet({
     this.red = const [],
@@ -77,7 +117,6 @@ class QwixxPlayerSheet {
   }
 
   int calculateRowScore(int crosses) {
-    // 1 cross = 1, 2 crosses = 3, 3 = 6, 4 = 10, ... sum of 1..N
     if (crosses <= 0) return 0;
     return (crosses * (crosses + 1)) ~/ 2;
   }

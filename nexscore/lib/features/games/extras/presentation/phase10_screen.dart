@@ -12,9 +12,9 @@ class Phase10StateNotifier extends Notifier<Phase10GameState> {
   Phase10GameState build() => const Phase10GameState();
 
   void setVariant(Phase10Variant variant) {
-    state = Phase10GameState(
-      playerStates: state.playerStates,
+    state = state.copyWith(
       variant: variant,
+      playerStates: {}, // Reset on major variant change
     );
   }
 
@@ -23,7 +23,7 @@ class Phase10StateNotifier extends Notifier<Phase10GameState> {
   }
 
   void resetGame() {
-    state = const Phase10GameState();
+    state = state.copyWith(playerStates: {});
   }
 
   void advancePhase(String playerId) {
@@ -33,23 +33,27 @@ class Phase10StateNotifier extends Notifier<Phase10GameState> {
       state.playerStates,
     );
 
-    if (state.variant == Phase10Variant.original) {
-      updatedStates[playerId] = currentState.copyWith(
-        currentPhase: (currentState.currentPhase + 1).clamp(1, 10),
-      );
-    } else {
-      // Masters / Duel: mark current phase as completed, let user pick next
-      final completed = Set<int>.from(currentState.completedPhases)
-        ..add(currentState.currentPhase);
-      updatedStates[playerId] = currentState.copyWith(
-        completedPhases: completed,
-        currentPhase: currentState.currentPhase,
+    final completed = Set<int>.from(currentState.completedPhases)
+      ..add(currentState.currentPhase);
+
+    int nextPhase = currentState.currentPhase;
+    if (state.variant == Phase10Variant.original ||
+        state.variant == Phase10Variant.levelUp) {
+      nextPhase = (currentState.currentPhase + 1).clamp(
+        1,
+        state.activePhases.length,
       );
     }
+
+    updatedStates[playerId] = currentState.copyWith(
+      completedPhases: completed,
+      currentPhase: nextPhase,
+    );
+
     state = state.copyWith(playerStates: updatedStates);
   }
 
-  void selectMastersPhase(String playerId, int phase) {
+  void selectPhase(String playerId, int phase) {
     final currentState =
         state.playerStates[playerId] ?? const Phase10PlayerState();
     final updatedStates = Map<String, Phase10PlayerState>.from(
@@ -77,13 +81,6 @@ final phase10StateProvider =
       Phase10StateNotifier.new,
     );
 
-class Phase10PlayersNotifier extends Notifier<List<Player>> {
-  @override
-  List<Player> build() => [];
-
-  void setPlayers(List<Player> players) => state = players;
-}
-
 final phase10PlayersProvider = activePlayersProvider;
 
 class Phase10Screen extends ConsumerWidget {
@@ -106,7 +103,9 @@ class Phase10Screen extends ConsumerWidget {
     final variantLabel = switch (gameState.variant) {
       Phase10Variant.original => l10n.get('phase10_original'),
       Phase10Variant.masters => l10n.get('phase10_masters'),
+      Phase10Variant.levelUp => 'Level Up',
       Phase10Variant.duel => l10n.get('phase10_duel'),
+      Phase10Variant.custom => 'Custom',
     };
 
     return Scaffold(
@@ -144,9 +143,8 @@ class Phase10Screen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // Phase legend button
           InkWell(
-            onTap: () => _showPhaseLegend(context),
+            onTap: () => _showPhaseLegend(context, gameState),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -179,10 +177,15 @@ class Phase10Screen extends ConsumerWidget {
                     leaders.last == p.id &&
                     players.length > 1;
 
+                final activePhases = gameState.activePhases;
                 final phaseNum = pState.currentPhase;
-                final phase = Phase10Phase.values[phaseNum - 1];
-                final phaseTitle = _labelForPhase(phase, l10n, isTitle: true);
-                final phaseDesc = _labelForPhase(phase, l10n, isTitle: false);
+                final phase =
+                    activePhases[(phaseNum - 1).clamp(
+                      0,
+                      activePhases.length - 1,
+                    )];
+                final phaseTitle = phase.title;
+                final phaseDesc = phase.description;
 
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(
@@ -217,7 +220,7 @@ class Phase10Screen extends ConsumerWidget {
                           pState.completedPhases.isNotEmpty)
                         Text(
                           l10n.getWith('phase10_done', [
-                            pState.completedPhases.toList().toString(),
+                            pState.completedPhases.toList().join(', '),
                           ]),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: Colors.green.shade700),
@@ -227,15 +230,15 @@ class Phase10Screen extends ConsumerWidget {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (gameState.variant == Phase10Variant.masters)
-                        _MastersPhaseSelector(
+                      if (gameState.variant == Phase10Variant.masters ||
+                          gameState.variant == Phase10Variant.duel)
+                        _PhaseSelector(
                           currentPhase: pState.currentPhase,
                           completedPhases: pState.completedPhases,
-                          onChanged: (p) => ref
+                          onChanged: (pNum) => ref
                               .read(phase10StateProvider.notifier)
-                              .selectMastersPhase(p.toString(), p),
-                          playerId: p.id,
-                          ref: ref,
+                              .selectPhase(p.id, pNum),
+                          activePhases: activePhases,
                           l10n: l10n,
                         )
                       else
@@ -276,7 +279,8 @@ class Phase10Screen extends ConsumerWidget {
                             ),
                             IconButton(
                               icon: const Icon(Icons.add_circle_outline),
-                              onPressed: pState.currentPhase < 10
+                              onPressed:
+                                  pState.currentPhase < activePhases.length
                                   ? () => ref
                                         .read(phase10StateProvider.notifier)
                                         .advancePhase(p.id)
@@ -338,12 +342,16 @@ class Phase10Screen extends ConsumerWidget {
             final title = switch (v) {
               Phase10Variant.original => l10n.get('phase10_original'),
               Phase10Variant.masters => l10n.get('phase10_masters'),
+              Phase10Variant.levelUp => 'Level Up',
               Phase10Variant.duel => l10n.get('phase10_duel'),
+              Phase10Variant.custom => 'Custom',
             };
             final label = switch (v) {
               Phase10Variant.original => l10n.get('phase10_v_desc_original'),
               Phase10Variant.masters => l10n.get('phase10_v_desc_masters'),
+              Phase10Variant.levelUp => 'Higher rounds require more points.',
               Phase10Variant.duel => l10n.get('phase10_v_desc_duel'),
+              Phase10Variant.custom => 'Custom phases.',
             };
             final isSelected = state.variant == v;
             return ListTile(
@@ -380,7 +388,7 @@ class Phase10Screen extends ConsumerWidget {
     );
   }
 
-  void _showPhaseLegend(BuildContext context) {
+  void _showPhaseLegend(BuildContext context, Phase10GameState gameState) {
     final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
@@ -390,7 +398,7 @@ class Phase10Screen extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: Phase10Phase.values.map((phase) {
+            children: gameState.activePhases.map((phase) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
@@ -399,13 +407,11 @@ class Phase10Screen extends ConsumerWidget {
                     SizedBox(
                       width: 64,
                       child: Text(
-                        _labelForPhase(phase, l10n, isTitle: true),
+                        phase.title,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    Expanded(
-                      child: Text(_labelForPhase(phase, l10n, isTitle: false)),
-                    ),
+                    Expanded(child: Text(phase.description)),
                   ],
                 ),
               );
@@ -557,35 +563,20 @@ class Phase10Screen extends ConsumerWidget {
       ),
     );
   }
-
-  String _labelForPhase(
-    Phase10Phase phase,
-    AppLocalizations l10n, {
-    required bool isTitle,
-  }) {
-    final num = phase.number;
-    if (isTitle) {
-      return l10n.get('phase10_p${num}_title');
-    } else {
-      return l10n.get('phase10_p${num}_desc');
-    }
-  }
 }
 
-class _MastersPhaseSelector extends StatelessWidget {
+class _PhaseSelector extends StatelessWidget {
   final int currentPhase;
   final Set<int> completedPhases;
   final void Function(int) onChanged;
-  final String playerId;
-  final WidgetRef ref;
+  final List<Phase10Phase> activePhases;
   final AppLocalizations l10n;
 
-  const _MastersPhaseSelector({
+  const _PhaseSelector({
     required this.currentPhase,
     required this.completedPhases,
     required this.onChanged,
-    required this.playerId,
-    required this.ref,
+    required this.activePhases,
     required this.l10n,
   });
 
@@ -606,22 +597,20 @@ class _MastersPhaseSelector extends StatelessWidget {
           width: 300,
           child: ListView(
             shrinkWrap: true,
-            children: Phase10Phase.values.map((phase) {
+            children: activePhases.map((phase) {
               final done = completedPhases.contains(phase.number);
               return ListTile(
                 leading: done
                     ? const Icon(Icons.check_circle, color: Colors.green)
                     : const Icon(Icons.radio_button_unchecked),
-                title: Text(l10n.get('phase10_p${phase.number}_title')),
+                title: Text(phase.title),
                 subtitle: Text(
-                  l10n.get('phase10_p${phase.number}_desc'),
+                  phase.description,
                   style: const TextStyle(fontSize: 11),
                 ),
                 selected: phase.number == currentPhase,
                 onTap: () {
-                  ref
-                      .read(phase10StateProvider.notifier)
-                      .selectMastersPhase(playerId, phase.number);
+                  onChanged(phase.number);
                   Navigator.pop(ctx);
                 },
               );

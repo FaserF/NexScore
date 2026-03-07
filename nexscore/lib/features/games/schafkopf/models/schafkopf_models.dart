@@ -7,12 +7,14 @@ class SchafkopfRound {
   final int roundIndex;
   final SchafkopfGameType gameType;
   final String activePlayerId;
-  final String? partnerPlayerId; // Only for Sauspiel
-  final Map<String, int> points; // Trick points – max 120 total
-  final bool schneider; // Opponent has ≤30 trick points
-  final bool schwarz; // Opponent has 0 tricks
-  final int runners; // Laufende: uninterrupted trump chain from Ober down
-  final double baseTariff; // Default: 0.10 (10 Euro-cent)
+  final String? partnerPlayerId;
+  final Map<String, int> points;
+  final bool schneider;
+  final bool schwarz;
+  final int runners;
+  final double baseTariff;
+  final bool isBockRound;
+  final bool isMussSpiel;
 
   const SchafkopfRound({
     required this.roundIndex,
@@ -24,24 +26,14 @@ class SchafkopfRound {
     this.schwarz = false,
     this.runners = 0,
     this.baseTariff = 0.10,
+    this.isBockRound = false,
+    this.isMussSpiel = false,
   });
 
-  /// Calculates the payout for each player involved in this round.
-  ///
-  /// Rules applied:
-  /// - Solo variants (Wenz, Solo, Geier, Farbwenz, Tout) add a +0.50 base premium.
-  /// - Schneider adds +0.10 per player.
-  /// - Schwarz adds +0.10 per player (on top of Schneider).
-  /// - Each Laufende (runner) adds +0.10 per player.
-  /// - In Sauspiel (team play), active player + partner each earn `gameValue`; each opponent loses `gameValue`.
-  /// - In Solo variants, the solo player earns `gameValue * 3`; each of the 3 opponents loses `gameValue`.
-  /// Calculates the payout for each of the 4 players involved in this round.
-  /// The resulting map will contain values for all players in `allPlayerIds`.
   Map<String, double> calculatePayouts(List<String> allPlayerIds) {
     double gameValue = baseTariff;
 
     if (gameType != SchafkopfGameType.sauspiel) {
-      // Solo variants: base tariff is doubled (official Bavarian premium)
       gameValue *= 2;
     }
     if (schneider) gameValue += baseTariff;
@@ -50,6 +42,8 @@ class SchafkopfRound {
       gameValue += (runners * baseTariff);
     }
 
+    if (isBockRound) gameValue *= 2;
+
     final int activeTeamPoints =
         (points[activePlayerId] ?? 0) + (points[partnerPlayerId] ?? 0);
     final bool activeWon = activeTeamPoints > 60;
@@ -57,14 +51,11 @@ class SchafkopfRound {
     final Map<String, double> payouts = {for (var id in allPlayerIds) id: 0.0};
 
     if (gameType == SchafkopfGameType.sauspiel) {
-      // Sauspiel: two-vs-two team game
       final double perPlayerValue = activeWon ? gameValue : -gameValue;
       payouts[activePlayerId] = perPlayerValue;
       if (partnerPlayerId != null) {
         payouts[partnerPlayerId!] = perPlayerValue;
       }
-
-      // Opponents lose what winners gain
       final opponents = allPlayerIds
           .where((id) => id != activePlayerId && id != partnerPlayerId)
           .toList();
@@ -72,12 +63,9 @@ class SchafkopfRound {
         payouts[opId] = -perPlayerValue;
       }
     } else {
-      // Solo variant: one player against three opponents
       final double soloTotal = gameValue * 3;
       final double winAmount = activeWon ? soloTotal : -soloTotal;
       payouts[activePlayerId] = winAmount;
-
-      // Each opponent pays 1/3 of the solo total
       final opponents = allPlayerIds
           .where((id) => id != activePlayerId)
           .toList();
@@ -87,5 +75,86 @@ class SchafkopfRound {
     }
 
     return payouts;
+  }
+
+  Map<String, dynamic> toJson() => {
+    'roundIndex': roundIndex,
+    'gameType': gameType.name,
+    'activePlayerId': activePlayerId,
+    'partnerPlayerId': partnerPlayerId,
+    'points': points,
+    'schneider': schneider,
+    'schwarz': schwarz,
+    'runners': runners,
+    'baseTariff': baseTariff,
+    'isBockRound': isBockRound,
+    'isMussSpiel': isMussSpiel,
+  };
+
+  factory SchafkopfRound.fromJson(Map<String, dynamic> json) {
+    return SchafkopfRound(
+      roundIndex: json['roundIndex'] as int,
+      gameType: SchafkopfGameType.values.firstWhere(
+        (e) => e.name == json['gameType'],
+      ),
+      activePlayerId: json['activePlayerId'] as String,
+      partnerPlayerId: json['partnerPlayerId'] as String?,
+      points: Map<String, int>.from(json['points']),
+      schneider: json['schneider'] as bool? ?? false,
+      schwarz: json['schwarz'] as bool? ?? false,
+      runners: json['runners'] as int? ?? 0,
+      baseTariff: (json['baseTariff'] as num?)?.toDouble() ?? 0.10,
+      isBockRound: json['isBockRound'] as bool? ?? false,
+      isMussSpiel: json['isMussSpiel'] as bool? ?? false,
+    );
+  }
+}
+
+class SchafkopfGameState {
+  final List<SchafkopfRound> rounds;
+  final double stock; // Pot in Euro
+  final int bockRoundsRemaining;
+
+  const SchafkopfGameState({
+    this.rounds = const [],
+    this.stock = 0.0,
+    this.bockRoundsRemaining = 0,
+  });
+
+  SchafkopfGameState copyWith({
+    List<SchafkopfRound>? rounds,
+    double? stock,
+    int? bockRoundsRemaining,
+  }) {
+    return SchafkopfGameState(
+      rounds: rounds ?? this.rounds,
+      stock: stock ?? this.stock,
+      bockRoundsRemaining: bockRoundsRemaining ?? this.bockRoundsRemaining,
+    );
+  }
+
+  double getPlayerBalance(String playerId, List<String> allPlayerIds) {
+    double total = 0.0;
+    for (final round in rounds) {
+      final payouts = round.calculatePayouts(allPlayerIds);
+      total += (payouts[playerId] ?? 0.0);
+    }
+    return total;
+  }
+
+  Map<String, dynamic> toJson() => {
+    'rounds': rounds.map((e) => e.toJson()).toList(),
+    'stock': stock,
+    'bockRoundsRemaining': bockRoundsRemaining,
+  };
+
+  factory SchafkopfGameState.fromJson(Map<String, dynamic> json) {
+    return SchafkopfGameState(
+      rounds: (json['rounds'] as List)
+          .map((e) => SchafkopfRound.fromJson(e))
+          .toList(),
+      stock: (json['stock'] as num?)?.toDouble() ?? 0.0,
+      bockRoundsRemaining: json['bockRoundsRemaining'] as int? ?? 0,
+    );
   }
 }

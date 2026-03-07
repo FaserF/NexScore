@@ -11,14 +11,21 @@ class QwixxStateNotifier extends Notifier<QwixxGameState> {
     state = QwixxGameState(sheets: sheets);
   }
 
+  void setVariant(QwixxVariant variant) {
+    state = state.copyWith(
+      variant: variant,
+      sheets: {},
+    ); // Reset on variant change
+  }
+
   void updateSheet(String playerId, QwixxPlayerSheet newSheet) {
     final updated = Map<String, QwixxPlayerSheet>.from(state.sheets);
     updated[playerId] = newSheet;
-    state = QwixxGameState(sheets: updated);
+    state = state.copyWith(sheets: updated);
   }
 
   void resetGame() {
-    state = const QwixxGameState();
+    state = state.copyWith(sheets: {});
   }
 }
 

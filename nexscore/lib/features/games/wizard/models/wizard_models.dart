@@ -6,13 +6,17 @@ class WizardRound {
   final int roundIndex;
   final Map<String, int> bids;
   final Map<String, int> tricks;
-  final int blownTricks; // For special cards like "Bomb" in Extreme variant
+  final int blownTricks; // For "Bomb" cards
+  final Map<String, bool> playedDragon;
+  final Map<String, bool> playedFairy;
 
   const WizardRound({
     required this.roundIndex,
     this.bids = const {},
     this.tricks = const {},
     this.blownTricks = 0,
+    this.playedDragon = const {},
+    this.playedFairy = const {},
   });
 
   Map<String, dynamic> toJson() => {
@@ -28,6 +32,8 @@ class WizardRound {
       bids: Map<String, int>.from(json['bids'] as Map),
       tricks: Map<String, int>.from(json['tricks'] as Map),
       blownTricks: json['blownTricks'] as int? ?? 0,
+      playedDragon: Map<String, bool>.from(json['playedDragon'] ?? {}),
+      playedFairy: Map<String, bool>.from(json['playedFairy'] ?? {}),
     );
   }
 
@@ -36,12 +42,16 @@ class WizardRound {
     Map<String, int>? bids,
     Map<String, int>? tricks,
     int? blownTricks,
+    Map<String, bool>? playedDragon,
+    Map<String, bool>? playedFairy,
   }) {
     return WizardRound(
       roundIndex: roundIndex ?? this.roundIndex,
       bids: bids ?? this.bids,
       tricks: tricks ?? this.tricks,
       blownTricks: blownTricks ?? this.blownTricks,
+      playedDragon: playedDragon ?? this.playedDragon,
+      playedFairy: playedFairy ?? this.playedFairy,
     );
   }
 }
@@ -51,6 +61,9 @@ class WizardGameState {
   final WizardScoringVariant scoringVariant;
   final bool ruleSticheDuertenNichtAufgehen;
   final int customStartRound;
+  final int? customTotalRounds;
+  final bool jesterTrumpRules;
+  final bool anniversaryCards;
   final Map<String, int>? currentRoundBids;
 
   const WizardGameState({
@@ -58,6 +71,9 @@ class WizardGameState {
     this.scoringVariant = WizardScoringVariant.standard,
     this.ruleSticheDuertenNichtAufgehen = false,
     this.customStartRound = 1,
+    this.customTotalRounds,
+    this.jesterTrumpRules = false,
+    this.anniversaryCards = false,
     this.currentRoundBids,
   });
 
@@ -68,6 +84,9 @@ class WizardGameState {
     'scoringVariant': scoringVariant.name,
     'ruleSticheDuertenNichtAufgehen': ruleSticheDuertenNichtAufgehen,
     'customStartRound': customStartRound,
+    'customTotalRounds': customTotalRounds,
+    'jesterTrumpRules': jesterTrumpRules,
+    'anniversaryCards': anniversaryCards,
     'currentRoundBids': currentRoundBids,
   };
 
@@ -83,6 +102,8 @@ class WizardGameState {
       ruleSticheDuertenNichtAufgehen:
           json['ruleSticheDuertenNichtAufgehen'] as bool? ?? false,
       customStartRound: json['customStartRound'] as int? ?? 1,
+      customTotalRounds: json['customTotalRounds'] as int?,
+      jesterTrumpRules: json['jesterTrumpRules'] as bool? ?? false,
       currentRoundBids: json['currentRoundBids'] != null
           ? Map<String, int>.from(json['currentRoundBids'] as Map)
           : null,
@@ -94,6 +115,9 @@ class WizardGameState {
     WizardScoringVariant? scoringVariant,
     bool? ruleSticheDuertenNichtAufgehen,
     int? customStartRound,
+    int? customTotalRounds,
+    bool? jesterTrumpRules,
+    bool? anniversaryCards,
     Map<String, int>? currentRoundBids,
     bool resetBids = false,
   }) {
@@ -103,6 +127,9 @@ class WizardGameState {
       ruleSticheDuertenNichtAufgehen:
           ruleSticheDuertenNichtAufgehen ?? this.ruleSticheDuertenNichtAufgehen,
       customStartRound: customStartRound ?? this.customStartRound,
+      customTotalRounds: customTotalRounds ?? this.customTotalRounds,
+      jesterTrumpRules: jesterTrumpRules ?? this.jesterTrumpRules,
+      anniversaryCards: anniversaryCards ?? this.anniversaryCards,
       currentRoundBids: resetBids
           ? null
           : (currentRoundBids ?? this.currentRoundBids),
@@ -131,18 +158,32 @@ class WizardGameState {
       final int bid = round.bids[playerId]!;
       final int trick = round.tricks[playerId]!;
 
+      int roundScore = 0;
       if (bid == trick) {
-        totalScore += extreme ? (30 + trick * 10) : (20 + trick * 10);
+        roundScore = extreme ? (30 + trick * 10) : (20 + trick * 10);
       } else {
         final int diff = (bid - trick).abs();
         if (lenient) {
-          totalScore += (trick * 10) - (diff * 10);
+          roundScore = (trick * 10) - (diff * 10);
         } else if (extreme) {
-          totalScore -= diff * 20;
+          roundScore = -(diff * 20);
         } else {
-          totalScore -= diff * 10;
+          roundScore = -(diff * 10);
         }
       }
+
+      // Anniversary Cards Scoring
+      if (round.playedDragon[playerId] == true) {
+        // Dragon: Win the trick = +10, lose = -10 (if part of bid)
+        // Standard simplifies: If you played it and win the trick, usually it just helps your bid.
+        // Anniversary rules: +10 if you win the trick with it.
+        roundScore += 10;
+      }
+      if (round.playedFairy[playerId] == true) {
+        roundScore -= 10; // Fairy: Often -10 points or similar.
+      }
+
+      totalScore += roundScore;
     }
     return totalScore;
   }

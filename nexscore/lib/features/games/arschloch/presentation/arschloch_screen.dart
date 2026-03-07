@@ -2,20 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
+import '../../../../core/models/player_model.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/arschloch_models.dart';
 import '../providers/arschloch_provider.dart';
 
-class ArschlochScreen extends ConsumerWidget {
+class ArschlochScreen extends ConsumerStatefulWidget {
   const ArschlochScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(arschlochStateProvider);
+  ConsumerState<ArschlochScreen> createState() => _ArschlochScreenState();
+}
+
+class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(arschlochStateProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
+
+    if (players.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: Text(l10n.get('game_arschloch'))),
+        body: Center(child: Text(l10n.get('game_no_players'))),
+      );
+    }
+
+    final leaders = state.getLeaders();
 
     return Scaffold(
       appBar: AppBar(
@@ -27,16 +41,16 @@ class ArschlochScreen extends ConsumerWidget {
             onPressed: () {
               launchUrl(
                 Uri.parse(
-                  'https://faserf.github.io/NexScore/docs/user_guide/games/#arschloch-president',
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#arschloch',
                 ),
               );
             },
-            tooltip: l10n.get('help_title'),
+            tooltip: l10n.get('nav_help'),
           ),
           IconButton(
-            icon: const Icon(Icons.menu_book),
-            onPressed: () => _showRulesDialog(context, l10n),
-            tooltip: l10n.get('arschloch_rules'),
+            icon: const Icon(Icons.settings),
+            onPressed: () => _showSettingsDialog(context),
+            tooltip: l10n.get('settings'),
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -45,371 +59,216 @@ class ArschlochScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: players.isEmpty
-          ? Center(child: Text(l10n.get('game_no_players')))
-          : gameState.playerStates.isEmpty
-          ? _buildSetupScreen(context, ref, players, l10n)
-          : _buildGameScreen(context, ref, players, gameState, l10n),
+      body: Column(
+        children: [
+          // Instructions for card exchange
+          if (state.rounds.isNotEmpty)
+            _buildExchangeBanner(state, players, l10n),
+
+          Expanded(
+            child: ListView.builder(
+              itemCount: leaders.length,
+              itemBuilder: (context, index) {
+                final playerId = leaders[index];
+                final player = players.firstWhere((p) => p.id == playerId);
+                final pState = state.playerStates[playerId]!;
+
+                final rankLabel = pState.lastRank != null
+                    ? (state.customRankNames?[pState.lastRank!] ??
+                          (l10n.locale.languageCode == 'de'
+                              ? pState.lastRank!.labelDe()
+                              : pState.lastRank!.labelEn()))
+                    : l10n.get('arschloch_no_rank');
+
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Color(
+                      int.parse(player.avatarColor.replaceFirst('#', '0xff')),
+                    ),
+                    child: Text(player.name.substring(0, 1).toUpperCase()),
+                  ),
+                  title: Text(player.name),
+                  subtitle: Text(
+                    '${l10n.get('leaderboard_score')}: ${pState.points} · $rankLabel',
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (pState.roundsAsPresident > 0)
+                        _buildStatChip(
+                          context,
+                          'P: ${pState.roundsAsPresident}',
+                          Colors.amber.shade700,
+                        ),
+                      const SizedBox(width: 4),
+                      if (pState.roundsAsArschloch > 0)
+                        _buildStatChip(
+                          context,
+                          'A: ${pState.roundsAsArschloch}',
+                          Colors.brown,
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: FilledButton.icon(
+              onPressed: () =>
+                  _showAddRoundDialog(context, ref, players, state),
+              icon: const Icon(Icons.add),
+              label: Text(
+                l10n.getWith('wizard_next_round', [
+                  (state.rounds.length + 1).toString(),
+                ]),
+              ),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(double.infinity, 52),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildSetupScreen(
-    BuildContext context,
-    WidgetRef ref,
+  Widget _buildExchangeBanner(
+    ArschlochGameState state,
     List<Player> players,
     AppLocalizations l10n,
   ) {
-    return SingleChildScrollView(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+    final lastRound = state.rounds.last;
+    final playerNames = {for (var p in players) p.id: p.name};
+    final instructions = ArschlochGameState.cardExchangeInstructions(
+      lastRound.finishOrder,
+      playerNames,
+      players.length,
+      state.cardSwappingCount,
+    );
+
+    if (instructions.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.tertiaryContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              const Icon(Icons.style, size: 80, color: Colors.deepPurple),
-              const SizedBox(height: 24),
+              Icon(
+                Icons.swap_horiz,
+                color: Theme.of(context).colorScheme.onTertiaryContainer,
+              ),
+              const SizedBox(width: 8),
               Text(
-                l10n.get('arschloch_title'),
-                style: const TextStyle(
-                  fontSize: 28,
+                'Karten-Tausch',
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${players.length} ${l10n.get('nav_players')}',
-                style: const TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.get('arschloch_goal_desc'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 48),
-              if (players.length < 2)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                    l10n.get('arschloch_min_3_players'),
-                    style: const TextStyle(color: Colors.orange),
-                  ),
-                )
-              else if (players.length == 2)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                    l10n.get('arschloch_min_3_players'),
-                    style: const TextStyle(color: Colors.orange),
-                  ),
-                ),
-              FilledButton.icon(
-                onPressed: players.length >= 2
-                    ? () => ref
-                          .read(arschlochStateProvider.notifier)
-                          .initPlayers(players.map((p) => p.id).toList())
-                    : null,
-                icon: const Icon(Icons.play_arrow),
-                label: Text(
-                  l10n.get('sipdeck_start'),
-                  style: const TextStyle(fontSize: 18),
-                ),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 48,
-                    vertical: 16,
-                  ),
+                  color: Theme.of(context).colorScheme.onTertiaryContainer,
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 8),
+          ...instructions.map(
+            (ins) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                '• $ins',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Theme.of(context).colorScheme.onTertiaryContainer,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatChip(BuildContext context, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
 
-  Widget _buildGameScreen(
-    BuildContext context,
-    WidgetRef ref,
-    List<Player> players,
-    ArschlochGameState gameState,
-    AppLocalizations l10n,
-  ) {
-    final leaders = gameState.getLeaders();
-    final playerMap = {for (final p in players) p.id: p.name};
-
-    // Card exchange instructions from last round
-    List<String> exchangeInstructions = [];
-    if (gameState.rounds.isNotEmpty) {
-      exchangeInstructions = ArschlochGameState.cardExchangeInstructions(
-        gameState.rounds.last.finishOrder,
-        playerMap,
-        players.length,
-      );
-    }
-
-    return Column(
-      children: [
-        Expanded(
-          child: CustomScrollView(
-            slivers: [
-              if (exchangeInstructions.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.all(12),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.shade50,
-                      border: Border.all(color: Colors.amber.shade300),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.get('arschloch_exchange_title'),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 4),
-                        ...exchangeInstructions.map(
-                          (i) => Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Text(
-                              '• $i',
-                              style: const TextStyle(fontSize: 13),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final pid = leaders[index];
-                  final ps = gameState.playerStates[pid]!;
-                  final player = players.firstWhere(
-                    (p) => p.id == pid,
-                    orElse: () => players.first,
-                  );
-
-                  final rankLabel = ps.lastRank == null
-                      ? '–'
-                      : _labelForRank(ps.lastRank!, l10n);
-                  final rankColor = switch (ps.lastRank) {
-                    ArschlochRank.president => Colors.amber.shade700,
-                    ArschlochRank.vicePresident => Colors.blueGrey.shade400,
-                    ArschlochRank.arschloch => Colors.red.shade700,
-                    ArschlochRank.viceArschloch => Colors.orange.shade700,
-                    _ => Colors.grey,
-                  };
-
-                  return Column(
-                    children: [
-                      ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Color(
-                            int.parse(
-                              player.avatarColor.replaceFirst('#', '0xff'),
-                            ),
-                          ),
-                          child: Text(
-                            player.name.substring(0, 1).toUpperCase(),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        title: Text(
-                          player.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          l10n.getWith('arschloch_rounds', [
-                            ps.roundsAsPresident.toString(),
-                            ps.roundsAsArschloch.toString(),
-                          ]),
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color: rankColor.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                rankLabel,
-                                style: TextStyle(
-                                  color: rankColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${ps.points > 0 ? '+' : ''}${ps.points} ${l10n.get('history_pts')}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: ps.points > 0
-                                    ? Colors.green
-                                    : ps.points < 0
-                                    ? Colors.red
-                                    : null,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (index < leaders.length - 1) const Divider(height: 1),
-                    ],
-                  );
-                }, childCount: leaders.length),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 16)),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FilledButton.icon(
-            onPressed: () =>
-                _showRoundEntryDialog(context, ref, players, gameState, l10n),
-            icon: const Icon(Icons.add),
-            label: Text(
-              '${l10n.get('wizard_round')} ${gameState.rounds.length + 1}',
-            ),
-            style: FilledButton.styleFrom(
-              minimumSize: const Size(double.infinity, 52),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _showRoundEntryDialog(
-    BuildContext context,
-    WidgetRef ref,
-    List<Player> players,
-    ArschlochGameState gameState,
-    AppLocalizations l10n,
-  ) async {
-    // finishPosition[playerId] = position (1 = finished first)
-    final positions = <String, int>{};
-    int nextPosition = 1;
-
-    await showDialog(
+  void _showSettingsDialog(BuildContext context) {
+    showDialog(
       context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setState) {
-            final unranked = players
-                .where((p) => !positions.containsKey(p.id))
-                .toList();
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final state = ref.watch(arschlochStateProvider);
+            final l10n = AppLocalizations.of(context);
             return AlertDialog(
-              title: Text(
-                '${l10n.get('wizard_round')} ${gameState.rounds.length + 1} – ${l10n.get('arschloch_finish_order')}',
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (positions.isNotEmpty) ...[
-                      Text(
-                        l10n.get('arschloch_ranked'),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      ...() {
-                        final sortedEntries = positions.entries.toList()
-                          ..sort((a, b) => a.value.compareTo(b.value));
-                        return sortedEntries.map((e) {
-                          final player = players.firstWhere(
-                            (p) => p.id == e.key,
-                          );
-                          final rank = ArschlochGameState.rankFromPosition(
-                            e.value,
-                            players.length,
-                          );
-                          return ListTile(
-                            dense: true,
-                            leading: Text(
-                              '${e.value}.',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            title: Text(player.name),
-                            subtitle: Text(_labelForRank(rank, l10n)),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.undo, size: 18),
-                              onPressed: () => setState(() {
-                                positions.remove(e.key);
-                                nextPosition = positions.isEmpty
-                                    ? 1
-                                    : positions.values.reduce(
-                                            (a, b) => a > b ? a : b,
-                                          ) +
-                                          1;
-                              }),
-                            ),
-                          );
-                        }).toList();
-                      }(),
-                      const Divider(),
-                    ],
-                    if (unranked.isNotEmpty) ...[
-                      Text(
-                        l10n.get('arschloch_tap_to_rank'),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      ...unranked.map(
-                        (p) => ListTile(
-                          dense: true,
-                          title: Text(p.name),
-                          trailing: const Icon(
-                            Icons.touch_app,
-                            size: 18,
-                            color: Colors.blue,
+              title: Text(l10n.get('settings')),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SwitchListTile(
+                    title: const Text('Punkte zählen'),
+                    value: state.usePoints,
+                    onChanged: (val) {
+                      ref
+                          .read(arschlochStateProvider.notifier)
+                          .updateState(state.copyWith(usePoints: val));
+                    },
+                  ),
+                  const Divider(),
+                  const Text(
+                    'Karten-Tausch (Präsident)',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [0, 1, 2]
+                        .map(
+                          (count) => ChoiceChip(
+                            label: Text('$count'),
+                            selected: state.cardSwappingCount == count,
+                            onSelected: (val) {
+                              if (val) {
+                                ref
+                                    .read(arschlochStateProvider.notifier)
+                                    .updateState(
+                                      state.copyWith(cardSwappingCount: count),
+                                    );
+                              }
+                            },
                           ),
-                          onTap: () => setState(() {
-                            positions[p.id] = nextPosition++;
-                          }),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+                        )
+                        .toList(),
+                  ),
+                ],
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(l10n.get('cancel')),
-                ),
-                FilledButton(
-                  onPressed: positions.length == players.length
-                      ? () {
-                          ref
-                              .read(arschlochStateProvider.notifier)
-                              .addRound(
-                                ArschlochRound(
-                                  roundIndex: gameState.rounds.length + 1,
-                                  finishOrder: Map.from(positions),
-                                ),
-                              );
-                          Navigator.pop(ctx);
-                        }
-                      : null,
-                  child: Text(l10n.get('wizard_save_round')),
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.get('close')),
                 ),
               ],
             );
@@ -419,70 +278,121 @@ class ArschlochScreen extends ConsumerWidget {
     );
   }
 
-  void _showRulesDialog(BuildContext context, AppLocalizations l10n) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          '${l10n.get('game_arschloch')} – ${l10n.get('arschloch_rules')}',
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                l10n.get('arschloch_goal'),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(l10n.get('arschloch_goal_desc')),
-              const SizedBox(height: 8),
-              Text(
-                l10n.get('nav_leaderboard'),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(l10n.get('arschloch_ranks_desc')),
-              const SizedBox(height: 8),
-              Text(
-                l10n.get('arschloch_exchange_title'),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(l10n.get('arschloch_rules_exchange_p')),
-              Text(l10n.get('arschloch_rules_exchange_vp')),
-              const SizedBox(height: 8),
-              Text(
-                l10n.get('arschloch_rules_special'),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(l10n.get('arschloch_rules_2_high')),
-              Text(l10n.get('arschloch_rules_bomb')),
-              Text(l10n.get('arschloch_rules_passing')),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.get('close')),
-          ),
-        ],
-      ),
-    );
-  }
+  Future<void> _showAddRoundDialog(
+    BuildContext context,
+    WidgetRef ref,
+    List<Player> players,
+    ArschlochGameState gameState,
+  ) async {
+    final List<String?> finishOrder = List.filled(players.length, null);
+    final List<String> availablePlayerIds = players.map((p) => p.id).toList();
 
-  String _labelForRank(ArschlochRank rank, AppLocalizations l10n) {
-    switch (rank) {
-      case ArschlochRank.president:
-        return l10n.get('arschloch_rank_president');
-      case ArschlochRank.vicePresident:
-        return l10n.get('arschloch_rank_vice_president');
-      case ArschlochRank.neutral:
-        return l10n.get('arschloch_rank_neutral');
-      case ArschlochRank.viceArschloch:
-        return l10n.get('arschloch_rank_vice_arschloch');
-      case ArschlochRank.arschloch:
-        return l10n.get('arschloch_rank_arschloch');
-    }
+    await showDialog(
+      context: context,
+      builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(
+                '${l10n.get('wizard_round')} ${gameState.rounds.length + 1}',
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(players.length, (index) {
+                    final position = index + 1;
+                    final rank = ArschlochGameState.rankFromPosition(
+                      position,
+                      players.length,
+                    );
+
+                    final rankLabel =
+                        gameState.customRankNames?[rank] ??
+                        (l10n.locale.languageCode == 'de'
+                            ? rank.labelDe()
+                            : rank.labelEn());
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 24,
+                            alignment: Alignment.center,
+                            child: Text(
+                              '$position.',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: finishOrder[index],
+                              hint: Text(rankLabel),
+                              items: availablePlayerIds
+                                  .where(
+                                    (id) =>
+                                        !finishOrder.contains(id) ||
+                                        finishOrder[index] == id,
+                                  )
+                                  .map((id) {
+                                    final p = players.firstWhere(
+                                      (p) => p.id == id,
+                                    );
+                                    return DropdownMenuItem(
+                                      value: id,
+                                      child: Text(p.name),
+                                    );
+                                  })
+                                  .toList(),
+                              onChanged: (id) {
+                                setDialogState(() {
+                                  finishOrder[index] = id;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.get('cancel')),
+                ),
+                FilledButton(
+                  onPressed: finishOrder.contains(null)
+                      ? null
+                      : () {
+                          final Map<String, int> order = {
+                            for (int i = 0; i < finishOrder.length; i++)
+                              finishOrder[i]!: i + 1,
+                          };
+                          ref
+                              .read(arschlochStateProvider.notifier)
+                              .addRound(
+                                ArschlochRound(
+                                  roundIndex: gameState.rounds.length + 1,
+                                  finishOrder: order,
+                                ),
+                              );
+                          Navigator.pop(context);
+                        },
+                  child: Text(l10n.get('save')),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   void _confirmReset(

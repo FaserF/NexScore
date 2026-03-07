@@ -14,6 +14,13 @@ enum SipTargetType {
   manual, // Targets determined by external logic or group
 }
 
+enum SipDeckTaskTag {
+  dare, // Pflichtaufgabe / Dare
+  social, // Social interaction
+  messaging, // Contacting people/messaging
+  physical, // Physical activity
+}
+
 /// A single SipDeck challenge card.
 class SipDeckCard {
   final String id;
@@ -22,6 +29,7 @@ class SipDeckCard {
   final String? explanation; // Foolproof explanation for the task
   final int sips; // 0 = rule-based, >0 = number of sips to take
   final SipDeckCategory category;
+  final Set<SipDeckTaskTag> tags;
   final bool isVirus; // Ongoing rule that persists until "cured"
   final int minPlayers; // Minimum players required for this card to make sense
   final List<String> targetIds; // Resolved player IDs for this card instance
@@ -34,6 +42,7 @@ class SipDeckCard {
     this.explanation,
     this.sips = 1,
     required this.category,
+    this.tags = const {},
     this.isVirus = false,
     this.minPlayers = 2,
     this.targetIds = const [],
@@ -50,6 +59,7 @@ class SipDeckCard {
     'explanation': explanation,
     'sips': sips,
     'category': category.name,
+    'tags': tags.map((t) => t.name).toList(),
     'isVirus': isVirus,
     'minPlayers': minPlayers,
   };
@@ -65,6 +75,9 @@ class SipDeckCard {
         (e) => e.name == json['category'],
         orElse: () => SipDeckCategory.warmUp,
       ),
+      tags: (json['tags'] as List? ?? [])
+          .map((t) => SipDeckTaskTag.values.firstWhere((e) => e.name == t))
+          .toSet(),
       isVirus: json['isVirus'] as bool? ?? false,
       minPlayers: json['minPlayers'] as int? ?? 2,
     );
@@ -74,6 +87,7 @@ class SipDeckCard {
 class SipDeckGameState {
   final List<String> activePlayerIds;
   final List<SipDeckCategory> selectedCategories;
+  final Set<SipDeckTaskTag> disabledTags;
   final List<SipDeckCard> playedCards;
   final List<SipDeckCard> activeViruses;
   final bool
@@ -83,6 +97,7 @@ class SipDeckGameState {
   const SipDeckGameState({
     this.activePlayerIds = const [],
     this.selectedCategories = const [SipDeckCategory.warmUp],
+    this.disabledTags = const {},
     this.playedCards = const [],
     this.activeViruses = const [],
     this.filterMultiplayerOnly = true,
@@ -92,6 +107,7 @@ class SipDeckGameState {
   SipDeckGameState copyWith({
     List<String>? activePlayerIds,
     List<SipDeckCategory>? selectedCategories,
+    Set<SipDeckTaskTag>? disabledTags,
     List<SipDeckCard>? playedCards,
     List<SipDeckCard>? activeViruses,
     bool? filterMultiplayerOnly,
@@ -100,6 +116,7 @@ class SipDeckGameState {
     return SipDeckGameState(
       activePlayerIds: activePlayerIds ?? this.activePlayerIds,
       selectedCategories: selectedCategories ?? this.selectedCategories,
+      disabledTags: disabledTags ?? this.disabledTags,
       playedCards: playedCards ?? this.playedCards,
       activeViruses: activeViruses ?? this.activeViruses,
       filterMultiplayerOnly:
@@ -122,6 +139,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0}, name three things you can see that are blue. Fail? Take 2 sips.',
     sips: 2,
     category: SipDeckCategory.warmUp,
+    tags: {SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'w002',
@@ -130,6 +148,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         'Waterfall! {0} starts. Everyone follows. Stop only when the person to your left stops.',
     sips: 0,
     category: SipDeckCategory.warmUp,
+    tags: {SipDeckTaskTag.social, SipDeckTaskTag.physical},
   ),
   SipDeckCard(
     id: 'w003',
@@ -138,6 +157,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0} gives {1} a compliment. {1} must respond in a made-up language. Fail? Take 3 sips.',
     sips: 3,
     category: SipDeckCategory.warmUp,
+    tags: {SipDeckTaskTag.social, SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'w004',
@@ -147,6 +167,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 2,
     category: SipDeckCategory.warmUp,
     minPlayers: 3,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'w005',
@@ -154,6 +175,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: '{0}, 10 seconds to name 5 animals. Miss any? Drink 1 sip per miss.',
     sips: 1,
     category: SipDeckCategory.warmUp,
+    tags: {SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'w006',
@@ -161,6 +183,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: 'Thumb war! {0} vs {1}. Loser takes 2 sips.',
     sips: 2,
     category: SipDeckCategory.warmUp,
+    tags: {SipDeckTaskTag.social, SipDeckTaskTag.physical},
   ),
   SipDeckCard(
     id: 'w007',
@@ -176,6 +199,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0}, do your best celebrity impression. Bad impression? Take 3 sips.',
     sips: 3,
     category: SipDeckCategory.warmUp,
+    tags: {SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'w009',
@@ -183,6 +207,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: 'Never Have I Ever: {0} starts. Go around the circle once.',
     sips: 0,
     category: SipDeckCategory.warmUp,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'w010',
@@ -190,6 +215,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: '{0} and {1} have a staring contest. First to blink takes 2 sips.',
     sips: 2,
     category: SipDeckCategory.warmUp,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'w011',
@@ -198,6 +224,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 3,
     category: SipDeckCategory.warmUp,
     minPlayers: 3,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'w012',
@@ -207,6 +234,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 2,
     category: SipDeckCategory.warmUp,
     isVirus: true,
+    tags: {SipDeckTaskTag.social, SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'w013',
@@ -215,6 +243,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 2,
     category: SipDeckCategory.warmUp,
     minPlayers: 3,
+    tags: {SipDeckTaskTag.social},
   ),
 
   // ─────── Wild Cards ───────
@@ -225,6 +254,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 4,
     category: SipDeckCategory.wildCards,
     isVirus: true,
+    tags: {SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'wc002',
@@ -233,6 +263,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         'Make a rule. {0} creates a rule everyone must follow this round. Break it? 2 sips.',
     sips: 2,
     category: SipDeckCategory.wildCards,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'wc003',
@@ -242,6 +273,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 1,
     category: SipDeckCategory.wildCards,
     isVirus: true,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'wc004',
@@ -251,6 +283,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 0,
     category: SipDeckCategory.wildCards,
     minPlayers: 4,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'wc005',
@@ -258,6 +291,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: 'CHALLENGE: {0} does 10 jumping jacks, or takes 5 sips.',
     sips: 5,
     category: SipDeckCategory.wildCards,
+    tags: {SipDeckTaskTag.dare, SipDeckTaskTag.physical},
   ),
   SipDeckCard(
     id: 'wc006',
@@ -267,6 +301,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 3,
     category: SipDeckCategory.wildCards,
     minPlayers: 3,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'wc007',
@@ -275,6 +310,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         'Everyone on their phones: screenshot your last search. Most embarrassing? Take 3 sips.',
     sips: 3,
     category: SipDeckCategory.wildCards,
+    tags: {SipDeckTaskTag.messaging},
   ),
   SipDeckCard(
     id: 'wc008',
@@ -299,6 +335,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0} draws a portrait of {1} without looking at the paper. Worst drawing? Drink 3.',
     sips: 3,
     category: SipDeckCategory.wildCards,
+    tags: {SipDeckTaskTag.social, SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'wc011',
@@ -308,6 +345,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 5,
     category: SipDeckCategory.wildCards,
     minPlayers: 3,
+    tags: {SipDeckTaskTag.social, SipDeckTaskTag.physical},
   ),
 
   // ─────── Flirty (18+) ───────
@@ -318,6 +356,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0}, give {1} a genuine compliment about their style. If you blush, take 2 sips.',
     sips: 2,
     category: SipDeckCategory.flirty,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'f002',
@@ -326,6 +365,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0} and {1} have 30 seconds to find one thing in common. Fail? Both take 3 sips.',
     sips: 3,
     category: SipDeckCategory.flirty,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'f003',
@@ -334,6 +374,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0}, text your most recent contact a heart emoji. Refuse? Take 2 sips.',
     sips: 2,
     category: SipDeckCategory.flirty,
+    tags: {SipDeckTaskTag.messaging, SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'f004',
@@ -343,6 +384,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 3,
     category: SipDeckCategory.flirty,
     minPlayers: 3,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'f005',
@@ -350,6 +392,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: '{0}, describe your crush without naming them. Group tries to guess.',
     sips: 0,
     category: SipDeckCategory.flirty,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'f006',
@@ -357,6 +400,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: 'Truth: {0}, rate each person 1–10. Refuse? Take 4 sips.',
     sips: 4,
     category: SipDeckCategory.flirty,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'f007',
@@ -366,6 +410,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 1,
     category: SipDeckCategory.flirty,
     minPlayers: 3,
+    tags: {SipDeckTaskTag.social},
   ),
 
   // ─────── Bar Night ───────
@@ -377,6 +422,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 2,
     category: SipDeckCategory.barNight,
     minPlayers: 3,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'b002',
@@ -410,6 +456,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 2,
     category: SipDeckCategory.barNight,
     minPlayers: 3,
+    tags: {SipDeckTaskTag.social, SipDeckTaskTag.physical},
   ),
   SipDeckCard(
     id: 'b006',
@@ -417,6 +464,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: '{0}, talk to a stranger for at least 1 minute. Fail? Take 4 sips.',
     sips: 4,
     category: SipDeckCategory.barNight,
+    tags: {SipDeckTaskTag.social, SipDeckTaskTag.dare},
   ),
 
   // ─────── Laughs ───────
@@ -426,6 +474,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     text: '{0}, walk like a penguin to the other end of the room and back.',
     sips: 2,
     category: SipDeckCategory.laughs,
+    tags: {SipDeckTaskTag.dare, SipDeckTaskTag.physical},
   ),
   SipDeckCard(
     id: 'l002',
@@ -435,6 +484,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 2,
     category: SipDeckCategory.laughs,
     isVirus: true,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'l003',
@@ -443,6 +493,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0}, narrate what is happening right now as a nature documentary. 60 seconds.',
     sips: 3,
     category: SipDeckCategory.laughs,
+    tags: {SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'l004',
@@ -452,6 +503,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 2,
     category: SipDeckCategory.laughs,
     minPlayers: 3,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'l005',
@@ -461,6 +513,7 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 1,
     category: SipDeckCategory.laughs,
     isVirus: true,
+    tags: {SipDeckTaskTag.social},
   ),
   SipDeckCard(
     id: 'l006',
@@ -469,6 +522,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0}, explain your job using only hand gestures. Nobody guesses in 30s? Take 3 sips.',
     sips: 3,
     category: SipDeckCategory.laughs,
+    tags: {SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'l007',
@@ -477,6 +531,7 @@ const List<SipDeckCard> sipDeckDatabase = [
         '{0}, invent a new word and use it convincingly. Group votes if it sounds real.',
     sips: 0,
     category: SipDeckCategory.laughs,
+    tags: {SipDeckTaskTag.dare},
   ),
   SipDeckCard(
     id: 'l008',
@@ -493,5 +548,6 @@ const List<SipDeckCard> sipDeckDatabase = [
     sips: 3,
     category: SipDeckCategory.laughs,
     isVirus: true,
+    tags: {SipDeckTaskTag.dare},
   ),
 ];

@@ -342,14 +342,10 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
     final currentCard = state.playedCards.last;
 
     return GestureDetector(
-      onTap: (currentCard.sips == 0)
-          ? () {
-              HapticFeedback.mediumImpact();
-              ref
-                  .read(buzzTapStateProvider.notifier)
-                  .drawNextCard(players, l10n);
-            }
-          : null,
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        ref.read(buzzTapStateProvider.notifier).drawNextCard(players, l10n);
+      },
       child: Container(
         width: double.infinity,
         height: double.infinity,

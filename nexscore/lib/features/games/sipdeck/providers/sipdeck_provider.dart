@@ -18,6 +18,16 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     state = state.copyWith(selectedCategories: cats);
   }
 
+  void toggleTag(SipDeckTaskTag tag) {
+    final tags = Set<SipDeckTaskTag>.from(state.disabledTags);
+    if (tags.contains(tag)) {
+      tags.remove(tag);
+    } else {
+      tags.add(tag);
+    }
+    state = state.copyWith(disabledTags: tags);
+  }
+
   void toggleFilterMultiplayerOnly(bool value) {
     state = state.copyWith(filterMultiplayerOnly: value);
   }
@@ -29,7 +39,12 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
 
       // Apply 2-player optimization filter
       if (state.filterMultiplayerOnly && activePlayers.length <= 2) {
-        return c.minPlayers <= 2;
+        if (c.minPlayers > 2) return false;
+      }
+
+      // Apply granular tag filters
+      for (final tag in c.tags) {
+        if (state.disabledTags.contains(tag)) return false;
       }
 
       return true;

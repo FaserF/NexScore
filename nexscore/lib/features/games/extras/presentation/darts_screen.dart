@@ -14,7 +14,11 @@ class DartsStateNotifier extends Notifier<DartsGameState> {
   void addRound(String playerId, DartRound round) {
     final currentState =
         state.playerStates[playerId] ??
-        DartPlayerState(startingScore: state.targetScore);
+        DartPlayerState(
+          startingScore: state.targetScore,
+          finishType: state.finishType,
+          startType: state.startType,
+        );
     final updatedStates = Map<String, DartPlayerState>.from(state.playerStates);
 
     updatedStates[playerId] = currentState.copyWith(
@@ -24,13 +28,21 @@ class DartsStateNotifier extends Notifier<DartsGameState> {
     state = state.copyWith(playerStates: updatedStates);
   }
 
-  void setTargetScore(int score) {
-    // Reset all local player states when changing game type
-    state = DartsGameState(targetScore: score, playerStates: {});
+  void updateSettings({
+    int? targetScore,
+    DartsFinishType? finishType,
+    DartsStartType? startType,
+  }) {
+    state = state.copyWith(
+      targetScore: targetScore,
+      finishType: finishType,
+      startType: startType,
+      playerStates: {}, // Reset on major setting change
+    );
   }
 
   void resetGame() {
-    state = DartsGameState(targetScore: state.targetScore, playerStates: {});
+    state = state.copyWith(playerStates: {});
   }
 }
 
@@ -83,16 +95,10 @@ class DartsScreen extends ConsumerWidget {
             },
             tooltip: l10n.get('nav_help'),
           ),
-          PopupMenuButton<int>(
+          IconButton(
             icon: const Icon(Icons.settings),
-            onSelected: (val) =>
-                ref.read(dartsStateProvider.notifier).setTargetScore(val),
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 301, child: Text('301')),
-              const PopupMenuItem(value: 501, child: Text('501')),
-              const PopupMenuItem(value: 701, child: Text('701')),
-              const PopupMenuItem(value: 1001, child: Text('1001')),
-            ],
+            onPressed: () => _showSettingsDialog(context, ref, gameState, l10n),
+            tooltip: l10n.get('darts_settings'),
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -109,7 +115,11 @@ class DartsScreen extends ConsumerWidget {
           final p = players[index];
           final pState =
               gameState.playerStates[p.id] ??
-              DartPlayerState(startingScore: gameState.targetScore);
+              DartPlayerState(
+                startingScore: gameState.targetScore,
+                finishType: gameState.finishType,
+                startType: gameState.startType,
+              );
           final currentScore = pState.currentScore;
           final isWinner = currentScore == 0;
 
@@ -154,7 +164,14 @@ class DartsScreen extends ConsumerWidget {
                   icon: const Icon(Icons.add),
                   onPressed: isWinner
                       ? null
-                      : () => _showPointsDialog(context, ref, p, pState, l10n),
+                      : () => _showPointsDialog(
+                          context,
+                          ref,
+                          p,
+                          pState,
+                          gameState,
+                          l10n,
+                        ),
                 ),
               ],
             ),
@@ -169,6 +186,7 @@ class DartsScreen extends ConsumerWidget {
     WidgetRef ref,
     Player player,
     DartPlayerState pState,
+    DartsGameState gameState,
     AppLocalizations l10n,
   ) async {
     final List<DartThrow> currentThrows = [];
@@ -182,17 +200,62 @@ class DartsScreen extends ConsumerWidget {
             int previewScore = pState.currentScore;
             bool isBust = false;
 
-            // Calculate preview
-            for (final t in currentThrows) {
-              final newScore = previewScore - t.total;
-              if (newScore > 1) {
-                previewScore = newScore;
-              } else if (newScore == 0 && t.multiplier == 2) {
-                previewScore = 0;
-                break;
-              } else {
-                isBust = true;
-                break;
+            // Calculate preview using the logic from our model
+            final tempPlayerState = pState.copyWith(
+              rounds: [
+                ...pState.rounds,
+                DartRound(throws: currentThrows),
+              ],
+            );
+            previewScore = tempPlayerState.currentScore;
+
+            // Check if we busted in THIS round
+            if (currentThrows.isNotEmpty) {
+              // A simplified bust check for UI feedback
+              // In the model, currentScore stays same on bust.
+              if (previewScore == pState.currentScore &&
+                  currentThrows.fold(0, (s, t) => s + t.total) > 0) {
+                // Might be a bust, but could also be "not started"
+                // Let's check more carefully
+                int lastWorkingScore = pState.currentScore;
+                bool started =
+                    pState.currentScore < pState.startingScore ||
+                    gameState.startType == DartsStartType.straight;
+
+                for (int i = 0; i < currentThrows.length; i++) {
+                  final t = currentThrows[i];
+                  if (!started) {
+                    if ((gameState.startType == DartsStartType.double &&
+                            t.multiplier == 2) ||
+                        (gameState.startType == DartsStartType.master &&
+                            (t.multiplier == 2 || t.multiplier == 3))) {
+                      started = true;
+                    } else {
+                      continue;
+                    }
+                  }
+
+                  final next = lastWorkingScore - t.total;
+                  if (next < 0 || next == 1) {
+                    isBust = true;
+                    break;
+                  }
+                  if (next == 0) {
+                    bool valid = false;
+                    if (gameState.finishType == DartsFinishType.single)
+                      valid = true;
+                    else if (gameState.finishType == DartsFinishType.double &&
+                        t.multiplier == 2)
+                      valid = true;
+                    else if (gameState.finishType == DartsFinishType.master &&
+                        (t.multiplier == 2 || t.multiplier == 3))
+                      valid = true;
+
+                    if (!valid) isBust = true;
+                    break;
+                  }
+                  lastWorkingScore = next;
+                }
               }
             }
 
@@ -424,6 +487,109 @@ class DartsScreen extends ConsumerWidget {
           },
         );
       },
+    );
+  }
+
+  void _showSettingsDialog(
+    BuildContext context,
+    WidgetRef ref,
+    DartsGameState state,
+    AppLocalizations l10n,
+  ) {
+    int selectedScore = state.targetScore;
+    DartsFinishType selectedFinish = state.finishType;
+    DartsStartType selectedStart = state.startType;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text(l10n.get('darts_settings')),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.get('history_pts'),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: [101, 201, 301, 501, 701, 1001]
+                      .map(
+                        (s) => ChoiceChip(
+                          label: Text('$s'),
+                          selected: selectedScore == s,
+                          onSelected: (val) =>
+                              setState(() => selectedScore = s),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const Divider(height: 32),
+                Text(
+                  l10n.get('darts_start_type'),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                DropdownButton<DartsStartType>(
+                  isExpanded: true,
+                  value: selectedStart,
+                  onChanged: (val) => setState(() => selectedStart = val!),
+                  items: DartsStartType.values
+                      .map(
+                        (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(l10n.get('darts_start_${e.name}')),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const Divider(height: 32),
+                Text(
+                  l10n.get('darts_finish_type'),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                DropdownButton<DartsFinishType>(
+                  isExpanded: true,
+                  value: selectedFinish,
+                  onChanged: (val) => setState(() => selectedFinish = val!),
+                  items: DartsFinishType.values
+                      .map(
+                        (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(l10n.get('darts_finish_${e.name}')),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.get('cancel')),
+            ),
+            FilledButton(
+              onPressed: () {
+                ref
+                    .read(dartsStateProvider.notifier)
+                    .updateSettings(
+                      targetScore: selectedScore,
+                      finishType: selectedFinish,
+                      startType: selectedStart,
+                    );
+                Navigator.pop(context);
+              },
+              child: Text(l10n.get('ok')),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

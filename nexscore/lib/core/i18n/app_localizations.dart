@@ -377,7 +377,8 @@ class AppLocalizations {
       'kniffel_cat_lgstraight': 'Large Straight (40)',
       'kniffel_cat_yahtzee': 'Yahtzee (50)',
       'kniffel_cat_chance': 'Chance',
-      'kniffel_enter_score': 'Enter score for {0}',
+      'kniffel_multiple_yahtzee': 'Multiple Yahtzees Bonus (+50)',
+      'kniffel_yahtzee_joker': 'Yahtzee Joker used',
 
       // ── Darts
       'darts_title': 'Darts (X01)',
@@ -390,6 +391,15 @@ class AppLocalizations {
       'darts_remaining': 'Remaining',
       'darts_remove_last': 'Remove last throw',
       'darts_checkout_possible': 'Checkout possible!',
+      'darts_finish_type': 'Finish Type',
+      'darts_start_type': 'Start Type',
+      'darts_finish_single': 'Single Out',
+      'darts_finish_double': 'Double Out',
+      'darts_finish_master': 'Master Out (Double/Treble)',
+      'darts_start_straight': 'Straight Start',
+      'darts_start_double': 'Double In',
+      'darts_start_master': 'Master In',
+      'darts_settings': 'Darts Settings',
 
       // ── Phase 10
       'phase10_variant': 'Phase 10 Variant',
@@ -431,6 +441,12 @@ class AppLocalizations {
       'romme_penalty_title': 'Round {0} – Enter Penalty Points',
       'romme_breakdown': 'Score Breakdown',
       'romme_total_points': 'Total Points',
+      'romme_first_meld': 'First Meld Requirement',
+      'romme_hand_romme': 'Hand-Rommé (Finish in one go)',
+      'romme_joker_points': 'Joker Points',
+      'romme_settings': 'Rommé Settings',
+      'romme_hand_romme_desc':
+          'Points are doubled when finishing without previous melds.',
 
       // ── History
       'history': 'History',
@@ -466,6 +482,11 @@ class AppLocalizations {
       'sipdeck_optimize_2players_desc':
           'Hide cards that aren\'t fun with only two players.',
       'sipdeck_no_players': 'Add players first to play SipDeck.',
+      'sipdeck_filters': 'Task Filters',
+      'sipdeck_tag_dare': 'Dares',
+      'sipdeck_tag_social': 'Social',
+      'sipdeck_tag_messaging': 'Messaging',
+      'sipdeck_tag_physical': 'Physical',
 
       // ── BuzzTap
       'buzztap_title': 'BuzzTap',
@@ -1176,6 +1197,8 @@ class AppLocalizations {
       'kniffel_cat_lgstraight': 'Große Straße (40)',
       'kniffel_cat_yahtzee': 'Kniffel (50)',
       'kniffel_cat_chance': 'Chance',
+      'kniffel_multiple_yahtzee': 'Mehrfach-Kniffel Bonus (+50)',
+      'kniffel_yahtzee_joker': 'Kniffel-Joker genutzt',
       'kniffel_enter_score': 'Punkte eingeben für {0}',
 
       // ── Darts
@@ -1189,6 +1212,15 @@ class AppLocalizations {
       'darts_remaining': 'Restlich',
       'darts_remove_last': 'Letzten Wurf entfernen',
       'darts_checkout_possible': 'Checkout möglich!',
+      'darts_finish_type': 'Finish-Typ',
+      'darts_start_type': 'Start-Typ',
+      'darts_finish_single': 'Single Out',
+      'darts_finish_double': 'Double Out',
+      'darts_finish_master': 'Master Out (Double/Triple)',
+      'darts_start_straight': 'Direkter Start',
+      'darts_start_double': 'Double In',
+      'darts_start_master': 'Master In',
+      'darts_settings': 'Darts Einstellungen',
 
       // ── Phase 10
       'phase10_variant': 'Phase 10 Variante',
@@ -1231,6 +1263,12 @@ class AppLocalizations {
       'romme_penalty_title': 'Runde {0} – Strafpunkte eingeben',
       'romme_breakdown': 'Punktübersicht',
       'romme_total_points': 'Gesamtpunkte',
+      'romme_first_meld': 'Erstmeldung (Punkte)',
+      'romme_hand_romme': 'Hand-Rommé (In einem Zug)',
+      'romme_joker_points': 'Joker Punkte',
+      'romme_settings': 'Rommé Einstellungen',
+      'romme_hand_romme_desc':
+          'Punkte werden verdoppelt, wenn ohne vorherige Meldung beendet wird.',
 
       // ── History
       'history': 'Verlauf',
@@ -1266,6 +1304,11 @@ class AppLocalizations {
       'sipdeck_optimize_2players_desc':
           'Blende Karten aus, die zu zweit wenig Sinn machen.',
       'sipdeck_no_players': 'Füge zuerst Spieler hinzu, um SipDeck zu spielen.',
+      'sipdeck_filters': 'Aufgaben-Filter',
+      'sipdeck_tag_dare': 'Pflichtaufgaben',
+      'sipdeck_tag_social': 'Soziale Interaktion',
+      'sipdeck_tag_messaging': 'Personen anschreiben',
+      'sipdeck_tag_physical': 'Körperliches',
 
       'sipdeck_18_warning': 'Ab 18 Jahren freigegeben.',
       'sipdeck_2player_warning':

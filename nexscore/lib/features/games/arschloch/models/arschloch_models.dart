@@ -128,24 +128,31 @@ class ArschlochRound {
 class ArschlochGameState {
   final Map<String, ArschlochPlayerState> playerStates;
   final List<ArschlochRound> rounds;
-  final bool
-  usePoints; // Scoring variant: point accumulation vs just rank tracking
+  final bool usePoints;
+  final int cardSwappingCount; // 1 or 2 (default 2)
+  final Map<ArschlochRank, String>? customRankNames;
 
   const ArschlochGameState({
     this.playerStates = const {},
     this.rounds = const [],
     this.usePoints = true,
+    this.cardSwappingCount = 2,
+    this.customRankNames,
   });
 
   ArschlochGameState copyWith({
     Map<String, ArschlochPlayerState>? playerStates,
     List<ArschlochRound>? rounds,
     bool? usePoints,
+    int? cardSwappingCount,
+    Map<ArschlochRank, String>? customRankNames,
   }) {
     return ArschlochGameState(
       playerStates: playerStates ?? this.playerStates,
       rounds: rounds ?? this.rounds,
       usePoints: usePoints ?? this.usePoints,
+      cardSwappingCount: cardSwappingCount ?? this.cardSwappingCount,
+      customRankNames: customRankNames ?? this.customRankNames,
     );
   }
 
@@ -182,8 +189,9 @@ class ArschlochGameState {
     Map<String, int> lastFinishOrder,
     Map<String, String> playerNames,
     int totalPlayers,
+    int cardSwappingCount,
   ) {
-    if (totalPlayers < 2) return [];
+    if (totalPlayers < 2 || cardSwappingCount == 0) return [];
     final sorted = lastFinishOrder.entries.toList()
       ..sort((a, b) => a.value.compareTo(b.value));
 
@@ -194,18 +202,21 @@ class ArschlochGameState {
     final arschloch = sorted.last.key;
 
     instructions.add(
-      '${playerNames[arschloch] ?? arschloch} gibt 2 beste Karten an ${playerNames[president] ?? president} (Arschloch → Präsident)',
+      '${playerNames[arschloch] ?? arschloch} gibt $cardSwappingCount beste Karten an ${playerNames[president] ?? president} (Arschloch → Präsident)',
     );
     instructions.add(
-      '${playerNames[president] ?? president} gibt 2 niedrigste Karten zurück',
+      '${playerNames[president] ?? president} gibt $cardSwappingCount niedrigste Karten zurück',
     );
 
-    if (totalPlayers >= 5) {
+    if (totalPlayers >= 5 && cardSwappingCount > 0) {
       final vicePres = sorted[1].key;
       final viceArsch = sorted[sorted.length - 2].key;
-      instructions.add(
-        '${playerNames[viceArsch] ?? viceArsch} gibt 1 beste Karte an ${playerNames[vicePres] ?? vicePres}',
-      );
+      final viceCount = cardSwappingCount > 1 ? 1 : 0; // Usually 1 if pres is 2
+      if (viceCount > 0) {
+        instructions.add(
+          '${playerNames[viceArsch] ?? viceArsch} gibt $viceCount beste Karte an ${playerNames[vicePres] ?? vicePres}',
+        );
+      }
     }
 
     return instructions;
@@ -228,6 +239,8 @@ class ArschlochGameState {
     'playerStates': playerStates.map((k, v) => MapEntry(k, v.toJson())),
     'rounds': rounds.map((r) => r.toJson()).toList(),
     'usePoints': usePoints,
+    'cardSwappingCount': cardSwappingCount,
+    'customRankNames': customRankNames?.map((k, v) => MapEntry(k.name, v)),
   };
 
   factory ArschlochGameState.fromJson(Map<String, dynamic> json) {
@@ -242,6 +255,15 @@ class ArschlochGameState {
           .map((r) => ArschlochRound.fromJson(r as Map<String, dynamic>))
           .toList(),
       usePoints: json['usePoints'] as bool? ?? true,
+      cardSwappingCount: json['cardSwappingCount'] as int? ?? 2,
+      customRankNames: json['customRankNames'] != null
+          ? (json['customRankNames'] as Map<String, dynamic>).map(
+              (k, v) => MapEntry(
+                ArschlochRank.values.firstWhere((r) => r.name == k),
+                v as String,
+              ),
+            )
+          : null,
     );
   }
 }

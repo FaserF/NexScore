@@ -101,6 +101,7 @@ void main() {
         finishOrder,
         names,
         4,
+        2,
       );
 
       expect(instructions.length, 2);
@@ -116,6 +117,7 @@ void main() {
         finishOrder,
         names,
         5,
+        2,
       );
 
       expect(instructions.length, 3);
@@ -130,6 +132,7 @@ void main() {
         finishOrder,
         names,
         3,
+        2,
       );
 
       expect(instructions.length, 2);

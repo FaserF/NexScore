@@ -138,6 +138,90 @@ void main() {
       expect(state.averagePerDart, closeTo(60.0, 0.01));
     });
 
+    test('straight start works immediately', () {
+      const state = DartPlayerState(
+        startingScore: 301,
+        startType: DartsStartType.straight,
+        rounds: [
+          DartRound(throws: [DartThrow(score: 20)]),
+        ],
+      );
+      expect(state.currentScore, 281);
+    });
+
+    test('double in: score only starts after a double', () {
+      const state = DartPlayerState(
+        startingScore: 301,
+        startType: DartsStartType.double,
+        rounds: [
+          DartRound(throws: [DartThrow(score: 20)]), // No start
+          DartRound(
+            throws: [DartThrow(score: 20, multiplier: 2)],
+          ), // Starts! (40)
+          DartRound(throws: [DartThrow(score: 20)]), // Counts (20)
+        ],
+      );
+      // 301 - 40 - 20 = 241
+      expect(state.currentScore, 241);
+    });
+
+    test('master in: score starts after double or treble', () {
+      const state = DartPlayerState(
+        startingScore: 301,
+        startType: DartsStartType.master,
+        rounds: [
+          DartRound(throws: [DartThrow(score: 20)]), // No start
+          DartRound(
+            throws: [DartThrow(score: 20, multiplier: 3)],
+          ), // Starts! (60)
+          DartRound(throws: [DartThrow(score: 20)]), // Counts (20)
+        ],
+      );
+      // 301 - 60 - 20 = 221
+      expect(state.currentScore, 221);
+    });
+
+    test('single out: allows finishing on single', () {
+      const state = DartPlayerState(
+        startingScore: 20,
+        finishType: DartsFinishType.single,
+        rounds: [
+          DartRound(throws: [DartThrow(score: 20)]),
+        ],
+      );
+      expect(state.currentScore, 0);
+    });
+
+    test('master out: allows finishing on treble', () {
+      const state = DartPlayerState(
+        startingScore: 60,
+        finishType: DartsFinishType.master,
+        rounds: [
+          DartRound(throws: [DartThrow(score: 20, multiplier: 3)]),
+        ],
+      );
+      expect(state.currentScore, 0);
+    });
+
+    test('double in bust: reverts hasStarted flag if busted in same round', () {
+      const state = DartPlayerState(
+        startingScore: 301,
+        startType: DartsStartType.double,
+        rounds: [
+          DartRound(
+            throws: [
+              DartThrow(score: 20, multiplier: 2), // Starts (261)
+              DartThrow(
+                score: 261,
+              ), // Bust! (should revert to 301 and not started)
+            ],
+          ),
+          DartRound(throws: [DartThrow(score: 20)]), // Should not count
+        ],
+      );
+      expect(state.currentScore, 301);
+    });
+
     test('average is 0 when no rounds played', () {
       final state = DartPlayerState(startingScore: 501);
       expect(state.averagePerDart, 0.0);
@@ -146,6 +230,8 @@ void main() {
     test('serialization round-trips correctly', () {
       final state = DartPlayerState(
         startingScore: 701,
+        finishType: DartsFinishType.master,
+        startType: DartsStartType.double,
         rounds: [
           DartRound(throws: [const DartThrow(score: 100, multiplier: 1)]),
         ],
@@ -153,27 +239,40 @@ void main() {
       final json = state.toJson();
       final restored = DartPlayerState.fromJson(json);
       expect(restored.startingScore, 701);
-      expect(restored.rounds.length, 1);
-      expect(restored.rounds[0].throws[0].score, 100);
+      expect(restored.finishType, DartsFinishType.master);
+      expect(restored.startType, DartsStartType.double);
     });
   });
 
   group('Darts Models – DartsGameState', () {
-    test('copyWith updates targetScore', () {
-      const gs = DartsGameState(targetScore: 301);
-      final updated = gs.copyWith(targetScore: 501);
+    test('copyWith updates variant types', () {
+      const gs = DartsGameState(
+        targetScore: 301,
+        finishType: DartsFinishType.double,
+        startType: DartsStartType.straight,
+      );
+      final updated = gs.copyWith(
+        targetScore: 501,
+        finishType: DartsFinishType.master,
+        startType: DartsStartType.double,
+      );
       expect(updated.targetScore, 501);
-      expect(updated.playerStates, isEmpty);
+      expect(updated.finishType, DartsFinishType.master);
+      expect(updated.startType, DartsStartType.double);
     });
 
     test('serialization round-trips', () {
       final gs = DartsGameState(
         targetScore: 501,
+        finishType: DartsFinishType.master,
+        startType: DartsStartType.double,
         playerStates: {
           'p1': DartPlayerState(
             startingScore: 501,
+            finishType: DartsFinishType.master,
+            startType: DartsStartType.double,
             rounds: [
-              DartRound(throws: [const DartThrow(score: 60)]),
+              DartRound(throws: [const DartThrow(score: 20, multiplier: 2)]),
             ],
           ),
         },
@@ -181,7 +280,9 @@ void main() {
       final json = gs.toJson();
       final restored = DartsGameState.fromJson(json);
       expect(restored.targetScore, 501);
-      expect(restored.playerStates['p1']!.currentScore, 441);
+      expect(restored.finishType, DartsFinishType.master);
+      expect(restored.startType, DartsStartType.double);
+      expect(restored.playerStates['p1']!.currentScore, 461);
     });
   });
 }

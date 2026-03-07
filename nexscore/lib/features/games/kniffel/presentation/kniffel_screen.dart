@@ -243,6 +243,8 @@ class KniffelScreen extends ConsumerWidget {
             l10n,
           ),
           const Divider(),
+          _buildBonusYahtzeeRow(context, ref, player.id, sheet, l10n),
+          const Divider(),
           _buildSectionTotalRow(
             l10n.get('kniffel_lower'),
             sheet.lowerSectionSum.toString(),
@@ -315,6 +317,42 @@ class KniffelScreen extends ConsumerWidget {
           _showInputDialog(context, ref, playerId, category, label, l10n);
         }
       },
+    );
+  }
+
+  Widget _buildBonusYahtzeeRow(
+    BuildContext context,
+    WidgetRef ref,
+    String playerId,
+    YahtzeePlayerSheet sheet,
+    AppLocalizations l10n,
+  ) {
+    return ListTile(
+      title: Text(l10n.get('kniffel_yahtzee_bonus')),
+      subtitle: Text(l10n.get('kniffel_yahtzee_bonus_desc')),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.remove_circle_outline),
+            onPressed: sheet.bonusYahtzees > 0
+                ? () => ref
+                      .read(kniffelStateProvider.notifier)
+                      .updateBonus(playerId, sheet.bonusYahtzees - 1)
+                : null,
+          ),
+          Text(
+            '${sheet.bonusYahtzees}',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: () => ref
+                .read(kniffelStateProvider.notifier)
+                .updateBonus(playerId, sheet.bonusYahtzees + 1),
+          ),
+        ],
+      ),
     );
   }
 

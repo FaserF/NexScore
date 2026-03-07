@@ -16,8 +16,10 @@ enum YahtzeeCategory {
 
 class YahtzeePlayerSheet {
   final Map<YahtzeeCategory, int> scores;
+  final int
+  bonusYahtzees; // Count of additional Yahtzees after the first 50-pt one
 
-  const YahtzeePlayerSheet({this.scores = const {}});
+  const YahtzeePlayerSheet({this.scores = const {}, this.bonusYahtzees = 0});
 
   int get upperSectionSum {
     int sum = 0;
@@ -49,12 +51,37 @@ class YahtzeePlayerSheet {
     ]) {
       sum += scores[cat] ?? 0;
     }
+    // Add multiple yahtzee bonuses (+50 each)
+    sum += bonusYahtzees * 50;
     return sum;
   }
 
   int get totalScore => upperSectionSum + upperSectionBonus + lowerSectionSum;
 
-  YahtzeePlayerSheet copyWith({Map<YahtzeeCategory, int>? scores}) {
-    return YahtzeePlayerSheet(scores: scores ?? this.scores);
+  YahtzeePlayerSheet copyWith({
+    Map<YahtzeeCategory, int>? scores,
+    int? bonusYahtzees,
+  }) {
+    return YahtzeePlayerSheet(
+      scores: scores ?? this.scores,
+      bonusYahtzees: bonusYahtzees ?? this.bonusYahtzees,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'scores': scores.map((k, v) => MapEntry(k.name, v)),
+    'bonusYahtzees': bonusYahtzees,
+  };
+
+  factory YahtzeePlayerSheet.fromJson(Map<String, dynamic> json) {
+    return YahtzeePlayerSheet(
+      scores: (json['scores'] as Map<String, dynamic>).map(
+        (k, v) => MapEntry(
+          YahtzeeCategory.values.firstWhere((e) => e.name == k),
+          v as int,
+        ),
+      ),
+      bonusYahtzees: json['bonusYahtzees'] as int? ?? 0,
+    );
   }
 }

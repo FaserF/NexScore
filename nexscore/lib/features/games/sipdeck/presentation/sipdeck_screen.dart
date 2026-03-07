@@ -216,6 +216,55 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                     }).toList(),
                   ),
                 ),
+                const SizedBox(height: 24),
+
+                // Task Filters Section
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.get('sipdeck_filters'),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: SipDeckTaskTag.values.map((tag) {
+                      final isDisabled = state.disabledTags.contains(tag);
+                      final label = _labelForTag(tag, l10n);
+                      final icon = _iconForTag(tag);
+                      final color = _colorForTag(tag);
+
+                      return FilterChip(
+                        label: Text(label),
+                        avatar: Icon(icon, size: 16, color: color),
+                        selected: !isDisabled,
+                        onSelected: (_) {
+                          ref
+                              .read(sipDeckStateProvider.notifier)
+                              .toggleTag(tag);
+                        },
+                        selectedColor: color.withValues(alpha: 0.2),
+                        checkmarkColor: color,
+                        labelStyle: TextStyle(
+                          color: !isDisabled ? color : null,
+                          fontWeight: !isDisabled
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
                 const SizedBox(height: 32),
                 FilledButton.icon(
                   onPressed: () => ref
@@ -270,14 +319,12 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
         child: Focus(
           autofocus: true,
           child: GestureDetector(
-            onTap: (currentCard.sips == 0)
-                ? () {
-                    HapticFeedback.lightImpact();
-                    ref
-                        .read(sipDeckStateProvider.notifier)
-                        .drawNextCard(players, l10n);
-                  }
-                : null,
+            onTap: () {
+              HapticFeedback.lightImpact();
+              ref
+                  .read(sipDeckStateProvider.notifier)
+                  .drawNextCard(players, l10n);
+            },
             child: Container(
               width: double.infinity,
               color: currentCard.isVirus
@@ -663,6 +710,45 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
     );
   }
 
+  String _labelForTag(SipDeckTaskTag tag, AppLocalizations l10n) {
+    switch (tag) {
+      case SipDeckTaskTag.dare:
+        return l10n.get('sipdeck_tag_dare');
+      case SipDeckTaskTag.social:
+        return l10n.get('sipdeck_tag_social');
+      case SipDeckTaskTag.messaging:
+        return l10n.get('sipdeck_tag_messaging');
+      case SipDeckTaskTag.physical:
+        return l10n.get('sipdeck_tag_physical');
+    }
+  }
+
+  IconData _iconForTag(SipDeckTaskTag tag) {
+    switch (tag) {
+      case SipDeckTaskTag.dare:
+        return Icons.assignment_outlined;
+      case SipDeckTaskTag.social:
+        return Icons.group_outlined;
+      case SipDeckTaskTag.messaging:
+        return Icons.chat_bubble_outline;
+      case SipDeckTaskTag.physical:
+        return Icons.fitness_center_outlined;
+    }
+  }
+
+  Color _colorForTag(SipDeckTaskTag tag) {
+    switch (tag) {
+      case SipDeckTaskTag.dare:
+        return Colors.orange.shade700;
+      case SipDeckTaskTag.social:
+        return Colors.indigo.shade700;
+      case SipDeckTaskTag.messaging:
+        return Colors.amber.shade800;
+      case SipDeckTaskTag.physical:
+        return Colors.cyan.shade700;
+    }
+  }
+
   String _labelForCategory(SipDeckCategory cat, AppLocalizations l10n) {
     switch (cat) {
       case SipDeckCategory.warmUp:
@@ -783,35 +869,61 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text(
-              l10n.get('sipdeck_categories'),
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              l10n.get('sipdeck_categories'), // Use a desc if available
-              style: const TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-            ...SipDeckCategory.values.map((cat) {
-              final isSelected = state.selectedCategories.contains(cat);
-              return CheckboxListTile(
-                title: Text(_labelForCategory(cat, l10n)),
-                secondary: Icon(
-                  _iconForCategory(cat),
-                  color: _colorForCategory(cat),
+        return Consumer(
+          builder: (context, ref, _) {
+            final currentState = ref.watch(sipDeckStateProvider);
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Text(
+                  l10n.get('sipdeck_categories'),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                value: isSelected,
-                onChanged: (_) {
-                  ref.read(sipDeckStateProvider.notifier).toggleCategory(cat);
-                  Navigator.pop(context);
-                },
-              );
-            }),
-          ],
+                const SizedBox(height: 16),
+                ...SipDeckCategory.values.map((cat) {
+                  final isSelected = currentState.selectedCategories.contains(
+                    cat,
+                  );
+                  return CheckboxListTile(
+                    title: Text(_labelForCategory(cat, l10n)),
+                    secondary: Icon(
+                      _iconForCategory(cat),
+                      color: _colorForCategory(cat),
+                    ),
+                    value: isSelected,
+                    onChanged: (_) {
+                      ref
+                          .read(sipDeckStateProvider.notifier)
+                          .toggleCategory(cat);
+                    },
+                  );
+                }),
+                const Divider(),
+                Text(
+                  l10n.get('sipdeck_filters'),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ...SipDeckTaskTag.values.map((tag) {
+                  final isDisabled = currentState.disabledTags.contains(tag);
+                  return CheckboxListTile(
+                    title: Text(_labelForTag(tag, l10n)),
+                    secondary: Icon(_iconForTag(tag), color: _colorForTag(tag)),
+                    value: !isDisabled,
+                    onChanged: (_) {
+                      ref.read(sipDeckStateProvider.notifier).toggleTag(tag);
+                    },
+                  );
+                }),
+              ],
+            );
+          },
         );
       },
     );

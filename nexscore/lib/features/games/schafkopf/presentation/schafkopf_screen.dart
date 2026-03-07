@@ -14,7 +14,7 @@ class SchafkopfScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final rounds = ref.watch(schafkopfStateProvider);
+    final gameState = ref.watch(schafkopfStateProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
 
@@ -34,7 +34,7 @@ class SchafkopfScreen extends ConsumerWidget {
             },
             tooltip: l10n.get('nav_help'),
           ),
-          if (rounds.isNotEmpty)
+          if (gameState.rounds.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.undo),
               tooltip: l10n.get('schafkopf_undo'),
@@ -60,16 +60,17 @@ class SchafkopfScreen extends ConsumerWidget {
             )
           : Column(
               children: [
-                _buildScoreHeader(players, rounds, l10n),
+                _buildScoreHeader(players, gameState, l10n),
+                _buildStockInfo(context, ref, gameState, l10n),
                 const Divider(height: 1, thickness: 2),
                 Expanded(
-                  child: rounds.isEmpty
+                  child: gameState.rounds.isEmpty
                       ? Center(child: Text(l10n.get('schafkopf_no_rounds')))
                       : ListView.separated(
-                          itemCount: rounds.length,
+                          itemCount: gameState.rounds.length,
                           separatorBuilder: (_, _) => const Divider(height: 1),
                           itemBuilder: (context, index) {
-                            final round = rounds[index];
+                            final round = gameState.rounds[index];
                             final payouts = round.calculatePayouts(
                               players.map((p) => p.id).toList(),
                             );
@@ -103,6 +104,8 @@ class SchafkopfScreen extends ConsumerWidget {
                               ),
                               subtitle: Text(
                                 [
+                                  if (round.isBockRound) 'BOCK',
+                                  if (round.isMussSpiel) 'MUSS',
                                   if (round.runners > 0)
                                     l10n.getWith('schafkopf_runners_count', [
                                       round.runners.toString(),
@@ -143,16 +146,12 @@ class SchafkopfScreen extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: FilledButton.icon(
-                    onPressed: () => _showAddRoundDialog(
-                      context,
-                      ref,
-                      players,
-                      rounds.length,
-                    ),
+                    onPressed: () =>
+                        _showAddRoundDialog(context, ref, players, gameState),
                     icon: const Icon(Icons.add),
                     label: Text(
                       l10n.getWith('wizard_next_round', [
-                        (rounds.length + 1).toString(),
+                        (gameState.rounds.length + 1).toString(),
                       ]),
                     ),
                     style: FilledButton.styleFrom(
@@ -165,17 +164,122 @@ class SchafkopfScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildScoreHeader(
-    List<Player> players,
-    List<SchafkopfRound> rounds,
+  Widget _buildStockInfo(
+    BuildContext context,
+    WidgetRef ref,
+    SchafkopfGameState state,
     AppLocalizations l10n,
   ) {
-    final Map<String, double> totals = {for (var p in players) p.id: 0.0};
-    for (final r in rounds) {
-      r.calculatePayouts(players.map((p) => p.id).toList()).forEach((pid, val) {
-        if (totals.containsKey(pid)) totals[pid] = totals[pid]! + val;
-      });
-    }
+    return Container(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          const Icon(Icons.account_balance_wallet, size: 16),
+          const SizedBox(width: 8),
+          Text(
+            'Stock: ${state.stock.toStringAsFixed(2)} €',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const Spacer(),
+          if (state.bockRoundsRemaining > 0)
+            Chip(
+              label: Text('BOCK: ${state.bockRoundsRemaining}'),
+              visualDensity: VisualDensity.compact,
+              backgroundColor: Colors.orange.shade200,
+            ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.edit, size: 16),
+            onPressed: () => _showStockDialog(context, ref, l10n, state),
+            visualDensity: VisualDensity.compact,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showStockDialog(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    SchafkopfGameState state,
+  ) {
+    final controller = TextEditingController(
+      text: state.stock.toStringAsFixed(2),
+    );
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Stock / Bock Settings'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Stock Amount (€)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Set Bock Rounds:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [0, 4, 8, 12]
+                  .map(
+                    (count) => ActionChip(
+                      label: Text('$count'),
+                      onPressed: () {
+                        ref
+                            .read(schafkopfStateProvider.notifier)
+                            .setBockRounds(count);
+                        Navigator.pop(ctx);
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              final val = double.tryParse(controller.text);
+              if (val != null) {
+                ref
+                    .read(schafkopfStateProvider.notifier)
+                    .updateStock(val - state.stock);
+              }
+              Navigator.pop(ctx);
+            },
+            child: Text(l10n.get('save')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreHeader(
+    List<Player> players,
+    SchafkopfGameState gameState,
+    AppLocalizations l10n,
+  ) {
+    final Map<String, double> totals = {
+      for (var p in players)
+        p.id: gameState.getPlayerBalance(
+          p.id,
+          players.map((p) => p.id).toList(),
+        ),
+    };
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -230,7 +334,7 @@ class SchafkopfScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     List<Player> players,
-    int roundIndex,
+    SchafkopfGameState gameState,
   ) async {
     SchafkopfGameType selectedType = SchafkopfGameType.sauspiel;
     String activePlayerId = players[0].id;
@@ -240,6 +344,8 @@ class SchafkopfScreen extends ConsumerWidget {
     int runners = 0;
     bool activeWon = true;
     double baseValue = 0.10;
+    bool isBockRound = gameState.bockRoundsRemaining > 0;
+    bool isMussSpiel = false;
 
     await showDialog(
       context: context,
@@ -247,13 +353,14 @@ class SchafkopfScreen extends ConsumerWidget {
         final l10n = AppLocalizations.of(ctx);
         return StatefulBuilder(
           builder: (ctx, setState) => AlertDialog(
-            title: Text('${l10n.get('wizard_round')} ${roundIndex + 1}'),
+            title: Text(
+              '${l10n.get('wizard_round')} ${gameState.rounds.length + 1}',
+            ),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Game type
                   Text(
                     l10n.get('schafkopf_game_type'),
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -272,7 +379,6 @@ class SchafkopfScreen extends ConsumerWidget {
                     onChanged: (v) => setState(() => selectedType = v!),
                   ),
                   const SizedBox(height: 8),
-                  // Active player
                   Text(
                     l10n.get('schafkopf_active_player'),
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -290,7 +396,6 @@ class SchafkopfScreen extends ConsumerWidget {
                         .toList(),
                     onChanged: (v) => setState(() => activePlayerId = v!),
                   ),
-                  // Partner (only for Sauspiel)
                   if (selectedType == SchafkopfGameType.sauspiel) ...[
                     const SizedBox(height: 8),
                     Text(
@@ -313,7 +418,6 @@ class SchafkopfScreen extends ConsumerWidget {
                     ),
                   ],
                   const SizedBox(height: 8),
-                  // Won/Lost
                   Row(
                     children: [
                       Text(l10n.get('schafkopf_active_won')),
@@ -324,7 +428,6 @@ class SchafkopfScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  // Schneider
                   Row(
                     children: [
                       Text(l10n.get('schafkopf_schneider')),
@@ -338,7 +441,6 @@ class SchafkopfScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  // Schwarz
                   Row(
                     children: [
                       Text(l10n.get('schafkopf_schwarz')),
@@ -351,8 +453,27 @@ class SchafkopfScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
+                  Row(
+                    children: [
+                      Text('Bock-Runde (x2)'),
+                      const Spacer(),
+                      Switch(
+                        value: isBockRound,
+                        onChanged: (v) => setState(() => isBockRound = v),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text('Muss-Spiel'),
+                      const Spacer(),
+                      Switch(
+                        value: isMussSpiel,
+                        onChanged: (v) => setState(() => isMussSpiel = v),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 8),
-                  // Laufende
                   Row(
                     children: [
                       Text(l10n.get('schafkopf_runners')),
@@ -382,16 +503,7 @@ class SchafkopfScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  if (runners > 0 && runners < 3)
-                    Text(
-                      l10n.get('schafkopf_runners_warning'),
-                      style: const TextStyle(
-                        color: Colors.orange,
-                        fontSize: 12,
-                      ),
-                    ),
                   const SizedBox(height: 8),
-                  // Base value
                   Row(
                     children: [
                       Text(l10n.get('schafkopf_base_tariff')),
@@ -420,21 +532,26 @@ class SchafkopfScreen extends ConsumerWidget {
               ),
               FilledButton(
                 onPressed: () {
-                  final pointMap = {activePlayerId: activeWon ? 61 : 59};
                   final round = SchafkopfRound(
-                    roundIndex: roundIndex + 1,
+                    roundIndex: gameState.rounds.length + 1,
                     gameType: selectedType,
                     activePlayerId: activePlayerId,
                     partnerPlayerId: selectedType == SchafkopfGameType.sauspiel
                         ? partnerPlayerId
                         : null,
-                    points: pointMap,
+                    points: {activePlayerId: activeWon ? 61 : 59},
                     schneider: schneider,
                     schwarz: schwarz,
                     runners: runners,
                     baseTariff: baseValue,
+                    isBockRound: isBockRound,
+                    isMussSpiel: isMussSpiel,
                   );
                   ref.read(schafkopfStateProvider.notifier).addRound(round);
+
+                  // Automatically pay out Stock if player won a Muss-Spiel or if user wants to clear it
+                  // For now, simple manual management via Stock Dialog is safer.
+
                   Navigator.pop(ctx);
                 },
                 child: Text(l10n.get('wizard_save_round')),

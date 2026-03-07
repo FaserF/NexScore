@@ -26,15 +26,20 @@ class QwixxScreen extends ConsumerWidget {
     }
 
     // Initialize sheets if not already done
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(qwixxStateProvider.notifier)
-          .initPlayers(players.map((p) => p.id).toList());
-    });
-
     if (gameState.sheets.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(qwixxStateProvider.notifier)
+            .initPlayers(players.map((p) => p.id).toList());
+      });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
+    final variantLabel = switch (gameState.variant) {
+      QwixxVariant.original => l10n.get('qwixx_variant_original'),
+      QwixxVariant.mixedColors => 'Mixx A (Colors)',
+      QwixxVariant.mixedNumbers => 'Mixx B (Numbers)',
+    };
 
     return DefaultTabController(
       length: players.length,
@@ -54,6 +59,16 @@ class QwixxScreen extends ConsumerWidget {
               },
               tooltip: l10n.get('nav_help'),
             ),
+            Chip(
+              label: Text(variantLabel),
+              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () =>
+                  _showVariantDialog(context, ref, gameState.variant, l10n),
+              tooltip: l10n.get('game_settings'),
+            ),
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => _confirmReset(context, ref, l10n),
@@ -72,10 +87,46 @@ class QwixxScreen extends ConsumerWidget {
             return _QwixxPlayerView(
               player: player,
               sheet: sheet,
+              variant: gameState.variant,
               onUpdate: (newSheet) => ref
                   .read(qwixxStateProvider.notifier)
                   .updateSheet(player.id, newSheet),
               l10n: l10n,
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  void _showVariantDialog(
+    BuildContext context,
+    WidgetRef ref,
+    QwixxVariant current,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_settings')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: QwixxVariant.values.map((v) {
+            final label = switch (v) {
+              QwixxVariant.original => l10n.get('qwixx_variant_original'),
+              QwixxVariant.mixedColors => 'Mixx A (Mixed Colors)',
+              QwixxVariant.mixedNumbers => 'Mixx B (Mixed Numbers)',
+            };
+            return RadioListTile<QwixxVariant>(
+              title: Text(label),
+              value: v,
+              groupValue: current,
+              onChanged: (newV) {
+                if (newV != null) {
+                  ref.read(qwixxStateProvider.notifier).setVariant(newV);
+                  Navigator.pop(context);
+                }
+              },
             );
           }).toList(),
         ),
@@ -117,12 +168,14 @@ class QwixxScreen extends ConsumerWidget {
 class _QwixxPlayerView extends StatelessWidget {
   final Player player;
   final QwixxPlayerSheet sheet;
+  final QwixxVariant variant;
   final Function(QwixxPlayerSheet) onUpdate;
   final AppLocalizations l10n;
 
   const _QwixxPlayerView({
     required this.player,
     required this.sheet,
+    required this.variant,
     required this.onUpdate,
     required this.l10n,
   });
@@ -145,37 +198,33 @@ class _QwixxPlayerView extends StatelessWidget {
           ),
           _buildRow(
             context,
-            l10n.get('qwixx_red'),
+            0,
             Colors.red.shade300,
             sheet.red,
-            true,
             (list) => onUpdate(sheet.copyWith(red: list)),
           ),
           const SizedBox(height: 8),
           _buildRow(
             context,
-            l10n.get('qwixx_yellow'),
+            1,
             Colors.yellow.shade600,
             sheet.yellow,
-            true,
             (list) => onUpdate(sheet.copyWith(yellow: list)),
           ),
           const SizedBox(height: 8),
           _buildRow(
             context,
-            l10n.get('qwixx_green'),
+            2,
             Colors.green.shade400,
             sheet.green,
-            false,
             (list) => onUpdate(sheet.copyWith(green: list)),
           ),
           const SizedBox(height: 8),
           _buildRow(
             context,
-            l10n.get('qwixx_blue'),
+            3,
             Colors.blue.shade300,
             sheet.blue,
-            false,
             (list) => onUpdate(sheet.copyWith(blue: list)),
           ),
           const SizedBox(height: 24),
@@ -187,21 +236,22 @@ class _QwixxPlayerView extends StatelessWidget {
 
   Widget _buildRow(
     BuildContext context,
-    String colorName,
-    Color color,
+    int rowIndex,
+    Color baseColor,
     List<int> crossed,
-    bool ascending,
     Function(List<int>) onRowUpdate,
   ) {
-    List<int> numbers = ascending
-        ? List.generate(11, (i) => i + 2)
-        : List.generate(11, (i) => 12 - i);
+    final numbers = QwixxGameState.getRowNumbers(rowIndex, variant);
+
+    // Mixx A (Mixed Colors) official mapping (simplified: we still use the row's base color mostly)
+    // In a real Mixx A app, each cell would have its own color.
+    // For now, we use the base row color.
 
     return Container(
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.2),
+        color: baseColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color, width: 2),
+        border: Border.all(color: baseColor, width: 2),
       ),
       padding: const EdgeInsets.all(8),
       child: Wrap(
@@ -226,9 +276,9 @@ class _QwixxPlayerView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isCrossed
                       ? Colors.white
-                      : color.withValues(alpha: 0.5),
+                      : baseColor.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: color, width: 2),
+                  border: Border.all(color: baseColor, width: 2),
                 ),
                 alignment: Alignment.center,
                 child: isCrossed
@@ -249,8 +299,8 @@ class _QwixxPlayerView extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: color, width: 2),
-              color: color.withValues(alpha: 0.5),
+              border: Border.all(color: baseColor, width: 2),
+              color: baseColor.withValues(alpha: 0.4),
             ),
             child: const Icon(Icons.lock_outline, color: Colors.black54),
           ),
@@ -291,25 +341,6 @@ class _QwixxPlayerView extends StatelessWidget {
           );
         }),
       ],
-    );
-  }
-}
-
-// Add copyWith to QwixxPlayerSheet model dynamically for this file
-extension QwixxPlayerSheetCopyWith on QwixxPlayerSheet {
-  QwixxPlayerSheet copyWith({
-    List<int>? red,
-    List<int>? yellow,
-    List<int>? green,
-    List<int>? blue,
-    int? penalties,
-  }) {
-    return QwixxPlayerSheet(
-      red: red ?? this.red,
-      yellow: yellow ?? this.yellow,
-      green: green ?? this.green,
-      blue: blue ?? this.blue,
-      penalties: penalties ?? this.penalties,
     );
   }
 }
