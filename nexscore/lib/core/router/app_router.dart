@@ -25,6 +25,7 @@ import '../../features/games/arschloch/presentation/arschloch_screen.dart';
 import '../../features/multiplayer/presentation/multiplayer_hub_screen.dart';
 import '../../features/multiplayer/presentation/lobby_screen.dart';
 import '../../features/multiplayer/presentation/join_lobby_screen.dart';
+import '../../features/games/wizard_digital/presentation/wizard_digital_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -103,6 +104,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'arschloch',
                     builder: (context, state) => const ArschlochScreen(),
+                  ),
+                  GoRoute(
+                    path: 'wizard-digital',
+                    builder: (context, state) => const WizardDigitalScreen(),
                   ),
                   GoRoute(
                     path: 'multiplayer',
