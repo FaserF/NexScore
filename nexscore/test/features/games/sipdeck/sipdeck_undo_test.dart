@@ -90,7 +90,7 @@ void main() {
             .read(sipDeckStateProvider)
             .playerSips
             .values
-            .every((v) => v == 0 || v == null),
+            .every((v) => v == 0),
         isTrue,
       );
 

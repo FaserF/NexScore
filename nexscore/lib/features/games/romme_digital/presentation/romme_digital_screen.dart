@@ -330,10 +330,19 @@ class _RommeDigitalScreenState extends ConsumerState<RommeDigitalScreen> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     if (_selectedCardIds.isNotEmpty)
-                      TextButton(
+                      TextButton.icon(
                         onPressed: () =>
                             setState(() => _selectedCardIds.clear()),
-                        child: const Text('Auswahl aufheben'),
+                        icon: const Icon(Icons.close_rounded, size: 14),
+                        label: const Text(
+                          'Auswahl aufheben',
+                          style: TextStyle(fontSize: 11),
+                        ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
+                        ),
                       ),
                   ],
                 ),
@@ -363,7 +372,7 @@ class _RommeDigitalScreenState extends ConsumerState<RommeDigitalScreen> {
                             width: 46,
                             height: 66,
                             transform: isSelected
-                                ? (Matrix4.identity()..translate(0.0, -8.0))
+                                ? Matrix4.translationValues(0.0, -8.0, 0.0)
                                 : Matrix4.identity(),
                             decoration: BoxDecoration(
                               color: Colors.white,

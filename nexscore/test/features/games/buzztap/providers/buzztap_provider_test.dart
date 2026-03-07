@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nexscore/features/games/buzztap/models/buzztap_models.dart';
+
 import 'package:nexscore/features/games/buzztap/providers/buzztap_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nexscore/core/i18n/app_localizations.dart';

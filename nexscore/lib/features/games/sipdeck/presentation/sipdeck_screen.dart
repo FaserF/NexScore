@@ -178,11 +178,12 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                   if (players.length == 2) const SizedBox(height: 24),
 
                   // Drink Intensity Selection
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
                     children: [
                       Text(
                         l10n.get('drink_intensity_title'),
+                        textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -196,45 +197,48 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   const SizedBox(height: 12),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: SegmentedButton<DrinkIntensity>(
-                      segments: [
-                        ButtonSegment(
-                          value: DrinkIntensity.chill,
-                          label: Text(
-                            l10n.get('drink_intensity_chill'),
-                            style: const TextStyle(fontSize: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: SegmentedButton<DrinkIntensity>(
+                        segments: [
+                          ButtonSegment(
+                            value: DrinkIntensity.chill,
+                            label: Text(
+                              l10n.get('drink_intensity_chill'),
+                              style: const TextStyle(fontSize: 12),
+                            ),
                           ),
-                        ),
-                        ButtonSegment(
-                          value: DrinkIntensity.normal,
-                          label: Text(
-                            l10n.get('drink_intensity_normal'),
-                            style: const TextStyle(fontSize: 12),
+                          ButtonSegment(
+                            value: DrinkIntensity.normal,
+                            label: Text(
+                              l10n.get('drink_intensity_normal'),
+                              style: const TextStyle(fontSize: 12),
+                            ),
                           ),
-                        ),
-                        ButtonSegment(
-                          value: DrinkIntensity.extreme,
-                          label: Text(
-                            l10n.get('drink_intensity_extreme'),
-                            style: const TextStyle(fontSize: 12),
+                          ButtonSegment(
+                            value: DrinkIntensity.extreme,
+                            label: Text(
+                              l10n.get('drink_intensity_extreme'),
+                              style: const TextStyle(fontSize: 12),
+                            ),
                           ),
-                        ),
-                        ButtonSegment(
-                          value: DrinkIntensity.custom,
-                          label: Text(
-                            l10n.get('drink_intensity_custom'),
-                            style: const TextStyle(fontSize: 12),
+                          ButtonSegment(
+                            value: DrinkIntensity.custom,
+                            label: Text(
+                              l10n.get('drink_intensity_custom'),
+                              style: const TextStyle(fontSize: 12),
+                            ),
                           ),
-                        ),
-                      ],
-                      selected: {state.intensity},
-                      onSelectionChanged: (val) {
-                        ref
-                            .read(sipDeckStateProvider.notifier)
-                            .toggleIntensity(val.first);
-                      },
+                        ],
+                        selected: {state.intensity},
+                        onSelectionChanged: (val) {
+                          ref
+                              .read(sipDeckStateProvider.notifier)
+                              .toggleIntensity(val.first);
+                        },
+                      ),
                     ),
                   ),
                   if (state.intensity == DrinkIntensity.custom) ...[
@@ -271,8 +275,9 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                   const SizedBox(height: 32),
 
                   // Category Selection Section
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(
                         l10n.get('sipdeck_select_modes'),
@@ -327,8 +332,8 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                   const SizedBox(height: 24),
 
                   // Task Filters Section
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
                     children: [
                       Text(
                         l10n.get('sipdeck_filters'),

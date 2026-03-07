@@ -108,12 +108,12 @@ void main() {
       // Combined regex for l10n.get and l10n.getWith
       final getRegex = RegExp(
         r"l10n\.get(?:With)?\(\s*['"
-                '"' +
-            "']([^'"
-                '"' +
-            "']+)['"
-                '"' +
-            "']",
+        '"'
+        r"']([^'"
+        '"'
+        r"']+)['"
+        '"'
+        r"']",
       );
 
       for (final file in files) {

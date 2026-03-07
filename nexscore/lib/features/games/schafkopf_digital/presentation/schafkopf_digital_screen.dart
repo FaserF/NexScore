@@ -200,10 +200,10 @@ class SchafkopfDigitalScreen extends ConsumerWidget {
                               SchafkopfDigitalGameType.sauspiel,
                               calledSuit: suit,
                             ),
-                        child: Text('Sauspiel auf ${_suitName(suit)}'),
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(double.infinity, 48),
                         ),
+                        child: Text('Sauspiel auf ${_suitName(suit)}'),
                       ),
                     ),
                   ),

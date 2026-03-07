@@ -29,7 +29,7 @@ final currentLobbyProvider = Provider<Lobby?>((ref) {
 /// Convenience provider to know if the current user is the host
 final isHostProvider = Provider<bool>((ref) {
   final service = ref.watch(multiplayerServiceProvider);
-  final currentLobby = ref.watch(currentLobbyProvider);
+  ref.watch(currentLobbyProvider);
   // Re-evaluate whenever lobby changes
   return service.isHost;
 });

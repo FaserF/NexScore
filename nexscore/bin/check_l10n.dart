@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'package:nexscore/core/i18n/app_localizations.dart';
 
 void main() {

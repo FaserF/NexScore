@@ -1,5 +1,6 @@
 /// Copyright-safe card models for the digital Wizard-like trick-taking game.
 /// These are generic "Mystic Tricks" cards — 4 suits + 2 special roles.
+library;
 
 enum CardSuit { flame, frost, earth, wind }
 

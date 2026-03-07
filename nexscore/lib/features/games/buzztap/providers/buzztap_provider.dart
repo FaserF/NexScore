@@ -120,7 +120,7 @@ class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
           .get(modeStrKey)
           .replaceAll('{0}', intensityName)
           .replaceAll('{1}', finalSips.toString());
-      hydratedText += '\n\n' + modeStr;
+      hydratedText += '\n\n$modeStr';
     }
 
     final hydratedCard = BuzzTapCard(

@@ -6,13 +6,18 @@ import 'package:nexscore/core/providers/active_players_provider.dart';
 import 'package:nexscore/core/models/player_model.dart';
 import 'package:nexscore/core/i18n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:nexscore/core/i18n/app_localizations.dart';
+import 'package:nexscore/core/multiplayer/providers/multiplayer_provider.dart';
+import '../../mocks/mock_multiplayer_service.dart';
 
 void main() {
   testWidgets('App Router handles /games/arschloch route', (
     WidgetTester tester,
   ) async {
-    final container = ProviderContainer();
+    final container = ProviderContainer(
+      overrides: [
+        multiplayerServiceProvider.overrideWithValue(MockMultiplayerService()),
+      ],
+    );
     container.read(activePlayersProvider.notifier).setPlayers([
       Player(id: '1', name: 'Alice', avatarColor: '#000000'),
       Player(id: '2', name: 'Bob', avatarColor: '#000000'),

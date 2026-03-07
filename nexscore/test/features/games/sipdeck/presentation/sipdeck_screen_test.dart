@@ -6,6 +6,8 @@ import 'package:nexscore/core/models/player_model.dart';
 import 'package:nexscore/core/providers/active_players_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:nexscore/core/i18n/app_localizations.dart';
+import 'package:nexscore/core/multiplayer/providers/multiplayer_provider.dart';
+import '../../../../mocks/mock_multiplayer_service.dart';
 
 void main() {
   testWidgets('SipDeckScreen setup view does not overflow on small screens', (
@@ -20,7 +22,11 @@ void main() {
       Player(id: '2', name: 'Bob', avatarColor: '#FFFFFF'),
     ];
 
-    final container = ProviderContainer();
+    final container = ProviderContainer(
+      overrides: [
+        multiplayerServiceProvider.overrideWithValue(MockMultiplayerService()),
+      ],
+    );
     container.read(activePlayersProvider.notifier).setPlayers(players);
 
     await tester.pumpWidget(

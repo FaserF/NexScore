@@ -90,8 +90,9 @@ class WizardEngine {
     if (!hand.any((c) => c.id == card.id)) return false;
 
     // Wizards and Jesters can always be played
-    if (card.type == CardType.wizard || card.type == CardType.jester)
+    if (card.type == CardType.wizard || card.type == CardType.jester) {
       return true;
+    }
 
     // If this is the first card in the trick, anything goes
     if (state.currentTrick.playedCards.isEmpty) return true;

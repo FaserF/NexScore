@@ -363,12 +363,18 @@ class _Phase10DigitalScreenState extends ConsumerState<Phase10DigitalScreen> {
                       ),
                     ),
                     if (_selectedCardIds.isNotEmpty)
-                      TextButton(
+                      TextButton.icon(
                         onPressed: () =>
                             setState(() => _selectedCardIds.clear()),
-                        child: const Text(
+                        icon: const Icon(Icons.close_rounded, size: 14),
+                        label: const Text(
                           'Auswahl aufheben',
                           style: TextStyle(fontSize: 11),
+                        ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                         ),
                       ),
                   ],
@@ -399,7 +405,7 @@ class _Phase10DigitalScreenState extends ConsumerState<Phase10DigitalScreen> {
                             width: 44,
                             height: 62,
                             transform: isSelected
-                                ? (Matrix4.identity()..translate(0.0, -8.0))
+                                ? Matrix4.translationValues(0.0, -8.0, 0.0)
                                 : Matrix4.identity(),
                             decoration: BoxDecoration(
                               color: card.isWild

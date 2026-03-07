@@ -183,6 +183,7 @@ class AppLocalizations {
           'Sum of won tricks ({0}) + bombs ({1}) must be equal to round number ({2}).',
       'wizard_history': 'Round History ({0} rounds)',
       'wizard_scoring_standard': 'Standard – correct bid = +20 + tricks×10',
+      'wizard_total': 'Total',
       'wizard_scoring_lenient': 'Lenient – tricks offset against bids',
       'wizard_scoring_extreme': 'Extreme – correct = +30, wrong = ‒2× penalty',
       'wizard_rule_stiche': 'Stiche dürfen nicht aufgehen',
@@ -1312,6 +1313,7 @@ class AppLocalizations {
           'Summe der gewonnenen Stiche ({0}) + Bomben ({1}) muss der Rundenzahl ({2}) entsprechen.',
       'wizard_history': 'Rundenverlauf ({0} Runden)',
       'wizard_scoring_standard': 'Standard – richtiges Gebot = +20 + Stiche×10',
+      'wizard_total': 'Gesamt',
       'wizard_scoring_lenient':
           'Lenient – Stiche werden mit Geboten verrechnet',
       'wizard_scoring_extreme':

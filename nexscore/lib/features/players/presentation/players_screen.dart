@@ -144,7 +144,7 @@ class PlayersScreen extends ConsumerWidget {
                                               .millisecond %
                                           Colors.primaries.length];
                                   final rColorStr =
-                                      '#${(rColor.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+                                      '#${(rColor.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
                                   ref
                                       .read(playersProvider.notifier)
                                       .updatePlayer(
@@ -239,7 +239,7 @@ class PlayersScreen extends ConsumerWidget {
                   Colors.primaries[DateTime.now().millisecond %
                       Colors.primaries.length];
               final rColorStr =
-                  '#${(rColor.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+                  '#${(rColor.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
 
               final newPlayer = Player(
                 id: const Uuid().v4(),

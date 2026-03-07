@@ -192,7 +192,7 @@ class QwixxDigitalScreen extends ConsumerWidget {
                   _phaseLabel(state.phase),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                TextButton(
+                TextButton.icon(
                   onPressed: () {
                     if (state.phase == QwixxDigitalPhase.otherPlayers) {
                       ref.read(qwixxDigitalProvider.notifier).endRound();
@@ -200,7 +200,13 @@ class QwixxDigitalScreen extends ConsumerWidget {
                       ref.read(qwixxDigitalProvider.notifier).skipPhase();
                     }
                   },
-                  child: Text(
+                  icon: Icon(
+                    state.phase == QwixxDigitalPhase.otherPlayers
+                        ? Icons.check_circle_outline
+                        : Icons.skip_next,
+                    size: 18,
+                  ),
+                  label: Text(
                     state.phase == QwixxDigitalPhase.otherPlayers
                         ? 'Runde beenden'
                         : 'Überspringen',

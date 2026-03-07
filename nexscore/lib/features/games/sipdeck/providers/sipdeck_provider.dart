@@ -165,7 +165,7 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
           .get(modeStrKey)
           .replaceAll('{0}', intensityName)
           .replaceAll('{1}', finalSips.toString());
-      hydratedText += '\n\n' + modeStr;
+      hydratedText += '\n\n$modeStr';
     }
 
     final hydratedCard = SipDeckCard(

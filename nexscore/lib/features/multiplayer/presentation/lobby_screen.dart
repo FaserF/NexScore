@@ -14,7 +14,6 @@ class LobbyScreen extends ConsumerStatefulWidget {
 
 class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   bool _isHosting = false;
-  String? _roomCode;
 
   @override
   void initState() {
@@ -28,13 +27,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     try {
       final service = ref.read(multiplayerServiceProvider);
       // For now, hardcode host name, later we can fetch from a generic profile/settings provider
-      final code = await service.hostLobby(
+      await service.hostLobby(
         hostName: 'Host Player',
         hostAvatarColor: '#FFD700', // Gold for host
       );
       if (mounted) {
         setState(() {
-          _roomCode = code;
           _isHosting = false;
         });
       }

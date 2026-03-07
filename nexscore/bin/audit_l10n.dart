@@ -1,9 +1,9 @@
+// ignore_for_file: avoid_print
 import 'dart:io';
 
 void main() {
   final libDir = Directory('lib');
   if (!libDir.existsSync()) {
-    // ignore: avoid_print
     print('Error: lib directory not found.');
     return;
   }
@@ -91,8 +91,6 @@ void main() {
   final missingInEn = usedKeys.where((k) => !enKeys.contains(k)).toList();
   final missingInDe = usedKeys.where((k) => !deKeys.contains(k)).toList();
 
-  // ignore: avoid_print
   print('Missing in EN: $missingInEn');
-  // ignore: avoid_print
   print('Missing in DE: $missingInDe');
 }
