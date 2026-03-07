@@ -120,7 +120,22 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
           ],
           bottom: TabBar(
             isScrollable: players.length > 3,
-            tabs: players.map((p) => Tab(text: p.name)).toList(),
+            tabs: players
+                .map(
+                  (p) => Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (p.emoji != null) ...[
+                          Text(p.emoji!),
+                          const SizedBox(width: 8),
+                        ],
+                        Text(p.name),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
           ),
         ),
         body: WinnerConfettiOverlay(

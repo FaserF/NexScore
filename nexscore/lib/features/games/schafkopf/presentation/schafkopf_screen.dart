@@ -135,10 +135,14 @@ class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
                                         ),
                                       ),
                                     ),
-                                    child: Text(
-                                      activePlayer.name.substring(0, 1),
-                                      style: const TextStyle(fontSize: 12),
-                                    ),
+                                    child: activePlayer.emoji != null
+                                        ? Text(activePlayer.emoji!)
+                                        : Text(
+                                            activePlayer.name.substring(0, 1),
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                            ),
+                                          ),
                                   ),
                                   title: Text(
                                     '${l10n.get('schafkopf_gt_${round.gameType.name}')} – ${activePlayer.name}',
@@ -351,10 +355,12 @@ class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
                     backgroundColor: Color(
                       int.parse(p.avatarColor.replaceFirst('#', '0xff')),
                     ),
-                    child: Text(
-                      p.name.substring(0, 1),
-                      style: const TextStyle(fontSize: 10),
-                    ),
+                    child: p.emoji != null
+                        ? Text(p.emoji!)
+                        : Text(
+                            p.name.substring(0, 1),
+                            style: const TextStyle(fontSize: 10),
+                          ),
                   ),
                   const SizedBox(height: 2),
                   Text(

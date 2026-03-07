@@ -131,7 +131,18 @@
       // Stash the event so it can be triggered later.
       deferredPrompt = e;
       console.log('beforeinstallprompt event captured');
+
+      // Notify Flutter if it wants to know when the prompt is ready
+      if (window.onFlutterInstallPromptReady) {
+        window.onFlutterInstallPromptReady();
+      }
     });
+
+    window.flutterCanShowInstallPrompt = () => {
+      // Return true if we have a prompt and we're not already standalone
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      return !!deferredPrompt && !isStandalone;
+    };
 
     window.flutterShowInstallPrompt = async () => {
       if (deferredPrompt) {

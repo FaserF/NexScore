@@ -780,10 +780,15 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                     backgroundColor: Color(
                       int.parse(p.avatarColor.replaceFirst('#', '0xff')),
                     ),
-                    child: Text(
-                      p.name.substring(0, 1).toUpperCase(),
-                      style: const TextStyle(fontSize: 10, color: Colors.white),
-                    ),
+                    child: p.emoji != null
+                        ? Text(p.emoji!, style: const TextStyle(fontSize: 16))
+                        : Text(
+                            p.name.substring(0, 1).toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -882,6 +887,14 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                     ...players.map((p) {
                       final sips = currentState.playerSips[p.id] ?? 0;
                       return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Color(
+                            int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+                          ),
+                          child: p.emoji != null
+                              ? Text(p.emoji!)
+                              : Text(p.name.substring(0, 1).toUpperCase()),
+                        ),
                         title: Text(
                           p.name,
                           style: const TextStyle(

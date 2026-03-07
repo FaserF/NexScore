@@ -25,12 +25,21 @@ class DatabaseService {
       final path = filePath; // On web, the path is usually just the filename
       return await factory.openDatabase(
         path,
-        options: OpenDatabaseOptions(version: 1, onCreate: _createDB),
+        options: OpenDatabaseOptions(
+          version: 2,
+          onCreate: _createDB,
+          onUpgrade: _onUpgrade,
+        ),
       );
     } else {
       final dbPath = await getDatabasesPath();
       final path = join(dbPath, filePath);
-      return await openDatabase(path, version: 1, onCreate: _createDB);
+      return await openDatabase(
+        path,
+        version: 2,
+        onCreate: _createDB,
+        onUpgrade: _onUpgrade,
+      );
     }
   }
 
@@ -41,6 +50,7 @@ CREATE TABLE players (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   avatarColor TEXT NOT NULL,
+  emoji TEXT,
   ownerUid TEXT,
   isDeleted INTEGER NOT NULL DEFAULT 0
 )
@@ -67,6 +77,17 @@ CREATE TABLE sessions (
       'CREATE INDEX idx_sessions_start_time ON sessions(startTime)',
     );
     AppLogger.info('Database initialization complete.', tag: 'Database');
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    AppLogger.info(
+      'Upgrading database from $oldVersion to $newVersion...',
+      tag: 'Database',
+    );
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE players ADD COLUMN emoji TEXT');
+      AppLogger.info('Added emoji column to players table.', tag: 'Database');
+    }
   }
 
   // --- Platform Agnostic CRUD ---

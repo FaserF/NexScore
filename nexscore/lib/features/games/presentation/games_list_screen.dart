@@ -26,18 +26,35 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
   @override
   void initState() {
     super.initState();
+    _initPwaListeners();
     _checkPwaInstallPrompt();
+  }
+
+  void _initPwaListeners() {
+    // Also try to show it if it becomes ready while we are on this screen
+    pwa.onInstallPromptReady = () {
+      if (mounted) _checkPwaInstallPrompt();
+    };
+  }
+
+  @override
+  void dispose() {
+    pwa.onInstallPromptReady = null;
+    super.dispose();
   }
 
   Future<void> _checkPwaInstallPrompt() async {
     try {
+      if (!pwa.canShowInstallPrompt()) return;
+
       final prefs = await SharedPreferences.getInstance();
       final hasShownPrompt = prefs.getBool('pwa_prompt_shown') ?? false;
 
       if (!hasShownPrompt) {
         // We wait a few seconds so the app can render and user is slightly engaged
+        // But if it's already ready, we can show it
         await Future.delayed(const Duration(seconds: 3));
-        if (mounted) {
+        if (mounted && pwa.canShowInstallPrompt()) {
           final shown = await pwa.showInstallPrompt();
           if (shown) {
             await prefs.setBool('pwa_prompt_shown', true);

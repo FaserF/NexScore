@@ -92,7 +92,20 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
           ],
           bottom: TabBar(
             isScrollable: true,
-            tabs: players.map((p) => Tab(text: p.name)).toList(),
+            tabs: players.map((p) {
+              return Tab(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (p.emoji != null) ...[
+                      Text(p.emoji!),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(p.name),
+                  ],
+                ),
+              );
+            }).toList(),
           ),
         ),
         body: MultiplayerClientOverlay(

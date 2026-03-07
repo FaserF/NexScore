@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -10,8 +11,21 @@ import 'models/multiplayer_user.dart';
 import 'multiplayer_service.dart';
 
 class FirestoreMultiplayerImpl implements MultiplayerService {
-  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
-  FirebaseAuth get _auth => FirebaseAuth.instance;
+  FirebaseFirestore get _firestore {
+    _checkFirebase();
+    return FirebaseFirestore.instance;
+  }
+
+  FirebaseAuth get _auth {
+    _checkFirebase();
+    return FirebaseAuth.instance;
+  }
+
+  void _checkFirebase() {
+    if (Firebase.apps.isEmpty) {
+      throw Exception('FIREBASE_NOT_CONFIGURED');
+    }
+  }
 
   String? _uid;
   StreamSubscription<DocumentSnapshot>? _lobbySubscription;

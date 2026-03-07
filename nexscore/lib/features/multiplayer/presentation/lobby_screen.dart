@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/i18n/app_localizations.dart';
 import '../../../core/multiplayer/providers/multiplayer_provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -23,6 +24,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
   Future<void> _initLobby() async {
     if (!widget.isHostingStart) return;
+    final l10n = AppLocalizations.of(context);
     setState(() => _isHosting = true);
     try {
       final service = ref.read(multiplayerServiceProvider);
@@ -38,10 +40,31 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error hosting lobby: $e')));
-        context.pop();
+        String message = e.toString();
+        if (message.contains('FIREBASE_NOT_CONFIGURED')) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.get('multiplayer_firebase_missing')),
+              content: Text(l10n.get('multiplayer_firebase_missing_desc')),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Pop dialog
+                    context.pop(); // Go back from lobby screen
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error hosting lobby: $e')));
+          context.pop();
+        }
       }
     }
   }

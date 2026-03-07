@@ -194,10 +194,16 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                               children: players.map((p) {
                                 return Column(
                                   children: [
-                                    Text(
-                                      p.name,
-                                      style: const TextStyle(fontSize: 12),
-                                    ),
+                                    if (p.emoji != null)
+                                      Text(
+                                        p.emoji!,
+                                        style: const TextStyle(fontSize: 16),
+                                      )
+                                    else
+                                      Text(
+                                        p.name,
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
                                     Text(
                                       (state.currentRoundBids![p.id] ?? 0)
                                           .toString(),
@@ -232,7 +238,9 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                         backgroundColor: Color(
                           int.parse(p.avatarColor.replaceFirst('#', '0xff')),
                         ),
-                        child: Text(p.name.substring(0, 1).toUpperCase()),
+                        child: p.emoji != null
+                            ? Text(p.emoji!)
+                            : Text(p.name.substring(0, 1).toUpperCase()),
                       ),
                       title: Text(p.name),
                       subtitle: Text(

@@ -1,7 +1,7 @@
 {
     "name": "NexScore",
     "short_name": "NexScore",
-    "start_url": ".",
+    "start_url": "/NexScore/",
     "display": "standalone",
     "background_color": "#1A1A2E",
     "theme_color": "#0175C2",
@@ -14,7 +14,7 @@
     ],
     "lang": "en",
     "dir": "ltr",
-    "scope": "/",
+    "scope": "/NexScore/",
     "id": "nexscore-v1",
     "screenshots": [],
     "icons": [

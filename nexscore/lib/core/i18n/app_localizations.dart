@@ -166,6 +166,12 @@ class AppLocalizations {
       'help_settings': 'App Settings',
       'help_multiplayer': 'Multiplayer Guide',
       'help_multiplayer_desc': 'Learn how to host and join games with friends.',
+      'settings_pwa_install': 'Install NexScore',
+      'settings_pwa_install_desc':
+          'Install NexScore on your home screen for a better experience and offline access.',
+      'multiplayer_firebase_missing': 'Firebase not configured',
+      'multiplayer_firebase_missing_desc':
+          'Multiplayer requires Firebase. Please configure environment variables or secrets.',
 
       // ── Wizard
       'wizard_title': 'Wizard',
@@ -1313,6 +1319,12 @@ class AppLocalizations {
       'help_multiplayer': 'Multiplayer-Anleitung',
       'help_multiplayer_desc':
           'Erfahre, wie du Spiele hostest und ihnen beitrittst.',
+      'settings_pwa_install': 'NexScore installieren',
+      'settings_pwa_install_desc':
+          'Installiere NexScore auf deinem Startbildschirm für eine bessere Erfahrung und Offline-Zugriff.',
+      'multiplayer_firebase_missing': 'Firebase nicht konfiguriert',
+      'multiplayer_firebase_missing_desc':
+          'Multiplayer erfordert Firebase. Bitte konfiguriere Umgebungsvariablen oder Secrets.',
 
       // ── Wizard
       'wizard_title': 'Wizard',

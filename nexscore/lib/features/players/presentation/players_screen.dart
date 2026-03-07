@@ -115,14 +115,19 @@ class PlayersScreen extends ConsumerWidget {
                                   ],
                                 ),
                                 child: Center(
-                                  child: Text(
-                                    initial,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
-                                  ),
+                                  child: player.emoji != null
+                                      ? Text(
+                                          player.emoji!,
+                                          style: const TextStyle(fontSize: 24),
+                                        )
+                                      : Text(
+                                          initial,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                          ),
+                                        ),
                                 ),
                               ),
                               const SizedBox(width: 16),
@@ -223,6 +228,35 @@ class PlayersScreen extends ConsumerWidget {
   void _showAddPlayerDialog(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
+    String? selectedEmoji;
+    final List<String> commonEmojis = [
+      '😀',
+      '🎮',
+      '🎲',
+      '🃏',
+      '🍺',
+      '🍷',
+      '🥃',
+      '🎯',
+      '🏆',
+      '👑',
+      '🦄',
+      '🐱',
+      '🐶',
+      '🦊',
+      '🐼',
+      '🦁',
+      '👻',
+      '👾',
+      '🤖',
+      '👽',
+      '🎃',
+      '🎩',
+      '🍕',
+      '🍦',
+      '🚀',
+      '💎',
+    ];
     String? errorMessage;
 
     showDialog(
@@ -245,6 +279,7 @@ class PlayersScreen extends ConsumerWidget {
                 id: const Uuid().v4(),
                 name: name,
                 avatarColor: rColorStr,
+                emoji: selectedEmoji,
               );
 
               final result = await ref
@@ -271,6 +306,37 @@ class PlayersScreen extends ConsumerWidget {
                       autofocus: true,
                       onSubmitted: (_) => submit(),
                     ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 50,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: commonEmojis.length,
+                        itemBuilder: (context, i) {
+                          final emoji = commonEmojis[i];
+                          final isSelected = selectedEmoji == emoji;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: IconButton(
+                              onPressed: () =>
+                                  setState(() => selectedEmoji = emoji),
+                              style: IconButton.styleFrom(
+                                backgroundColor: isSelected
+                                    ? Theme.of(
+                                        context,
+                                      ).colorScheme.primaryContainer
+                                    : null,
+                                padding: const EdgeInsets.all(8),
+                              ),
+                              icon: Text(
+                                emoji,
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -295,6 +361,35 @@ class PlayersScreen extends ConsumerWidget {
   ) {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: player.name);
+    String? selectedEmoji = player.emoji;
+    final List<String> commonEmojis = [
+      '😀',
+      '🎮',
+      '🎲',
+      '🃏',
+      '🍺',
+      '🍷',
+      '🥃',
+      '🎯',
+      '🏆',
+      '👑',
+      '🦄',
+      '🐱',
+      '🐶',
+      '🦊',
+      '🐼',
+      '🦁',
+      '👻',
+      '👾',
+      '🤖',
+      '👽',
+      '🎃',
+      '🎩',
+      '🍕',
+      '🍦',
+      '🚀',
+      '💎',
+    ];
     String? errorMessage;
 
     showDialog(
@@ -307,7 +402,10 @@ class PlayersScreen extends ConsumerWidget {
               final name = controller.text.trim();
               if (name.isEmpty) return;
 
-              final updatedPlayer = player.copyWith(name: name);
+              final updatedPlayer = player.copyWith(
+                name: name,
+                emoji: selectedEmoji,
+              );
               final result = await ref
                   .read(playersProvider.notifier)
                   .updatePlayer(updatedPlayer);
@@ -332,6 +430,37 @@ class PlayersScreen extends ConsumerWidget {
                       ),
                       autofocus: true,
                       onSubmitted: (_) => submit(),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 50,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: commonEmojis.length,
+                        itemBuilder: (context, i) {
+                          final emoji = commonEmojis[i];
+                          final isSelected = selectedEmoji == emoji;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: IconButton(
+                              onPressed: () =>
+                                  setState(() => selectedEmoji = emoji),
+                              style: IconButton.styleFrom(
+                                backgroundColor: isSelected
+                                    ? Theme.of(
+                                        context,
+                                      ).colorScheme.primaryContainer
+                                    : null,
+                                padding: const EdgeInsets.all(8),
+                              ),
+                              icon: Text(
+                                emoji,
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

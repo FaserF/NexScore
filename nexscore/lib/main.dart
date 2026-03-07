@@ -17,14 +17,20 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    if (kIsWeb && FirebaseOptionsWeb.isConfigured) {
-      await Firebase.initializeApp(options: FirebaseOptionsWeb.currentPlatform);
+    if (kIsWeb) {
+      if (FirebaseOptionsWeb.isConfigured) {
+        await Firebase.initializeApp(
+          options: FirebaseOptionsWeb.currentPlatform,
+        );
+      } else {
+        debugPrint('Firebase Web: Initialization skipped (No config)');
+      }
     } else {
       // Basic initialization for mobile (uses google-services.json / plist)
       await Firebase.initializeApp();
     }
   } catch (e) {
-    debugPrint('Firebase initialization skipped: $e');
+    debugPrint('Firebase initialization error: $e');
   }
 
   runApp(const ProviderScope(child: NexScoreApp()));

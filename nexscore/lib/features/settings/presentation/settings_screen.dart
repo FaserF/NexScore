@@ -10,13 +10,36 @@ import '../../../core/theme/widgets/glass_container.dart';
 import '../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../core/utils/app_version.dart';
 
-class SettingsScreen extends ConsumerWidget {
+import '../../../core/pwa/pwa_prompt.dart' as pwa;
+
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Listen for the install prompt being ready to refresh the UI
+    pwa.onInstallPromptReady = () {
+      if (mounted) setState(() {});
+    };
+  }
+
+  @override
+  void dispose() {
+    pwa.onInstallPromptReady = null;
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final settings = ref.watch(settingsProvider);
+    final canInstall = pwa.canShowInstallPrompt();
 
     return Scaffold(
       body: CustomScrollView(
@@ -147,6 +170,54 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
+                if (canInstall) ...[
+                  _SectionHeader(title: l10n.get('settings_pwa_install')),
+                  AnimatedScaleButton(
+                    onPressed: () async {
+                      final accepted = await pwa.showInstallPrompt();
+                      if (accepted && mounted) {
+                        setState(() {});
+                      }
+                    },
+                    child: GlassContainer(
+                      borderRadius: 24,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.secondary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.install_mobile,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        ),
+                        title: Text(
+                          l10n.get('settings_pwa_install'),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          l10n.get('settings_pwa_install_desc'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
                 _SectionHeader(title: l10n.get('settings_data')),
                 AnimatedScaleButton(
                   onPressed: () => _confirmReset(context, ref, l10n),
