@@ -187,6 +187,16 @@ class AppLocalizations {
       'multiplayer_join': 'Join a Room',
       'multiplayer_room_code': 'Room Code',
       'multiplayer_diagnostics': 'Multiplayer Diagnostics',
+      'settings_presets': 'Player Groups',
+      'presets_save': 'Save as Group',
+      'presets_load': 'Load Group',
+      'presets_name': 'Group Name',
+      'presets_delete': 'Delete Group',
+      'presets_empty': 'No groups saved yet.',
+      'presets_save_success': 'Group saved successfully.',
+      'presets_save_error': 'Failed to save group.',
+      'presets_load_confirm':
+          'Load this group? (Current players will be replaced)',
       'multiplayer_diagnostics_desc':
           'If you are having trouble connecting, check the following:',
       'multiplayer_auth_title': 'Anonymous Auth',
@@ -1377,6 +1387,16 @@ class AppLocalizations {
       'multiplayer_join': 'Raum beitreten',
       'multiplayer_room_code': 'Raum-Code',
       'multiplayer_diagnostics': 'Multiplayer Diagnose',
+      'settings_presets': 'Spieler-Gruppen',
+      'presets_save': 'Als Gruppe speichern',
+      'presets_load': 'Gruppe laden',
+      'presets_name': 'Gruppen-Name',
+      'presets_delete': 'Gruppe löschen',
+      'presets_empty': 'Noch keine Gruppen gespeichert.',
+      'presets_save_success': 'Gruppe erfolgreich gespeichert.',
+      'presets_save_error': 'Fehler beim Speichern der Gruppe.',
+      'presets_load_confirm':
+          'Diese Gruppe laden? (Aktuelle Spieler werden ersetzt)',
       'multiplayer_diagnostics_desc':
           'Falls du Verbindungsprobleme hast, prüfe Folgendes:',
       'multiplayer_auth_title': 'Anonymer Login',

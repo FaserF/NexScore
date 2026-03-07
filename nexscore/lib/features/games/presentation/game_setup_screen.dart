@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/i18n/app_localizations.dart';
 import '../../../core/models/player_model.dart';
+import '../../../core/models/player_group.dart';
 import '../../players/repository/player_repository.dart';
+import '../../players/repository/player_group_repository.dart';
 import '../../../core/providers/active_players_provider.dart';
 
 class GameSetupScreen extends ConsumerStatefulWidget {
@@ -45,6 +47,18 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
       appBar: AppBar(
         title: Text(l10n.get('game_setup_title')),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bookmarks_outlined),
+            onPressed: () => _showPresetsSheet(context, ref),
+            tooltip: l10n.get('presets_load'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.group_add_outlined),
+            onPressed: _selectedPlayerIds.isEmpty
+                ? null
+                : () => _showSaveGroupDialog(context, ref),
+            tooltip: l10n.get('presets_save'),
+          ),
           IconButton(
             icon: const Icon(Icons.person_add),
             onPressed: () => _showAddPlayerDialog(context, ref),
@@ -199,6 +213,110 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
             ),
             FilledButton(onPressed: submit, child: Text(l10n.get('add'))),
           ],
+        );
+      },
+    );
+  }
+
+  void _showSaveGroupDialog(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        void submit() async {
+          final name = controller.text.trim();
+          if (name.isNotEmpty) {
+            final group = PlayerGroup(
+              id: const Uuid().v4(),
+              name: name,
+              playerIds: _selectedPlayerIds.toList(),
+            );
+            final result = await ref
+                .read(playerGroupsProvider.notifier)
+                .addGroup(group);
+
+            if (mounted) {
+              if (result.isSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.get('presets_save_success'))),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.get('presets_save_error'))),
+                );
+              }
+            }
+          }
+          if (dialogContext.mounted) Navigator.pop(dialogContext);
+        }
+
+        return AlertDialog(
+          title: Text(l10n.get('presets_save')),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: l10n.get('presets_name')),
+            autofocus: true,
+            onSubmitted: (_) => submit(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n.get('cancel')),
+            ),
+            FilledButton(onPressed: submit, child: Text(l10n.get('add'))),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPresetsSheet(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final groupsAsync = ref.watch(playerGroupsProvider);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return groupsAsync.when(
+          data: (groups) {
+            if (groups.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Text(l10n.get('presets_empty')),
+                ),
+              );
+            }
+            return ListView.builder(
+              itemCount: groups.length,
+              itemBuilder: (context, index) {
+                final group = groups[index];
+                return ListTile(
+                  title: Text(group.name),
+                  subtitle: Text('${group.playerIds.length} players'),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    onPressed: () {
+                      ref
+                          .read(playerGroupsProvider.notifier)
+                          .deleteGroup(group.id);
+                    },
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _selectedPlayerIds.clear();
+                      _selectedPlayerIds.addAll(group.playerIds);
+                    });
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Center(child: Text('Error: $e')),
         );
       },
     );

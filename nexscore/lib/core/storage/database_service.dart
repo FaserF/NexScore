@@ -26,7 +26,7 @@ class DatabaseService {
       return await factory.openDatabase(
         path,
         options: OpenDatabaseOptions(
-          version: 2,
+          version: 3,
           onCreate: _createDB,
           onUpgrade: _onUpgrade,
         ),
@@ -36,7 +36,7 @@ class DatabaseService {
       final path = join(dbPath, filePath);
       return await openDatabase(
         path,
-        version: 2,
+        version: 3,
         onCreate: _createDB,
         onUpgrade: _onUpgrade,
       );
@@ -76,6 +76,15 @@ CREATE TABLE sessions (
     await db.execute(
       'CREATE INDEX idx_sessions_start_time ON sessions(startTime)',
     );
+
+    await db.execute('''
+CREATE TABLE player_groups (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  playerIds TEXT NOT NULL
+)
+''');
+
     AppLogger.info('Database initialization complete.', tag: 'Database');
   }
 
@@ -87,6 +96,16 @@ CREATE TABLE sessions (
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE players ADD COLUMN emoji TEXT');
       AppLogger.info('Added emoji column to players table.', tag: 'Database');
+    }
+    if (oldVersion < 3) {
+      await db.execute('''
+CREATE TABLE player_groups (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  playerIds TEXT NOT NULL
+)
+''');
+      AppLogger.info('Added player_groups table.', tag: 'Database');
     }
   }
 
