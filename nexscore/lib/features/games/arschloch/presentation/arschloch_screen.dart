@@ -16,6 +16,7 @@ class ArschlochScreen extends ConsumerStatefulWidget {
 }
 
 class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
+  bool _isBannerDismissed = false;
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(arschlochStateProvider);
@@ -61,6 +62,27 @@ class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
       ),
       body: Column(
         children: [
+          if (players.length == 2 && !_isBannerDismissed)
+            MaterialBanner(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              content: Text(
+                l10n.get('arschloch_2player_warning'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onErrorContainer,
+                ),
+              ),
+              leading: Icon(
+                Icons.warning_amber_rounded,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => setState(() => _isBannerDismissed = true),
+                  child: Text(l10n.get('ok')),
+                ),
+              ],
+            ),
+
           // Instructions for card exchange
           if (state.rounds.isNotEmpty)
             _buildExchangeBanner(state, players, l10n),

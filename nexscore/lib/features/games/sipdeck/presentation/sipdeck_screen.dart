@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/models/drink_intensity.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
@@ -118,172 +119,270 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
           ),
         Expanded(
           child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.local_bar, size: 80, color: Colors.pink),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.get('sipdeck_title'),
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.local_bar, size: 80, color: Colors.pink),
+                  const SizedBox(height: 24),
+                  Text(
+                    l10n.get('sipdeck_title'),
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.getWith('sipdeck_players_ready', [
-                    players.length.toString(),
-                  ]),
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.get('sipdeck_18_warning'),
-                  style: const TextStyle(fontSize: 12, color: Colors.red),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.getWith('sipdeck_players_ready', [
+                      players.length.toString(),
+                    ]),
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.get('sipdeck_18_warning'),
+                    style: const TextStyle(fontSize: 12, color: Colors.red),
+                  ),
+                  const SizedBox(height: 24),
 
-                // 2-Player Optimization Toggle (only show if 2 players)
-                if (players.length == 2)
+                  // 2-Player Optimization Toggle (only show if 2 players)
+                  if (players.length == 2)
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: SwitchListTile(
+                        title: Text(l10n.get('sipdeck_optimize_2players')),
+                        subtitle: Text(
+                          l10n.get('sipdeck_optimize_2players_desc'),
+                        ),
+                        value: state.filterMultiplayerOnly,
+                        onChanged: (val) {
+                          ref
+                              .read(sipDeckStateProvider.notifier)
+                              .toggleFilterMultiplayerOnly(val);
+                        },
+                      ),
+                    ),
+
+                  if (players.length == 2) const SizedBox(height: 24),
+
+                  // Drink Intensity Selection
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        l10n.get('drink_intensity_title'),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.get('drink_intensity_subtitle'),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 12),
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 400),
-                    child: SwitchListTile(
-                      title: Text(l10n.get('sipdeck_optimize_2players')),
-                      subtitle: Text(
-                        l10n.get('sipdeck_optimize_2players_desc'),
-                      ),
-                      value: state.filterMultiplayerOnly,
-                      onChanged: (val) {
+                    child: SegmentedButton<DrinkIntensity>(
+                      segments: [
+                        ButtonSegment(
+                          value: DrinkIntensity.chill,
+                          label: Text(
+                            l10n.get('drink_intensity_chill'),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        ButtonSegment(
+                          value: DrinkIntensity.normal,
+                          label: Text(
+                            l10n.get('drink_intensity_normal'),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        ButtonSegment(
+                          value: DrinkIntensity.extreme,
+                          label: Text(
+                            l10n.get('drink_intensity_extreme'),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        ButtonSegment(
+                          value: DrinkIntensity.custom,
+                          label: Text(
+                            l10n.get('drink_intensity_custom'),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                      selected: {state.intensity},
+                      onSelectionChanged: (val) {
                         ref
                             .read(sipDeckStateProvider.notifier)
-                            .toggleFilterMultiplayerOnly(val);
+                            .toggleIntensity(val.first);
                       },
                     ),
                   ),
-
-                if (players.length == 2) const SizedBox(height: 24),
-
-                // Category Selection Section
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.get('sipdeck_select_modes'),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.help_outline, size: 20),
-                      onPressed: () => _showCategoryHelpDialog(context, l10n),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: SipDeckCategory.values.map((cat) {
-                      final isSelected = state.selectedCategories.contains(cat);
-                      final label = _labelForCategory(cat, l10n);
-                      final icon = _iconForCategory(cat);
-                      final color = _colorForCategory(cat);
-
-                      return FilterChip(
-                        label: Text(label),
-                        avatar: Icon(icon, size: 16, color: color),
-                        selected: isSelected,
-                        onSelected: (_) {
-                          ref
-                              .read(sipDeckStateProvider.notifier)
-                              .toggleCategory(cat);
-                        },
-                        selectedColor: color.withValues(alpha: 0.2),
-                        checkmarkColor: color,
-                        labelStyle: TextStyle(
-                          color: isSelected ? color : null,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Task Filters Section
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.get('sipdeck_filters'),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                  if (state.intensity == DrinkIntensity.custom) ...[
+                    const SizedBox(height: 16),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: Column(
+                        children: [
+                          Text(
+                            l10n.getWith('drink_intensity_custom_slider', [
+                              state.customIntensityMultiplier.toStringAsFixed(
+                                1,
+                              ),
+                            ]),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Slider(
+                            value: state.customIntensityMultiplier,
+                            min: 0.1,
+                            max: 10.0,
+                            divisions: 99,
+                            label: state.customIntensityMultiplier
+                                .toStringAsFixed(1),
+                            onChanged: (val) {
+                              ref
+                                  .read(sipDeckStateProvider.notifier)
+                                  .setCustomIntensity(val);
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 12),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: SipDeckTaskTag.values.map((tag) {
-                      final isDisabled = state.disabledTags.contains(tag);
-                      final label = _labelForTag(tag, l10n);
-                      final icon = _iconForTag(tag);
-                      final color = _colorForTag(tag);
+                  const SizedBox(height: 32),
 
-                      return FilterChip(
-                        label: Text(label),
-                        avatar: Icon(icon, size: 16, color: color),
-                        selected: !isDisabled,
-                        onSelected: (_) {
-                          ref
-                              .read(sipDeckStateProvider.notifier)
-                              .toggleTag(tag);
-                        },
-                        selectedColor: color.withValues(alpha: 0.2),
-                        checkmarkColor: color,
-                        labelStyle: TextStyle(
-                          color: !isDisabled ? color : null,
-                          fontWeight: !isDisabled
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                  // Category Selection Section
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        l10n.get('sipdeck_select_modes'),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-                    }).toList(),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.help_outline, size: 20),
+                        onPressed: () => _showCategoryHelpDialog(context, l10n),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 32),
-                FilledButton.icon(
-                  onPressed: () => ref
-                      .read(sipDeckStateProvider.notifier)
-                      .drawNextCard(players, l10n),
-                  icon: const Icon(Icons.play_arrow),
-                  label: Text(
-                    l10n.get('sipdeck_start'),
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 48,
-                      vertical: 16,
+                  const SizedBox(height: 12),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: SipDeckCategory.values.map((cat) {
+                        final isSelected = state.selectedCategories.contains(
+                          cat,
+                        );
+                        final label = _labelForCategory(cat, l10n);
+                        final icon = _iconForCategory(cat);
+                        final color = _colorForCategory(cat);
+
+                        return FilterChip(
+                          label: Text(label),
+                          avatar: Icon(icon, size: 16, color: color),
+                          selected: isSelected,
+                          onSelected: (_) {
+                            ref
+                                .read(sipDeckStateProvider.notifier)
+                                .toggleCategory(cat);
+                          },
+                          selectedColor: color.withValues(alpha: 0.2),
+                          checkmarkColor: color,
+                          labelStyle: TextStyle(
+                            color: isSelected ? color : null,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        );
+                      }).toList(),
                     ),
-                    backgroundColor: Colors.pink.shade700,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 24),
+
+                  // Task Filters Section
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        l10n.get('sipdeck_filters'),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: SipDeckTaskTag.values.map((tag) {
+                        final isDisabled = state.disabledTags.contains(tag);
+                        final label = _labelForTag(tag, l10n);
+                        final icon = _iconForTag(tag);
+                        final color = _colorForTag(tag);
+
+                        return FilterChip(
+                          label: Text(label),
+                          avatar: Icon(icon, size: 16, color: color),
+                          selected: !isDisabled,
+                          onSelected: (_) {
+                            ref
+                                .read(sipDeckStateProvider.notifier)
+                                .toggleTag(tag);
+                          },
+                          selectedColor: color.withValues(alpha: 0.2),
+                          checkmarkColor: color,
+                          labelStyle: TextStyle(
+                            color: !isDisabled ? color : null,
+                            fontWeight: !isDisabled
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  FilledButton.icon(
+                    onPressed: () => ref
+                        .read(sipDeckStateProvider.notifier)
+                        .drawNextCard(players, l10n),
+                    icon: const Icon(Icons.play_arrow),
+                    label: Text(
+                      l10n.get('sipdeck_start'),
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 48,
+                        vertical: 16,
+                      ),
+                      backgroundColor: Colors.pink.shade700,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -615,7 +714,7 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          TextButton(
+                          TextButton.icon(
                             onPressed: () {
                               HapticFeedback.lightImpact();
                               ref
@@ -625,11 +724,13 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                                   .read(sipDeckStateProvider.notifier)
                                   .drawNextCard(players, l10n);
                             },
-                            child: Text(
-                              l10n.get('game_skip'),
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                decoration: TextDecoration.underline,
+                            icon: const Icon(Icons.skip_next, size: 20),
+                            label: Text(l10n.get('game_skip')),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white70,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
                               ),
                             ),
                           ),

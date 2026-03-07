@@ -582,9 +582,13 @@ class _PhaseSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
+    return FilledButton.tonalIcon(
       onPressed: () => _pickPhase(context),
-      child: Text('${l10n.get('phase10_phase')} $currentPhase'),
+      icon: const Icon(Icons.arrow_drop_down),
+      label: Text(
+        '${l10n.get('phase10_phase')} $currentPhase',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
     );
   }
 

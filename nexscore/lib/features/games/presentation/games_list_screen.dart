@@ -297,16 +297,6 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
         tag: l10n.get('home_tag_card'),
       ),
       _GameEntry(
-        id: 'wizard_extreme',
-        name: 'Wizard Extreme',
-        description: 'Trick-taking with colored seals and the Black Magician.',
-        route: '/games/setup/wizard_extreme',
-        icon: Icons.bolt,
-        color: Colors.deepPurple,
-        playerCount: '3–5',
-        tag: l10n.get('home_tag_card'),
-      ),
-      _GameEntry(
         id: 'qwixx',
         name: l10n.get('game_qwixx'),
         description: l10n.get('desc_qwixx'),
@@ -406,7 +396,7 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
         icon: Icons.directions_car,
         color: Colors.blueAccent.shade700,
         playerCount: '2+',
-        tag: l10n.get('home_tag_travel'),
+        tag: l10n.get('home_tag_ext'),
       ),
       _GameEntry(
         id: 'generic',

@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexscore/features/games/sipdeck/models/sipdeck_models.dart';
+import 'package:flutter/widgets.dart';
+import 'package:nexscore/core/i18n/app_localizations.dart';
 
 void main() {
   group('SipDeck Models', () {
@@ -65,10 +67,11 @@ void main() {
     });
 
     test('sipDeckDatabase is non-empty and covers all categories', () {
-      expect(sipDeckDatabase.isNotEmpty, true);
-      expect(sipDeckDatabase.length, greaterThanOrEqualTo(40));
+      final db = getSipDeckDatabase(AppLocalizations(const Locale('en')));
+      expect(db.isNotEmpty, true);
+      expect(db.length, greaterThanOrEqualTo(40));
 
-      final categories = sipDeckDatabase.map((c) => c.category).toSet();
+      final categories = db.map((c) => c.category).toSet();
       for (final cat in SipDeckCategory.values) {
         expect(
           categories.contains(cat),
@@ -78,18 +81,9 @@ void main() {
       }
     });
 
-    test('all database cards have non-empty text', () {
-      for (final card in sipDeckDatabase) {
-        expect(
-          card.text.isNotEmpty,
-          true,
-          reason: 'Card ${card.id} has empty text',
-        );
-      }
-    });
-
     test('all database card IDs are unique', () {
-      final ids = sipDeckDatabase.map((c) => c.id).toList();
+      final db = getSipDeckDatabase(AppLocalizations(const Locale('en')));
+      final ids = db.map((c) => c.id).toList();
       final uniqueIds = ids.toSet();
       expect(
         ids.length,

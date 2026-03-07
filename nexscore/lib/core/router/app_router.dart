@@ -15,13 +15,13 @@ import '../../features/games/extras/presentation/darts_screen.dart';
 import '../../features/games/extras/presentation/romme_screen.dart';
 import '../../features/games/buzztap/presentation/buzztap_screen.dart';
 import '../../features/games/wayquest/presentation/wayquest_screen.dart';
-import '../../features/games/wizard/presentation/wizard_extreme_screen.dart';
 import '../../features/leaderboards/presentation/leaderboard_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/help/presentation/help_screen.dart';
 import '../../features/games/extras/presentation/generic_score_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/games/presentation/game_setup_screen.dart';
+import '../../features/games/arschloch/presentation/arschloch_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -94,12 +94,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                     builder: (context, state) => const WayQuestScreen(),
                   ),
                   GoRoute(
-                    path: 'wizard_extreme',
-                    builder: (context, state) => const WizardExtremeScreen(),
-                  ),
-                  GoRoute(
                     path: 'generic',
                     builder: (context, state) => const GenericScoreScreen(),
+                  ),
+                  GoRoute(
+                    path: 'arschloch',
+                    builder: (context, state) => const ArschlochScreen(),
                   ),
                 ],
               ),

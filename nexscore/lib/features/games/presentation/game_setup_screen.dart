@@ -24,7 +24,7 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
       case 'schafkopf':
         return 4;
       case 'arschloch':
-        return 3;
+        return 2;
       case 'sipdeck':
         return 2;
       default:
@@ -42,7 +42,16 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
     final gameName = l10n.get(gameTranslationKey);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.get('game_setup_title'))),
+      appBar: AppBar(
+        title: Text(l10n.get('game_setup_title')),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person_add),
+            onPressed: () => _showAddPlayerDialog(context, ref),
+            tooltip: l10n.get('add_player'),
+          ),
+        ],
+      ),
       body: playersAsync.when(
         data: (players) {
           if (players.isEmpty) {
@@ -114,10 +123,6 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddPlayerDialog(context, ref),
-        child: const Icon(Icons.person_add),
       ),
     );
   }

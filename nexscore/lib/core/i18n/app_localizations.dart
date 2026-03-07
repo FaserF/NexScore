@@ -23,6 +23,18 @@ class AppLocalizations {
       'account': 'Account',
       'nav_help': 'Help',
 
+      // ── Drink Intensity
+      'drink_intensity_title': 'Drink Intensity',
+      'drink_intensity_chill': 'Chill',
+      'drink_intensity_normal': 'Normal',
+      'drink_intensity_extreme': 'Extreme',
+      'drink_intensity_custom': 'Custom',
+      'drink_intensity_subtitle':
+          'Adjust the multiplier for sipping challenges',
+      'drink_intensity_custom_slider': '{0}x',
+      'mode_sips_adjusted': '[{0} Mode: {1} Sips]',
+      'mode_sips_adjusted_1': '[{0} Mode: {1} Sip]',
+
       // ── General
       'app_name': 'NexScore',
       'ok': 'OK',
@@ -207,7 +219,6 @@ class AppLocalizations {
       'wayquest_tap_continue': 'Tap for next quest',
       'desc_wayquest':
           'Entertaining questions and challenges for long car rides.',
-      'home_tag_travel': 'Travel',
 
       // Deep Talks (WQ)
       'wq_card_dt001':
@@ -362,6 +373,8 @@ class AppLocalizations {
       'arschloch_rules_2_high': '• 2 is the highest card.',
       'arschloch_rules_bomb': '• Bomb: 4 of a kind beats everything.',
       'arschloch_rules_passing': '• Passing is allowed.',
+      'arschloch_2player_warning':
+          'Arschloch is best enjoyed with 3 or more players!',
 
       // ── Kniffel
       'kniffel_title': 'Kniffel',
@@ -426,16 +439,17 @@ class AppLocalizations {
       'phase10_v_desc_masters':
           'Masters – choose any phase each round (can repeat)',
       'phase10_v_desc_duel': 'Duel (2 players) – choose phases tactically',
-      'phase10_p1_title': 'Phase 1', 'phase10_p1_desc': '2 sets of 3',
+      'phase10_p1_title': 'Phase 1\', \'phase10_p1_desc\': \'2 sets of 3',
       'phase10_p2_title': 'Phase 2',
       'phase10_p2_desc': '1 set of 3 + 1 run of 4',
       'phase10_p3_title': 'Phase 3',
       'phase10_p3_desc': '1 set of 4 + 1 run of 4',
-      'phase10_p4_title': 'Phase 4', 'phase10_p4_desc': '1 run of 7',
-      'phase10_p5_title': 'Phase 5', 'phase10_p5_desc': '1 run of 8',
-      'phase10_p6_title': 'Phase 6', 'phase10_p6_desc': '1 run of 9',
-      'phase10_p7_title': 'Phase 7', 'phase10_p7_desc': '2 sets of 4',
-      'phase10_p8_title': 'Phase 8', 'phase10_p8_desc': '7 cards of 1 color',
+      'phase10_p4_title': 'Phase 4\', \'phase10_p4_desc\': \'1 run of 7',
+      'phase10_p5_title': 'Phase 5\', \'phase10_p5_desc\': \'1 run of 8',
+      'phase10_p6_title': 'Phase 6\', \'phase10_p6_desc\': \'1 run of 9',
+      'phase10_p7_title': 'Phase 7\', \'phase10_p7_desc\': \'2 sets of 4',
+      'phase10_p8_title':
+          'Phase 8\', \'phase10_p8_desc\': \'7 cards of 1 color',
       'phase10_p9_title': 'Phase 9',
       'phase10_p9_desc': '1 set of 5 + 1 set of 2',
       'phase10_p10_title': 'Phase 10',
@@ -765,6 +779,291 @@ class AppLocalizations {
           '🐢 {0}, speak in slow motion for the next 3 turns or take 3 sips.',
       'sd_card_l009_expl':
           'Every. Single. Word. Drawn. Out. Long. If you talk at normal speed within 3 turns, drink 3.',
+      'sd_card_w100': 'Name 3 capital cities in 5 seconds. Fail? 2 sips.',
+      'sd_card_w101':
+          'Sing the chorus of the last song you listened to, or take 3 sips.',
+      'sd_card_w102': 'Anyone wearing something red takes 1 sip(s).',
+      'sd_card_w103':
+          'Never have I ever lied about my age. If you have, drink.',
+      'sd_card_w104':
+          'Name 3 car brands before the next person can say "beep". Fail = drink 2.',
+      'sd_card_w105': 'If you like pineapple on pizza, take 2 sips proudly.',
+      'sd_card_w106': 'Person with the most pets gives out 2 sips.',
+      'sd_card_w107':
+          'If your hands are cold right now, take a sip to warm up.',
+      'sd_card_w108': 'If your phone battery is below 20%, take 2 sips.',
+      'sd_card_w109': 'Everyone strictly wearing sneakers, take 1 sip.',
+      'sd_card_w110':
+          'Point to the person who has traveled the most. They drink 2.',
+      'sd_card_w111': 'If you have headphones in your pocket/bag, take a sip.',
+      'sd_card_w112': 'Coffee addicts, take 2 sips right now.',
+      'sd_card_w113':
+          'Name a Netflix show you binged in 2 days. Can\'t? Drink 2.',
+      'sd_card_w114': 'The youngest player takes 2 sips.',
+      'sd_card_w115': 'The oldest player takes 2 sips.',
+      'sd_card_w116': 'Anyone born in an odd-numbered month takes a sip.',
+      'sd_card_w117': 'Jump 3 times. If you refuse, drink 2.',
+      'sd_card_w118': 'Air guitar for 10 seconds or take 3 sips.',
+      'sd_card_w119': 'Clap your hands. Last person to clap takes 2 sips.',
+      'sd_card_wc100':
+          'Swap drinks with the person to your left until the next round.',
+      'sd_card_wc101':
+          'You are a ghost! Nobody can talk to you. If they do, they drink 2.',
+      'sd_card_wc102': 'Rule: Anyone who points a finger must take 1 sips.',
+      'sd_card_wc103':
+          'Rule: T-Rex Arms! You cannot fully extend your arms. Break it? Drink 2.',
+      'sd_card_wc104': 'Talk like a robot for your next 3 turns, or drink 3.',
+      'sd_card_wc105':
+          'Rule: Call everyone by their middle name or last name. Fail = drink.',
+      'sd_card_wc106': 'Unicorn! The next person to say "yes" drinks 2 sips.',
+      'sd_card_wc107':
+          'Take a selfie and make it your profile picture for a day. Or drink 5.',
+      'sd_card_wc108':
+          'Aliens abducted your memory. Ask "Who am I?" exactly 5 times. Fail = drink 3.',
+      'sd_card_wc109':
+          'Call a random contact and ask for a good joke. Refuse? Drink 4.',
+      'sd_card_wc110':
+          'Act like a dinosaur until it is your turn again. Or drink 3.',
+      'sd_card_wc111': 'Flip a coin. Heads = Give 2 sips, Tails = Take 2 sips.',
+      'sd_card_wc112':
+          'Everyone must spin around 3 times and sit down. Last one drinks 2.',
+      'sd_card_wc113': 'Hold an ice cube until it melts, or take 4 sips.',
+      'sd_card_wc114': 'Make up a haiku (5-7-5 syllables). Fail? Drink 3.',
+      'sd_card_wc115':
+          'Recreate a famous movie scene. If nobody guesses, drink 2.',
+      'sd_card_wc116':
+          'You can only use your non-dominant hand for drinking. Fail = 1 sip penalty.',
+      'sd_card_wc117': 'You are the general. Order 2 people to take 2 sips.',
+      'sd_card_wc118':
+          'Silent mode. Nobody can speak until someone finishes their current drink.',
+      'sd_card_wc119':
+          'Free pass! Save this card to skip any future dare or penalty.',
+      'sd_card_f100':
+          'Who is the best kisser here? If you refuse to guess, drink 4.',
+      'sd_card_f101':
+          'Stare into the eyes of the person opposite you for 15s. Laugh? Drink 3.',
+      'sd_card_f102':
+          'Demonstrate your best pickup line. If people cringe, take 3.',
+      'sd_card_f103':
+          'Tell the group your most embarrassing romantic encounter, or drink 4.',
+      'sd_card_f104':
+          'Give someone a shoulder massage for 30 seconds. Or drink 3.',
+      'sd_card_f105':
+          'Let someone else sit on your lap for native 2 turns. Refuse? Drink 4.',
+      'sd_card_f106': 'Share your weirdest turn-on. Chicken out? Drink 5.',
+      'sd_card_f107': 'Blow a kiss to the cutest person. They give out 2 sips.',
+      'sd_card_f108':
+          'Never have I ever had a crush on someone in this room. Drink if true.',
+      'sd_card_f109':
+          'Take a seductive photo. Keep it as wallpaper for 1 hour. Or drink 5.',
+      'sd_card_f110':
+          'Who is the most likely to have a wild secret life? Point. Majority drinks 2.',
+      'sd_card_f111':
+          'Show your best modeling face. Group rates 1-10. Less than 5? Drink 3.',
+      'sd_card_f112':
+          'Eat an imaginary strawberry as suggestively as possible. Or drink 4.',
+      'sd_card_f113':
+          'Link arms with the person to your left and drink your next drink together.',
+      'sd_card_f114':
+          'Let the person on your right send a flirty text to someone in your contacts. Or drink 5.',
+      'sd_card_f115':
+          'Whisper something naughty into the ear of the person on your left.',
+      'sd_card_f116':
+          'Name one physical trait you find extremely attractive. Or drink 2.',
+      'sd_card_f117': 'Do a 10 second sexy dance. Or drink 4.',
+      'sd_card_f118': 'Tell us about your best kiss ever. Refuse? Drink 3.',
+      'sd_card_f119': 'Confess a minor crush you had in school. Or drink 2.',
+      'sd_card_b100': 'Cheers to the bartender! Everyone clinks glasses.',
+      'sd_card_b101': 'Whoever went to the bathroom most recently drinks 2.',
+      'sd_card_b102': 'Guess the song playing right now. Wrong? Drink 2.',
+      'sd_card_b103': 'Anyone who has ice in their drink takes 1 sips.',
+      'sd_card_b104': 'If your drink has fruit in it, enjoy 2 bonus sips.',
+      'sd_card_b105':
+          'Beer drinkers take 2 sips. Cocktail/Wine drinkers take 2.',
+      'sd_card_b106': 'Person with the highest tab right now gives out 3 sips.',
+      'sd_card_b107': 'Yell "BARTENDER" into your hand. Refuse? Drink 2.',
+      'sd_card_b108': 'Anyone wearing a hat/cap drinks 2.',
+      'sd_card_b109':
+          'If you brought a jacket but aren\'t wearing it, drink 1.',
+      'sd_card_b110': 'Name 3 ride-sharing apps. Too slow? Drink 2.',
+      'sd_card_b111': 'Last person to eat fast food drinks 2.',
+      'sd_card_b112': 'Hold your breath for 15s. Fail = drink 3.',
+      'sd_card_b113': 'Everyone drink a sip of water. Hydrate!',
+      'sd_card_b114':
+          'High-five the person next to you. Slowest pair drinks 2.',
+      'sd_card_b115': 'Take a group photo right now! Blurry? Drink 1.',
+      'sd_card_b116':
+          'Celebrate someone taking a sip loudly. If you don\'t, you drink 2.',
+      'sd_card_b117': 'Cash or Card? Minority drinks 2 sips.',
+      'sd_card_b118': 'If your drink is almost empty, finish it!',
+      'sd_card_b119':
+          'Roll an imaginary dice. Everyone except you drinks 2 sips.',
+      'sd_card_l100': 'Try to lick your elbow. Fail? That equals 2 sips.',
+      'sd_card_l101': 'Talk like Yoda until your next turn. Or drink 3.',
+      'sd_card_l102': 'Act like a monkey for 10 seconds. Refuse? Drink 4.',
+      'sd_card_l103': 'Balance a spoon on your nose for 5s. Drop it = drink 2.',
+      'sd_card_l104':
+          'Moo loudly every time someone says your name. Drink 1 if you forget.',
+      'sd_card_l105':
+          'Describe a shopping trip dramatically. Bore the group = drink 2.',
+      'sd_card_l106':
+          'Argue passionately about why pizza is awful. Or drink 3.',
+      'sd_card_l107': 'Cast a Harry Potter spell on someone. They drink 1.',
+      'sd_card_l108':
+          'Speak entirely in whispers for 2 rounds. Forget = 2 sips.',
+      'sd_card_l109': 'Tell the worst Dad joke you know. No laughs? Drink 2.',
+      'sd_card_l110': 'Gently pat the head of the person to your left.',
+      'sd_card_l111': 'Read the next card in a dramatic opera voice.',
+      'sd_card_l112': 'Crawl on the floor for 10 seconds. Refuse? Drink 4.',
+      'sd_card_l113': 'Caw like an eagle before you drink next.',
+      'sd_card_l114': 'Make car engine noises for 5 seconds.',
+      'sd_card_l115': 'Do the robot dance for 5 seconds. Fail = drink 2.',
+      'sd_card_l116': 'Beatbox while someone else drinks their penalty.',
+      'sd_card_l117': 'Sit under the table for 1 round. Refuse = drink 3.',
+      'sd_card_l118':
+          'Pretend to cry intensely about your drink. Group rates. Fail = 3 sips.',
+      'sd_card_l119':
+          'Strike a superhero pose for exactly 1 minute. Break it = drink 2 sips.',
+      'bt_card_w100':
+          'Stand up and formally introduce yourself to your beverage. Or drink 2.',
+      'bt_card_w101':
+          'Roll an imaginary dice. Odd numbers drink 1, Even drink 1.',
+      'bt_card_w102': 'Anyone wearing white socks takes 2 sips.',
+      'bt_card_w103': 'Name 3 things that are yellow. Fail = 2 sips.',
+      'bt_card_w104': 'Cheers! Everyone clinks glasses and takes a sip.',
+      'bt_card_w105': 'If your phone is an iPhone, take 1. Androids take 1.',
+      'bt_card_w106':
+          'Hum a familiar song. If they guess it, they give away 2 sips.',
+      'bt_card_w107': 'Whose birthday is next? They drink 3 sips.',
+      'bt_card_w108': 'Anyone older than 25 takes 2 sips.',
+      'bt_card_w109':
+          'Take off one shoe and keep it off for 5 rounds. Refuse = 3 sips.',
+      'bt_card_w110': 'Whoever brought a bag/purse tonight drinks 2.',
+      'bt_card_w111': 'Anyone wearing glasses or contacts takes 2 sips.',
+      'bt_card_w112':
+          'Yawn as widely as possible. Anyone who yawns back drinks 2.',
+      'bt_card_w113': 'Person with the coldest drink gives out 2 sips.',
+      'bt_card_w114': 'Person with the warmest drink takes 2 sips out of pity.',
+      'bt_card_w115': 'High five someone. Slowest to react drinks 2.',
+      'bt_card_w116':
+          'Say "NexScore is the best app" 5 times fast. Stumble = drink 2.',
+      'bt_card_w117': 'Point to north. Those who are completely wrong take 2.',
+      'bt_card_w118':
+          'If you prefer dogs over cats, take 1 sip. Cat lovers take 1.',
+      'bt_card_w119': 'Name 3 animated movies. Fail? 2 sips.',
+      'bt_card_w120': 'Whoever slept the most tonight takes 2 sips.',
+      'bt_card_w121': 'Jog in place for 10 seconds or take 3 sips.',
+      'bt_card_w122': 'Name 3 fruits. Hesitate = drink 2.',
+      'bt_card_w123': 'Anyone with cash in their wallet takes 2.',
+      'bt_card_w124': 'If you drink out of a can, take 2 sips.',
+      'bt_card_p100':
+          'Group cheers! Everyone stands up, cheers, and takes 1 sips.',
+      'bt_card_p101': 'Do a cartwheel (or attempt one). Refuse? Drink 4.',
+      'bt_card_p102': 'Start a conga line! Whoever doesn\'t join drinks 3.',
+      'bt_card_p103': 'You are the Party King/Queen. Assign 4 sips to anyone.',
+      'bt_card_p104':
+          'Pretend to inflate a huge balloon until it pops. Or drink 3.',
+      'bt_card_p105': 'Everyone poses for a crazy photo. Worst pose drinks 3.',
+      'bt_card_p106': 'Rap 4 lines. If they don\'t rhyme, drink 4.',
+      'bt_card_p107': 'Name 3 drinking games. Too slow? Take 3 sips.',
+      'bt_card_p108': 'Air guitar solo! Best performance gives 3 sips.',
+      'bt_card_p109': 'Act out a wildly inappropriate scene. Cringe? Take 4.',
+      'bt_card_p110': 'Swap seats with the person to your left.',
+      'bt_card_p111':
+          'Finish whatever is left in your glass! Or take 5 penalty sips.',
+      'bt_card_p112':
+          'Roar like a lion at the person opposite you. Laugh? Drink 2.',
+      'bt_card_p113': 'Silent library! The loudest breather drinks 2.',
+      'bt_card_p114': 'Do 5 push-ups. Can\'t? Drink 3.',
+      'bt_card_p115': 'Take off a piece of clothing or drink 4.',
+      'bt_card_p116': 'Throw imaginary confetti and yell woo! Drink 1 anyway.',
+      'bt_card_p117': 'Anyone who hasn\'t eaten in the last 3 hours drinks 2.',
+      'bt_card_p118':
+          'The person with the most empty bottles near them drinks 3.',
+      'bt_card_p119': 'Chug for 5 seconds!',
+      'bt_card_p120': 'Juggle 3 items. Fail immediately = drink 3.',
+      'bt_card_p121': 'If you have a band-aid on right now, take 2 sips.',
+      'bt_card_p122':
+          'You are the hero! Prevent someone from taking their next penalty.',
+      'bt_card_p123': 'Talk in a whisper for the next 2 rounds.',
+      'bt_card_p124': 'Laugh maniacally for 10 seconds. Refuse = 3 sips.',
+      'bt_card_h100':
+          'Demonstrate how to kiss on your hand. Boring? Drink 4 sips.',
+      'bt_card_h101': 'Show the group your most provocative photo. Or drink 5.',
+      'bt_card_h102':
+          'Make eye contact with someone and slowly bite your lip. Break? Drink 3.',
+      'bt_card_h103': 'Describe your ultimate fantasy in 3 words. Or drink 4.',
+      'bt_card_h104': 'Twerk for 10 seconds. If you refuse, finish your drink.',
+      'bt_card_h105':
+          'Take an ice cube and rub it on your neck. Or take 3 sips.',
+      'bt_card_h106':
+          'Whisper something incredibly dirty to the person adjacent. Or drink 4.',
+      'bt_card_h107':
+          'Seductively eat a piece of fruit or air. Fail = drink 3.',
+      'bt_card_h108':
+          'Give someone a lap dance for 15 seconds. Refuse = 6 sips.',
+      'bt_card_h109': 'Name one thing you love in bed. Too silent = drink 5.',
+      'bt_card_h110': 'Unbutton an item of clothing. If impossible, drink 4.',
+      'bt_card_h111': 'Drink the next 3 sips from the glass of someone else.',
+      'bt_card_h112':
+          'Lick your lips provocatively every time you hear your name for 2 rounds.',
+      'bt_card_h113':
+          'Confess who you would hook up with strictly based on looks.',
+      'bt_card_h114': 'If you shower naked (obviously), everyone drinks 2.',
+      'bt_card_h115': 'Pretend to put lotion on yourself. Awkward? Drink 3.',
+      'bt_card_h116': 'Let someone reapply your lipbalm/lipstick. Or drink 3.',
+      'bt_card_h117': 'Crawl like a cat for 10 seconds. Refuse = 5 sips.',
+      'bt_card_h118':
+          'Never have I ever sent a nude. If you have, drink proudly.',
+      'bt_card_h119':
+          'Take a hot photo of the person opposite you. Or drink 4.',
+      'bt_card_h120':
+          'Name synonymous words for boobs in 10s. Loser takes 3 sips.',
+      'bt_card_h121':
+          'Spill a tiny bit of drink on yourself and wipe it seductively. Or drink 3.',
+      'bt_card_h122':
+          'Show the group your tinder/dating app profile. Or drink 5.',
+      'bt_card_h123':
+          'Leave a kiss mark on a napkin or back of your hand. Or drink 2.',
+      'bt_card_h124':
+          'Flash your best seductive smile. Everyone else drinks 1.',
+      'bt_card_e100': 'You are cursed! Finish your drink!',
+      'bt_card_e101':
+          'Spin around 10 times and try to walk in a straight line. Fail = 4 sips.',
+      'bt_card_e102': 'Take a shot. Yes, right now.',
+      'bt_card_e103':
+          'Let the group shave a tiny patch of your hair. Refuse = finish drink.',
+      'bt_card_e104':
+          'Call your parents and say you are quitting your job/school. Or drink 8.',
+      'bt_card_e105':
+          'Mix 3 different drinks and take a sip. Or take 6 penalty sips.',
+      'bt_card_e106':
+          'Everyone votes. The person they hate the most right now drinks 5.',
+      'bt_card_e107':
+          'Let someone draw on your face with a sharpie. Or drink 8.',
+      'bt_card_e108':
+          'Put someone else\'s sock in your pocket for the rest of the game.',
+      'bt_card_e109': 'Throw your drink in the sink. Refuse? Drink 10.',
+      'bt_card_e110': 'Put an ice cube down your pants. Or finish your drink.',
+      'bt_card_e111': 'Eat a raw egg. Or drink 8 sips.',
+      'bt_card_e112': 'Lick the floor. Yes, the floor. Refuse = 10 sips.',
+      'bt_card_e113': 'Venmo/PayPal someone €5. Or drink 5 sips.',
+      'bt_card_e114':
+          'Delete an app from your phone chosen by the group. Or drink 6.',
+      'bt_card_e115': 'Drop your phone on the carpet from 1 meter. Or drink 3.',
+      'bt_card_e116': 'Eat a spoonful of hot sauce. Or finish your drink.',
+      'bt_card_e117':
+          'Arm wrestle the strongest looking person. Loser drinks 5.',
+      'bt_card_e118': 'Let someone slap you lightly. Or take 5 sips.',
+      'bt_card_e119': 'Wear your shirt backwards for the rest of the game.',
+      'bt_card_e120': 'Run outside and yell "I LOVE NEXSCORE". Or drink 7.',
+      'bt_card_e121':
+          'Stick your head under the faucet/shower. Or finish your drink.',
+      'bt_card_e122':
+          'Drink water out of your own shoe. Disgusting? Then drink 10.',
+      'bt_card_e123':
+          'Roast every single person in the room brutally. Fail = drink 5.',
+      'bt_card_e124': 'Everyone finish their drinks immediately!!',
     },
     'de': {
       // ── Navigation
@@ -775,6 +1074,17 @@ class AppLocalizations {
       'nav_account': 'Konto',
       'account': 'Konto',
       'nav_help': 'Hilfe',
+
+      // ── Drink Intensity
+      'drink_intensity_title': 'Trink-Intensität',
+      'drink_intensity_chill': 'Gemütlich',
+      'drink_intensity_normal': 'Normal',
+      'drink_intensity_extreme': 'Extrem',
+      'drink_intensity_custom': 'Benutzerdefiniert',
+      'drink_intensity_subtitle': 'Multiplikator für Trink-Aufgaben anpassen',
+      'drink_intensity_custom_slider': '{0}x',
+      'mode_sips_adjusted': '[{0}-Modus: {1} Schlücke]',
+      'mode_sips_adjusted_1': '[{0}-Modus: {1} Schluck]',
 
       // ── General
       'app_name': 'NexScore',
@@ -1032,7 +1342,6 @@ class AppLocalizations {
       'wayquest_tap_continue': 'Tippen für die nächste Quest',
       'desc_wayquest':
           'Unterhaltsame Fragen und Challenges für lange Autofahrten.',
-      'home_tag_travel': 'Reise',
 
       // Deep Talks (DE)
       'wq_card_dt001':
@@ -1193,7 +1502,9 @@ class AppLocalizations {
       'arschloch_rules_special': 'Sonderregeln',
       'arschloch_rules_2_high': '• 2 ist die höchste Karte.',
       'arschloch_rules_bomb': '• Bombe: Vierling schlägt alles.',
-      'arschloch_rules_passing': '• Passen ist jederzeit erlaubt.',
+      'arschloch_rules_passing': '• Niemand MUSS legen. Aussetzen ist erlaubt.',
+      'arschloch_2player_warning':
+          'Arschloch macht mit 3 oder mehr Spielern am meisten Spaß!',
 
       // ── Kniffel
       'kniffel_title': 'Kniffel',
@@ -1259,16 +1570,17 @@ class AppLocalizations {
       'phase10_v_desc_masters':
           'Masters – jede Runde eine beliebige Phase wählen',
       'phase10_v_desc_duel': 'Duell (2 Spieler) – Phasen taktisch wählen',
-      'phase10_p1_title': 'Phase 1', 'phase10_p1_desc': '2 Drillinge',
+      'phase10_p1_title': 'Phase 1\', \'phase10_p1_desc\': \'2 Drillinge',
       'phase10_p2_title': 'Phase 2',
       'phase10_p2_desc': '1 Drilling + 1 Viererfolge',
       'phase10_p3_title': 'Phase 3',
       'phase10_p3_desc': '1 Vierling + 1 Viererfolge',
-      'phase10_p4_title': 'Phase 4', 'phase10_p4_desc': '1 Siebenerfolge',
-      'phase10_p5_title': 'Phase 5', 'phase10_p5_desc': '1 Achterfolge',
-      'phase10_p6_title': 'Phase 6', 'phase10_p6_desc': '1 Neunerfolge',
-      'phase10_p7_title': 'Phase 7', 'phase10_p7_desc': '2 Vierlinge',
-      'phase10_p8_title': 'Phase 8', 'phase10_p8_desc': '7 Karten einer Farbe',
+      'phase10_p4_title': 'Phase 4\', \'phase10_p4_desc\': \'1 Siebenerfolge',
+      'phase10_p5_title': 'Phase 5\', \'phase10_p5_desc\': \'1 Achterfolge',
+      'phase10_p6_title': 'Phase 6\', \'phase10_p6_desc\': \'1 Neunerfolge',
+      'phase10_p7_title': 'Phase 7\', \'phase10_p7_desc\': \'2 Vierlinge',
+      'phase10_p8_title':
+          'Phase 8\', \'phase10_p8_desc\': \'7 Karten einer Farbe',
       'phase10_p9_title': 'Phase 9',
       'phase10_p9_desc': '1 Fünfling + 1 Zwilling',
       'phase10_p10_title': 'Phase 10',
@@ -1544,6 +1856,319 @@ class AppLocalizations {
           '🐢 {0}, sprich für die nächsten 3 Runden in Zeitlupe oder trinke 3 Schlucke.',
       'sd_card_l009_expl':
           'Jedes... einzelne... Wort... extra... lang... ziehen... Wenn du normal sprichst, bevor die 3 Runden um sind: Trinke 3.',
+      'sd_card_w100':
+          'Nenne 3 Hauptstädte in 5 Sekunden. Zu langsam? 2 Schlücke.',
+      'sd_card_w101':
+          'Singe den Refrain des letzten Liedes, das du gehört hast, oder trinke 3.',
+      'sd_card_w102': 'Jeder, der etwas Rotes trägt, trinkt 1 Schluck(e).',
+      'sd_card_w103':
+          'Ich habe noch nie über mein Alter gelogen. Wer doch, trinkt.',
+      'sd_card_w104':
+          'Nenne 3 Automarken, bevor der nächste "Beep" sagt. Sonst 2 Schlücke.',
+      'sd_card_w105': 'Wer Ananas auf Pizza mag, trinkt stolz 2 Schlücke.',
+      'sd_card_w106':
+          'Die Person mit den meisten Haustieren verteilt 2 Schlücke.',
+      'sd_card_w107':
+          'Wessen Hände jetzt gerade kalt sind, trinkt zum Aufwärmen.',
+      'sd_card_w108': 'Wenn dein Handyakku unter 20% ist, trinke 2 Schlücke.',
+      'sd_card_w109': 'Jeder, der Sneaker trägt, trinkt 1 Schluck.',
+      'sd_card_w110':
+          'Zeige auf die Person, die am meisten gereist ist. Sie trinkt 2.',
+      'sd_card_w111': 'Wer Kopfhörer in der Tasche hat, trinkt einen Schluck.',
+      'sd_card_w112': 'Kaffee-Süchtige, trinkt sofort 2 Schlücke.',
+      'sd_card_w113':
+          'Nenne eine Netflix-Serie, die du in 2 Tagen durchgeschaut hast. Keine? Trinke 2.',
+      'sd_card_w114': 'Der jüngste Spieler trinkt 2 Schlücke.',
+      'sd_card_w115': 'Der älteste Spieler trinkt 2 Schlücke.',
+      'sd_card_w116':
+          'Jeder, der in einem ungeraden Monat geboren wurde, trinkt.',
+      'sd_card_w117': 'Hüpfe 3 Mal. Wenn du dich weigerst, trinke 2.',
+      'sd_card_w118': 'Spiele 10 Sekunden Luftgitarre oder trinke 3.',
+      'sd_card_w119':
+          'Klatsche in die Hände. Der Letzte, der klatscht, trinkt 2.',
+      'sd_card_wc100':
+          'Tausche dein Getränk mit der Person links bis zur nächsten Runde.',
+      'sd_card_wc101':
+          'Du bist ein Geist! Niemand darf mit dir reden. Wer es tut, trinkt 2.',
+      'sd_card_wc102':
+          'Regel: Jeder, der mit dem Finger auf jemanden zeigt, trinkt 1.',
+      'sd_card_wc103':
+          'Regel: T-Rex Arme! Du darfst deine Arme nicht ausstrecken. Bei Verstoß 2 trinken.',
+      'sd_card_wc104':
+          'Sprich wie ein Roboter für deine nächsten 3 Züge, oder trinke 3.',
+      'sd_card_wc105':
+          'Regel: Nenne jeden beim Zweit- oder Nachnamen. Vergessen = trinken.',
+      'sd_card_wc106':
+          'Einhorn! Die nächste Person, die "Ja" sagt, trinkt 2 Schlücke.',
+      'sd_card_wc107':
+          'Mache ein Selfie und nutze es für einen Tag als Profilbild. Oder trinke 5.',
+      'sd_card_wc108':
+          'Aliens haben dein Gedächtnis entführt. Frage 5 Mal "Wer bin ich?". Vergessen = trinke 3.',
+      'sd_card_wc109':
+          'Rufe einen Kontakt an und frage nach einem Witz. Keine Lust? Trinke 4.',
+      'sd_card_wc110':
+          'Verhalte dich wie ein Dinosaurier bis du wieder dran bist. Oder trinke 3.',
+      'sd_card_wc111':
+          'Wirf eine Münze. Kopf = 2 Schlücke verteilen, Zahl = 2 trinken.',
+      'sd_card_wc112':
+          'Jeder muss sich 3 Mal drehen und hinsetzen. Der Letzte trinkt 2.',
+      'sd_card_wc113':
+          'Halte einen Eiswürfel, bis er schmilzt, oder trinke 4 Schlücke.',
+      'sd_card_wc114':
+          'Denke dir ein Haiku aus (5-7-5 Silben). Versagt? Trinke 3.',
+      'sd_card_wc115':
+          'Spiele eine bekannte Filmszene nach. Wenn keiner sie errät, trinke 2.',
+      'sd_card_wc116':
+          'Trinke nur mit der schwachen Hand. Vergessen = 1 Strafschluck.',
+      'sd_card_wc117':
+          'Du bist der General. Befehle 2 Personen, 2 Schlücke zu nehmen.',
+      'sd_card_wc118':
+          'Stummschaltung. Niemand darf reden, bis jemand sein Glas leert.',
+      'sd_card_wc119':
+          'Freifahrtschein! Behalte diese Karte, um eine zukünftige Aufgabe zu überspringen.',
+      'sd_card_f100':
+          'Wer küsst hier am besten? Wenn du nicht raten willst, trinke 4.',
+      'sd_card_f101':
+          'Starre der Person gegenüber 15s in die Augen. Gelacht? Trinke 3.',
+      'sd_card_f102':
+          'Zeige deinen besten Anmachspruch. Wenn alle cringen, trinke 3.',
+      'sd_card_f103':
+          'Erzähle der Gruppe dein peinlichstes Date, oder trinke 4.',
+      'sd_card_f104':
+          'Gib jemandem eine Schultermassage für 30 Sekunden. Oder trinke 3.',
+      'sd_card_f105':
+          'Lass jemanden für 2 Runden auf deinem Schoß sitzen. Nein? Trinke 4.',
+      'sd_card_f106': 'Nenne deinen komischsten Turn-On. Feige? Trinke 5.',
+      'sd_card_f107':
+          'Wirf der süßesten Person einen Kuss zu. Sie verteilt 2 Schlücke.',
+      'sd_card_f108':
+          'Ich war noch nie in jemanden in diesem Raum verknallt. Wenn doch: Trinken.',
+      'sd_card_f109':
+          'Mache ein verführerisches Foto. Nutze es 1 h als Hintergrund. Oder trinke 5.',
+      'sd_card_f110':
+          'Wer hat am ehesten ein wildes Doppelleben? Zeigt auf jemanden! Gewinner trinkt 2.',
+      'sd_card_f111':
+          'Zeige deinen besten Model-Blick. Gruppe bewertet 1-10. Unter 5? Trinke 3.',
+      'sd_card_f112':
+          'Iss eine imaginäre Erdbeere so provokant wie möglich. Oder trinke 4.',
+      'sd_card_f113':
+          'Hake dich bei der Person links ein und trinkt euer Getränk zusammen.',
+      'sd_card_f114':
+          'Lass deinen rechten Nachbarn einen Flirt-Text an einen Kontakt senden. Oder trinke 5.',
+      'sd_card_f115': 'Flüstere der Person links etwas Unanständiges ins Ohr.',
+      'sd_card_f116':
+          'Nenne ein körperliches Merkmal, das du extrem attraktiv findest. Oder trinke 2.',
+      'sd_card_f117': 'Mache einen 10 Sekunden Sexy-Tanz. Oder trinke 4.',
+      'sd_card_f118': 'Erzähle von deinem besten Kuss. Keine Lust? Trinke 3.',
+      'sd_card_f119':
+          'Gestehe, in wen du in der Schule mal leicht verknallt warst. Oder trinke 2.',
+      'sd_card_b100': 'Prost auf den Barkeeper! Alle stoßen an.',
+      'sd_card_b101': 'Wer zuletzt auf der Toilette war, trinkt 2 Schlücke.',
+      'sd_card_b102': 'Errate den Song, der gerade läuft. Falsch? Trinke 2.',
+      'sd_card_b103':
+          'Jeder, der Eis in seinem Getränk hat, trinkt 1 Schlücke.',
+      'sd_card_b104':
+          'Wenn dein Drink Früchte enthält, genieße 2 Extra-Schlücke.',
+      'sd_card_b105': 'Biertrinker: 2 Schlücke. Cocktail/Wein: 2 Schlücke.',
+      'sd_card_b106':
+          'Person mit der aktuell höchsten Rechnung verteilt 3 Schlücke.',
+      'sd_card_b107':
+          'Rufe "BARKEEPER" leise in deine Hand. Weigerung? Trinke 2.',
+      'sd_card_b108': 'Jeder mit Hut oder Cappie trinkt 2.',
+      'sd_card_b109':
+          'Wer eine Jacke dabei hat, sie aber nicht trägt: 1 trinken.',
+      'sd_card_b110': 'Nenne 3 Ride-Sharing/Taxi Apps. Zu langsam? 2 Schlücke.',
+      'sd_card_b111': 'Wer zuletzt Fast-Food gegessen hat, trinkt 2.',
+      'sd_card_b112': 'Halte die Luft für 15s an. Fail = 3 trinken.',
+      'sd_card_b113': 'Jeder trinkt einen Schluck Wasser. Hydratisieren!',
+      'sd_card_b114':
+          'High-Five mit dem Nachbarn. Das langsamste Paar trinkt 2.',
+      'sd_card_b115': 'Mache sofort ein Gruppenfoto! Unscharf? Trinke 1.',
+      'sd_card_b116':
+          'Feiere jemanden, der gerade trinkt, sehr laut. Sonst trinkst du 2.',
+      'sd_card_b117': 'Bargeld oder Karte? Die Minderheit trinkt 2.',
+      'sd_card_b118': 'Wenn dein Glas fast leer ist, trinke es auf Ex aus!',
+      'sd_card_b119': 'Wirf einen imaginären Würfel. Jeder außer dir trinkt 2.',
+      'sd_card_l100':
+          'Versuche, deinen Ellbogen zu lecken. Geht nicht? Das macht 2 Schlücke.',
+      'sd_card_l101':
+          'Sprich wie Yoda, bis du wieder dran bist. Oder trinke 3.',
+      'sd_card_l102': 'Verhalte dich 10 Sekunden wie ein Affe. Nein? Trinke 4.',
+      'sd_card_l103':
+          'Balanciere einen Löffel auf der Nase. Fällt er runter = 2 trinken.',
+      'sd_card_l104':
+          'Muhe laut, wenn jemand deinen Namen sagt. Vergessen = 1 Schlücke.',
+      'sd_card_l105':
+          'Beschreibe deinen letzten Einkauf hochdramatisch. Langweilig = 2 trinken.',
+      'sd_card_l106':
+          'Argumentiere leidenschaftlich, warum Pizza furchtbar ist. Oder trinke 3.',
+      'sd_card_l107':
+          'Verwende einen Harry Potter Zauberspruch gegen jemanden. Er trinkt 1.',
+      'sd_card_l108':
+          'Sprich für 2 Runden nur flüsternd. Vergessen = 2 Schlücke.',
+      'sd_card_l109':
+          'Erzähle den schlechtesten Flachwitz. Lacht keiner? Trinke 2.',
+      'sd_card_l110': 'Tätschele sanft den Kopf der Person links von dir.',
+      'sd_card_l111':
+          'Lies die nächste Karte mit einer dramatischen Opernstimme vor.',
+      'sd_card_l112': 'Krable für 10s auf dem Boden. Weigerung? Trinke 4.',
+      'sd_card_l113':
+          'Krächze wie ein Adler, bevor du das nächste Mal trinkst.',
+      'sd_card_l114': 'Mache 5 Sekunden lang laute Motorgeräusche.',
+      'sd_card_l115': 'Mach 5 Sekunden lang den Robotertanz. Fail = 2 trinken.',
+      'sd_card_l116':
+          'Beatboxe, während jemand anderes seine Strafschlücke trinkt.',
+      'sd_card_l117':
+          'Sitz für 1 Runde unter dem Tisch. Weigerung = 3 trinken.',
+      'sd_card_l118':
+          'Tu so, als würdest du wegen deines Drinks heulen. Zu unauthentisch = 3 Schlücke.',
+      'sd_card_l119':
+          'Mache 1 Minute lang ununterbrochen eine Superheldenpose. Abbruch = 2 trinken.',
+      'bt_card_w100':
+          'Steh auf und stelle dich feierlich deinem Getränk vor. Oder trinke 2.',
+      'bt_card_w101':
+          'Wirf einen unsichtbaren Würfel. Ungerade trinkt 1, Gerade 1.',
+      'bt_card_w102': 'Jeder mit weißen Socken trinkt 2 Schlücke.',
+      'bt_card_w103': 'Nenne 3 gelbe Dinge. Fail = 2 Schlücke.',
+      'bt_card_w104': 'Prost! Alle stoßen an und trinken einen Schluck.',
+      'bt_card_w105': 'iPhones trinken 1. Androids trinken 1.',
+      'bt_card_w106': 'Summe eine Melodie. Wer sie errät, darf 2 verteilen.',
+      'bt_card_w107': 'Wer hat als nächstes Geburtstag? Trinke 3 Schlücke.',
+      'bt_card_w108': 'Jeder über 25 trinkt 2 Schlücke.',
+      'bt_card_w109':
+          'Zieh einen Schuh aus und lass ihn 5 Runden aus. Nein = 3 trinken.',
+      'bt_card_w110': 'Wer heute eine Tasche dabei hat, trinkt 2.',
+      'bt_card_w111': 'Jeder mit Brille oder Kontaktlinsen trinkt 2.',
+      'bt_card_w112':
+          'Gähne intensiv. Jeder, der ansteckend mitgähnt, trinkt 2.',
+      'bt_card_w113': 'Person mit dem kältesten Getränk verteilt 2 Schlücke.',
+      'bt_card_w114':
+          'Person mit dem wärmsten Getränk trinkt aus Mitleid 2 Schlücke.',
+      'bt_card_w115':
+          'Gib jemandem ein High-Five. Der Langsamste im Raum trinkt 2.',
+      'bt_card_w116':
+          'Sage schnell 5x "NexScore ist die beste App". Stolpern = 2 trinken.',
+      'bt_card_w117': 'Zeige nach Norden. Wer völlig daneben liegt, trinkt 2.',
+      'bt_card_w118': 'Hunde-Fans trinken 1 Schluck. Katzen-Fans 1.',
+      'bt_card_w119': 'Nenne 3 Trickfilme. Fail = 2 Schlücke.',
+      'bt_card_w120':
+          'Wer heute am längsten geschlafen hat, trinkt 2 Schlücke.',
+      'bt_card_w121': 'Jogge 10s auf der Stelle oder trinke 3 Schlücke.',
+      'bt_card_w122': 'Nenne 3 Früchte. Zögern = 2 trinken.',
+      'bt_card_w123': 'Jeder mit Bargeld im Portemonnaie trinkt 2.',
+      'bt_card_w124': 'Wenn du aus einer Dose trinkst, nimm 2 Schlücke.',
+      'bt_card_p100':
+          'Gruppen-Cheers! Alle stehen auf, jubeln und nehmen 1 Schlücke.',
+      'bt_card_p101':
+          'Schlage ein Rad (oder versuche es). Weigerung = 4 trinken.',
+      'bt_card_p102': 'Starte eine Polonaise! Wer nicht mitmacht, trinkt 3.',
+      'bt_card_p103': 'Du bist der Party King/Queen. Verteile 4 Schlücke.',
+      'bt_card_p104':
+          'Tu so, als würdest du einen riesigen Ballon aufblasen, bis er platzt. Oder 3 trinken.',
+      'bt_card_p105': 'Alle posieren verrückt. Die schlechteste Pose trinkt 3.',
+      'bt_card_p106': 'Rappe 4 Zeilen. Reimen sie sich nicht, trinke 4.',
+      'bt_card_p107': 'Nenne 3 Trinkspiele. Zu langsam? Trinke 3 Schlücke.',
+      'bt_card_p108':
+          'Luftgitarren-Solo! Die beste Performance verteilt 3 Schlücke.',
+      'bt_card_p109': 'Spiele eine extrem unpassende Szene. Cringe? Trinke 4.',
+      'bt_card_p110': 'Tausche den Platz mit der Person links von dir.',
+      'bt_card_p111': 'Leere dein Glas auf Ex! Oder nimm 5 Strafschlücke.',
+      'bt_card_p112':
+          'Brülle wie ein Löwe die Person gegenüber an. Gelacht? 2 trinken.',
+      'bt_card_p113': 'Stille Bibliothek! Der lauteste Atmer trinkt 2.',
+      'bt_card_p114': 'Mache 5 Liegestütze. Geht nicht? Trinke 3.',
+      'bt_card_p115': 'Zieh ein Kleidungsstück aus oder trinke 4.',
+      'bt_card_p116':
+          'Wirf imaginäres Konfetti und schreie Wooo! Trinke trotzdem 1.',
+      'bt_card_p117': 'Jeder, der seit 3h nichts gegessen hat, trinkt 2.',
+      'bt_card_p118':
+          'Die Person mit den meisten leeren Flaschen in der Nähe trinkt 3.',
+      'bt_card_p119': 'Trinke 5 Sekunden lang ohne Absetzen!',
+      'bt_card_p120': 'Jongliere mit 3 Dingen. Sofort fail = 3 trinken.',
+      'bt_card_p121': 'Wer gerade ein Pflaster trägt, nimmt 2 Schlücke.',
+      'bt_card_p122':
+          'Du bist der Held! Bewahre den nächsten vor seiner Strafe.',
+      'bt_card_p123': 'Flüstere für die nächsten 2 Runden.',
+      'bt_card_p124': 'Lache 10s lang absolut irre. Weigerung = 3 Schlücke.',
+      'bt_card_h100':
+          'Demonstriere einen Kuss auf deinem Handrücken. Langweilig? Trinke 4.',
+      'bt_card_h101':
+          'Zeige der Gruppe dein aufreizendstes Foto. Oder trinke 5.',
+      'bt_card_h102':
+          'Augenkontakt aufbauen und langsam auf die Lippe beißen. Fehler? 3 trinken.',
+      'bt_card_h103':
+          'Beschreibe deine ultimative Fantasie in 3 Worten. Oder trinke 4.',
+      'bt_card_h104':
+          'Twerke 10 Sekunden lang. Wenn du lachst oder weigerst, Glas exen.',
+      'bt_card_h105':
+          'Nimm einen Eiswürfel und reibe ihn über deinen Hals. Oder trinke 3.',
+      'bt_card_h106':
+          'Flüstere deinem Nachbarn etwas extrem Schmutziges. Oder trinke 4.',
+      'bt_card_h107':
+          'Iss verführerisch ein Stück Obst oder Luft. Fail = 3 trinken.',
+      'bt_card_h108':
+          'Spende jemandem einen kurzen Lapdance. Weigerung = 6 Schlücke.',
+      'bt_card_h109':
+          'Nenne eine Sache, die du im Bett liebst. Zu still = trinke 5.',
+      'bt_card_h110':
+          'Knöpfe ein Kleidungsstück auf. Falls unmöglich, trinke 4.',
+      'bt_card_h111':
+          'Trinke die nächsten 3 Schlücke aus dem Glas von jemand anderem.',
+      'bt_card_h112':
+          'Lecke provokant deine Lippen, wenn jemand 2 Runden lang deinen Namen sagt.',
+      'bt_card_h113':
+          'Gestehe, mit wem du dich nur basierend auf dem Aussehen einlassen würdest.',
+      'bt_card_h114': 'Jeder, der nackt duscht (offensichtlich), trinkt 2.',
+      'bt_card_h115':
+          'Tu so, als würdest du dich eincremen. Peinlich? Trinke 3.',
+      'bt_card_h116':
+          'Lass dir von jemandem Lippenbalsam/stift auftragen. Oder trinke 3.',
+      'bt_card_h117':
+          'Krable 10s wie eine rollige Katze. Weigerung = 5 Schlücke.',
+      'bt_card_h118':
+          'Ich habe noch nie ein Nude verschickt. Wenn doch, stolz trinken.',
+      'bt_card_h119':
+          'Mache ein heißes Foto von der Person gegenüber. Oder trinke 4.',
+      'bt_card_h120': 'Nenne in 10s Synonyme für Brüste. Wer zögert, trinkt 3.',
+      'bt_card_h121':
+          'Klecker minimal und wisch es verführerisch weg. Oder trinke 3.',
+      'bt_card_h122': 'Zeige der Gruppe dein Dating-App Profil. Oder trinke 5.',
+      'bt_card_h123':
+          'Hinterlasse einen Kussmund auf einer Serviette/Handrücken. Oder trinke 2.',
+      'bt_card_h124':
+          'Zeige dein verführerischstes Lächeln. Alle anderen trinken 1.',
+      'bt_card_e100': 'Du bist verflucht! Ex dein Glas!',
+      'bt_card_e101': 'Dreh dich 10x und gehe geradeaus. Fail = 4 Schlücke.',
+      'bt_card_e102': 'Nimm einen Shot. Ja, sofort.',
+      'bt_card_e103':
+          'Lass dir eine winzige Stelle rasieren. Oder ex dein Glas!',
+      'bt_card_e104':
+          'Ruf deine Eltern an und sage, du schmeißt hin. Oder trinke 8.',
+      'bt_card_e105':
+          'Mixe 3 Getränke und probiere. Oder nimm 6 Strafschlücke.',
+      'bt_card_e106': 'Abstimmung. Die nervigste Person gerade trinkt 5.',
+      'bt_card_e107': 'Lass dir mit Edding ins Gesicht malen. Oder trinke 8.',
+      'bt_card_e108':
+          'Steck dir die Socke von jemand anderem in die Tasche für den Rest des Spiels.',
+      'bt_card_e109': 'Kipp dein Getränk in den Ausguss. Nein? Trinke 10.',
+      'bt_card_e110': 'Eiswürfel in die Hose. Oder Glas exen.',
+      'bt_card_e111': 'Esse ein rohes Ei. Oder trinke 8.',
+      'bt_card_e112': 'Lecke den Boden ab. Weigerung = 10 Schlücke.',
+      'bt_card_e113': 'Sende jemandem 5€ per PayPal. Oder trinke 5.',
+      'bt_card_e114': 'Lösche eine App, die die Gruppe wählt. Oder trinke 6.',
+      'bt_card_e115': 'Lass dein Handy aus 1m aufs Sofa fallen. Oder trinke 3.',
+      'bt_card_e116': 'Esse einen Löffel scharfe Soße. Oder Glas exen.',
+      'bt_card_e117': 'Armdrücken gegen den Stärksten. Verlierer trinkt 5.',
+      'bt_card_e118': 'Lass dir eine leichte Ohrfeige geben. Oder trinke 5.',
+      'bt_card_e119': 'Trage dein Shirt für den Rest des Spiels falsch herum.',
+      'bt_card_e120':
+          'Lauf raus und brülle "IXH LIEBE NEXSCORE". Oder trinke 7.',
+      'bt_card_e121': 'Kopf unter den Wasserhahn/Dusche. Oder Glas exen.',
+      'bt_card_e122':
+          'Trink Wasser aus deinem eigenen Schuh. Eklig? Dann trinke 10 Schlücke.',
+      'bt_card_e123':
+          'Brate jeden Einzelnen im Raum gnadenlos. Zu weich = 5 trinken.',
+      'bt_card_e124': 'JEDER trinkt sein Getränk sofort auf Ex aus!!',
     },
   };
 

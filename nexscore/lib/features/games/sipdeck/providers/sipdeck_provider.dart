@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/sipdeck_models.dart';
-import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
+import '../../../../core/models/player_model.dart';
+import '../../../../core/models/drink_intensity.dart';
+import '../models/sipdeck_models.dart';
 
 class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
   @override
@@ -32,8 +33,16 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     state = state.copyWith(filterMultiplayerOnly: value);
   }
 
+  void toggleIntensity(DrinkIntensity intensity) {
+    state = state.copyWith(intensity: intensity);
+  }
+
+  void setCustomIntensity(double multiplier) {
+    state = state.copyWith(customIntensityMultiplier: multiplier);
+  }
+
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
-    final available = sipDeckDatabase.where((c) {
+    final available = getSipDeckDatabase(l10n).where((c) {
       final isCategorySelected = state.selectedCategories.contains(c.category);
       if (!isCategorySelected) return false;
 
@@ -109,13 +118,42 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
       targetType = SipTargetType.everyone;
     }
 
+    // Apply Drink Intensity
+    final initialSips = card.sips;
+    final finalSips = state.intensity.calculateSips(
+      initialSips,
+      customMultiplier: state.customIntensityMultiplier,
+    );
+
+    // If the intensity altered the sips string, append an explicit hint
+    if (finalSips != initialSips && initialSips > 0) {
+      String intensityName;
+      if (state.intensity == DrinkIntensity.custom) {
+        intensityName = l10n.getWith('drink_intensity_custom_slider', [
+          state.customIntensityMultiplier.toStringAsFixed(1),
+        ]);
+      } else {
+        intensityName = state.intensity == DrinkIntensity.chill
+            ? l10n.get('drink_intensity_chill')
+            : l10n.get('drink_intensity_extreme');
+      }
+      final modeStrKey = finalSips == 1
+          ? 'mode_sips_adjusted_1'
+          : 'mode_sips_adjusted';
+      final modeStr = l10n
+          .get(modeStrKey)
+          .replaceAll('{0}', intensityName)
+          .replaceAll('{1}', finalSips.toString());
+      hydratedText += '\n\n' + modeStr;
+    }
+
     final hydratedCard = SipDeckCard(
       id: card.id,
       text: hydratedText,
       explanation: hydratedExpl.isNotEmpty ? hydratedExpl : null,
       emoji: card.emoji,
       category: card.category,
-      sips: card.sips,
+      sips: finalSips,
       isVirus: card.isVirus,
       targetIds: targetIds,
       targetType: targetType,

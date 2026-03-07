@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/buzztap_models.dart';
-import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
+import '../../../../core/models/player_model.dart';
+import '../../../../core/models/drink_intensity.dart';
+import '../models/buzztap_models.dart';
 
 class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
   @override
@@ -19,9 +20,9 @@ class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
   }
 
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
-    var available = buzzTapDatabase
-        .where((c) => state.selectedCategories.contains(c.category))
-        .toList();
+    var available = getBuzzTapDatabase(
+      l10n,
+    ).where((c) => state.selectedCategories.contains(c.category)).toList();
 
     if (state.optimizeForTwoPlayers) {
       available = available.where((c) => c.minPlayers <= 2).toList();
@@ -76,13 +77,42 @@ class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
       targetType = BuzzTapTargetType.everyone;
     }
 
+    // Apply Drink Intensity
+    final initialSips = card.sips;
+    final finalSips = state.intensity.calculateSips(
+      initialSips,
+      customMultiplier: state.customIntensityMultiplier,
+    );
+
+    // If the intensity altered the sips string, append an explicit hint
+    if (finalSips != initialSips && initialSips > 0) {
+      String intensityName;
+      if (state.intensity == DrinkIntensity.custom) {
+        intensityName = l10n.getWith('drink_intensity_custom_slider', [
+          state.customIntensityMultiplier.toStringAsFixed(1),
+        ]);
+      } else {
+        intensityName = state.intensity == DrinkIntensity.chill
+            ? l10n.get('drink_intensity_chill')
+            : l10n.get('drink_intensity_extreme');
+      }
+      final modeStrKey = finalSips == 1
+          ? 'mode_sips_adjusted_1'
+          : 'mode_sips_adjusted';
+      final modeStr = l10n
+          .get(modeStrKey)
+          .replaceAll('{0}', intensityName)
+          .replaceAll('{1}', finalSips.toString());
+      hydratedText += '\n\n' + modeStr;
+    }
+
     final hydratedCard = BuzzTapCard(
       id: card.id,
       text: hydratedText,
       emoji: card.emoji,
       explanation: card.explanation,
       category: card.category,
-      sips: card.sips,
+      sips: finalSips,
       minPlayers: card.minPlayers,
       targetIds: targetIds,
       targetType: targetType,
@@ -127,6 +157,14 @@ class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
 
   void toggle2PlayerOptimization(bool value) {
     state = state.copyWith(optimizeForTwoPlayers: value);
+  }
+
+  void toggleIntensity(DrinkIntensity intensity) {
+    state = state.copyWith(intensity: intensity);
+  }
+
+  void setCustomIntensity(double multiplier) {
+    state = state.copyWith(customIntensityMultiplier: multiplier);
   }
 }
 

@@ -70,7 +70,7 @@ class PlayersScreen extends ConsumerWidget {
                 );
               }
               return SliverPadding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 140),
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 100),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final player = players[index];
@@ -135,6 +135,25 @@ class PlayersScreen extends ConsumerWidget {
                               ),
                               IconButton(
                                 icon: Icon(
+                                  Icons.shuffle,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                onPressed: () {
+                                  final rColor =
+                                      Colors.primaries[DateTime.now()
+                                              .millisecond %
+                                          Colors.primaries.length];
+                                  final rColorStr =
+                                      '#${(rColor.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+                                  ref
+                                      .read(playersProvider.notifier)
+                                      .updatePlayer(
+                                        player.copyWith(avatarColor: rColorStr),
+                                      );
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(
                                   Icons.edit_outlined,
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
@@ -169,13 +188,10 @@ class PlayersScreen extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 90.0),
-        child: FloatingActionButton(
-          onPressed: () => _showAddPlayerDialog(context, ref),
-          elevation: 4,
-          child: const Icon(Icons.add),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddPlayerDialog(context, ref),
+        elevation: 4,
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -207,51 +223,66 @@ class PlayersScreen extends ConsumerWidget {
   void _showAddPlayerDialog(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
-
-    void submit() async {
-      final name = controller.text.trim();
-      if (name.isEmpty) return;
-
-      final newPlayer = Player(
-        id: const Uuid().v4(),
-        name: name,
-        avatarColor: '#2196F3',
-      );
-
-      final result = await ref
-          .read(playersProvider.notifier)
-          .addPlayer(newPlayer);
-      result.fold((failure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.get(failure.message)),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }, (_) => Navigator.pop(context));
-    }
+    String? errorMessage;
 
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(l10n.get('add_player')),
-          content: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(hintText: l10n.get('player_name')),
-              autofocus: true,
-              onSubmitted: (_) => submit(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(l10n.get('cancel')),
-            ),
-            FilledButton(onPressed: submit, child: Text(l10n.get('add'))),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            void submit() async {
+              setState(() => errorMessage = null);
+              final name = controller.text.trim();
+              if (name.isEmpty) return;
+
+              final rColor =
+                  Colors.primaries[DateTime.now().millisecond %
+                      Colors.primaries.length];
+              final rColorStr =
+                  '#${(rColor.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+
+              final newPlayer = Player(
+                id: const Uuid().v4(),
+                name: name,
+                avatarColor: rColorStr,
+              );
+
+              final result = await ref
+                  .read(playersProvider.notifier)
+                  .addPlayer(newPlayer);
+              result.fold((failure) {
+                setState(() => errorMessage = l10n.get(failure.message));
+              }, (_) => Navigator.pop(context));
+            }
+
+            return AlertDialog(
+              title: Text(l10n.get('add_player')),
+              content: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                        hintText: l10n.get('player_name'),
+                        errorText: errorMessage,
+                      ),
+                      autofocus: true,
+                      onSubmitted: (_) => submit(),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(l10n.get('cancel')),
+                ),
+                FilledButton(onPressed: submit, child: Text(l10n.get('add'))),
+              ],
+            );
+          },
         );
       },
     );
@@ -264,47 +295,56 @@ class PlayersScreen extends ConsumerWidget {
   ) {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: player.name);
-
-    void submit() async {
-      final name = controller.text.trim();
-      if (name.isEmpty) return;
-
-      final updatedPlayer = player.copyWith(name: name);
-      final result = await ref
-          .read(playersProvider.notifier)
-          .updatePlayer(updatedPlayer);
-
-      result.fold((failure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.get(failure.message)),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }, (_) => Navigator.pop(context));
-    }
+    String? errorMessage;
 
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(l10n.get('edit_player')),
-          content: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(hintText: l10n.get('player_name')),
-              autofocus: true,
-              onSubmitted: (_) => submit(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(l10n.get('cancel')),
-            ),
-            FilledButton(onPressed: submit, child: Text(l10n.get('save'))),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            void submit() async {
+              setState(() => errorMessage = null);
+              final name = controller.text.trim();
+              if (name.isEmpty) return;
+
+              final updatedPlayer = player.copyWith(name: name);
+              final result = await ref
+                  .read(playersProvider.notifier)
+                  .updatePlayer(updatedPlayer);
+
+              result.fold((failure) {
+                setState(() => errorMessage = l10n.get(failure.message));
+              }, (_) => Navigator.pop(context));
+            }
+
+            return AlertDialog(
+              title: Text(l10n.get('edit_player')),
+              content: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                        hintText: l10n.get('player_name'),
+                        errorText: errorMessage,
+                      ),
+                      autofocus: true,
+                      onSubmitted: (_) => submit(),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(l10n.get('cancel')),
+                ),
+                FilledButton(onPressed: submit, child: Text(l10n.get('save'))),
+              ],
+            );
+          },
         );
       },
     );

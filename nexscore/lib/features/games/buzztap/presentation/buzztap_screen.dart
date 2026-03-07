@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/models/player_model.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/models/drink_intensity.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/buzztap_models.dart';
@@ -271,6 +272,113 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                         ),
                       );
                     }),
+                    const SizedBox(height: 16),
+                    // Drink Intensity Selection
+                    Text(
+                      l10n.get('drink_intensity_title'),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.get('drink_intensity_subtitle'),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: SegmentedButton<DrinkIntensity>(
+                        segments: [
+                          ButtonSegment(
+                            value: DrinkIntensity.chill,
+                            label: Text(
+                              l10n.get('drink_intensity_chill'),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          ButtonSegment(
+                            value: DrinkIntensity.normal,
+                            label: Text(
+                              l10n.get('drink_intensity_normal'),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          ButtonSegment(
+                            value: DrinkIntensity.extreme,
+                            label: Text(
+                              l10n.get('drink_intensity_extreme'),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          ButtonSegment(
+                            value: DrinkIntensity.custom,
+                            label: Text(
+                              l10n.get('drink_intensity_custom'),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ],
+                        selected: {state.intensity},
+                        onSelectionChanged: (val) {
+                          ref
+                              .read(buzzTapStateProvider.notifier)
+                              .toggleIntensity(val.first);
+                        },
+                        style: SegmentedButton.styleFrom(
+                          selectedBackgroundColor: Colors.amber.withValues(
+                            alpha: 0.2,
+                          ),
+                          selectedForegroundColor: Colors.amber,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    if (state.intensity == DrinkIntensity.custom) ...[
+                      const SizedBox(height: 16),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        child: Column(
+                          children: [
+                            Text(
+                              l10n.getWith('drink_intensity_custom_slider', [
+                                state.customIntensityMultiplier.toStringAsFixed(
+                                  1,
+                                ),
+                              ]),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber,
+                              ),
+                            ),
+                            Slider(
+                              value: state.customIntensityMultiplier,
+                              min: 0.1,
+                              max: 10.0,
+                              divisions: 99,
+                              activeColor: Colors.amber,
+                              inactiveColor: Colors.amber.withValues(
+                                alpha: 0.3,
+                              ),
+                              label: state.customIntensityMultiplier
+                                  .toStringAsFixed(1),
+                              onChanged: (val) {
+                                ref
+                                    .read(buzzTapStateProvider.notifier)
+                                    .setCustomIntensity(val);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 32),
+
                     if (players.length == 2) ...[
                       const SizedBox(height: 16),
                       Container(
@@ -595,7 +703,7 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                         ],
                       ),
                       const SizedBox(height: 16),
-                      TextButton(
+                      TextButton.icon(
                         onPressed: () {
                           HapticFeedback.lightImpact();
                           ref
@@ -605,11 +713,13 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                               .read(buzzTapStateProvider.notifier)
                               .drawNextCard(players, l10n);
                         },
-                        child: Text(
-                          l10n.get('game_skip'),
-                          style: const TextStyle(
-                            color: Colors.white54,
-                            decoration: TextDecoration.underline,
+                        icon: const Icon(Icons.skip_next, size: 20),
+                        label: Text(l10n.get('game_skip')),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white54,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
                           ),
                         ),
                       ),
