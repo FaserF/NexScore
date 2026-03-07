@@ -30,6 +30,8 @@ import '../../features/games/schafkopf_digital/presentation/schafkopf_digital_sc
 import '../../features/games/arschloch_digital/presentation/arschloch_digital_screen.dart';
 import '../../features/games/kniffel_digital/presentation/kniffel_digital_screen.dart';
 import '../../features/games/qwixx_digital/presentation/qwixx_digital_screen.dart';
+import '../../features/games/romme_digital/presentation/romme_digital_screen.dart';
+import '../../features/games/phase10_digital/presentation/phase10_digital_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -128,6 +130,14 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'qwixx-digital',
                     builder: (context, state) => const QwixxDigitalScreen(),
+                  ),
+                  GoRoute(
+                    path: 'romme-digital',
+                    builder: (context, state) => const RommeDigitalScreen(),
+                  ),
+                  GoRoute(
+                    path: 'phase10-digital',
+                    builder: (context, state) => const Phase10DigitalScreen(),
                   ),
                   GoRoute(
                     path: 'multiplayer',
