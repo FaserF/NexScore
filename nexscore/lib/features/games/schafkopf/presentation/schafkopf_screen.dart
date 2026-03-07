@@ -9,12 +9,44 @@ import '../models/schafkopf_models.dart';
 
 import '../providers/schafkopf_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
 
-class SchafkopfScreen extends ConsumerWidget {
+class SchafkopfScreen extends ConsumerStatefulWidget {
   const SchafkopfScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SchafkopfScreen> createState() => _SchafkopfScreenState();
+}
+
+class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(SchafkopfGameState gameState, List<Player> players) {
+    if (players.isEmpty) return;
+    String? winnerId;
+    double maxBalance = double.negativeInfinity;
+    final playerIds = players.map((p) => p.id).toList();
+    for (final p in players) {
+      final balance = gameState.getPlayerBalance(p.id, playerIds);
+      if (balance > maxBalance) {
+        maxBalance = balance;
+        winnerId = p.id;
+      }
+    }
+    if (winnerId != null) {
+      final winnerName = players.firstWhere((p) => p.id == winnerId).name;
+      _confettiController.show(winnerName: winnerName);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(schafkopfStateProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
@@ -24,6 +56,11 @@ class SchafkopfScreen extends ConsumerWidget {
         title: Text(l10n.get('game_schafkopf')),
         leading: BackButton(onPressed: () => context.go('/games')),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.emoji_events, color: Colors.amber),
+            onPressed: () => _showWinner(gameState, players),
+            tooltip: l10n.get('game_show_winner'),
+          ),
           IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: () {
@@ -49,121 +86,129 @@ class SchafkopfScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: players.length < 4
-            ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    l10n.get('schafkopf_requires_4'),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              )
-            : Column(
-                children: [
-                  _buildScoreHeader(players, gameState, l10n),
-                  _buildStockInfo(context, ref, gameState, l10n),
-                  const Divider(height: 1, thickness: 2),
-                  Expanded(
-                    child: gameState.rounds.isEmpty
-                        ? Center(child: Text(l10n.get('schafkopf_no_rounds')))
-                        : ListView.separated(
-                            itemCount: gameState.rounds.length,
-                            separatorBuilder: (_, _) =>
-                                const Divider(height: 1),
-                            itemBuilder: (context, index) {
-                              final round = gameState.rounds[index];
-                              final payouts = round.calculatePayouts(
-                                players.map((p) => p.id).toList(),
-                              );
-                              final activePlayer = players.firstWhere(
-                                (p) => p.id == round.activePlayerId,
-                                orElse: () => Player(
-                                  id: '',
-                                  name: 'Unknown',
-                                  avatarColor: '#000000',
-                                  ownerUid: null,
-                                ),
-                              );
-                              return ListTile(
-                                leading: CircleAvatar(
-                                  radius: 16,
-                                  backgroundColor: Color(
-                                    int.parse(
-                                      activePlayer.avatarColor.replaceFirst(
-                                        '#',
-                                        '0xff',
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    activePlayer.name.substring(0, 1),
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                ),
-                                title: Text(
-                                  '${l10n.get('schafkopf_gt_${round.gameType.name}')} – ${activePlayer.name}',
-                                ),
-                                subtitle: Text(
-                                  [
-                                    if (round.isBockRound) 'BOCK',
-                                    if (round.isMussSpiel) 'MUSS',
-                                    if (round.runners > 0)
-                                      l10n.getWith('schafkopf_runners_count', [
-                                        round.runners.toString(),
-                                      ]),
-                                    if (round.schneider)
-                                      l10n.get('schafkopf_schneider'),
-                                    if (round.schwarz)
-                                      l10n.get('schafkopf_schwarz'),
-                                  ].join(' · '),
-                                ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: players.map((p) {
-                                    final val = payouts[p.id] ?? 0.0;
-                                    return Container(
-                                      width: 56,
-                                      alignment: Alignment.centerRight,
-                                      child: Text(
-                                        val > 0
-                                            ? '+${val.toStringAsFixed(2)}'
-                                            : val.toStringAsFixed(2),
-                                        style: TextStyle(
-                                          color: val > 0
-                                              ? Colors.green
-                                              : val < 0
-                                              ? Colors.red
-                                              : Colors.grey,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              );
-                            },
-                          ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: FilledButton.icon(
-                      onPressed: () =>
-                          _showAddRoundDialog(context, ref, players, gameState),
-                      icon: const Icon(Icons.add),
-                      label: Text(
-                        l10n.getWith('wizard_next_round', [
-                          (gameState.rounds.length + 1).toString(),
-                        ]),
-                      ),
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 52),
-                      ),
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: players.length < 4
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      l10n.get('schafkopf_requires_4'),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ],
-              ),
+                )
+              : Column(
+                  children: [
+                    _buildScoreHeader(players, gameState, l10n),
+                    _buildStockInfo(context, ref, gameState, l10n),
+                    const Divider(height: 1, thickness: 2),
+                    Expanded(
+                      child: gameState.rounds.isEmpty
+                          ? Center(child: Text(l10n.get('schafkopf_no_rounds')))
+                          : ListView.separated(
+                              itemCount: gameState.rounds.length,
+                              separatorBuilder: (_, _) =>
+                                  const Divider(height: 1),
+                              itemBuilder: (context, index) {
+                                final round = gameState.rounds[index];
+                                final payouts = round.calculatePayouts(
+                                  players.map((p) => p.id).toList(),
+                                );
+                                final activePlayer = players.firstWhere(
+                                  (p) => p.id == round.activePlayerId,
+                                  orElse: () => Player(
+                                    id: '',
+                                    name: 'Unknown',
+                                    avatarColor: '#000000',
+                                    ownerUid: null,
+                                  ),
+                                );
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    radius: 16,
+                                    backgroundColor: Color(
+                                      int.parse(
+                                        activePlayer.avatarColor.replaceFirst(
+                                          '#',
+                                          '0xff',
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      activePlayer.name.substring(0, 1),
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                  title: Text(
+                                    '${l10n.get('schafkopf_gt_${round.gameType.name}')} – ${activePlayer.name}',
+                                  ),
+                                  subtitle: Text(
+                                    [
+                                      if (round.isBockRound) 'BOCK',
+                                      if (round.isMussSpiel) 'MUSS',
+                                      if (round.runners > 0)
+                                        l10n.getWith(
+                                          'schafkopf_runners_count',
+                                          [round.runners.toString()],
+                                        ),
+                                      if (round.schneider)
+                                        l10n.get('schafkopf_schneider'),
+                                      if (round.schwarz)
+                                        l10n.get('schafkopf_schwarz'),
+                                    ].join(' · '),
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: players.map((p) {
+                                      final val = payouts[p.id] ?? 0.0;
+                                      return Container(
+                                        width: 56,
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          val > 0
+                                              ? '+${val.toStringAsFixed(2)}'
+                                              : val.toStringAsFixed(2),
+                                          style: TextStyle(
+                                            color: val > 0
+                                                ? Colors.green
+                                                : val < 0
+                                                ? Colors.red
+                                                : Colors.grey,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: FilledButton.icon(
+                        onPressed: () => _showAddRoundDialog(
+                          context,
+                          ref,
+                          players,
+                          gameState,
+                        ),
+                        icon: const Icon(Icons.add),
+                        label: Text(
+                          l10n.getWith('wizard_next_round', [
+                            (gameState.rounds.length + 1).toString(),
+                          ]),
+                        ),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 52),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }

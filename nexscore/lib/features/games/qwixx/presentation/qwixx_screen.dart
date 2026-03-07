@@ -9,12 +9,43 @@ import '../models/qwixx_models.dart';
 
 import '../providers/qwixx_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
 
-class QwixxScreen extends ConsumerWidget {
+class QwixxScreen extends ConsumerStatefulWidget {
   const QwixxScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<QwixxScreen> createState() => _QwixxScreenState();
+}
+
+class _QwixxScreenState extends ConsumerState<QwixxScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(Map<String, QwixxPlayerSheet> sheets, List<Player> players) {
+    if (sheets.isEmpty || players.isEmpty) return;
+    String? winnerId;
+    int maxScore = -1;
+    for (final p in players) {
+      final score = sheets[p.id]?.totalScore ?? 0;
+      if (score > maxScore) {
+        maxScore = score;
+        winnerId = p.id;
+      }
+    }
+    if (winnerId != null) {
+      final winnerName = players.firstWhere((p) => p.id == winnerId).name;
+      _confettiController.show(winnerName: winnerName);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(qwixxStateProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
@@ -50,6 +81,11 @@ class QwixxScreen extends ConsumerWidget {
           leading: BackButton(onPressed: () => context.go('/games')),
           actions: [
             IconButton(
+              icon: const Icon(Icons.emoji_events, color: Colors.amber),
+              onPressed: () => _showWinner(gameState.sheets, players),
+              tooltip: l10n.get('game_show_winner'),
+            ),
+            IconButton(
               icon: const Icon(Icons.help_outline),
               onPressed: () {
                 launchUrl(
@@ -81,21 +117,24 @@ class QwixxScreen extends ConsumerWidget {
             tabs: players.map((p) => Tab(text: p.name)).toList(),
           ),
         ),
-        body: MultiplayerClientOverlay(
-          child: TabBarView(
-            children: players.map((player) {
-              final sheet =
-                  gameState.sheets[player.id] ?? const QwixxPlayerSheet();
-              return _QwixxPlayerView(
-                player: player,
-                sheet: sheet,
-                variant: gameState.variant,
-                onUpdate: (newSheet) => ref
-                    .read(qwixxStateProvider.notifier)
-                    .updateSheet(player.id, newSheet),
-                l10n: l10n,
-              );
-            }).toList(),
+        body: WinnerConfettiOverlay(
+          controller: _confettiController,
+          child: MultiplayerClientOverlay(
+            child: TabBarView(
+              children: players.map((player) {
+                final sheet =
+                    gameState.sheets[player.id] ?? const QwixxPlayerSheet();
+                return _QwixxPlayerView(
+                  player: player,
+                  sheet: sheet,
+                  variant: gameState.variant,
+                  onUpdate: (newSheet) => ref
+                      .read(qwixxStateProvider.notifier)
+                      .updateSheet(player.id, newSheet),
+                  l10n: l10n,
+                );
+              }).toList(),
+            ),
           ),
         ),
       ),
