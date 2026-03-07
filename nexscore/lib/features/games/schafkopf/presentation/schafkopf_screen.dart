@@ -72,12 +72,11 @@ class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
             },
             tooltip: l10n.get('nav_help'),
           ),
-          if (gameState.rounds.isNotEmpty)
+          if (ref.watch(schafkopfStateProvider.notifier).canUndo)
             IconButton(
               icon: const Icon(Icons.undo),
-              tooltip: l10n.get('schafkopf_undo'),
-              onPressed: () =>
-                  ref.read(schafkopfStateProvider.notifier).removeLastRound(),
+              tooltip: l10n.get('game_undo'),
+              onPressed: () => ref.read(schafkopfStateProvider.notifier).undo(),
             ),
           IconButton(
             icon: const Icon(Icons.refresh),

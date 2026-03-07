@@ -80,6 +80,7 @@ class AppLocalizations {
       'game_drink_everyone': 'Everyone Drinks!',
       'game_skip': 'Skip',
       'game_show_winner': 'Show Winner',
+      'game_undo': 'Undo',
       'back': 'Back',
 
       // ── Game Descriptions
@@ -1112,6 +1113,7 @@ class AppLocalizations {
       'game_drink_everyone': 'Alle trinken!',
       'game_skip': 'Überspringen',
       'game_show_winner': 'Gewinner anzeigen',
+      'game_undo': 'Rückgängig',
       'settings_language': 'Sprache',
       'settings_language_en': 'Englisch',
       'settings_language_de': 'Deutsch',

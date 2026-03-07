@@ -6,10 +6,26 @@ import '../../../../core/models/drink_intensity.dart';
 import '../models/buzztap_models.dart';
 
 class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
+  final List<BuzzTapGameState> _history = [];
+
   @override
   BuzzTapGameState build() => const BuzzTapGameState();
 
+  void _pushState() {
+    _history.add(state);
+    if (_history.length > 20) _history.removeAt(0);
+  }
+
+  bool get canUndo => _history.isNotEmpty;
+
+  void undo() {
+    if (_history.isNotEmpty) {
+      state = _history.removeLast();
+    }
+  }
+
   void toggleCategory(BuzzTapCategory cat) {
+    _pushState();
     final cats = List<BuzzTapCategory>.from(state.selectedCategories);
     if (cats.contains(cat)) {
       if (cats.length > 1) cats.remove(cat);
@@ -20,6 +36,7 @@ class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
   }
 
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
+    _pushState();
     var available = getBuzzTapDatabase(
       l10n,
     ).where((c) => state.selectedCategories.contains(c.category)).toList();
@@ -122,12 +139,14 @@ class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
   }
 
   void incrementSips(String playerId, int amount) {
+    _pushState();
     final sips = Map<String, int>.from(state.playerSips);
     sips[playerId] = (sips[playerId] ?? 0) + amount;
     state = state.copyWith(playerSips: sips);
   }
 
   void decrementSips(String playerId, int amount) {
+    _pushState();
     final sips = Map<String, int>.from(state.playerSips);
     final current = sips[playerId] ?? 0;
     if (current >= amount) {
@@ -139,6 +158,7 @@ class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
   }
 
   void completeCard(bool skipped) {
+    _pushState();
     if (state.currentCard == null) return;
 
     final card = state.currentCard!;
@@ -152,18 +172,22 @@ class BuzzTapStateNotifier extends Notifier<BuzzTapGameState> {
   }
 
   void resetGame() {
+    _pushState();
     state = state.copyWith(playedCards: [], playerSips: {});
   }
 
   void toggle2PlayerOptimization(bool value) {
+    _pushState();
     state = state.copyWith(optimizeForTwoPlayers: value);
   }
 
   void toggleIntensity(DrinkIntensity intensity) {
+    _pushState();
     state = state.copyWith(intensity: intensity);
   }
 
   void setCustomIntensity(double multiplier) {
+    _pushState();
     state = state.copyWith(customIntensityMultiplier: multiplier);
   }
 }

@@ -6,10 +6,26 @@ import '../../../../core/models/drink_intensity.dart';
 import '../models/sipdeck_models.dart';
 
 class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
+  final List<SipDeckGameState> _history = [];
+
   @override
   SipDeckGameState build() => const SipDeckGameState();
 
+  void _pushState() {
+    _history.add(state);
+    if (_history.length > 20) _history.removeAt(0);
+  }
+
+  bool get canUndo => _history.isNotEmpty;
+
+  void undo() {
+    if (_history.isNotEmpty) {
+      state = _history.removeLast();
+    }
+  }
+
   void toggleCategory(SipDeckCategory cat) {
+    _pushState();
     final cats = List<SipDeckCategory>.from(state.selectedCategories);
     if (cats.contains(cat)) {
       if (cats.length > 1) cats.remove(cat);
@@ -20,6 +36,7 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
   }
 
   void toggleTag(SipDeckTaskTag tag) {
+    _pushState();
     final tags = Set<SipDeckTaskTag>.from(state.disabledTags);
     if (tags.contains(tag)) {
       tags.remove(tag);
@@ -30,18 +47,22 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
   }
 
   void toggleFilterMultiplayerOnly(bool value) {
+    _pushState();
     state = state.copyWith(filterMultiplayerOnly: value);
   }
 
   void toggleIntensity(DrinkIntensity intensity) {
+    _pushState();
     state = state.copyWith(intensity: intensity);
   }
 
   void setCustomIntensity(double multiplier) {
+    _pushState();
     state = state.copyWith(customIntensityMultiplier: multiplier);
   }
 
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
+    _pushState();
     final available = getSipDeckDatabase(l10n).where((c) {
       final isCategorySelected = state.selectedCategories.contains(c.category);
       if (!isCategorySelected) return false;
@@ -176,12 +197,14 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
   }
 
   void incrementSips(String playerId, int amount) {
+    _pushState();
     final sips = Map<String, int>.from(state.playerSips);
     sips[playerId] = (sips[playerId] ?? 0) + amount;
     state = state.copyWith(playerSips: sips);
   }
 
   void decrementSips(String playerId, int amount) {
+    _pushState();
     final sips = Map<String, int>.from(state.playerSips);
     final current = sips[playerId] ?? 0;
     if (current >= amount) {
@@ -193,6 +216,7 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
   }
 
   void completeCard(bool skipped) {
+    _pushState();
     if (state.currentCard == null) return;
 
     final card = state.currentCard!;
@@ -209,6 +233,7 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
   }
 
   void resetGame() {
+    _pushState();
     state = state.copyWith(playedCards: [], playerSips: {});
   }
 }

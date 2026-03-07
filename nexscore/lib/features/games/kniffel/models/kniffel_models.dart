@@ -85,3 +85,25 @@ class YahtzeePlayerSheet {
     );
   }
 }
+
+class KniffelGameState {
+  final Map<String, YahtzeePlayerSheet> playerSheets;
+
+  const KniffelGameState({this.playerSheets = const {}});
+
+  KniffelGameState copyWith({Map<String, YahtzeePlayerSheet>? playerSheets}) {
+    return KniffelGameState(playerSheets: playerSheets ?? this.playerSheets);
+  }
+
+  Map<String, dynamic> toJson() => {
+    'playerSheets': playerSheets.map((k, v) => MapEntry(k, v.toJson())),
+  };
+
+  factory KniffelGameState.fromJson(Map<String, dynamic> json) {
+    return KniffelGameState(
+      playerSheets: (json['playerSheets'] as Map<String, dynamic>).map(
+        (k, v) => MapEntry(k, YahtzeePlayerSheet.fromJson(v)),
+      ),
+    );
+  }
+}

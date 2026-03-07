@@ -113,6 +113,12 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
               onPressed: () =>
                   _showSipsModal(context, ref, state, players, l10n),
             ),
+            if (ref.watch(buzzTapStateProvider.notifier).canUndo)
+              IconButton(
+                icon: const Icon(Icons.undo),
+                onPressed: () => ref.read(buzzTapStateProvider.notifier).undo(),
+                tooltip: l10n.get('game_undo'),
+              ),
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => _confirmReset(context, ref, l10n),

@@ -106,6 +106,12 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
                   _showVariantDialog(context, ref, gameState.variant, l10n),
               tooltip: l10n.get('game_settings'),
             ),
+            if (ref.watch(qwixxStateProvider.notifier).canUndo)
+              IconButton(
+                icon: const Icon(Icons.undo),
+                onPressed: () => ref.read(qwixxStateProvider.notifier).undo(),
+                tooltip: l10n.get('game_undo'),
+              ),
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => _confirmReset(context, ref, l10n),

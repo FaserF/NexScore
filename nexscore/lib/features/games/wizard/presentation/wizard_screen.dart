@@ -107,6 +107,12 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
             onPressed: () => _showEndGameDialog(context),
             tooltip: l10n.get('wizard_end_game'),
           ),
+          if (ref.watch(wizardStateProvider.notifier).canUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () => ref.read(wizardStateProvider.notifier).undo(),
+              tooltip: l10n.get('game_undo'),
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),

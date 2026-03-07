@@ -47,7 +47,7 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final sheets = ref.watch(kniffelStateProvider);
+    final state = ref.watch(kniffelStateProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
 
@@ -58,7 +58,7 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
       );
     }
 
-    if (sheets.isEmpty) {
+    if (state.playerSheets.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref
             .read(kniffelStateProvider.notifier)
@@ -73,9 +73,15 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
         appBar: AppBar(
           title: Text(l10n.get('game_kniffel')),
           actions: [
+            if (ref.read(kniffelStateProvider.notifier).canUndo)
+              IconButton(
+                icon: const Icon(Icons.undo),
+                onPressed: () => ref.read(kniffelStateProvider.notifier).undo(),
+                tooltip: l10n.get('game_undo'),
+              ),
             IconButton(
               icon: const Icon(Icons.emoji_events, color: Colors.amber),
-              onPressed: () => _showWinner(sheets, players),
+              onPressed: () => _showWinner(state.playerSheets, players),
               tooltip: l10n.get('game_show_winner'),
             ),
             IconButton(
@@ -94,7 +100,8 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
             controller: _confettiController,
             child: TabBarView(
               children: players.map((p) {
-                final sheet = sheets[p.id] ?? const YahtzeePlayerSheet();
+                final sheet =
+                    state.playerSheets[p.id] ?? const YahtzeePlayerSheet();
                 return _buildPlayerSheet(context, ref, p, sheet, l10n);
               }).toList(),
             ),
