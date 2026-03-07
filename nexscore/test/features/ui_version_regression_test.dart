@@ -28,7 +28,18 @@ void main() {
     await tester.pumpAndSettle();
 
     final versionText = 'NexScore ${AppVersion.displayVersion}';
-    expect(find.text(versionText), findsOneWidget);
+    final finder = find.text(versionText);
+
+    // Scroll to the bottom to find the version label
+    // Specify the main Scrollable to avoid conflict with TextField's internal scrollable
+    await tester.scrollUntilVisible(
+      finder,
+      100.0,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(finder, findsOneWidget);
   });
 
   testWidgets('HelpScreen displays correct version label', (tester) async {
