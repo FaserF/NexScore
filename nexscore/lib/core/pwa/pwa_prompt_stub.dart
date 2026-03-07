@@ -10,4 +10,4 @@ Future<bool> showInstallPrompt() async {
 }
 
 /// Callback for when the install prompt is ready.
-set onInstallPromptReady(Function? value) {}
+set onInstallPromptReady(void Function()? value) {}

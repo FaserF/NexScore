@@ -8,7 +8,12 @@ external JSPromise<JSBoolean>? get _flutterShowInstallPrompt;
 external JSBoolean _flutterCanShowInstallPrompt();
 
 @JS('window.onFlutterInstallPromptReady')
-external set onInstallPromptReady(JSFunction? value);
+external set _onInstallPromptReady(JSFunction? value);
+
+/// Callback for when the install prompt is ready.
+set onInstallPromptReady(void Function()? value) {
+  _onInstallPromptReady = value?.toJS;
+}
 
 /// Returns true if the PWA install prompt can be shown.
 bool canShowInstallPrompt() {
