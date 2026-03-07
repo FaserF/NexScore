@@ -4,14 +4,49 @@ import '../models/kniffel_models.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
 
 import '../providers/kniffel_provider.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
-class KniffelScreen extends ConsumerWidget {
+class KniffelScreen extends ConsumerStatefulWidget {
   const KniffelScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<KniffelScreen> createState() => _KniffelScreenState();
+}
+
+class _KniffelScreenState extends ConsumerState<KniffelScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(
+    Map<String, YahtzeePlayerSheet> sheets,
+    List<Player> players,
+  ) {
+    if (sheets.isEmpty || players.isEmpty) return;
+    String? winnerId;
+    int maxScore = -1;
+    for (final p in players) {
+      final score = sheets[p.id]?.totalScore ?? 0;
+      if (score > maxScore) {
+        maxScore = score;
+        winnerId = p.id;
+      }
+    }
+    if (winnerId != null) {
+      final winnerName = players.firstWhere((p) => p.id == winnerId).name;
+      _confettiController.show(winnerName: winnerName);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final sheets = ref.watch(kniffelStateProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
@@ -39,6 +74,11 @@ class KniffelScreen extends ConsumerWidget {
           title: Text(l10n.get('game_kniffel')),
           actions: [
             IconButton(
+              icon: const Icon(Icons.emoji_events, color: Colors.amber),
+              onPressed: () => _showWinner(sheets, players),
+              tooltip: l10n.get('game_show_winner'),
+            ),
+            IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => _confirmReset(context, ref, l10n),
               tooltip: l10n.get('game_reset'),
@@ -49,11 +89,16 @@ class KniffelScreen extends ConsumerWidget {
             tabs: players.map((p) => Tab(text: p.name)).toList(),
           ),
         ),
-        body: TabBarView(
-          children: players.map((p) {
-            final sheet = sheets[p.id] ?? const YahtzeePlayerSheet();
-            return _buildPlayerSheet(context, ref, p, sheet, l10n);
-          }).toList(),
+        body: MultiplayerClientOverlay(
+          child: WinnerConfettiOverlay(
+            controller: _confettiController,
+            child: TabBarView(
+              children: players.map((p) {
+                final sheet = sheets[p.id] ?? const YahtzeePlayerSheet();
+                return _buildPlayerSheet(context, ref, p, sheet, l10n);
+              }).toList(),
+            ),
+          ),
         ),
       ),
     );

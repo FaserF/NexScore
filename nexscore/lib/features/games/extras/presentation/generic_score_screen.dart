@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../providers/generic_score_provider.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class GenericScoreScreen extends ConsumerWidget {
   const GenericScoreScreen({super.key});
@@ -34,23 +35,25 @@ class GenericScoreScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildTableHeader(context, players),
-            ...List.generate(state.rounds.length, (roundIndex) {
-              return _buildRoundRow(
-                context,
-                ref,
-                roundIndex,
-                state.rounds[roundIndex],
-                players,
-              );
-            }),
-            const Divider(height: 32, thickness: 2),
-            _buildFooterTotals(context, state, players, l10n),
-            const SizedBox(height: 100),
-          ],
+      body: MultiplayerClientOverlay(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              _buildTableHeader(context, players),
+              ...List.generate(state.rounds.length, (roundIndex) {
+                return _buildRoundRow(
+                  context,
+                  ref,
+                  roundIndex,
+                  state.rounds[roundIndex],
+                  players,
+                );
+              }),
+              const Divider(height: 32, thickness: 2),
+              _buildFooterTotals(context, state, players, l10n),
+              const SizedBox(height: 100),
+            ],
+          ),
         ),
       ),
     );

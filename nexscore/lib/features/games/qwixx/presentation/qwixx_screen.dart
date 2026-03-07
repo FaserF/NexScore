@@ -8,6 +8,7 @@ import '../../../../core/i18n/app_localizations.dart';
 import '../models/qwixx_models.dart';
 
 import '../providers/qwixx_provider.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class QwixxScreen extends ConsumerWidget {
   const QwixxScreen({super.key});
@@ -80,20 +81,22 @@ class QwixxScreen extends ConsumerWidget {
             tabs: players.map((p) => Tab(text: p.name)).toList(),
           ),
         ),
-        body: TabBarView(
-          children: players.map((player) {
-            final sheet =
-                gameState.sheets[player.id] ?? const QwixxPlayerSheet();
-            return _QwixxPlayerView(
-              player: player,
-              sheet: sheet,
-              variant: gameState.variant,
-              onUpdate: (newSheet) => ref
-                  .read(qwixxStateProvider.notifier)
-                  .updateSheet(player.id, newSheet),
-              l10n: l10n,
-            );
-          }).toList(),
+        body: MultiplayerClientOverlay(
+          child: TabBarView(
+            children: players.map((player) {
+              final sheet =
+                  gameState.sheets[player.id] ?? const QwixxPlayerSheet();
+              return _QwixxPlayerView(
+                player: player,
+                sheet: sheet,
+                variant: gameState.variant,
+                onUpdate: (newSheet) => ref
+                    .read(qwixxStateProvider.notifier)
+                    .updateSheet(player.id, newSheet),
+                l10n: l10n,
+              );
+            }).toList(),
+          ),
         ),
       ),
     );

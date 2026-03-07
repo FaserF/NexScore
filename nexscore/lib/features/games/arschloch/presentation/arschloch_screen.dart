@@ -7,6 +7,7 @@ import '../../../../core/models/player_model.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/arschloch_models.dart';
 import '../providers/arschloch_provider.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class ArschlochScreen extends ConsumerStatefulWidget {
   const ArschlochScreen({super.key});
@@ -60,99 +61,101 @@ class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          if (players.length == 2 && !_isBannerDismissed)
-            MaterialBanner(
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              content: Text(
-                l10n.get('arschloch_2player_warning'),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onErrorContainer,
+      body: MultiplayerClientOverlay(
+        child: Column(
+          children: [
+            if (players.length == 2 && !_isBannerDismissed)
+              MaterialBanner(
+                backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                content: Text(
+                  l10n.get('arschloch_2player_warning'),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
                 ),
-              ),
-              leading: Icon(
-                Icons.warning_amber_rounded,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => setState(() => _isBannerDismissed = true),
-                  child: Text(l10n.get('ok')),
+                leading: Icon(
+                  Icons.warning_amber_rounded,
+                  color: Theme.of(context).colorScheme.error,
                 ),
-              ],
-            ),
+                actions: [
+                  TextButton(
+                    onPressed: () => setState(() => _isBannerDismissed = true),
+                    child: Text(l10n.get('ok')),
+                  ),
+                ],
+              ),
 
-          // Instructions for card exchange
-          if (state.rounds.isNotEmpty)
-            _buildExchangeBanner(state, players, l10n),
+            // Instructions for card exchange
+            if (state.rounds.isNotEmpty)
+              _buildExchangeBanner(state, players, l10n),
 
-          Expanded(
-            child: ListView.builder(
-              itemCount: leaders.length,
-              itemBuilder: (context, index) {
-                final playerId = leaders[index];
-                final player = players.firstWhere((p) => p.id == playerId);
-                final pState = state.playerStates[playerId]!;
+            Expanded(
+              child: ListView.builder(
+                itemCount: leaders.length,
+                itemBuilder: (context, index) {
+                  final playerId = leaders[index];
+                  final player = players.firstWhere((p) => p.id == playerId);
+                  final pState = state.playerStates[playerId]!;
 
-                final rankLabel = pState.lastRank != null
-                    ? (state.customRankNames?[pState.lastRank!] ??
-                          (l10n.locale.languageCode == 'de'
-                              ? pState.lastRank!.labelDe()
-                              : pState.lastRank!.labelEn()))
-                    : l10n.get('arschloch_no_rank');
+                  final rankLabel = pState.lastRank != null
+                      ? (state.customRankNames?[pState.lastRank!] ??
+                            (l10n.locale.languageCode == 'de'
+                                ? pState.lastRank!.labelDe()
+                                : pState.lastRank!.labelEn()))
+                      : l10n.get('arschloch_no_rank');
 
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Color(
-                      int.parse(player.avatarColor.replaceFirst('#', '0xff')),
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Color(
+                        int.parse(player.avatarColor.replaceFirst('#', '0xff')),
+                      ),
+                      child: Text(player.name.substring(0, 1).toUpperCase()),
                     ),
-                    child: Text(player.name.substring(0, 1).toUpperCase()),
-                  ),
-                  title: Text(player.name),
-                  subtitle: Text(
-                    '${l10n.get('leaderboard_score')}: ${pState.points} · $rankLabel',
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (pState.roundsAsPresident > 0)
-                        _buildStatChip(
-                          context,
-                          'P: ${pState.roundsAsPresident}',
-                          Colors.amber.shade700,
-                        ),
-                      const SizedBox(width: 4),
-                      if (pState.roundsAsArschloch > 0)
-                        _buildStatChip(
-                          context,
-                          'A: ${pState.roundsAsArschloch}',
-                          Colors.brown,
-                        ),
-                    ],
-                  ),
-                );
-              },
+                    title: Text(player.name),
+                    subtitle: Text(
+                      '${l10n.get('leaderboard_score')}: ${pState.points} · $rankLabel',
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (pState.roundsAsPresident > 0)
+                          _buildStatChip(
+                            context,
+                            'P: ${pState.roundsAsPresident}',
+                            Colors.amber.shade700,
+                          ),
+                        const SizedBox(width: 4),
+                        if (pState.roundsAsArschloch > 0)
+                          _buildStatChip(
+                            context,
+                            'A: ${pState.roundsAsArschloch}',
+                            Colors.brown,
+                          ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
 
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: FilledButton.icon(
-              onPressed: () =>
-                  _showAddRoundDialog(context, ref, players, state),
-              icon: const Icon(Icons.add),
-              label: Text(
-                l10n.getWith('wizard_next_round', [
-                  (state.rounds.length + 1).toString(),
-                ]),
-              ),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: FilledButton.icon(
+                onPressed: () =>
+                    _showAddRoundDialog(context, ref, players, state),
+                icon: const Icon(Icons.add),
+                label: Text(
+                  l10n.getWith('wizard_next_round', [
+                    (state.rounds.length + 1).toString(),
+                  ]),
+                ),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

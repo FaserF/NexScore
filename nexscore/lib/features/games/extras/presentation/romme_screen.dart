@@ -5,6 +5,7 @@ import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/romme_models.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class RommeStateNotifier extends Notifier<RommeGameState> {
   @override
@@ -84,71 +85,73 @@ class RommeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          _RommeScoreHeader(players: players, gameState: gameState),
-          const Divider(height: 1, thickness: 2),
-          Expanded(
-            child: gameState.rounds.isEmpty
-                ? Center(child: Text(l10n.get('romme_no_rounds')))
-                : ListView.separated(
-                    itemCount: gameState.rounds.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1),
-                    itemBuilder: (context, i) {
-                      final round = gameState.rounds[i];
-                      return ListTile(
-                        title: Text(
-                          '${l10n.get('romme_round')} ${round.roundIndex}',
-                        ),
-                        subtitle: round.isHandRomme
-                            ? Text(
-                                l10n.get('romme_hand_romme'),
-                                style: const TextStyle(
-                                  color: Colors.orange,
-                                  fontSize: 12,
+      body: MultiplayerClientOverlay(
+        child: Column(
+          children: [
+            _RommeScoreHeader(players: players, gameState: gameState),
+            const Divider(height: 1, thickness: 2),
+            Expanded(
+              child: gameState.rounds.isEmpty
+                  ? Center(child: Text(l10n.get('romme_no_rounds')))
+                  : ListView.separated(
+                      itemCount: gameState.rounds.length,
+                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      itemBuilder: (context, i) {
+                        final round = gameState.rounds[i];
+                        return ListTile(
+                          title: Text(
+                            '${l10n.get('romme_round')} ${round.roundIndex}',
+                          ),
+                          subtitle: round.isHandRomme
+                              ? Text(
+                                  l10n.get('romme_hand_romme'),
+                                  style: const TextStyle(
+                                    color: Colors.orange,
+                                    fontSize: 12,
+                                  ),
+                                )
+                              : null,
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: players.map((p) {
+                              final pts = round.penaltyPoints[p.id] ?? 0;
+                              return SizedBox(
+                                width: 56,
+                                child: Text(
+                                  '$pts',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: pts > 0 ? Colors.red : Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              )
-                            : null,
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: players.map((p) {
-                            final pts = round.penaltyPoints[p.id] ?? 0;
-                            return SizedBox(
-                              width: 56,
-                              child: Text(
-                                '$pts',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: pts > 0 ? Colors.red : Colors.green,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: FilledButton.icon(
-              onPressed: () => _showAddRoundDialog(
-                context,
-                ref,
-                players,
-                gameState.rounds.length + 1,
-                gameState,
-                l10n,
-              ),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.get('add_round')),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
+                              );
+                            }).toList(),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: FilledButton.icon(
+                onPressed: () => _showAddRoundDialog(
+                  context,
+                  ref,
+                  players,
+                  gameState.rounds.length + 1,
+                  gameState,
+                  l10n,
+                ),
+                icon: const Icon(Icons.add),
+                label: Text(l10n.get('add_round')),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: leaders.isNotEmpty
           ? FloatingActionButton.extended(
