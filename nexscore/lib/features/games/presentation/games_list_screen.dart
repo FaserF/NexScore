@@ -132,6 +132,35 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: AnimatedScaleButton(
+                  onPressed: () => context.go('/games/multiplayer'),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.hub_outlined,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: AnimatedScaleButton(
                   onPressed: () => context.go('/profile/settings'),
                   child: Container(
                     padding: const EdgeInsets.all(12),

@@ -22,6 +22,9 @@ import '../../features/games/extras/presentation/generic_score_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/games/presentation/game_setup_screen.dart';
 import '../../features/games/arschloch/presentation/arschloch_screen.dart';
+import '../../features/multiplayer/presentation/multiplayer_hub_screen.dart';
+import '../../features/multiplayer/presentation/lobby_screen.dart';
+import '../../features/multiplayer/presentation/join_lobby_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -100,6 +103,26 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'arschloch',
                     builder: (context, state) => const ArschlochScreen(),
+                  ),
+                  GoRoute(
+                    path: 'multiplayer',
+                    builder: (context, state) => const MultiplayerHubScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'host',
+                        builder: (context, state) =>
+                            const LobbyScreen(isHostingStart: true),
+                      ),
+                      GoRoute(
+                        path: 'join',
+                        builder: (context, state) => const JoinLobbyScreen(),
+                      ),
+                      GoRoute(
+                        path: 'lobby',
+                        builder: (context, state) =>
+                            const LobbyScreen(isHostingStart: false),
+                      ),
+                    ],
                   ),
                 ],
               ),

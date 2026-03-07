@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../firestore_multiplayer_impl.dart';
 import '../models/lobby.dart';
 import '../multiplayer_service.dart';
+import '../../models/player_model.dart';
+import '../../providers/active_players_provider.dart';
 
 /// Provides the singleton instance of the MultiplayerService
 final multiplayerServiceProvider = Provider<MultiplayerService>((ref) {
@@ -29,4 +31,28 @@ final isHostProvider = Provider<bool>((ref) {
   final currentLobby = ref.watch(currentLobbyProvider);
   // Re-evaluate whenever lobby changes
   return service.isHost;
+});
+
+/// Automatically synchronizes the players in the active lobby into the app's player list
+final lobbyPlayerSyncProvider = Provider<void>((ref) {
+  ref.listen<AsyncValue<Lobby?>>(lobbyStreamProvider, (previous, next) {
+    final lobby = next.value;
+    if (lobby != null) {
+      final mappedPlayers = lobby.users.values
+          .map(
+            (u) => Player(
+              id: u.uid,
+              name: u.name,
+              avatarColor: u.avatarColor,
+              ownerUid: u.isHost ? 'host' : u.uid,
+            ),
+          )
+          .toList();
+
+      // We must use Future.microtask to avoid modifying providers during build phase
+      Future.microtask(() {
+        ref.read(activePlayersProvider.notifier).setPlayers(mappedPlayers);
+      });
+    }
+  });
 });
