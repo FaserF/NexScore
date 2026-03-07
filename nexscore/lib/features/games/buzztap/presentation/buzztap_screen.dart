@@ -11,6 +11,7 @@ import '../providers/buzztap_provider.dart';
 import '../../../../core/theme/widgets/glass_container.dart';
 import '../../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/swipeable_card.dart';
 
 class BuzzTapScreen extends ConsumerStatefulWidget {
   const BuzzTapScreen({super.key});
@@ -452,8 +453,9 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
   ) {
     final currentCard = state.playedCards.last;
 
-    return GestureDetector(
-      onTap: () {
+    return SwipeableCard(
+      cardKey: ValueKey(currentCard.id + state.playedCards.length.toString()),
+      onSwipe: () {
         HapticFeedback.mediumImpact();
         ref.read(buzzTapStateProvider.notifier).drawNextCard(players, l10n);
       },

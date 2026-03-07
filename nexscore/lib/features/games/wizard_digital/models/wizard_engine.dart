@@ -190,8 +190,14 @@ class WizardEngine {
 
       // First Wizard played always wins
       if (card.type == CardType.wizard) {
-        winnerId ??= pid;
-        // First wizard wins, subsequent wizards don't override
+        // Wizard overrides any non-wizard winner; first wizard keeps priority
+        final currentWinnerCard = winnerId != null
+            ? trick.playedCards[winnerId]
+            : null;
+        if (currentWinnerCard == null ||
+            currentWinnerCard.type != CardType.wizard) {
+          winnerId = pid;
+        }
         continue;
       }
 

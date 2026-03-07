@@ -9,6 +9,7 @@ import '../../../../core/providers/active_players_provider.dart';
 import '../models/sipdeck_models.dart';
 import '../providers/sipdeck_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/swipeable_card.dart';
 
 class SipDeckScreen extends ConsumerStatefulWidget {
   const SipDeckScreen({super.key});
@@ -420,9 +421,11 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
         },
         child: Focus(
           autofocus: true,
-          child: GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
+          child: SwipeableCard(
+            cardKey: ValueKey(
+              currentCard.id + state.playedCards.length.toString(),
+            ),
+            onSwipe: () {
               ref
                   .read(sipDeckStateProvider.notifier)
                   .drawNextCard(players, l10n);
