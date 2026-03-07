@@ -352,6 +352,7 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
           : null,
       child: Container(
         width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -362,240 +363,273 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
             ],
           ),
         ),
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Chip(
-              label: Text(
-                _labelForCategory(currentCard.category, l10n).toUpperCase(),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                ),
-              ),
-              backgroundColor: _colorForCategory(
-                currentCard.category,
-              ).withValues(alpha: 0.2),
-              side: BorderSide(
-                color: _colorForCategory(
-                  currentCard.category,
-                ).withValues(alpha: 0.5),
-              ),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight:
+                  MediaQuery.of(context).size.height -
+                  AppBar().preferredSize.height -
+                  MediaQuery.of(context).padding.top -
+                  MediaQuery.of(context).padding.bottom -
+                  96, // Account for padding
             ),
-            const Spacer(),
-            if (currentCard.emoji != null)
-              ScaleTransition(
-                scale: _pulseAnimation,
-                child: Text(
-                  currentCard.emoji!,
-                  style: const TextStyle(fontSize: 100),
-                ),
-              ),
-            const SizedBox(height: 48),
-            Text(
-              currentCard.text,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-                height: 1.2,
-              ),
-            ),
-            const Spacer(),
-            if (currentCard.sips > 0)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(40),
-                  border: Border.all(
-                    color: Colors.amber.withValues(alpha: 0.3),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Chip(
+                  label: Text(
+                    _labelForCategory(currentCard.category, l10n).toUpperCase(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  backgroundColor: _colorForCategory(
+                    currentCard.category,
+                  ).withValues(alpha: 0.2),
+                  side: BorderSide(
+                    color: _colorForCategory(
+                      currentCard.category,
+                    ).withValues(alpha: 0.5),
                   ),
                 ),
-                child: Text(
-                  '${currentCard.sips} SIPS',
-                  style: const TextStyle(
-                    fontSize: 28,
-                    color: Colors.amber,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-            const Spacer(),
-            _buildInlineSipCounter(state, players),
-            const SizedBox(height: 24),
-            // Action Area
-            if (currentCard.sips > 0)
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (currentCard.targetType == BuzzTapTargetType.single ||
-                          currentCard.targetType == BuzzTapTargetType.everyone)
-                        Expanded(
-                          child: AnimatedScaleButton(
-                            onPressed: () {
-                              HapticFeedback.vibrate();
-                              ref
-                                  .read(buzzTapStateProvider.notifier)
-                                  .completeCard(false);
-                              ref
-                                  .read(buzzTapStateProvider.notifier)
-                                  .drawNextCard(players, l10n);
-                            },
-                            child: GlassContainer(
-                              padding: const EdgeInsets.symmetric(vertical: 20),
-                              borderRadius: 20,
-                              color: Colors.amber,
-                              child: Text(
-                                currentCard.targetType ==
-                                        BuzzTapTargetType.everyone
-                                    ? l10n.get('game_drink_everyone')
-                                    : l10n.getWith('game_drink_single', [
-                                        players
-                                            .firstWhere(
-                                              (p) =>
-                                                  p.id ==
-                                                  currentCard.targetIds.first,
-                                              orElse: () => players.first,
-                                            )
-                                            .name,
-                                      ]),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      if (currentCard.targetType == BuzzTapTargetType.dual) ...[
-                        Expanded(
-                          child: AnimatedScaleButton(
-                            onPressed: () {
-                              HapticFeedback.mediumImpact();
-                              ref
-                                  .read(buzzTapStateProvider.notifier)
-                                  .incrementSips(
-                                    currentCard.targetIds.first,
-                                    currentCard.sips,
-                                  );
-                              ref
-                                  .read(buzzTapStateProvider.notifier)
-                                  .drawNextCard(players, l10n);
-                            },
-                            child: GlassContainer(
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              borderRadius: 16,
-                              color: Colors.white.withValues(alpha: 0.1),
-                              child: Text(
-                                players
-                                    .firstWhere(
-                                      (p) =>
-                                          p.id == currentCard.targetIds.first,
-                                    )
-                                    .name,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: AnimatedScaleButton(
-                            onPressed: () {
-                              HapticFeedback.mediumImpact();
-                              ref
-                                  .read(buzzTapStateProvider.notifier)
-                                  .incrementSips(
-                                    currentCard.targetIds.last,
-                                    currentCard.sips,
-                                  );
-                              ref
-                                  .read(buzzTapStateProvider.notifier)
-                                  .drawNextCard(players, l10n);
-                            },
-                            child: GlassContainer(
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              borderRadius: 16,
-                              color: Colors.white.withValues(alpha: 0.1),
-                              child: Text(
-                                players
-                                    .firstWhere(
-                                      (p) => p.id == currentCard.targetIds.last,
-                                    )
-                                    .name,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                      if (currentCard.targetType == BuzzTapTargetType.manual)
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () {
-                              HapticFeedback.lightImpact();
-                              ref
-                                  .read(buzzTapStateProvider.notifier)
-                                  .drawNextCard(players, l10n);
-                            },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.amber),
-                              padding: const EdgeInsets.symmetric(vertical: 20),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            child: Text(l10n.get('sipdeck_tap_continue')),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      ref
-                          .read(buzzTapStateProvider.notifier)
-                          .completeCard(true);
-                      ref
-                          .read(buzzTapStateProvider.notifier)
-                          .drawNextCard(players, l10n);
-                    },
+                const SizedBox(height: 32),
+                if (currentCard.emoji != null)
+                  ScaleTransition(
+                    scale: _pulseAnimation,
                     child: Text(
-                      l10n.get('game_skip'),
+                      currentCard.emoji!,
+                      style: const TextStyle(fontSize: 100),
+                    ),
+                  ),
+                const SizedBox(height: 48),
+                Text(
+                  currentCard.text,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    height: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 48),
+                if (currentCard.sips > 0)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(40),
+                      border: Border.all(
+                        color: Colors.amber.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Text(
+                      '${currentCard.sips} SIPS',
                       style: const TextStyle(
-                        color: Colors.white54,
-                        decoration: TextDecoration.underline,
+                        fontSize: 28,
+                        color: Colors.amber,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
-                ],
-              )
-            else
-              Text(
-                l10n.get('sipdeck_tap_continue'),
-                style: const TextStyle(color: Colors.white38, letterSpacing: 1),
-              ),
-          ],
+                const SizedBox(height: 48),
+                _buildInlineSipCounter(state, players),
+                const SizedBox(height: 24),
+                // Action Area
+                if (currentCard.sips > 0)
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (currentCard.targetType ==
+                                  BuzzTapTargetType.single ||
+                              currentCard.targetType ==
+                                  BuzzTapTargetType.everyone)
+                            Expanded(
+                              child: AnimatedScaleButton(
+                                onPressed: () {
+                                  HapticFeedback.vibrate();
+                                  ref
+                                      .read(buzzTapStateProvider.notifier)
+                                      .completeCard(false);
+                                  ref
+                                      .read(buzzTapStateProvider.notifier)
+                                      .drawNextCard(players, l10n);
+                                },
+                                child: GlassContainer(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 20,
+                                  ),
+                                  borderRadius: 20,
+                                  color: Colors.amber,
+                                  child: Text(
+                                    currentCard.targetType ==
+                                            BuzzTapTargetType.everyone
+                                        ? l10n.get('game_drink_everyone')
+                                        : l10n.getWith('game_drink_single', [
+                                            players
+                                                .firstWhere(
+                                                  (p) =>
+                                                      p.id ==
+                                                      currentCard
+                                                          .targetIds
+                                                          .first,
+                                                  orElse: () => players.first,
+                                                )
+                                                .name,
+                                          ]),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (currentCard.targetType ==
+                              BuzzTapTargetType.dual) ...[
+                            Expanded(
+                              child: AnimatedScaleButton(
+                                onPressed: () {
+                                  HapticFeedback.mediumImpact();
+                                  ref
+                                      .read(buzzTapStateProvider.notifier)
+                                      .incrementSips(
+                                        currentCard.targetIds.first,
+                                        currentCard.sips,
+                                      );
+                                  ref
+                                      .read(buzzTapStateProvider.notifier)
+                                      .drawNextCard(players, l10n);
+                                },
+                                child: GlassContainer(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 18,
+                                  ),
+                                  borderRadius: 16,
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  child: Text(
+                                    players
+                                        .firstWhere(
+                                          (p) =>
+                                              p.id ==
+                                              currentCard.targetIds.first,
+                                        )
+                                        .name,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: AnimatedScaleButton(
+                                onPressed: () {
+                                  HapticFeedback.mediumImpact();
+                                  ref
+                                      .read(buzzTapStateProvider.notifier)
+                                      .incrementSips(
+                                        currentCard.targetIds.last,
+                                        currentCard.sips,
+                                      );
+                                  ref
+                                      .read(buzzTapStateProvider.notifier)
+                                      .drawNextCard(players, l10n);
+                                },
+                                child: GlassContainer(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 18,
+                                  ),
+                                  borderRadius: 16,
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  child: Text(
+                                    players
+                                        .firstWhere(
+                                          (p) =>
+                                              p.id ==
+                                              currentCard.targetIds.last,
+                                        )
+                                        .name,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                          if (currentCard.targetType ==
+                              BuzzTapTargetType.manual)
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  HapticFeedback.lightImpact();
+                                  ref
+                                      .read(buzzTapStateProvider.notifier)
+                                      .drawNextCard(players, l10n);
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  side: const BorderSide(color: Colors.amber),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 20,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: Text(l10n.get('sipdeck_tap_continue')),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () {
+                          HapticFeedback.lightImpact();
+                          ref
+                              .read(buzzTapStateProvider.notifier)
+                              .completeCard(true);
+                          ref
+                              .read(buzzTapStateProvider.notifier)
+                              .drawNextCard(players, l10n);
+                        },
+                        child: Text(
+                          l10n.get('game_skip'),
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Text(
+                    l10n.get('sipdeck_tap_continue'),
+                    style: const TextStyle(
+                      color: Colors.white38,
+                      letterSpacing: 1,
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );

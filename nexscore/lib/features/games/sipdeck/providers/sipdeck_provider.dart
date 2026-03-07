@@ -106,7 +106,20 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
       targetType: targetType,
     );
 
-    state = state.copyWith(playedCards: [...state.playedCards, hydratedCard]);
+    List<SipDeckCard> activeViruses = List.from(state.activeViruses);
+    if (hydratedCard.isVirus) {
+      activeViruses.add(hydratedCard);
+    }
+
+    // Special case: Virus Cured card
+    if (hydratedCard.id == 'wc009') {
+      activeViruses.clear();
+    }
+
+    state = state.copyWith(
+      playedCards: [...state.playedCards, hydratedCard],
+      activeViruses: activeViruses,
+    );
   }
 
   void incrementSips(String playerId, int amount) {

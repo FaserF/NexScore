@@ -59,65 +59,70 @@ class ArschlochScreen extends ConsumerWidget {
     List<Player> players,
     AppLocalizations l10n,
   ) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.style, size: 80, color: Colors.deepPurple),
-            const SizedBox(height: 24),
-            Text(
-              l10n.get('arschloch_title'),
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${players.length} ${l10n.get('nav_players')}',
-              style: const TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.get('arschloch_goal_desc'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 48),
-            if (players.length < 2)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(
-                  l10n.get('arschloch_min_3_players'),
-                  style: const TextStyle(color: Colors.orange),
-                ),
-              )
-            else if (players.length == 2)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(
-                  l10n.get('arschloch_min_3_players'),
-                  style: const TextStyle(color: Colors.orange),
+    return SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.style, size: 80, color: Colors.deepPurple),
+              const SizedBox(height: 24),
+              Text(
+                l10n.get('arschloch_title'),
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            FilledButton.icon(
-              onPressed: players.length >= 2
-                  ? () => ref
-                        .read(arschlochStateProvider.notifier)
-                        .initPlayers(players.map((p) => p.id).toList())
-                  : null,
-              icon: const Icon(Icons.play_arrow),
-              label: Text(
-                l10n.get('sipdeck_start'),
-                style: const TextStyle(fontSize: 18),
+              const SizedBox(height: 8),
+              Text(
+                '${players.length} ${l10n.get('nav_players')}',
+                style: const TextStyle(color: Colors.grey),
               ),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 48,
-                  vertical: 16,
+              const SizedBox(height: 8),
+              Text(
+                l10n.get('arschloch_goal_desc'),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              const SizedBox(height: 48),
+              if (players.length < 2)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    l10n.get('arschloch_min_3_players'),
+                    style: const TextStyle(color: Colors.orange),
+                  ),
+                )
+              else if (players.length == 2)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    l10n.get('arschloch_min_3_players'),
+                    style: const TextStyle(color: Colors.orange),
+                  ),
+                ),
+              FilledButton.icon(
+                onPressed: players.length >= 2
+                    ? () => ref
+                          .read(arschlochStateProvider.notifier)
+                          .initPlayers(players.map((p) => p.id).toList())
+                    : null,
+                icon: const Icon(Icons.play_arrow),
+                label: Text(
+                  l10n.get('sipdeck_start'),
+                  style: const TextStyle(fontSize: 18),
+                ),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 48,
+                    vertical: 16,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -145,117 +150,130 @@ class ArschlochScreen extends ConsumerWidget {
 
     return Column(
       children: [
-        if (exchangeInstructions.isNotEmpty) ...[
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.all(12),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.amber.shade50,
-              border: Border.all(color: Colors.amber.shade300),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.get('arschloch_exchange_title'),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                ...exchangeInstructions.map(
-                  (i) => Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Text('• $i', style: const TextStyle(fontSize: 13)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
         Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.only(bottom: 16),
-            itemCount: leaders.length,
-            separatorBuilder: (_, _) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final pid = leaders[index];
-              final ps = gameState.playerStates[pid]!;
-              final player = players.firstWhere(
-                (p) => p.id == pid,
-                orElse: () => players.first,
-              );
-
-              final rankLabel = ps.lastRank == null
-                  ? '–'
-                  : _labelForRank(ps.lastRank!, l10n);
-              final rankColor = switch (ps.lastRank) {
-                ArschlochRank.president => Colors.amber.shade700,
-                ArschlochRank.vicePresident => Colors.blueGrey.shade400,
-                ArschlochRank.arschloch => Colors.red.shade700,
-                ArschlochRank.viceArschloch => Colors.orange.shade700,
-                _ => Colors.grey,
-              };
-
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Color(
-                    int.parse(player.avatarColor.replaceFirst('#', '0xff')),
+          child: CustomScrollView(
+            slivers: [
+              if (exchangeInstructions.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      border: Border.all(color: Colors.amber.shade300),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.get('arschloch_exchange_title'),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        ...exchangeInstructions.map(
+                          (i) => Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              '• $i',
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Text(
-                    player.name.substring(0, 1).toUpperCase(),
-                    style: const TextStyle(color: Colors.white),
-                  ),
                 ),
-                title: Text(
-                  player.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  l10n.getWith('arschloch_rounds', [
-                    ps.roundsAsPresident.toString(),
-                    ps.roundsAsArschloch.toString(),
-                  ]),
-                  style: const TextStyle(fontSize: 12),
-                ),
-                trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: rankColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        rankLabel,
-                        style: TextStyle(
-                          color: rankColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final pid = leaders[index];
+                  final ps = gameState.playerStates[pid]!;
+                  final player = players.firstWhere(
+                    (p) => p.id == pid,
+                    orElse: () => players.first,
+                  );
+
+                  final rankLabel = ps.lastRank == null
+                      ? '–'
+                      : _labelForRank(ps.lastRank!, l10n);
+                  final rankColor = switch (ps.lastRank) {
+                    ArschlochRank.president => Colors.amber.shade700,
+                    ArschlochRank.vicePresident => Colors.blueGrey.shade400,
+                    ArschlochRank.arschloch => Colors.red.shade700,
+                    ArschlochRank.viceArschloch => Colors.orange.shade700,
+                    _ => Colors.grey,
+                  };
+
+                  return Column(
+                    children: [
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Color(
+                            int.parse(
+                              player.avatarColor.replaceFirst('#', '0xff'),
+                            ),
+                          ),
+                          child: Text(
+                            player.name.substring(0, 1).toUpperCase(),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        title: Text(
+                          player.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          l10n.getWith('arschloch_rounds', [
+                            ps.roundsAsPresident.toString(),
+                            ps.roundsAsArschloch.toString(),
+                          ]),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: rankColor.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                rankLabel,
+                                style: TextStyle(
+                                  color: rankColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${ps.points > 0 ? '+' : ''}${ps.points} ${l10n.get('history_pts')}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: ps.points > 0
+                                    ? Colors.green
+                                    : ps.points < 0
+                                    ? Colors.red
+                                    : null,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${ps.points > 0 ? '+' : ''}${ps.points} ${l10n.get('history_pts')}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: ps.points > 0
-                            ? Colors.green
-                            : ps.points < 0
-                            ? Colors.red
-                            : null,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                      if (index < leaders.length - 1) const Divider(height: 1),
+                    ],
+                  );
+                }, childCount: leaders.length),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+            ],
           ),
         ),
         Padding(

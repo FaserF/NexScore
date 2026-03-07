@@ -75,85 +75,84 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // 2-player warning banner
-          if (players.length == 2 && !_isBannerDismissed)
-            MaterialBanner(
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              content: Text(
-                l10n.get('wizard_2player_warning'),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onErrorContainer,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // 2-player warning banner
+            if (players.length == 2 && !_isBannerDismissed)
+              MaterialBanner(
+                backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                content: Text(
+                  l10n.get('wizard_2player_warning'),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
                 ),
-              ),
-              leading: Icon(
-                Icons.warning_amber_rounded,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => setState(() => _isBannerDismissed = true),
-                  child: Text(l10n.get('ok')),
+                leading: Icon(
+                  Icons.warning_amber_rounded,
+                  color: Theme.of(context).colorScheme.error,
                 ),
-              ],
-            ),
+                actions: [
+                  TextButton(
+                    onPressed: () => setState(() => _isBannerDismissed = true),
+                    child: Text(l10n.get('ok')),
+                  ),
+                ],
+              ),
 
-          // Active Round / Current Predictions
-          if (state.currentRoundBids != null)
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                elevation: 4,
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound}',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          Chip(label: Text(l10n.get('wizard_predictions'))),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 8,
-                        children: players.map((p) {
-                          return Column(
-                            children: [
-                              Text(
-                                p.name,
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              Text(
-                                (state.currentRoundBids![p.id] ?? 0).toString(),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+            // Active Round / Current Predictions
+            if (state.currentRoundBids != null)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Card(
+                  elevation: 4,
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound}',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            Chip(label: Text(l10n.get('wizard_predictions'))),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 8,
+                          children: players.map((p) {
+                            return Column(
+                              children: [
+                                Text(
+                                  p.name,
+                                  style: const TextStyle(fontSize: 12),
                                 ),
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ],
+                                Text(
+                                  (state.currentRoundBids![p.id] ?? 0)
+                                      .toString(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-          // Scoreboard
-          Expanded(
-            child: ListView.builder(
-              itemCount: players.length,
-              itemBuilder: (context, index) {
-                final p = players[index];
+            // Scoreboard (Changed from Expanded ListView to Column for scrollability)
+            Column(
+              children: players.map((p) {
                 final score = WizardGameState.calculatePlayerScore(
                   p.id,
                   state.rounds,
@@ -182,74 +181,74 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                           ),
                         ),
                 );
-              },
-            ),
-          ),
-
-          // Round history
-          if (state.rounds.isNotEmpty)
-            ExpansionTile(
-              title: Text(
-                l10n.getWith('wizard_history', [
-                  state.rounds.length.toString(),
-                ]),
-              ),
-              children: state.rounds.reversed.map((round) {
-                return ListTile(
-                  dense: true,
-                  title: Text(
-                    '${l10n.get('wizard_round')} ${round.roundIndex}',
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        players
-                            .map(
-                              (p) =>
-                                  '${p.name}: ${l10n.get('wizard_bid')} ${round.bids[p.id] ?? 0} / ${l10n.get('wizard_won')} ${round.tricks[p.id] ?? 0}',
-                            )
-                            .join(' · '),
-                      ),
-                      if (round.blownTricks > 0)
-                        Text(
-                          '${l10n.get('wizard_bombs')}: ${round.blownTricks}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                          ),
-                        ),
-                    ],
-                  ),
-                );
               }).toList(),
             ),
 
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: FilledButton.icon(
-              onPressed: () {
-                if (state.currentRoundBids == null) {
-                  _showPredictionDialog(context, ref, state, players);
-                } else {
-                  _showResultsDialog(context, ref, state, players);
-                }
-              },
-              icon: Icon(
-                state.currentRoundBids == null ? Icons.edit : Icons.check,
+            // Round history
+            if (state.rounds.isNotEmpty)
+              ExpansionTile(
+                title: Text(
+                  l10n.getWith('wizard_history', [
+                    state.rounds.length.toString(),
+                  ]),
+                ),
+                children: state.rounds.reversed.map((round) {
+                  return ListTile(
+                    dense: true,
+                    title: Text(
+                      '${l10n.get('wizard_round')} ${round.roundIndex}',
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          players
+                              .map(
+                                (p) =>
+                                    '${p.name}: ${l10n.get('wizard_bid')} ${round.bids[p.id] ?? 0} / ${l10n.get('wizard_won')} ${round.tricks[p.id] ?? 0}',
+                              )
+                              .join(' · '),
+                        ),
+                        if (round.blownTricks > 0)
+                          Text(
+                            '${l10n.get('wizard_bombs')}: ${round.blownTricks}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                }).toList(),
               ),
-              label: Text(
-                state.currentRoundBids == null
-                    ? '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound} ${l10n.get('wizard_predictions')}'
-                    : '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound} ${l10n.get('wizard_actuals')}',
-              ),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
+
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: FilledButton.icon(
+                onPressed: () {
+                  if (state.currentRoundBids == null) {
+                    _showPredictionDialog(context, ref, state, players);
+                  } else {
+                    _showResultsDialog(context, ref, state, players);
+                  }
+                },
+                icon: Icon(
+                  state.currentRoundBids == null ? Icons.edit : Icons.check,
+                ),
+                label: Text(
+                  state.currentRoundBids == null
+                      ? '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound} ${l10n.get('wizard_predictions')}'
+                      : '${l10n.get('wizard_round')} ${state.rounds.length + state.customStartRound} ${l10n.get('wizard_actuals')}',
+                ),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

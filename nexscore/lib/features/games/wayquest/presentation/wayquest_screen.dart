@@ -202,46 +202,48 @@ class _WayQuestGame extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(32),
                       width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _getCategoryIcon(currentCard.category, size: 48),
-                          const SizedBox(height: 16),
-                          Text(
-                            l10n
-                                .get(
-                                  'wayquest_cat_${currentCard.category.name}',
-                                )
-                                .toUpperCase(),
-                            style: const TextStyle(
-                              letterSpacing: 2,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white70,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _getCategoryIcon(currentCard.category, size: 48),
+                            const SizedBox(height: 16),
+                            Text(
+                              l10n
+                                  .get(
+                                    'wayquest_cat_${currentCard.category.name}',
+                                  )
+                                  .toUpperCase(),
+                              style: const TextStyle(
+                                letterSpacing: 2,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
                             ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            currentCard.text,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              height: 1.3,
+                            const SizedBox(height: 32),
+                            Text(
+                              currentCard.text,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                height: 1.3,
+                              ),
                             ),
-                          ),
-                          const Spacer(),
-                          const Icon(
-                            Icons.touch_app,
-                            color: Colors.white54,
-                            size: 32,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            l10n.get('wayquest_tap_continue'),
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                        ],
+                            const SizedBox(height: 32),
+                            const Icon(
+                              Icons.touch_app,
+                              color: Colors.white54,
+                              size: 32,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              l10n.get('wayquest_tap_continue'),
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

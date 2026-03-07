@@ -284,318 +284,326 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                   ? Colors.deepOrange.shade800
                   : _colorForCategory(currentCard.category),
               padding: const EdgeInsets.fromLTRB(24, 48, 24, 32),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _labelForCategory(currentCard.category, l10n).toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const Spacer(),
-                  // Emoji Section
-                  if (currentCard.emoji != null)
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
                     Text(
-                      currentCard.emoji!,
-                      style: const TextStyle(fontSize: 80),
-                    )
-                  else
-                    Icon(
-                      _iconForCategory(currentCard.category),
-                      size: 80,
-                      color: Colors.white24,
-                    ),
-                  const SizedBox(height: 32),
-                  // Main Challenge Text
-                  Text(
-                    currentCard.text,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      height: 1.3,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  // Explanation Section
-                  if (currentCard.explanation != null)
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.black12,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white10),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.info_outline,
-                            color: Colors.white70,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              currentCard.explanation!,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white70,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ],
+                      _labelForCategory(
+                        currentCard.category,
+                        l10n,
+                      ).toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        letterSpacing: 2,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                     ),
-                  const SizedBox(height: 32),
-                  if (currentCard.sips > 0)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+                    const SizedBox(height: 48),
+                    // Emoji Section
+                    if (currentCard.emoji != null)
+                      Text(
+                        currentCard.emoji!,
+                        style: const TextStyle(fontSize: 80),
+                      )
+                    else
+                      Icon(
+                        _iconForCategory(currentCard.category),
+                        size: 80,
+                        color: Colors.white24,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.black26,
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
+                    const SizedBox(height: 32),
+                    // Main Challenge Text
+                    Text(
+                      currentCard.text,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.3,
                       ),
-                      child: Text(
-                        l10n.getWith('sipdeck_sips', [
-                          currentCard.sips.toString(),
-                        ]),
-                        style: const TextStyle(
-                          fontSize: 24,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(height: 32),
+                    // Explanation Section
+                    if (currentCard.explanation != null)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.white10),
                         ),
-                      ),
-                    ),
-                  if (currentCard.isVirus)
-                    Container(
-                      margin: const EdgeInsets.only(top: 16),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black38,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white30),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('🦠', style: TextStyle(fontSize: 16)),
-                          SizedBox(width: 8),
-                          Text(
-                            'ONGOING RULE',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  const Spacer(),
-                  _buildInlineSipCounter(state, players),
-                  const SizedBox(height: 24),
-                  // Action Area
-                  if (currentCard.sips > 0)
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        child: Row(
                           children: [
-                            if (currentCard.targetType ==
-                                    SipTargetType.single ||
-                                currentCard.targetType ==
-                                    SipTargetType.everyone)
-                              Expanded(
-                                child: FilledButton(
-                                  onPressed: () {
-                                    HapticFeedback.heavyImpact();
-                                    ref
-                                        .read(sipDeckStateProvider.notifier)
-                                        .completeCard(false);
-                                    ref
-                                        .read(sipDeckStateProvider.notifier)
-                                        .drawNextCard(players, l10n);
-                                  },
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: _colorForCategory(
-                                      currentCard.category,
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    currentCard.targetType ==
-                                            SipTargetType.everyone
-                                        ? l10n.get('game_drink_everyone')
-                                        : l10n.getWith('game_drink_single', [
-                                            players
-                                                .firstWhere(
-                                                  (p) =>
-                                                      p.id ==
-                                                      currentCard
-                                                          .targetIds
-                                                          .first,
-                                                  orElse: () => players.first,
-                                                )
-                                                .name,
-                                          ]),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
+                            const Icon(
+                              Icons.info_outline,
+                              color: Colors.white70,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                currentCard.explanation!,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70,
+                                  fontStyle: FontStyle.italic,
                                 ),
                               ),
-                            if (currentCard.targetType ==
-                                SipTargetType.dual) ...[
-                              Expanded(
-                                child: FilledButton(
-                                  onPressed: () {
-                                    HapticFeedback.mediumImpact();
-                                    ref
-                                        .read(sipDeckStateProvider.notifier)
-                                        .incrementSips(
-                                          currentCard.targetIds.first,
-                                          currentCard.sips,
-                                        );
-                                    ref
-                                        .read(sipDeckStateProvider.notifier)
-                                        .drawNextCard(players, l10n);
-                                  },
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: Colors.black87,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    players
-                                        .firstWhere(
-                                          (p) =>
-                                              p.id ==
-                                              currentCard.targetIds.first,
-                                        )
-                                        .name,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: FilledButton(
-                                  onPressed: () {
-                                    HapticFeedback.mediumImpact();
-                                    ref
-                                        .read(sipDeckStateProvider.notifier)
-                                        .incrementSips(
-                                          currentCard.targetIds.last,
-                                          currentCard.sips,
-                                        );
-                                    ref
-                                        .read(sipDeckStateProvider.notifier)
-                                        .drawNextCard(players, l10n);
-                                  },
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: Colors.black87,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    players
-                                        .firstWhere(
-                                          (p) =>
-                                              p.id ==
-                                              currentCard.targetIds.last,
-                                        )
-                                        .name,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                            ],
-                            if (currentCard.targetType == SipTargetType.manual)
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () {
-                                    HapticFeedback.lightImpact();
-                                    ref
-                                        .read(sipDeckStateProvider.notifier)
-                                        .drawNextCard(players, l10n);
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    side: const BorderSide(
-                                      color: Colors.white54,
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                  ),
-                                  child: Text(l10n.get('sipdeck_tap_continue')),
-                                ),
-                              ),
+                            ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        TextButton(
-                          onPressed: () {
-                            HapticFeedback.lightImpact();
-                            ref
-                                .read(sipDeckStateProvider.notifier)
-                                .completeCard(true);
-                            ref
-                                .read(sipDeckStateProvider.notifier)
-                                .drawNextCard(players, l10n);
-                          },
-                          child: Text(
-                            l10n.get('game_skip'),
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              decoration: TextDecoration.underline,
+                      ),
+                    const SizedBox(height: 32),
+                    if (currentCard.sips > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black26,
+                          borderRadius: BorderRadius.circular(30),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          l10n.getWith('sipdeck_sips', [
+                            currentCard.sips.toString(),
+                          ]),
+                          style: const TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    if (currentCard.isVirus)
+                      Container(
+                        margin: const EdgeInsets.only(top: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black38,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white30),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('🦠', style: TextStyle(fontSize: 16)),
+                            SizedBox(width: 8),
+                            Text(
+                              'ONGOING RULE',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: 48),
+                    _buildInlineSipCounter(state, players),
+                    const SizedBox(height: 24),
+                    // Action Area
+                    if (currentCard.sips > 0)
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (currentCard.targetType ==
+                                      SipTargetType.single ||
+                                  currentCard.targetType ==
+                                      SipTargetType.everyone)
+                                Expanded(
+                                  child: FilledButton(
+                                    onPressed: () {
+                                      HapticFeedback.heavyImpact();
+                                      ref
+                                          .read(sipDeckStateProvider.notifier)
+                                          .completeCard(false);
+                                      ref
+                                          .read(sipDeckStateProvider.notifier)
+                                          .drawNextCard(players, l10n);
+                                    },
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: _colorForCategory(
+                                        currentCard.category,
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      currentCard.targetType ==
+                                              SipTargetType.everyone
+                                          ? l10n.get('game_drink_everyone')
+                                          : l10n.getWith('game_drink_single', [
+                                              players
+                                                  .firstWhere(
+                                                    (p) =>
+                                                        p.id ==
+                                                        currentCard
+                                                            .targetIds
+                                                            .first,
+                                                    orElse: () => players.first,
+                                                  )
+                                                  .name,
+                                            ]),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              if (currentCard.targetType ==
+                                  SipTargetType.dual) ...[
+                                Expanded(
+                                  child: FilledButton(
+                                    onPressed: () {
+                                      HapticFeedback.mediumImpact();
+                                      ref
+                                          .read(sipDeckStateProvider.notifier)
+                                          .incrementSips(
+                                            currentCard.targetIds.first,
+                                            currentCard.sips,
+                                          );
+                                      ref
+                                          .read(sipDeckStateProvider.notifier)
+                                          .drawNextCard(players, l10n);
+                                    },
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black87,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      players
+                                          .firstWhere(
+                                            (p) =>
+                                                p.id ==
+                                                currentCard.targetIds.first,
+                                          )
+                                          .name,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: FilledButton(
+                                    onPressed: () {
+                                      HapticFeedback.mediumImpact();
+                                      ref
+                                          .read(sipDeckStateProvider.notifier)
+                                          .incrementSips(
+                                            currentCard.targetIds.last,
+                                            currentCard.sips,
+                                          );
+                                      ref
+                                          .read(sipDeckStateProvider.notifier)
+                                          .drawNextCard(players, l10n);
+                                    },
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black87,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      players
+                                          .firstWhere(
+                                            (p) =>
+                                                p.id ==
+                                                currentCard.targetIds.last,
+                                          )
+                                          .name,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              if (currentCard.targetType ==
+                                  SipTargetType.manual)
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      HapticFeedback.lightImpact();
+                                      ref
+                                          .read(sipDeckStateProvider.notifier)
+                                          .drawNextCard(players, l10n);
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      side: const BorderSide(
+                                        color: Colors.white54,
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      l10n.get('sipdeck_tap_continue'),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          TextButton(
+                            onPressed: () {
+                              HapticFeedback.lightImpact();
+                              ref
+                                  .read(sipDeckStateProvider.notifier)
+                                  .completeCard(true);
+                              ref
+                                  .read(sipDeckStateProvider.notifier)
+                                  .drawNextCard(players, l10n);
+                            },
+                            child: Text(
+                              l10n.get('game_skip'),
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    )
-                  else
-                    Column(
-                      children: [
-                        const Icon(Icons.touch_app, color: Colors.white38),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.get('sipdeck_tap_continue'),
-                          style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 12,
+                        ],
+                      )
+                    else
+                      Column(
+                        children: [
+                          const Icon(Icons.touch_app, color: Colors.white38),
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.get('sipdeck_tap_continue'),
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 12,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                ],
+                        ],
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
