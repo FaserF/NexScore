@@ -36,16 +36,11 @@ jobs:
             workflows:
               - '.github/workflows/**'
 
-  validate:
+  # Combined Validation and Build into one runner to share Flutter environment
+  build-android-web:
     needs: changes
     if: ${{ needs.changes.outputs.code == 'true' }}
-    name: 1. Validate (Test & Analyze)
-    uses: ./.github/workflows/validation.yml
-
-  build-android-web:
-    needs: [changes, validate]
-    if: ${{ needs.changes.outputs.code == 'true' }}
-    name: 2. Build Android & Web
+    name: 1. Validate & Build (Android/Web)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -57,18 +52,57 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      - name: Build Web
-        run: flutter build web --release --base-href "/"
+      - name: Cache Pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Install dependencies
+        run: flutter pub get
         working-directory: nexscore
+
+      - name: Analysis & Tests
+        run: |
+          flutter analyze
+          flutter test
+        working-directory: nexscore
+
+      - name: Build Web
+        run: |
+          # Inject Firebase Secrets into index.html if available
+          if [ -f "web/index.html" ]; then
+            sed -i "s/PLACEHOLDER_FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY }}/g" web/index.html
+            sed -i "s/PLACEHOLDER_FIREBASE_APP_ID/${{ secrets.FIREBASE_APP_ID }}/g" web/index.html
+            sed -i "s/PLACEHOLDER_FIREBASE_MEASUREMENT_ID/${{ secrets.FIREBASE_MEASUREMENT_ID }}/g" web/index.html
+          fi
+
+          flutter build web --release --base-href "/NexScore/" \
+            --no-pub \
+            --dart-define=FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
+            --dart-define=FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }} \
+            --dart-define=FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} \
+            --dart-define=FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }} \
+            --dart-define=FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }} \
+            --dart-define=FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
+        working-directory: nexscore
+      - name: Upload Web Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexscore-web-pwa
+          path: nexscore/build/web
+          retention-days: 1
       - name: Build Android APK
-        run: flutter build apk --release
+        run: flutter build apk --release --no-pub
         working-directory: nexscore
       - name: Build Docker Image
         run: docker build -t nexscore-web:latest -f Dockerfile .
         working-directory: nexscore
 
   build-ios:
-    needs: [changes, validate]
+    needs: [changes, build-android-web]
     if: false # Skipped for now to save resources
     name: 3. Build iOS
     runs-on: macos-latest
@@ -82,16 +116,25 @@ jobs:
         with:
           channel: 'stable'
           cache: true
+      - name: Cache Pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
       - name: Build iOS IPA (Unsigned)
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign --no-pub
         working-directory: nexscore
 
   deploy-docs:
-    needs: changes
-    if: ${{ needs.changes.outputs.docs == 'true' || needs.changes.outputs.workflows == 'true' }}
-    name: 4. Deploy Docs & PWA
+    needs: [changes, build-android-web]
+    if: ${{ needs.changes.outputs.docs == 'true' || needs.changes.outputs.workflows == 'true' || needs.changes.outputs.code == 'true' }}
+    name: 2. Deploy Docs & PWA
     uses: ./.github/workflows/deploy_pages.yml
     with:
       deploy_pwa: ${{ needs.changes.outputs.code == 'true' }}
+      web_artifact_name: 'nexscore-web-pwa'
       version_name: 'latest'
       is_beta: false

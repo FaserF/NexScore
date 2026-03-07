@@ -1,34 +1,31 @@
-# Stage 1: Build Flutter Web application
+# Stage 1: Build Flutter Web application (Optional if pre-built)
 FROM ubuntu:24.04 AS build-env
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl git wget unzip xz-utils libglu1-mesa ca-certificates \
-  && rm -rf /var/lib/apt/lists/*
-
-# Use a clean path for Flutter
-RUN git clone https://github.com/flutter/flutter.git /opt/flutter \
-    --branch stable \
-    --depth 1
 
 # Setup environment variables
 ENV FLUTTER_HOME=/opt/flutter
 ENV PATH="${FLUTTER_HOME}/bin:${FLUTTER_HOME}/bin/cache/dart-sdk/bin:${PATH}"
 
-# Pre-warm the Flutter tool cache
-RUN flutter precache --web --no-android --no-ios
-
 WORKDIR /app
 COPY . .
 
-# Build for Web with WASM
+# Argument to pass pre-built assets path (e.g., build/web)
+ARG PREBUILT_PATH=""
 ARG IS_BETA=false
-RUN flutter clean
-RUN flutter pub get
-RUN if [ "$IS_BETA" = "true" ]; then \
-      flutter build web --wasm --release --base-href="/" --dart-define=IS_BETA=true; \
+
+RUN if [ -n "$PREBUILT_PATH" ] && [ -d "$PREBUILT_PATH" ]; then \
+      echo "Using pre-built assets from $PREBUILT_PATH"; \
+      mkdir -p build/web && cp -R $PREBUILT_PATH/* build/web/; \
     else \
-      flutter build web --wasm --release --base-href="/"; \
+      echo "Building from source..."; \
+      apt-get update && apt-get install -y --no-install-recommends curl git wget unzip xz-utils libglu1-mesa ca-certificates && rm -rf /var/lib/apt/lists/*; \
+      git clone https://github.com/flutter/flutter.git /opt/flutter --branch stable --depth 1; \
+      flutter precache --web --no-android --no-ios; \
+      flutter pub get; \
+      if [ "$IS_BETA" = "true" ]; then \
+        flutter build web --wasm --release --base-href="/" --dart-define=IS_BETA=true; \
+      else \
+        flutter build web --wasm --release --base-href="/"; \
+      fi; \
     fi
 
 # Stage 2: Serve with Nginx (Alpine) - Optimized Runtime

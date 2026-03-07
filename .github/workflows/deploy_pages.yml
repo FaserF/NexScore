@@ -1,11 +1,6 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    paths:
-      - 'docs/**'
-    branches:
-      - main
   workflow_call:
     inputs:
       deploy_pwa:
@@ -20,6 +15,10 @@ on:
         required: false
         type: boolean
         default: false
+      web_artifact_name:
+        required: false
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       deploy_pwa:
@@ -49,15 +48,22 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Download Web Artifact
+        if: ${{ inputs.web_artifact_name != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.web_artifact_name }}
+          path: nexscore/build/web
+
       - name: Set up Flutter
-        if: ${{ inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true) || github.event_name == 'push' }}
+        if: ${{ inputs.web_artifact_name == '' && (inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true) || github.event_name == 'push') }}
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
 
       - name: Build Web App (PWA)
-        if: ${{ inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true) || github.event_name == 'push' }}
+        if: ${{ inputs.web_artifact_name == '' && (inputs.deploy_pwa == true || (github.event_name == 'workflow_dispatch' && inputs.deploy_pwa == true) || github.event_name == 'push') }}
         run: |
           if [ "${{ inputs.version_name || 'latest' }}" == "latest" ]; then
             APP_VERSION=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | cut -d '+' -f 1)
