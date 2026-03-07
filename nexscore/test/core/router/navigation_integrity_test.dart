@@ -47,18 +47,20 @@ void main() {
         ),
       );
 
+      final l10n = AppLocalizations(const Locale('en'));
+
       // Test absolute paths that previously failed
       router.go('/multiplayer/host');
       await tester.pumpAndSettle();
-      expect(find.text('Lobby'), findsOneWidget);
+      expect(find.text(l10n.get('multiplayer_host')), findsAtLeastNWidgets(1));
 
       router.go('/multiplayer/join');
       await tester.pumpAndSettle();
-      expect(find.text('Join Room'), findsOneWidget);
+      expect(find.text(l10n.get('multiplayer_join')), findsAtLeastNWidgets(1));
 
       router.go('/multiplayer');
       await tester.pumpAndSettle();
-      expect(find.text('Multiplayer Hub'), findsOneWidget);
+      expect(find.text(l10n.get('multiplayer_hub')), findsAtLeastNWidgets(1));
     });
 
     testWidgets('Verify all Game routes exist', (tester) async {

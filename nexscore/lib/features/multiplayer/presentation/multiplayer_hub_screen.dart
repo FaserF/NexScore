@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/i18n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 class MultiplayerHubScreen extends ConsumerWidget {
@@ -7,9 +8,19 @@ class MultiplayerHubScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // We don't have i18n keys for multiplayer yet, using hardcoded for now or creating a fallback
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Multiplayer Hub')),
+      appBar: AppBar(
+        title: Text(l10n.get('multiplayer_hub')),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.bug_report_outlined),
+            onPressed: () => _showDiagnostics(context, ref, l10n),
+            tooltip: l10n.get('multiplayer_diagnostics'),
+          ),
+        ],
+      ),
+
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -26,7 +37,7 @@ class MultiplayerHubScreen extends ConsumerWidget {
               FilledButton.icon(
                 onPressed: () => context.push('/multiplayer/host'),
                 icon: const Icon(Icons.add_box),
-                label: const Text('Host a Room'),
+                label: Text(l10n.get('multiplayer_host')),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.all(20),
                   textStyle: const TextStyle(
@@ -39,7 +50,7 @@ class MultiplayerHubScreen extends ConsumerWidget {
               FilledButton.tonalIcon(
                 onPressed: () => context.push('/multiplayer/join'),
                 icon: const Icon(Icons.login),
-                label: const Text('Join a Room'),
+                label: Text(l10n.get('multiplayer_join')),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.all(20),
                   textStyle: const TextStyle(
@@ -51,6 +62,54 @@ class MultiplayerHubScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showDiagnostics(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('multiplayer_diagnostics')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.get('multiplayer_diagnostics_desc'),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.security, color: Colors.orange),
+              title: Text(l10n.get('multiplayer_auth_title')),
+              subtitle: Text(l10n.get('multiplayer_auth_desc')),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.block, color: Colors.red),
+              title: Text(l10n.get('multiplayer_adblock_title')),
+              subtitle: Text(l10n.get('multiplayer_adblock_desc')),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.domain, color: Colors.blue),
+              title: Text(l10n.get('multiplayer_domains_title')),
+              subtitle: Text(l10n.get('multiplayer_domains_desc')),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('close')),
+          ),
+        ],
       ),
     );
   }

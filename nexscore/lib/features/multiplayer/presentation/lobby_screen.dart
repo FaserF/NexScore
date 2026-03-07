@@ -74,10 +74,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   @override
   Widget build(BuildContext context) {
     final lobby = ref.watch(currentLobbyProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lobby'),
+        title: Text(l10n.get('multiplayer_host')),
         leading: BackButton(
           onPressed: () async {
             await ref.read(multiplayerServiceProvider).leaveLobby();
@@ -97,9 +98,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   color: Theme.of(context).colorScheme.primaryContainer,
                   child: Column(
                     children: [
-                      const Text(
-                        'ROOM CODE',
-                        style: TextStyle(letterSpacing: 2),
+                      Text(
+                        l10n.get('multiplayer_room_code').toUpperCase(),
+                        style: const TextStyle(letterSpacing: 2),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -139,9 +140,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(double.infinity, 60),
                     ),
-                    child: const Text(
-                      'Choose Game',
-                      style: TextStyle(fontSize: 18),
+                    child: Text(
+                      l10n.get('home_choose_game'),
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ),
                 ),

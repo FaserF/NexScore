@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/i18n/app_localizations.dart';
 import '../../../core/multiplayer/providers/multiplayer_provider.dart';
 
 class JoinLobbyScreen extends ConsumerStatefulWidget {
@@ -15,13 +16,17 @@ class _JoinLobbyScreenState extends ConsumerState<JoinLobbyScreen> {
   final _nameController = TextEditingController();
   bool _isJoining = false;
 
-  void _join() async {
+  void _join(AppLocalizations l10n) async {
     final code = _codeController.text.trim().toUpperCase();
     final name = _nameController.text.trim();
 
     if (code.length != 5 || name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid 5-digit code and name.')),
+        SnackBar(
+          content: Text(
+            l10n.get('error_msg').replaceFirst('{0}', 'Invalid code or name'),
+          ),
+        ),
       );
       return;
     }
@@ -44,7 +49,7 @@ class _JoinLobbyScreenState extends ConsumerState<JoinLobbyScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to join: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.get('error')}: $e')));
       }
     } finally {
       if (mounted) {
@@ -55,8 +60,9 @@ class _JoinLobbyScreenState extends ConsumerState<JoinLobbyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Join Room')),
+      appBar: AppBar(title: Text(l10n.get('multiplayer_join'))),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -64,10 +70,10 @@ class _JoinLobbyScreenState extends ConsumerState<JoinLobbyScreen> {
           children: [
             TextField(
               controller: _codeController,
-              decoration: const InputDecoration(
-                labelText: 'Room Code',
+              decoration: InputDecoration(
+                labelText: l10n.get('multiplayer_room_code'),
                 hintText: 'e.g. AB8X9',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
               maxLength: 5,
               textCapitalization: TextCapitalization.characters,
@@ -81,16 +87,16 @@ class _JoinLobbyScreenState extends ConsumerState<JoinLobbyScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Your Name',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
+              decoration: InputDecoration(
+                labelText: l10n.get('player_name'),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.person),
               ),
               textCapitalization: TextCapitalization.words,
             ),
             const SizedBox(height: 32),
             FilledButton.icon(
-              onPressed: _isJoining ? null : _join,
+              onPressed: _isJoining ? null : () => _join(l10n),
               icon: _isJoining
                   ? const SizedBox(
                       width: 20,
@@ -101,7 +107,9 @@ class _JoinLobbyScreenState extends ConsumerState<JoinLobbyScreen> {
                       ),
                     )
                   : const Icon(Icons.login),
-              label: Text(_isJoining ? 'Joining...' : 'Join'),
+              label: Text(
+                _isJoining ? l10n.get('loading') : l10n.get('multiplayer_join'),
+              ),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.all(20),
                 textStyle: const TextStyle(

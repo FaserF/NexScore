@@ -172,6 +172,23 @@ class AppLocalizations {
       'multiplayer_firebase_missing': 'Firebase not configured',
       'multiplayer_firebase_missing_desc':
           'Multiplayer requires Firebase. Please configure environment variables or secrets.',
+      'multiplayer': 'Multiplayer',
+      'multiplayer_hub': 'Multiplayer Hub',
+      'multiplayer_host': 'Host a Room',
+      'multiplayer_join': 'Join a Room',
+      'multiplayer_room_code': 'Room Code',
+      'multiplayer_diagnostics': 'Multiplayer Diagnostics',
+      'multiplayer_diagnostics_desc':
+          'If you are having trouble connecting, check the following:',
+      'multiplayer_auth_title': 'Anonymous Auth',
+      'multiplayer_auth_desc':
+          'Ensure "Anonymous" authentication is enabled in your Firebase Console.',
+      'multiplayer_adblock_title': 'AdBlockers / VPN',
+      'multiplayer_adblock_desc':
+          'Disable AdBlockers or VPNs that might block "firestore.googleapis.com".',
+      'multiplayer_domains_title': 'Authorized Domains',
+      'multiplayer_domains_desc':
+          'Ensure your current domain is added to Firebase Authorized Domains.',
 
       // ── Wizard
       'wizard_title': 'Wizard',
@@ -1325,6 +1342,23 @@ class AppLocalizations {
       'multiplayer_firebase_missing': 'Firebase nicht konfiguriert',
       'multiplayer_firebase_missing_desc':
           'Multiplayer erfordert Firebase. Bitte konfiguriere Umgebungsvariablen oder Secrets.',
+      'multiplayer': 'Multiplayer',
+      'multiplayer_hub': 'Multiplayer Hub',
+      'multiplayer_host': 'Raum erstellen',
+      'multiplayer_join': 'Raum beitreten',
+      'multiplayer_room_code': 'Raum-Code',
+      'multiplayer_diagnostics': 'Multiplayer Diagnose',
+      'multiplayer_diagnostics_desc':
+          'Falls du Verbindungsprobleme hast, prüfe Folgendes:',
+      'multiplayer_auth_title': 'Anonymer Login',
+      'multiplayer_auth_desc':
+          'Stelle sicher, dass "Anonymous" Authentifizierung in der Firebase Console aktiviert ist.',
+      'multiplayer_adblock_title': 'AdBlocker / VPN',
+      'multiplayer_adblock_desc':
+          'Deaktiviere AdBlocker oder VPNs, die "firestore.googleapis.com" blockieren könnten.',
+      'multiplayer_domains_title': 'Autorisierte Domains',
+      'multiplayer_domains_desc':
+          'Stelle sicher, dass deine aktuelle Domain in der Firebase Console unter "Authorized Domains" hinterlegt ist.',
 
       // ── Wizard
       'wizard_title': 'Wizard',

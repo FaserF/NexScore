@@ -189,7 +189,6 @@ Add the following lines **before** the `<script src="flutter_bootstrap.js">` tag
     messagingSenderId: "96410867697",
     appId: "YOUR_FIREBASE_APP_ID"
   });
-  });
 </script>
 ```
 
