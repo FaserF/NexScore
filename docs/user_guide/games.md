@@ -22,18 +22,32 @@ Track your Qwixx game progress without needing a pen and paper.
 - **Auto-Score**: Points are calculated based on the number of crosses in each row using the triangular number sequence (1, 3, 6, 10, ...).
 
 ## 🍺 SipDeck (18+)
-A fun party game involving drinking challenges.
-- **Player Limits**: 2+ players (3+ recommended for maximum fun).
-- **Rules**: Follow the prompts, complete the challenges, and track the sips!
-- **Automated Sips**: The app automatically tracks sips for each player. Use the **Drink** button to record sips or **Skip** to pass without penalty.
-- **Differences from BuzzTap**: SipDeck acts as a structured virtual deck of cards. It is a **turn-based game** where players select categories, draw cards, and follow specific wildcards or dares.
+A virtual party card deck designed for turn-based drinking challenges and social icebreakers.
+
+- **Objective**: Players take turns drawing cards and completing the assigned tasks.
+- **Player Limits**: 2+ players (3-6 recommended for best flow).
+- **Gameplay flow**:
+    - Select your desired **Categories** (Warm Up, Wild Cards, etc.).
+    - Use the new **Task Filters** to disable specific types of challenges (Dares, Social, Messaging, Physical).
+    - Players take turns as the focus of the drawn card.
+- **Key Features**:
+    - **Automated Sips**: Sips are tracked per player based on card outcomes.
+    - **Viruses**: Long-running rules that stay active until "cured" or replaced.
+    - **Smart 2-Player Mode**: When playing with just two people, the app can automatically hide cards that require more participants.
+- **Task Filters**: Customize your experience by disabling:
+    - **Dares**: High-intensity tasks or dares.
+    - **Social Interaction**: Tasks requiring interaction with strangers or the group in specific ways.
+    - **Messaging**: Tasks that involve writing to people on your phone.
+    - **Physical**: Exercises or physical stunts.
 
 ## 👆 BuzzTap (18+)
-A dynamic, high-energy party game.
+A fast-paced, high-energy party game focused on quick reactions and group prompts.
+
+- **Objective**: Tap the screen to trigger random prompts and challenges.
 - **Player Limits**: 2+ players.
-- **Rules**: Fast-paced digital tapping and prompt-based challenges. Keep the energy high!
-- **Automated Sips**: Like SipDeck, BuzzTap tracks sips automatically with **Drink** and **Skip** buttons.
-- **Differences from SipDeck**: Unlike SipDeck's turn-based card reading, BuzzTap is designed to be a **fast-paced, chaotic tapping experience**.
+- **Core Loop**: Fast-paced digital tapping and immediate reaction challenges. Unlike SipDeck, there is no set "deck order"; the game is dynamic and chaotic.
+- **Automated Sips**: Includes built-in sip tracking with quick "Drink" and "Skip" buttons to keep the game moving.
+- **Strategy**: Keep the phone in the middle and stay ready – prompts can target anyone at any time!
 
 ## 🍻 Schafkopf
 A traditional German trick-taking card game.

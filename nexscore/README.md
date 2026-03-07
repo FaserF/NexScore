@@ -1,4 +1,4 @@
-# NexScore 0.1.0 🏆
+# NexScore 0.2.0 🏆
 
 NexScore is a premium, cross-platform score tracking application designed for serious board and card game enthusiasts. Built with **Flutter 3.41.4**, it offers a seamless experience across **Web**, **iOS**, and **Android**.
 

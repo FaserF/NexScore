@@ -48,7 +48,16 @@ For our party games (SipDeck & BuzzTap), we've integrated a smart sip counting s
 - **No Manual Counting**: The app calculates who needs to drink based on the card or prompt.
 - **Drink Button**: Confirm you've taken your sips to automatically increment your total in the session.
 - **Skip Button**: Allows players to opt-out of a challenge without affecting their score.
-- **Real-time Counter**: See the current sip tally for all players directly within the game screen.
+- **Real-time Counter**: Current sip tallies for all players are shown directly at the bottom of the game screen.
+- **Drink Button**: Confirm you've finished your sips. This is important for tracking long-term stats in the leaderboard.
+- **Skip Button**: If a player cannot or does not want to complete a task, the Skip button allows them to pass without an associated drink penalty.
+- **Granular Task Filters (SipDeck)**:
+    - You can now disable specific "flavors" of tasks before you start.
+    - Hate being the center of attention? Disable **Social Interaction**.
+    - Don't want to text your ex? Disable **Messaging**.
+    - Feeling lazy? Disable **Physical**.
+- **Smart 2-Player Optimization**:
+    - Many drinking games are built for groups. NexScore includes a toggle to hide "Group-only" cards when only 2 players are active, ensuring every card drawn is actually playable.
 
 ## ☁️ Account & Backup
 

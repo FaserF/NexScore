@@ -449,6 +449,10 @@ class AppLocalizations {
           'Points are doubled when finishing without previous melds.',
 
       // ── History
+      'game_generic': 'Generic Scoreboard',
+      'desc_generic': 'A flexible round-based table for any game.',
+      'pwa_update_available': 'Update available!',
+      'refresh': 'REFRESH',
       'history': 'History',
       'history_empty': 'No completed games yet. Start playing!',
       'history_share': 'Share Results',
@@ -1271,6 +1275,10 @@ class AppLocalizations {
           'Punkte werden verdoppelt, wenn ohne vorherige Meldung beendet wird.',
 
       // ── History
+      'game_generic': 'Punkteliste (Generisch)',
+      'desc_generic': 'Eine flexible Runden-Tabelle für jedes Spiel.',
+      'pwa_update_available': 'Update verfügbar!',
+      'refresh': 'AKTUALISIEREN',
       'history': 'Verlauf',
       'history_empty': 'Noch keine abgeschlossenen Spiele. Fang an zu spielen!',
       'history_share': 'Ergebnis teilen',

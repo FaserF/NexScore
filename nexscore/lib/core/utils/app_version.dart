@@ -1,7 +1,7 @@
 class AppVersion {
   static const String current = String.fromEnvironment(
     'APP_VERSION',
-    defaultValue: '0.1.0+1',
+    defaultValue: '0.2.0+1',
   );
 
   static bool get isPreRelease {

@@ -8,6 +8,7 @@ import '../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../core/theme/widgets/glass_container.dart';
 import '../../../core/utils/app_version.dart';
 import '../../../core/pwa/pwa_prompt.dart' as pwa;
+import '../../../core/theme/widgets/pwa_update_banner.dart';
 
 /// The main game selection screen shown at app start.
 /// Displays all supported games as rich cards with name, icon, and description.
@@ -278,6 +279,7 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const PwaUpdateBanner(),
     );
   }
 
@@ -405,6 +407,16 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
         color: Colors.blueAccent.shade700,
         playerCount: '2+',
         tag: l10n.get('home_tag_travel'),
+      ),
+      _GameEntry(
+        id: 'generic',
+        name: l10n.get('game_generic'),
+        description: l10n.get('desc_generic'),
+        route: '/games/generic',
+        icon: Icons.calculate,
+        color: Colors.blueGrey,
+        playerCount: '1+',
+        tag: l10n.get('home_tag_ext'),
       ),
     ];
   }

@@ -22,7 +22,7 @@ To start tracking scores, you first need to add your players:
 ### Starting a Game
 
 1. Navigate to the **Games** tab.
-2. Choose a game type (e.g., Wizard, Qwixx, or Generic).
+2. Choose a game type (e.g., **Wizard**, **Qwixx**, or **SipDeck**).
 3. Select the players participating in this session.
 4. Tap **Start Game**.
 
@@ -32,6 +32,7 @@ Each game has a custom interface tailored to its rules:
 
 - **Wizard**: Track bids and tricks won for each round. NexScore calculates the points automatically!
 - **Qwixx**: Tap the numbers as you cross them off your physical card.
+- **SipDeck**: Draw virtual cards and follow the instructions. The app tracks sips for everyone!
 - **Generic**: Simply enter the points for each player at the end of the game or after each round.
 
 ## Synchronization 🔄

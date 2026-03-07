@@ -67,7 +67,11 @@
       width: 100%;
       height: 100%;
       -webkit-tap-highlight-color: transparent;
-      touch-action: pan-y pinch-zoom;
+      touch-action: none;
+      /* Disable system-level touch handling to let Flutter handle 120Hz gestures */
+      user-select: none;
+      -webkit-user-select: none;
+      overscroll-behavior: none;
     }
 
     /* Optimized for high-refresh rate scrolling and interaction */
@@ -86,6 +90,37 @@
     window.flutterConfiguration = {
       canvasKitMaximumSurfaces: 1, // Minimize overhead
       buildTarget: 'wasm',
+    };
+
+    // PWA Update Detection
+    let newServiceWorker;
+    window.flutterUpdateAvailable = false;
+
+    window.addEventListener('load', function () {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('flutter_service_worker.js?v=' + new Date().getTime()).then(reg => {
+          reg.addEventListener('updatefound', () => {
+            newServiceWorker = reg.installing;
+            newServiceWorker.addEventListener('statechange', () => {
+              if (newServiceWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('New update available (PWA)');
+                window.flutterUpdateAvailable = true;
+                // Notify Flutter if it's already running and has registered a callback
+                if (window.onFlutterUpdateAvailable) {
+                  window.onFlutterUpdateAvailable();
+                }
+              }
+            });
+          });
+        });
+      }
+    });
+
+    window.flutterReloadApp = () => {
+      if (newServiceWorker) {
+        newServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+      }
+      window.location.reload();
     };
 
     // PWA Install Prompt handling

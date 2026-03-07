@@ -19,6 +19,7 @@ import '../../features/games/wizard/presentation/wizard_extreme_screen.dart';
 import '../../features/leaderboards/presentation/leaderboard_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/help/presentation/help_screen.dart';
+import '../../features/games/extras/presentation/generic_score_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/games/presentation/game_setup_screen.dart';
 
@@ -95,6 +96,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'wizard_extreme',
                     builder: (context, state) => const WizardExtremeScreen(),
+                  ),
+                  GoRoute(
+                    path: 'generic',
+                    builder: (context, state) => const GenericScoreScreen(),
                   ),
                 ],
               ),
