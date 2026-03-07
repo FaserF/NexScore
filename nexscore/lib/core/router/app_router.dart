@@ -26,6 +26,7 @@ import '../../features/multiplayer/presentation/multiplayer_hub_screen.dart';
 import '../../features/multiplayer/presentation/lobby_screen.dart';
 import '../../features/multiplayer/presentation/join_lobby_screen.dart';
 import '../../features/games/wizard_digital/presentation/wizard_digital_screen.dart';
+import '../../features/games/schafkopf_digital/presentation/schafkopf_digital_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -108,6 +109,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'wizard-digital',
                     builder: (context, state) => const WizardDigitalScreen(),
+                  ),
+                  GoRoute(
+                    path: 'schafkopf-digital',
+                    builder: (context, state) => const SchafkopfDigitalScreen(),
                   ),
                   GoRoute(
                     path: 'multiplayer',
