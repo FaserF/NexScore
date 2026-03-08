@@ -9,6 +9,7 @@ import '../models/wizard_models.dart';
 import '../providers/wizard_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
 
 class WizardScreen extends ConsumerStatefulWidget {
   const WizardScreen({super.key});
@@ -44,8 +45,30 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
       }
     }
     if (winnerId != null) {
-      final winnerName = players.firstWhere((p) => p.id == winnerId).name;
-      _confettiController.show(winnerName: winnerName);
+      final winner = players.firstWhere((p) => p.id == winnerId);
+      final l10n = AppLocalizations.of(context);
+
+      final List<PlayerScore> scores = players.map((p) {
+        return PlayerScore(
+          p.name,
+          WizardGameState.calculatePlayerScore(
+            p.id,
+            state.rounds,
+            lenient: state.scoringVariant == WizardScoringVariant.lenient,
+            extreme: state.scoringVariant == WizardScoringVariant.extreme,
+          ),
+        );
+      }).toList();
+
+      // Sort scores descending
+      scores.sort((a, b) => b.score.compareTo(a.score));
+
+      _confettiController.show(
+        winnerName: winner.name,
+        winnerEmoji: winner.emoji,
+        gameName: l10n.get('game_wizard'),
+        scores: scores,
+      );
     }
   }
 

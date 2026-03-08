@@ -10,6 +10,7 @@ import '../models/schafkopf_models.dart';
 import '../providers/schafkopf_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
 
 class SchafkopfScreen extends ConsumerStatefulWidget {
   const SchafkopfScreen({super.key});
@@ -40,8 +41,24 @@ class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
       }
     }
     if (winnerId != null) {
-      final winnerName = players.firstWhere((p) => p.id == winnerId).name;
-      _confettiController.show(winnerName: winnerName);
+      final winner = players.firstWhere((p) => p.id == winnerId);
+      final l10n = AppLocalizations.of(context);
+
+      final List<PlayerScore> scores = players.map((p) {
+        final balance = gameState.getPlayerBalance(p.id, playerIds);
+        // Convert to int cents for the scorecard
+        return PlayerScore(p.name, (balance * 100).round());
+      }).toList();
+
+      // Sort scores descending
+      scores.sort((a, b) => b.score.compareTo(a.score));
+
+      _confettiController.show(
+        winnerName: winner.name,
+        winnerEmoji: winner.emoji,
+        gameName: l10n.get('game_schafkopf'),
+        scores: scores,
+      );
     }
   }
 

@@ -1,17 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nexscore/shared/widgets/winner_confetti_overlay.dart';
+import 'package:nexscore/core/providers/audio_provider.dart';
+import 'package:nexscore/core/providers/share_provider.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+
+class FakeAudioPlayer extends Fake implements AudioPlayer {
+  @override
+  Future<void> play(
+    Source source, {
+    double? volume,
+    double? balance,
+    AudioContext? ctx,
+    Duration? position,
+    PlayerMode? mode,
+  }) async {}
+  @override
+  Future<void> dispose() async {}
+}
 
 void main() {
   group('WinnerConfettiOverlay', () {
     testWidgets('renders child widget', (tester) async {
       final controller = WinnerConfettiController();
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: WinnerConfettiOverlay(
-              controller: controller,
-              child: const Text('Game Body'),
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: WinnerConfettiOverlay(
+                controller: controller,
+                child: const Text('Game Body'),
+              ),
             ),
           ),
         ),
@@ -24,11 +45,13 @@ void main() {
     testWidgets('does NOT show winner banner initially', (tester) async {
       final controller = WinnerConfettiController();
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: WinnerConfettiOverlay(
-              controller: controller,
-              child: const Text('Game Body'),
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: WinnerConfettiOverlay(
+                controller: controller,
+                child: const Text('Game Body'),
+              ),
             ),
           ),
         ),
@@ -43,18 +66,21 @@ void main() {
     ) async {
       final controller = WinnerConfettiController();
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: WinnerConfettiOverlay(
-              controller: controller,
-              child: const Text('Game Body'),
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: WinnerConfettiOverlay(
+                controller: controller,
+                child: const Text('Game Body'),
+              ),
             ),
           ),
         ),
       );
 
       controller.show(winnerName: 'Alice');
-      await tester.pump();
+      // Animation duration is 600ms
+      await tester.pump(const Duration(milliseconds: 700));
 
       expect(find.text('Alice'), findsOneWidget);
       expect(find.text('WINNER!'), findsOneWidget);
@@ -64,22 +90,24 @@ void main() {
     testWidgets('hides winner banner when Continue is pressed', (tester) async {
       final controller = WinnerConfettiController();
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: WinnerConfettiOverlay(
-              controller: controller,
-              child: const Text('Game Body'),
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: WinnerConfettiOverlay(
+                controller: controller,
+                child: const Text('Game Body'),
+              ),
             ),
           ),
         ),
       );
 
       controller.show(winnerName: 'Bob');
-      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 700));
       expect(find.text('WINNER!'), findsOneWidget);
 
       await tester.tap(find.text('Continue'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('WINNER!'), findsNothing);
       controller.dispose();

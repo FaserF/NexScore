@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/audio_provider.dart';
 import '../../core/services/audio_service.dart';
+import '../../core/providers/share_provider.dart';
+import 'shareable_scorecard.dart';
 
 /// A reusable confetti celebration overlay widget.
 ///
@@ -28,12 +30,30 @@ import '../../core/services/audio_service.dart';
 class WinnerConfettiController extends ChangeNotifier {
   bool _isShowing = false;
   String _winnerName = '';
+  String _gameName = '';
+  List<PlayerScore> _scores = [];
+  Color _winnerColor = Colors.amber;
+  String? _winnerEmoji;
 
   bool get isShowing => _isShowing;
   String get winnerName => _winnerName;
+  String get gameName => _gameName;
+  List<PlayerScore> get scores => _scores;
+  Color get winnerColor => _winnerColor;
+  String? get winnerEmoji => _winnerEmoji;
 
-  void show({required String winnerName}) {
+  void show({
+    required String winnerName,
+    String gameName = '',
+    List<PlayerScore> scores = const [],
+    Color winnerColor = Colors.amber,
+    String? winnerEmoji,
+  }) {
     _winnerName = winnerName;
+    _gameName = gameName;
+    _scores = scores;
+    _winnerColor = winnerColor;
+    _winnerEmoji = winnerEmoji;
     _isShowing = true;
     notifyListeners();
   }
@@ -193,26 +213,58 @@ class _WinnerConfettiOverlayState extends ConsumerState<WinnerConfettiOverlay> {
               ),
             ),
           ),
-        // Dismiss button
+        // Action buttons
         if (widget.controller.isShowing)
           Positioned(
             bottom: 48,
             left: 0,
             right: 0,
-            child: Center(
-              child: FilledButton.icon(
-                onPressed: () => widget.controller.hide(),
-                icon: const Icon(Icons.replay),
-                label: const Text('Continue'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.amber,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 16,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FilledButton.icon(
+                  onPressed: () {
+                    ref
+                        .read(shareServiceProvider)
+                        .shareWidget(
+                          context,
+                          ShareableScorecard(
+                            gameName: widget.controller.gameName,
+                            winnerName: widget.controller.winnerName,
+                            winnerEmoji: widget.controller.winnerEmoji,
+                            winnerColor: widget.controller.winnerColor,
+                            finalScores: widget.controller.scores,
+                          ),
+                          text:
+                              'I just won ${widget.controller.gameName} on NexScore! 🏆',
+                        );
+                  },
+                  icon: const Icon(Icons.share),
+                  label: const Text('Share Results'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 16),
+                FilledButton.icon(
+                  onPressed: () => widget.controller.hide(),
+                  icon: const Icon(Icons.replay),
+                  label: const Text('Continue'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
       ],

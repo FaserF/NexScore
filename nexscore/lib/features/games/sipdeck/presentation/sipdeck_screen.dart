@@ -14,6 +14,8 @@ import '../../../../core/providers/tts_provider.dart';
 import '../../../../core/providers/audio_provider.dart';
 import '../../../../core/services/audio_service.dart';
 import '../../../settings/provider/settings_provider.dart';
+import '../../../../core/providers/share_provider.dart';
+import '../../../../shared/widgets/shareable_card.dart';
 
 class SipDeckScreen extends ConsumerStatefulWidget {
   const SipDeckScreen({super.key});
@@ -794,25 +796,61 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        TextButton.icon(
-                          onPressed: () {
-                            HapticFeedback.lightImpact();
-                            ref
-                                .read(sipDeckStateProvider.notifier)
-                                .completeCard(true);
-                            ref
-                                .read(sipDeckStateProvider.notifier)
-                                .drawNextCard(players, l10n);
-                          },
-                          icon: const Icon(Icons.skip_next, size: 20),
-                          label: Text(l10n.get('game_skip')),
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white70,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton.icon(
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                ref
+                                    .read(sipDeckStateProvider.notifier)
+                                    .completeCard(true);
+                                ref
+                                    .read(sipDeckStateProvider.notifier)
+                                    .drawNextCard(players, l10n);
+                              },
+                              icon: const Icon(Icons.skip_next, size: 20),
+                              label: Text(l10n.get('game_skip')),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white70,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 8),
+                            IconButton(
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                ref
+                                    .read(shareServiceProvider)
+                                    .shareWidget(
+                                      context,
+                                      ShareableCard(
+                                        title: _labelForCategory(
+                                          currentCard.category,
+                                          l10n,
+                                        ),
+                                        text: currentCard.text,
+                                        emoji: currentCard.emoji,
+                                        explanation: currentCard.explanation,
+                                        baseColor: _colorForCategory(
+                                          currentCard.category,
+                                        ),
+                                        brandText: 'SipDeck',
+                                      ),
+                                      text:
+                                          'Check out this challenge from SipDeck! 🍻 #NexScore',
+                                    );
+                              },
+                              icon: const Icon(
+                                Icons.share,
+                                color: Colors.white70,
+                              ),
+                              tooltip: 'Share this card',
+                            ),
+                          ],
                         ),
                       ],
                     ),

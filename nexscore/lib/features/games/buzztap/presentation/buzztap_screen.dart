@@ -16,6 +16,8 @@ import '../../../../core/providers/tts_provider.dart';
 import '../../../../core/providers/audio_provider.dart';
 import '../../../../core/services/audio_service.dart';
 import '../../../settings/provider/settings_provider.dart';
+import '../../../../core/providers/share_provider.dart';
+import '../../../../shared/widgets/shareable_card.dart';
 
 class BuzzTapScreen extends ConsumerStatefulWidget {
   const BuzzTapScreen({super.key});
@@ -754,25 +756,60 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                         ],
                       ),
                       const SizedBox(height: 16),
-                      TextButton.icon(
-                        onPressed: () {
-                          HapticFeedback.lightImpact();
-                          ref
-                              .read(buzzTapStateProvider.notifier)
-                              .completeCard(true);
-                          ref
-                              .read(buzzTapStateProvider.notifier)
-                              .drawNextCard(players, l10n);
-                        },
-                        icon: const Icon(Icons.skip_next, size: 20),
-                        label: Text(l10n.get('game_skip')),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white54,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () {
+                              HapticFeedback.lightImpact();
+                              ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .completeCard(true);
+                              ref
+                                  .read(buzzTapStateProvider.notifier)
+                                  .drawNextCard(players, l10n);
+                            },
+                            icon: const Icon(Icons.skip_next, size: 20),
+                            label: Text(l10n.get('game_skip')),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white54,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () {
+                              HapticFeedback.lightImpact();
+                              ref
+                                  .read(shareServiceProvider)
+                                  .shareWidget(
+                                    context,
+                                    ShareableCard(
+                                      title: _labelForCategory(
+                                        currentCard.category,
+                                        l10n,
+                                      ),
+                                      text: currentCard.text,
+                                      emoji: currentCard.emoji,
+                                      baseColor: _colorForCategory(
+                                        currentCard.category,
+                                      ),
+                                      brandText: 'BuzzTap',
+                                    ),
+                                    text:
+                                        'Check out this prompt from BuzzTap! ⚡ #NexScore',
+                                  );
+                            },
+                            icon: const Icon(
+                              Icons.share,
+                              color: Colors.white54,
+                            ),
+                            tooltip: 'Share this prompt',
+                          ),
+                        ],
                       ),
                     ],
                   )

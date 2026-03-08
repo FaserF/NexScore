@@ -5,6 +5,7 @@ import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
 
 import '../providers/kniffel_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
@@ -28,20 +29,36 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
   void _showWinner(
     Map<String, YahtzeePlayerSheet> sheets,
     List<Player> players,
+    AppLocalizations l10n,
   ) {
     if (sheets.isEmpty || players.isEmpty) return;
     String? winnerId;
     int maxScore = -1;
+
+    final List<PlayerScore> scores = [];
     for (final p in players) {
-      final score = sheets[p.id]?.totalScore ?? 0;
-      if (score > maxScore) {
-        maxScore = score;
+      final s = sheets[p.id]?.totalScore ?? 0;
+      scores.add(PlayerScore(p.name, s));
+      if (s > maxScore) {
+        maxScore = s;
         winnerId = p.id;
       }
     }
+
+    // Sort scores descending for the share scorecard
+    scores.sort((a, b) => b.score.compareTo(a.score));
+
     if (winnerId != null) {
-      final winnerName = players.firstWhere((p) => p.id == winnerId).name;
-      _confettiController.show(winnerName: winnerName);
+      final winner = players.firstWhere((p) => p.id == winnerId);
+      _confettiController.show(
+        winnerName: winner.name,
+        gameName: l10n.get('game_kniffel'),
+        scores: scores,
+        winnerColor: Color(
+          int.parse(winner.avatarColor.replaceFirst('#', '0xff')),
+        ),
+        winnerEmoji: winner.emoji,
+      );
     }
   }
 
@@ -81,7 +98,7 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
               ),
             IconButton(
               icon: const Icon(Icons.emoji_events, color: Colors.amber),
-              onPressed: () => _showWinner(state.playerSheets, players),
+              onPressed: () => _showWinner(state.playerSheets, players, l10n),
               tooltip: l10n.get('game_show_winner'),
             ),
             IconButton(

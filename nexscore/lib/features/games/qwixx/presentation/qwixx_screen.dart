@@ -10,6 +10,7 @@ import '../models/qwixx_models.dart';
 import '../providers/qwixx_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
 
 class QwixxScreen extends ConsumerStatefulWidget {
   const QwixxScreen({super.key});
@@ -39,8 +40,22 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
       }
     }
     if (winnerId != null) {
-      final winnerName = players.firstWhere((p) => p.id == winnerId).name;
-      _confettiController.show(winnerName: winnerName);
+      final winner = players.firstWhere((p) => p.id == winnerId);
+      final l10n = AppLocalizations.of(context);
+
+      final List<PlayerScore> scores = players.map((p) {
+        return PlayerScore(p.name, sheets[p.id]?.totalScore ?? 0);
+      }).toList();
+
+      // Sort scores descending
+      scores.sort((a, b) => b.score.compareTo(a.score));
+
+      _confettiController.show(
+        winnerName: winner.name,
+        winnerEmoji: winner.emoji,
+        gameName: l10n.get('game_qwixx'),
+        scores: scores,
+      );
     }
   }
 
