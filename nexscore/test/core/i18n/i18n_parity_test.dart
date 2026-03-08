@@ -129,14 +129,14 @@ void main() {
       final enKeys = AppLocalizations.localizedValues['en']!.keys.toSet();
       final deKeys = AppLocalizations.localizedValues['de']!.keys.toSet();
 
-      // Filter out dynamic keys that use string interpolation templates
+      // Filter out dynamic keys that use string interpolation templates or logic
       final missingInEn = usedKeys
           .difference(enKeys)
-          .where((k) => !k.contains(r'${'))
+          .where((k) => !k.contains(r'${') && !k.contains(r'$'))
           .toSet();
       final missingInDe = usedKeys
           .difference(deKeys)
-          .where((k) => !k.contains(r'${'))
+          .where((k) => !k.contains(r'${') && !k.contains(r'$'))
           .toSet();
 
       expect(

@@ -1,14 +1,12 @@
 import 'package:audioplayers/audioplayers.dart';
 
-enum SfxType {
-  click,
-  swipe,
-  fanfare,
-}
+enum SfxType { click, swipe, fanfare }
 
 class AudioService {
-  final AudioPlayer _player = AudioPlayer();
+  final AudioPlayer _player;
   bool _enabled = true;
+
+  AudioService({AudioPlayer? player}) : _player = player ?? AudioPlayer();
 
   void setEnabled(bool enabled) {
     _enabled = enabled;

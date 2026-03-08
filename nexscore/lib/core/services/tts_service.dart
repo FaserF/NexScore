@@ -2,10 +2,10 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter/foundation.dart';
 
 class TtsService {
-  final FlutterTts _flutterTts = FlutterTts();
+  final FlutterTts _flutterTts;
   bool _isSpeaking = false;
 
-  TtsService() {
+  TtsService({FlutterTts? tts}) : _flutterTts = tts ?? FlutterTts() {
     _initTts();
   }
 

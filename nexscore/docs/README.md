@@ -36,6 +36,12 @@ Tracks ranks (President, Arschloch, etc.) across rounds. Automated card exchange
 
 ## 🚢 Deployment & CI/CD
 
+### 📘 User Guide
+- [General Game Setup & Rules](./README.md)
+- [Multiplayer & Cloud Sync](./multiplayer.md)
+- [📸 Sharing & Social-To-Story](./sharing.md)
+- [🔊 Audio, SFX & Text-To-Speech](./sfx_tts.md)
+
 ### Docker Usage
 The project includes a production-ready `Dockerfile` serving the app via Nginx:
 ```bash

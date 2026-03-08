@@ -23,7 +23,16 @@ NexScore is a premium, cross-platform score tracking application designed for se
 - **🌗 Smart Theming**: Integrated Light and Dark modes with specialized FlexColorScheme.
 - **💾 Offline-First**: Reliable local storage with optional Firestore cloud synchronization.
 - **📊 Detailed Statistics**: Win-rate analytics and comprehensive match history.
+- **📸 Share-To-Story**: Capture beautiful game result scorecards and challenges to share on Instagram, WhatsApp, and more.
+- **🔊 Living Audio**: Integrated Sound Effects (SFX) and Text-To-Speech (TTS) for an immersive game night.
 - **🚀 Agile Releases**: Automated CI/CD pipelines and Docker production support.
+
+## 🎵 Credits & Assets
+
+The following community assets are used in NexScore:
+- **SFX**: High-quality UI sounds from [Zapsplat.com](https://www.zapsplat.com) and [FreeSound.org](https://freesound.org).
+- **Typography**: Inter and Outfit via Google Fonts.
+- **Icons**: Material Design Icons collection.
 
 ## 🛠 Tech Stack
 
