@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'core/firebase/firebase_options_web.dart';
@@ -44,6 +45,19 @@ void main() async {
   } catch (e, stack) {
     debugPrint('Firebase initialization error: $e');
     debugPrint('Stack trace: $stack');
+  }
+
+  // Configure Firestore specifically to prevent Web timeouts
+  try {
+    firestore.FirebaseFirestore.instance.settings = const firestore.Settings(
+      persistenceEnabled:
+          false, // Prevents hanging due to IndexedDB/ServiceWorker conflicts
+    );
+    debugPrint(
+      'Firestore settings applied: persistence disabled to prevent timeouts',
+    );
+  } catch (e) {
+    debugPrint('Firestore settings error: $e');
   }
 
   runApp(const ProviderScope(child: NexScoreApp()));

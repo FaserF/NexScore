@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/i18n/app_localizations.dart';
 import '../../../core/providers/favorites_provider.dart';
 import '../../../core/theme/widgets/animated_scale_button.dart';
@@ -28,13 +27,11 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
   void initState() {
     super.initState();
     _initPwaListeners();
-    _checkPwaInstallPrompt();
   }
 
   void _initPwaListeners() {
-    // Also try to show it if it becomes ready while we are on this screen
     pwa.onInstallPromptReady = () {
-      if (mounted) _checkPwaInstallPrompt();
+      if (mounted) setState(() {});
     };
   }
 
@@ -42,29 +39,6 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
   void dispose() {
     pwa.onInstallPromptReady = null;
     super.dispose();
-  }
-
-  Future<void> _checkPwaInstallPrompt() async {
-    try {
-      if (!pwa.canShowInstallPrompt()) return;
-
-      final prefs = await SharedPreferences.getInstance();
-      final hasShownPrompt = prefs.getBool('pwa_prompt_shown') ?? false;
-
-      if (!hasShownPrompt) {
-        // We wait a few seconds so the app can render and user is slightly engaged
-        // But if it's already ready, we can show it
-        await Future.delayed(const Duration(seconds: 3));
-        if (mounted && pwa.canShowInstallPrompt()) {
-          final shown = await pwa.showInstallPrompt();
-          if (shown) {
-            await prefs.setBool('pwa_prompt_shown', true);
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('Error checking PWA prompt: $e');
-    }
   }
 
   @override

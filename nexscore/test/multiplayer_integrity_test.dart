@@ -91,7 +91,8 @@ void main() {
         expect(file.existsSync(), isTrue, reason: 'Main file should exist');
 
         final content = file.readAsStringSync();
-        expect(content, contains('// usePathUrlStrategy()'));
+        expect(content, isNot(contains('\n  usePathUrlStrategy();')));
+        expect(content, contains('//   usePathUrlStrategy();'));
       },
     );
   });
