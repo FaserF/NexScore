@@ -98,4 +98,6 @@ We follow a high-standard "Clean Code" policy.
 
 *NexScore is an independent project and is not affiliated with, authorized, or endorsed by the official publishers of Wizard®, Qwixx®, Kniffel®, or Phase 10® or any other mentioned game in here. All trademarks are property of their respective owners.*
 
+Audio assets provided by researchers from the `rse/soundfx` collection and creators on FreeSound.org. See **[Audio Credits](docs/audio_credits.md)** for details.
+
 Licensed under [MIT](LICENSE).

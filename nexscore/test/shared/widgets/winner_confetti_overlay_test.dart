@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nexscore/shared/widgets/winner_confetti_overlay.dart';
-import 'package:nexscore/core/providers/audio_provider.dart';
-import 'package:nexscore/core/providers/share_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 
 class FakeAudioPlayer extends Fake implements AudioPlayer {
   @override

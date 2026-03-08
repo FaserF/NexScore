@@ -277,49 +277,68 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
 
   void _showPresetsSheet(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final groupsAsync = ref.watch(playerGroupsProvider);
 
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return groupsAsync.when(
-          data: (groups) {
-            if (groups.isEmpty) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Text(l10n.get('presets_empty')),
-                ),
-              );
-            }
-            return ListView.builder(
-              itemCount: groups.length,
-              itemBuilder: (context, index) {
-                final group = groups[index];
-                return ListTile(
-                  title: Text(group.name),
-                  subtitle: Text('${group.playerIds.length} players'),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: () {
-                      ref
-                          .read(playerGroupsProvider.notifier)
-                          .deleteGroup(group.id);
-                    },
-                  ),
-                  onTap: () {
-                    setState(() {
-                      _selectedPlayerIds.clear();
-                      _selectedPlayerIds.addAll(group.playerIds);
-                    });
-                    Navigator.pop(context);
-                  },
+        return Consumer(
+          builder: (context, ref, _) {
+            final groupsAsync = ref.watch(playerGroupsProvider);
+            return groupsAsync.when(
+              data: (groups) {
+                if (groups.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Text(l10n.get('presets_empty')),
+                    ),
+                  );
+                }
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        l10n.get('settings_presets'),
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    Flexible(
+                      child: ListView.builder(
+                        itemCount: groups.length,
+                        itemBuilder: (context, index) {
+                          final group = groups[index];
+                          return ListTile(
+                            leading: const Icon(Icons.group),
+                            title: Text(group.name),
+                            subtitle: Text('${group.playerIds.length} players'),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              onPressed: () {
+                                ref
+                                    .read(playerGroupsProvider.notifier)
+                                    .deleteGroup(group.id);
+                              },
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _selectedPlayerIds.clear();
+                                _selectedPlayerIds.addAll(group.playerIds);
+                              });
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Error: $e')),
             );
           },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Error: $e')),
         );
       },
     );
