@@ -124,8 +124,9 @@ class AuthService {
     final stopwatch = Stopwatch()..start();
     try {
       final user = _auth.currentUser;
-      if (user == null)
+      if (user == null) {
         return Result.failure(const AuthFailure('No user logged in'));
+      }
 
       final googleProvider = GoogleAuthProvider();
       UserCredential credential;
@@ -160,8 +161,9 @@ class AuthService {
     final stopwatch = Stopwatch()..start();
     try {
       final user = _auth.currentUser;
-      if (user == null)
+      if (user == null) {
         return Result.failure(const AuthFailure('No user logged in'));
+      }
 
       final githubProvider = GithubAuthProvider();
       githubProvider.addScope('gist');

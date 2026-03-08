@@ -10,6 +10,7 @@ class Settings {
   final String hostName;
   final String hostColor;
   final bool ttsEnabled;
+  final bool sfxEnabled;
 
   const Settings({
     required this.themeMode,
@@ -17,6 +18,7 @@ class Settings {
     this.hostName = 'Player',
     this.hostColor = '#4287f5',
     this.ttsEnabled = false,
+    this.sfxEnabled = true,
   });
 
   Settings copyWith({
@@ -26,6 +28,7 @@ class Settings {
     String? hostName,
     String? hostColor,
     bool? ttsEnabled,
+    bool? sfxEnabled,
   }) {
     return Settings(
       themeMode: themeMode ?? this.themeMode,
@@ -33,6 +36,7 @@ class Settings {
       hostName: hostName ?? this.hostName,
       hostColor: hostColor ?? this.hostColor,
       ttsEnabled: ttsEnabled ?? this.ttsEnabled,
+      sfxEnabled: sfxEnabled ?? this.sfxEnabled,
     );
   }
 }
@@ -48,6 +52,7 @@ class SettingsNotifier extends Notifier<Settings> {
   static const _hostNameKey = 'settings_host_name';
   static const _hostColorKey = 'settings_host_color';
   static const _ttsEnabledKey = 'settings_tts_enabled';
+  static const _sfxEnabledKey = 'settings_sfx_enabled';
 
   @override
   Settings build() {
@@ -58,6 +63,7 @@ class SettingsNotifier extends Notifier<Settings> {
       themeMode: ThemeMode.system,
       hostName: _generateDefaultName(),
       ttsEnabled: false,
+      sfxEnabled: true,
     );
   }
 
@@ -75,6 +81,7 @@ class SettingsNotifier extends Notifier<Settings> {
     final hostName = prefs.getString(_hostNameKey) ?? _generateDefaultName();
     final hostColor = prefs.getString(_hostColorKey) ?? '#4287f5';
     final ttsEnabled = prefs.getBool(_ttsEnabledKey) ?? false;
+    final sfxEnabled = prefs.getBool(_sfxEnabledKey) ?? true;
 
     state = Settings(
       themeMode: themeMode,
@@ -82,6 +89,7 @@ class SettingsNotifier extends Notifier<Settings> {
       hostName: hostName,
       hostColor: hostColor,
       ttsEnabled: ttsEnabled,
+      sfxEnabled: sfxEnabled,
     );
   }
 
@@ -123,6 +131,12 @@ class SettingsNotifier extends Notifier<Settings> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_ttsEnabledKey, enabled);
     state = state.copyWith(ttsEnabled: enabled);
+  }
+
+  Future<void> setSfxEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_sfxEnabledKey, enabled);
+    state = state.copyWith(sfxEnabled: enabled);
   }
 
   /// Updates hostName if it currently follows the 'Player#12345' default pattern.

@@ -4,7 +4,8 @@ import 'game_save_manager.dart';
 
 /// Observer for the app's lifecycle to trigger auto-saves.
 class AppLifecycleObserver extends WidgetsBindingObserver {
-  final Ref ref;
+  /// We use dynamic here to allow both [Ref] and [ProviderContainer] for testing.
+  final dynamic ref;
 
   AppLifecycleObserver({required this.ref});
 

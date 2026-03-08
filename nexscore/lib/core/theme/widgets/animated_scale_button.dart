@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/audio_provider.dart';
+import '../../services/audio_service.dart';
 
-class AnimatedScaleButton extends StatefulWidget {
+class AnimatedScaleButton extends ConsumerStatefulWidget {
   final Widget child;
   final VoidCallback onPressed;
   final double scaleLowerBound;
@@ -15,10 +18,11 @@ class AnimatedScaleButton extends StatefulWidget {
   });
 
   @override
-  State<AnimatedScaleButton> createState() => _AnimatedScaleButtonState();
+  ConsumerState<AnimatedScaleButton> createState() =>
+      _AnimatedScaleButtonState();
 }
 
-class _AnimatedScaleButtonState extends State<AnimatedScaleButton>
+class _AnimatedScaleButtonState extends ConsumerState<AnimatedScaleButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
@@ -42,6 +46,8 @@ class _AnimatedScaleButtonState extends State<AnimatedScaleButton>
 
   void _onTapDown(TapDownDetails details) {
     _controller.reverse();
+    // Play click sound
+    ref.read(audioServiceProvider).play(SfxType.click);
   }
 
   void _onTapUp(TapUpDetails details) {

@@ -223,6 +223,45 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                _SectionHeader(title: l10n.get('settings_sfx')),
+                GlassContainer(
+                  borderRadius: 24,
+                  child: SwitchListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    secondary: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.secondary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.volume_up,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                    ),
+                    title: Text(
+                      l10n.get('settings_sfx'),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      l10n.get('settings_sfx_desc'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    value: settings.sfxEnabled,
+                    onChanged: (val) {
+                      ref.read(settingsProvider.notifier).setSfxEnabled(val);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
                 if (canInstall) ...[
                   _SectionHeader(title: l10n.get('settings_pwa_install')),
                   AnimatedScaleButton(

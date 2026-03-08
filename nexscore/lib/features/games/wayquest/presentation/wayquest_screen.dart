@@ -7,6 +7,8 @@ import '../models/wayquest_models.dart';
 import '../providers/wayquest_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../../../../core/providers/tts_provider.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
 import '../../../settings/provider/settings_provider.dart';
 
 class WayQuestScreen extends ConsumerStatefulWidget {
@@ -34,6 +36,9 @@ class _WayQuestScreenState extends ConsumerState<WayQuestScreen> {
 
     ref.listen<WayQuestGameState>(wayQuestStateProvider, (previous, next) {
       if (next.playedCards.length > (previous?.playedCards.length ?? 0)) {
+        // Play swipe sound
+        ref.read(audioServiceProvider).play(SfxType.swipe);
+
         if (ref.read(ttsActiveProvider)) {
           final card = next.currentCard;
           if (card != null) {

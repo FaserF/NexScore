@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/providers/audio_provider.dart';
+import '../../core/services/audio_service.dart';
 
 /// A reusable confetti celebration overlay widget.
 ///
@@ -41,7 +44,7 @@ class WinnerConfettiController extends ChangeNotifier {
   }
 }
 
-class WinnerConfettiOverlay extends StatefulWidget {
+class WinnerConfettiOverlay extends ConsumerStatefulWidget {
   final Widget child;
   final WinnerConfettiController controller;
 
@@ -52,10 +55,11 @@ class WinnerConfettiOverlay extends StatefulWidget {
   });
 
   @override
-  State<WinnerConfettiOverlay> createState() => _WinnerConfettiOverlayState();
+  ConsumerState<WinnerConfettiOverlay> createState() =>
+      _WinnerConfettiOverlayState();
 }
 
-class _WinnerConfettiOverlayState extends State<WinnerConfettiOverlay> {
+class _WinnerConfettiOverlayState extends ConsumerState<WinnerConfettiOverlay> {
   late final ConfettiController _confettiController;
 
   @override
@@ -70,6 +74,8 @@ class _WinnerConfettiOverlayState extends State<WinnerConfettiOverlay> {
   void _onControllerChanged() {
     if (widget.controller.isShowing) {
       _confettiController.play();
+      // Play fanfare sound
+      ref.read(audioServiceProvider).play(SfxType.fanfare);
     } else {
       _confettiController.stop();
     }

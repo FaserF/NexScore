@@ -11,6 +11,8 @@ import '../providers/sipdeck_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../../../../shared/widgets/swipeable_card.dart';
 import '../../../../core/providers/tts_provider.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
 import '../../../settings/provider/settings_provider.dart';
 
 class SipDeckScreen extends ConsumerStatefulWidget {
@@ -61,6 +63,9 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
 
     ref.listen<SipDeckGameState>(sipDeckStateProvider, (previous, next) {
       if (next.playedCards.length > (previous?.playedCards.length ?? 0)) {
+        // Play swipe sound
+        ref.read(audioServiceProvider).play(SfxType.swipe);
+
         if (ref.read(ttsActiveProvider)) {
           final card = next.playedCards.last;
           final ttsService = ref.read(ttsServiceProvider);
