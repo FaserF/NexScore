@@ -47,7 +47,7 @@ jobs:
       docker_tag: ${{ steps.calc.outputs.DOCKER_TAG }}
       is_prerelease: ${{ steps.calc.outputs.IS_PRERELEASE }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0 # Needed for tags
 
@@ -67,7 +67,7 @@ jobs:
     outputs:
       sha256: ${{ steps.generate_sha.outputs.sha256 }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 1
       - uses: subosito/flutter-action@v2
@@ -117,7 +117,7 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 1
       - uses: subosito/flutter-action@v2
@@ -157,7 +157,7 @@ jobs:
     outputs:
       image_name: ${{ steps.image_name.outputs.IMAGE_NAME }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 1
       - uses: subosito/flutter-action@v2
@@ -239,7 +239,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0 # Need history for changelog
 
