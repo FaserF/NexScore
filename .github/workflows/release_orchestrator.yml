@@ -106,7 +106,7 @@ jobs:
           echo "$SHA" > build/app/outputs/flutter-apk/app-release.apk.sha256
         working-directory: nexscore
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: NexScore-Android
           path: nexscore/build/app/outputs/flutter-apk/app-release.apk*
@@ -144,7 +144,7 @@ jobs:
             --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }}
         working-directory: nexscore
       - name: Upload IPA (Artifacts)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: NexScore-iOS
           path: nexscore/build/ios/archive/*.xcarchive
@@ -188,7 +188,7 @@ jobs:
         working-directory: nexscore
 
       - name: Upload Web Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: nexscore-release-web
           path: nexscore/build/web
@@ -244,7 +244,7 @@ jobs:
           fetch-depth: 0 # Need history for changelog
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8
         with:
           path: artifacts
 
