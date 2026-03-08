@@ -181,7 +181,7 @@ class AppLocalizations {
       'settings_pwa_guide_msg':
           'Your device or browser doesn\'t support automatic installation. You can still add NexScore to your home screen manually:',
       'settings_pwa_guide_ios':
-          'Safari: Tap the Share button [icon] and then "Add to Home Screen".',
+          'Safari: Tap the Share button and then "Add to Home Screen".',
       'settings_pwa_guide_android':
           'Chrome: Tap the menu button (three dots) and then "Install App".',
       'settings_pwa_guide_windows':
@@ -1410,7 +1410,7 @@ class AppLocalizations {
       'settings_pwa_guide_msg':
           'Dein Gerät oder Browser unterstützt keine automatische Installation. Du kannst NexScore manuell zum Startbildschirm hinzufügen:',
       'settings_pwa_guide_ios':
-          'Safari: Tippe auf den Teilen-Button [icon] und wähle "Zum Home-Bildschirm".',
+          'Safari: Tippe auf das Teilen-Symbol und wähle "Zum Home-Bildschirm".',
       'settings_pwa_guide_android':
           'Chrome: Tippe auf das Drei-Punkte-Menü und wähle "App installieren".',
       'settings_pwa_guide_windows':

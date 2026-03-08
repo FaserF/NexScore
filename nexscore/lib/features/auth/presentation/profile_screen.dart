@@ -325,8 +325,8 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                 Chip(
                   label: Text(
                     widget.user.isPrimaryProvider('google.com')
-                        ? 'Google (Primary)'
-                        : 'Google (Backup)',
+                        ? 'Google (${l10n.get('account_primary')})'
+                        : 'Google (${l10n.get('account_backup')})',
                   ),
                   avatar: const Icon(Icons.cloud_done, size: 16),
                   backgroundColor: const Color(0xFFE8F5E9),
@@ -335,8 +335,8 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                 Chip(
                   label: Text(
                     widget.user.isPrimaryProvider('github.com')
-                        ? '${l10n.get('account_sync_github')} (Primary)'
-                        : '${l10n.get('account_sync_github')} (Backup)',
+                        ? '${l10n.get('account_sync_github')} (${l10n.get('account_primary')})'
+                        : '${l10n.get('account_sync_github')} (${l10n.get('account_backup')})',
                   ),
                   avatar: const Icon(Icons.code, size: 16),
                   backgroundColor: Colors.blue.shade100,
@@ -456,12 +456,12 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
               const Divider(),
             ],
             if (!isGoogle || !isGitHub) ...[
-              const _SectionLabel(label: 'Link Additional Account'),
+              _SectionLabel(label: l10n.get('account_link_additional')),
               if (!isGoogle)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: _AuthButton(
-                    label: 'Link Google Account',
+                    label: l10n.get('account_link_google'),
                     icon: Icons.add_link,
                     isLoading: _isGoogleLoading,
                     onPressed: () async {
@@ -490,7 +490,7 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: _AuthButton(
-                    label: 'Link GitHub Account',
+                    label: l10n.get('account_link_github'),
                     icon: Icons.code,
                     isLoading: _isGithubLoading,
                     onPressed: () async {

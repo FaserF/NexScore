@@ -354,7 +354,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _SectionHeader(title: 'Multiplayer Host Profile'),
+                _SectionHeader(title: l10n.get('settings_host_profile')),
                 GlassContainer(
                   borderRadius: 24,
                   padding: const EdgeInsets.all(20),
@@ -368,7 +368,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             .read(settingsProvider.notifier)
                             .setHostName(val),
                         decoration: InputDecoration(
-                          labelText: 'Host Name',
+                          labelText: l10n.get('settings_host_name'),
                           prefixIcon: const Icon(Icons.person),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -378,9 +378,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          const Text(
-                            'Host Color',
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                          Text(
+                            l10n.get('settings_host_color'),
+                            style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
                           const Spacer(),
                           ...[
