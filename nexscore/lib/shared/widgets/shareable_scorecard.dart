@@ -20,8 +20,10 @@ class ShareableScorecard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations);
     final theme = Theme.of(context);
+
+    final winnerLabel = l10n?.get('winner') ?? 'Winner';
 
     return Container(
       width: 400,
@@ -74,7 +76,7 @@ class ShareableScorecard extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  l10n.get('winner').toUpperCase(),
+                  winnerLabel.toUpperCase(),
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: theme.colorScheme.primary,
                     letterSpacing: 2,

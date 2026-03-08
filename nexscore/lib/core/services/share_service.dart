@@ -6,6 +6,9 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
+import '../i18n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 class ShareService {
   final ScreenshotController _screenshotController = ScreenshotController();
 
@@ -20,20 +23,38 @@ class ShareService {
   }) async {
     try {
       final imageBytes = await _screenshotController.captureFromWidget(
-        Material(child: widget),
+        MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: Theme.of(context),
+          localizationsDelegates: const [
+            AppLocalizationsDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en'), Locale('de')],
+          locale: Localizations.localeOf(context),
+          home: Material(color: Colors.transparent, child: widget),
+        ),
         context: context,
-        delay: const Duration(milliseconds: 100),
+        delay: const Duration(
+          milliseconds: 200,
+        ), // Increased delay for rendering
       );
 
       if (kIsWeb) {
-        // Simple share for Web if possible, or download
-        await Share.shareXFiles([
-          XFile.fromData(
-            imageBytes,
-            mimeType: 'image/png',
-            name: 'nexscore_share_${const Uuid().v4().substring(0, 8)}.png',
+        await SharePlus.instance.share(
+          ShareParams(
+            files: [
+              XFile.fromData(
+                imageBytes,
+                mimeType: 'image/png',
+                name: 'nexscore_share_${const Uuid().v4().substring(0, 8)}.png',
+              ),
+            ],
+            subject: text,
           ),
-        ], text: text);
+        );
       } else {
         final tempDir = await getTemporaryDirectory();
         final file = await File(
@@ -41,7 +62,9 @@ class ShareService {
         ).create();
         await file.writeAsBytes(imageBytes);
 
-        await Share.shareXFiles([XFile(file.path)], text: text);
+        await SharePlus.instance.share(
+          ShareParams(files: [XFile(file.path)], subject: text),
+        );
       }
     } catch (e) {
       debugPrint('Share error: $e');
@@ -55,9 +78,10 @@ class ShareService {
 
   /// Shares a captured file path directly.
   Future<void> shareFile(String filePath, {String? text}) async {
-    await Share.shareXFiles([XFile(filePath)], text: text);
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(filePath)], subject: text),
+    );
   }
 }
 
-// Provider should be defined in a separate file or here for simplicity
-// but I'll put it in lib/core/providers/share_provider.dart later.
+// Provider defined in lib/core/providers/share_provider.dart

@@ -151,9 +151,30 @@ class AuthService {
         error: e,
         stackTrace: stack,
       );
-      return Result.failure(
-        AuthFailure('Linking failed', error: e, stackTrace: stack),
-      );
+
+      String message = 'Linking failed';
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'credential-already-in-use':
+            message =
+                'This Google account is already linked to another user. Please sign in with Google directly or use a different account.';
+            break;
+          case 'provider-already-linked':
+            message = 'This user already has a Google account linked.';
+            break;
+          case 'invalid-credential':
+            message = 'The Google credential is invalid or has expired.';
+            break;
+          case 'requires-recent-login':
+            message =
+                'For security reasons, this operation requires a recent login. Please sign out and sign in again before linking.';
+            break;
+          default:
+            message = 'Linking failed (${e.code})';
+        }
+      }
+
+      return Result.failure(AuthFailure(message, error: e, stackTrace: stack));
     }
   }
 
@@ -190,9 +211,30 @@ class AuthService {
         error: e,
         stackTrace: stack,
       );
-      return Result.failure(
-        AuthFailure('GitHub linking failed', error: e, stackTrace: stack),
-      );
+
+      String message = 'GitHub linking failed';
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'credential-already-in-use':
+            message =
+                'This GitHub account is already linked to another user. Please sign in with GitHub directly or use a different account.';
+            break;
+          case 'provider-already-linked':
+            message = 'This user already has a GitHub account linked.';
+            break;
+          case 'invalid-credential':
+            message = 'The GitHub credential is invalid or has expired.';
+            break;
+          case 'requires-recent-login':
+            message =
+                'For security reasons, this operation requires a recent login. Please sign out and sign in again before linking.';
+            break;
+          default:
+            message = 'GitHub linking failed (${e.code})';
+        }
+      }
+
+      return Result.failure(AuthFailure(message, error: e, stackTrace: stack));
     }
   }
 
@@ -212,6 +254,29 @@ class AuthService {
         AuthFailure('Sign-out failed', error: e, stackTrace: stack),
       );
     }
+  }
+}
+
+/// Extension to determine the primary identity (name/photo) based on the first linked social provider.
+extension UserPrimaryIdentity on User {
+  UserInfo? get primaryProvider {
+    if (providerData.isEmpty) return null;
+    // We prioritize social providers over 'firebase' (password) or anonymous
+    final socialProviders = providerData.where(
+      (info) =>
+          info.providerId == 'google.com' || info.providerId == 'github.com',
+    );
+    return socialProviders.isNotEmpty
+        ? socialProviders.first
+        : providerData.first;
+  }
+
+  String get primaryDisplayName =>
+      primaryProvider?.displayName ?? displayName ?? 'User';
+  String? get primaryPhotoURL => primaryProvider?.photoURL ?? photoURL;
+
+  bool isPrimaryProvider(String providerId) {
+    return primaryProvider?.providerId == providerId;
   }
 }
 

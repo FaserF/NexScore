@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/persistence_provider.dart';
 
@@ -16,7 +15,7 @@ import '../../features/games/wayquest/providers/wayquest_provider.dart';
 
 /// Handles saving the current active game state to persistent storage.
 class GameSaveManager {
-  static Future<void> saveCurrentGame(Ref ref) async {
+  static Future<void> saveCurrentGame(dynamic ref) async {
     final gameId = ref.read(activeGameIdProvider);
     if (gameId == null) return;
 
@@ -44,7 +43,7 @@ class GameSaveManager {
         stateMap = ref.read(wayQuestStateProvider).toMap();
       }
 
-      // schafkopf_digital omitted for now if not fully serializable yet
+      // schafkopf_digital omitted for now
 
       if (stateMap != null) {
         await service.saveGameState(gameId, stateMap);

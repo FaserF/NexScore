@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../features/settings/provider/settings_provider.dart';
 import '../error/failures.dart';
 import '../error/result.dart';
 import '../storage/database_service.dart';
@@ -12,6 +14,9 @@ import '../utils/logger.dart';
 /// is available on the [OAuthCredential].  We persist it in-memory for the
 /// lifetime of the service and use it to call the GitHub Gist REST API.
 class GistSyncService {
+  GistSyncService({this.ref});
+
+  final Ref? ref;
   static const _gistFileName = 'nexscore_backup.json';
   static const _gistDescription = 'NexScore – Score Tracker Backup';
   static const _apiBase = 'https://api.github.com';
@@ -52,14 +57,18 @@ class GistSyncService {
     final stopwatch = Stopwatch()..start();
     try {
       final payload = await _buildPayload();
-
-      // Check whether we already have a Gist
-      _gistId ??= await _findExistingGist();
+      _gistId = await _findExistingGist();
 
       if (_gistId != null) {
         await _updateGist(_gistId!, payload);
       } else {
         _gistId = await _createGist(payload);
+      }
+
+      if (ref != null) {
+        ref!
+            .read(settingsProvider.notifier)
+            .updateLastBackupMetadata(DateTime.now(), 'github');
       }
 
       AppLogger.info(
@@ -120,6 +129,17 @@ class GistSyncService {
 
       final content =
           jsonDecode(file['content'] as String) as Map<String, dynamic>;
+
+      // Update metadata in settings
+      if (ref != null) {
+        final updatedAt = content['exportedAt'] as String?;
+        if (updatedAt != null) {
+          ref!
+              .read(settingsProvider.notifier)
+              .updateLastBackupMetadata(DateTime.parse(updatedAt), 'github');
+        }
+      }
+
       await _importData(content);
 
       AppLogger.info(
@@ -138,6 +158,33 @@ class GistSyncService {
       return Result.failure(
         SyncFailure('Restore failed', error: e, stackTrace: stack),
       );
+    }
+  }
+
+  /// Peeks at the Gist metadata without importing.
+  Future<DateTime?> getBackupTimestamp() async {
+    if (!hasToken) return null;
+    try {
+      _gistId ??= await _findExistingGist();
+      if (_gistId == null) return null;
+
+      final response = await http.get(
+        Uri.parse('$_apiBase/gists/$_gistId'),
+        headers: _headers,
+      );
+      if (response.statusCode != 200) return null;
+
+      final gist = jsonDecode(response.body) as Map<String, dynamic>;
+      final files = gist['files'] as Map<String, dynamic>;
+      final file = files[_gistFileName] as Map<String, dynamic>?;
+      if (file == null) return null;
+
+      final content =
+          jsonDecode(file['content'] as String) as Map<String, dynamic>;
+      final updatedAt = content['exportedAt'] as String?;
+      return updatedAt != null ? DateTime.parse(updatedAt) : null;
+    } catch (_) {
+      return null;
     }
   }
 

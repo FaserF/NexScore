@@ -93,15 +93,16 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     // Connectivity test
     try {
       debugPrint('Multiplayer: Running connectivity check...');
+      // Remove strict Source.server for pre-flight to allow faster checks
       await _firestore
           .collection('lobbies')
           .limit(1)
-          .get(const GetOptions(source: Source.server))
-          .timeout(const Duration(seconds: 5));
-      debugPrint('Multiplayer: Server connection OK');
+          .get() // Allow default source (cache + server)
+          .timeout(const Duration(seconds: 15)); // Increased from 5s
+      debugPrint('Multiplayer: Connectivity check finished');
     } catch (e) {
-      debugPrint('Multiplayer: Pre-flight connection check failed: $e');
-      // We continue, but it's a strong indicator of what's wrong
+      debugPrint('Multiplayer: Pre-flight connectivity check warning: $e');
+      // We continue, as this might just be a slow initial handshake
     }
 
     while (!isUnique && attempts < 5) {
@@ -115,7 +116,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
             .collection('lobbies')
             .doc(roomCode)
             .get(const GetOptions(source: Source.server))
-            .timeout(const Duration(seconds: 10));
+            .timeout(const Duration(seconds: 15)); // Increased from 10s
         if (!doc.exists) {
           isUnique = true;
           debugPrint('Multiplayer: Room code is unique: $roomCode');
@@ -160,7 +161,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
           .collection('lobbies')
           .doc(roomCode)
           .set(lobby.toMap())
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15)); // Increased from 10s
       debugPrint('Multiplayer: Lobby document set successfully');
     } on TimeoutException {
       debugPrint('Multiplayer: Timeout while setting lobby document');

@@ -424,9 +424,9 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                       },
                     ),
                     SwitchListTile(
-                      title: const Text('Anniversary Edition'),
+                      title: const Text('Anniversary Edition (Extreme)'),
                       subtitle: const Text(
-                        'Include Dragon & Fairy (+/- 10 points)',
+                        'Include Dragon, Fairy & Bomb cards (+/- 10 points / Bomb summary)',
                       ),
                       value: state.anniversaryCards,
                       onChanged: (val) {
@@ -715,7 +715,7 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        state.scoringVariant == WizardScoringVariant.extreme
+                        state.anniversaryCards
                             ? 'Tricks: $currentTricksSum + Bombs: $currentBombs = $totalSum / $roundIndex'
                             : 'Total Tricks: $currentTricksSum / $roundIndex',
                         style: TextStyle(
@@ -727,8 +727,7 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    if (state.scoringVariant ==
-                        WizardScoringVariant.extreme) ...[
+                    if (state.anniversaryCards) ...[
                       TextField(
                         controller: bombController,
                         keyboardType: TextInputType.number,
@@ -875,25 +874,38 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
     final tricksSum = tricks.values.fold<int>(0, (sum, val) => sum + val);
     final bombTricks = int.tryParse(bombController.text) ?? 0;
 
-    if (tricksSum + bombTricks != roundIndex) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            state.scoringVariant == WizardScoringVariant.extreme
-                ? l10n.getWith('wizard_error_tricks_extreme', [
-                    tricksSum.toString(),
-                    bombTricks.toString(),
-                    roundIndex.toString(),
-                  ])
-                : l10n.getWith('wizard_error_tricks', [
-                    tricksSum.toString(),
-                    roundIndex.toString(),
-                  ]),
+    // Validation for round sum
+    if (state.anniversaryCards) {
+      if (tricksSum + bombTricks != roundIndex) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.getWith('wizard_error_tricks_extreme', [
+                tricksSum.toString(),
+                bombTricks.toString(),
+                roundIndex.toString(),
+              ]),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-      return; // Prevent saving if tricks don't match round number
+        );
+        return;
+      }
+    } else {
+      if (tricksSum != roundIndex) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.getWith('wizard_error_tricks', [
+                tricksSum.toString(),
+                roundIndex.toString(),
+              ]),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+        return;
+      }
     }
 
     final newRound = WizardRound(

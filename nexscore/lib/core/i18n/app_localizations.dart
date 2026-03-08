@@ -129,7 +129,7 @@ class AppLocalizations {
       // ── Game names & descriptions
       'game_wizard': 'Wizard',
       'game_wizard_desc':
-          'The classic trick-taking card game. Bid your tricks, outsmart your rivals. Standard, Lenient & Extreme variants.',
+          'The classic trick-taking card game. Bid your tricks, outsmart your rivals. Includes Anniversary Edition (Extreme) with Dragon, Fairy & Bomb cards.',
       'game_qwixx': 'Qwixx',
       'game_qwixx_desc':
           'Cross off numbers in four coloured rows before anyone else. Every cross counts!',

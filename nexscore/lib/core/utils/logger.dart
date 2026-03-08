@@ -45,8 +45,8 @@ class AppLogger {
     final formattedMessage =
         '$timestamp | $level | $tagPart$message$metadataPart';
 
-    if (kDebugMode) {
-      print(formattedMessage);
+    if (kDebugMode || level == 'ERROR') {
+      debugPrint(formattedMessage);
     }
 
     dev.log(

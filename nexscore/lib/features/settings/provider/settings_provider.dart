@@ -11,6 +11,10 @@ class Settings {
   final String hostColor;
   final bool ttsEnabled;
   final bool sfxEnabled;
+  final bool autoBackupEnabled;
+  final String autoBackupFrequency; // 'daily', 'weekly', 'manual'
+  final DateTime? lastBackupTime;
+  final String? lastBackupProvider; // 'google', 'github'
 
   const Settings({
     required this.themeMode,
@@ -19,6 +23,10 @@ class Settings {
     this.hostColor = '#4287f5',
     this.ttsEnabled = false,
     this.sfxEnabled = true,
+    this.autoBackupEnabled = true,
+    this.autoBackupFrequency = 'daily',
+    this.lastBackupTime,
+    this.lastBackupProvider,
   });
 
   Settings copyWith({
@@ -29,6 +37,10 @@ class Settings {
     String? hostColor,
     bool? ttsEnabled,
     bool? sfxEnabled,
+    bool? autoBackupEnabled,
+    String? autoBackupFrequency,
+    DateTime? lastBackupTime,
+    String? lastBackupProvider,
   }) {
     return Settings(
       themeMode: themeMode ?? this.themeMode,
@@ -37,6 +49,10 @@ class Settings {
       hostColor: hostColor ?? this.hostColor,
       ttsEnabled: ttsEnabled ?? this.ttsEnabled,
       sfxEnabled: sfxEnabled ?? this.sfxEnabled,
+      autoBackupEnabled: autoBackupEnabled ?? this.autoBackupEnabled,
+      autoBackupFrequency: autoBackupFrequency ?? this.autoBackupFrequency,
+      lastBackupTime: lastBackupTime ?? this.lastBackupTime,
+      lastBackupProvider: lastBackupProvider ?? this.lastBackupProvider,
     );
   }
 }
@@ -53,6 +69,10 @@ class SettingsNotifier extends Notifier<Settings> {
   static const _hostColorKey = 'settings_host_color';
   static const _ttsEnabledKey = 'settings_tts_enabled';
   static const _sfxEnabledKey = 'settings_sfx_enabled';
+  static const _autoBackupEnabledKey = 'settings_auto_backup_enabled';
+  static const _autoBackupFreqKey = 'settings_auto_backup_freq';
+  static const _lastBackupTimeKey = 'settings_last_backup_time';
+  static const _lastBackupProviderKey = 'settings_last_backup_provider';
 
   @override
   Settings build() {
@@ -82,6 +102,13 @@ class SettingsNotifier extends Notifier<Settings> {
     final hostColor = prefs.getString(_hostColorKey) ?? '#4287f5';
     final ttsEnabled = prefs.getBool(_ttsEnabledKey) ?? false;
     final sfxEnabled = prefs.getBool(_sfxEnabledKey) ?? true;
+    final autoBackupEnabled = prefs.getBool(_autoBackupEnabledKey) ?? true;
+    final autoBackupFreq = prefs.getString(_autoBackupFreqKey) ?? 'daily';
+    final lastBackupTimeStr = prefs.getString(_lastBackupTimeKey);
+    final lastBackupTime = lastBackupTimeStr != null
+        ? DateTime.parse(lastBackupTimeStr)
+        : null;
+    final lastBackupProvider = prefs.getString(_lastBackupProviderKey);
 
     state = Settings(
       themeMode: themeMode,
@@ -90,6 +117,10 @@ class SettingsNotifier extends Notifier<Settings> {
       hostColor: hostColor,
       ttsEnabled: ttsEnabled,
       sfxEnabled: sfxEnabled,
+      autoBackupEnabled: autoBackupEnabled,
+      autoBackupFrequency: autoBackupFreq,
+      lastBackupTime: lastBackupTime,
+      lastBackupProvider: lastBackupProvider,
     );
   }
 
@@ -137,6 +168,25 @@ class SettingsNotifier extends Notifier<Settings> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_sfxEnabledKey, enabled);
     state = state.copyWith(sfxEnabled: enabled);
+  }
+
+  Future<void> setAutoBackupEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_autoBackupEnabledKey, enabled);
+    state = state.copyWith(autoBackupEnabled: enabled);
+  }
+
+  Future<void> setAutoBackupFrequency(String freq) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_autoBackupFreqKey, freq);
+    state = state.copyWith(autoBackupFrequency: freq);
+  }
+
+  Future<void> updateLastBackupMetadata(DateTime time, String provider) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_lastBackupTimeKey, time.toIso8601String());
+    await prefs.setString(_lastBackupProviderKey, provider);
+    state = state.copyWith(lastBackupTime: time, lastBackupProvider: provider);
   }
 
   /// Updates hostName if it currently follows the 'Player#12345' default pattern.

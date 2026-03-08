@@ -5,9 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/i18n/app_localizations.dart';
 import '../providers/auth_providers.dart';
 import '../../../core/sync/gist_sync_service.dart';
+import '../../settings/provider/settings_provider.dart';
 
 final gistSyncServiceProvider = Provider<GistSyncService>(
-  (ref) => GistSyncService(),
+  (ref) => GistSyncService(ref: ref),
 );
 
 /// Profile / Account settings screen shown from settings or a dedicated tab.
@@ -17,7 +18,6 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(authUserProvider);
-
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -98,21 +98,13 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
                 : () async {
                     setState(() => _isGoogleLoading = true);
                     final messenger = ScaffoldMessenger.of(context);
-                    debugPrint('Auth: Google Sign-In requested');
                     final authService = ref.read(authServiceProvider);
                     final result = await authService.signInWithGoogleNative();
-                    debugPrint('Auth: Result received: ${result.isSuccess}');
                     if (mounted) {
                       setState(() => _isGoogleLoading = false);
-                      result.fold(
-                        (failure) {
-                          debugPrint('Auth: Failure: ${failure.message}');
-                          _showError(context, l10n, failure.message, messenger);
-                        },
-                        (_) {
-                          debugPrint('Auth: Success');
-                        },
-                      );
+                      result.fold((failure) {
+                        _showError(context, l10n, failure.message, messenger);
+                      }, (_) {});
                     }
                   },
             icon: _isGoogleLoading
@@ -132,26 +124,23 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
                 : () async {
                     setState(() => _isGithubLoading = true);
                     final messenger = ScaffoldMessenger.of(context);
-                    debugPrint('Auth: GitHub Sign-In requested');
                     final authService = ref.read(authServiceProvider);
                     final result = await authService.signInWithGithub();
-                    debugPrint('Auth: Result received: ${result.isSuccess}');
                     if (mounted) {
                       setState(() => _isGithubLoading = false);
                       result.fold(
                         (failure) {
-                          debugPrint('Auth: Failure: ${failure.message}');
                           _showError(context, l10n, failure.message, messenger);
                         },
                         (credential) {
-                          debugPrint('Auth: Success');
-                          // Capture GitHub OAuth access-token for Gist API calls
                           final oauthCred =
                               credential.credential as OAuthCredential?;
                           if (oauthCred?.accessToken != null) {
-                            ref
-                                .read(gistSyncServiceProvider)
-                                .setAccessToken(oauthCred!.accessToken!);
+                            final gistService = ref.read(
+                              gistSyncServiceProvider,
+                            );
+                            gistService.setAccessToken(oauthCred!.accessToken!);
+                            _checkAndPromptRestore(context, gistService);
                           }
                         },
                       );
@@ -179,13 +168,61 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
     );
   }
 
+  Future<void> _checkAndPromptRestore(
+    BuildContext context,
+    GistSyncService gistService,
+  ) async {
+    final timestamp = await gistService.getBackupTimestamp();
+    if (timestamp != null && context.mounted) {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Backup Found'),
+          content: Text(
+            'A backup from ${timestamp.toLocal().toString().split('.')[0]} was found on GitHub. Would you like to restore it now?\n\nThis will merge the cloud data with your local data.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Skip'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Restore Now'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirm == true && context.mounted) {
+        await _restoreFromGist(context);
+      }
+    }
+  }
+
+  Future<void> _restoreFromGist(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final gistService = ref.read(gistSyncServiceProvider);
+
+    final result = await gistService.restore();
+    if (context.mounted) {
+      if (result.isSuccess) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.get('account_gist_restore_success'))),
+        );
+      } else {
+        _showError(context, l10n, result.failure!.message, messenger);
+      }
+    }
+  }
+
   void _showError(
     BuildContext context,
     AppLocalizations l10n,
     String message,
     ScaffoldMessengerState messenger,
   ) {
-    // Show SnackBar
     messenger.showSnackBar(
       SnackBar(
         content: Text(l10n.getWith('account_sign_in_error', [message])),
@@ -195,7 +232,6 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
       ),
     );
 
-    // Also show a Dialog as a fallback
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -239,6 +275,7 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final settings = ref.watch(settingsProvider);
     final isGoogle = _isGoogleLinked;
     final isGitHub = _isGitHubLinked;
     final isGuest = widget.user.isAnonymous;
@@ -252,10 +289,10 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
           CircleAvatar(
             radius: 48,
             backgroundColor: isGuest ? Colors.grey.shade200 : null,
-            backgroundImage: !isGuest && widget.user.photoURL != null
-                ? NetworkImage(widget.user.photoURL!)
+            backgroundImage: !isGuest && widget.user.primaryPhotoURL != null
+                ? NetworkImage(widget.user.primaryPhotoURL!)
                 : null,
-            child: isGuest || widget.user.photoURL == null
+            child: isGuest || widget.user.primaryPhotoURL == null
                 ? Icon(isGuest ? Icons.person_outline : Icons.person, size: 48)
                 : null,
           ),
@@ -263,7 +300,7 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
           Text(
             isGuest
                 ? l10n.get('account_guest')
-                : (widget.user.displayName ?? l10n.get('account_default_name')),
+                : widget.user.primaryDisplayName,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           if (!isGuest)
@@ -284,14 +321,22 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                   backgroundColor: Colors.orange.shade100,
                 ),
               if (isGoogle)
-                const Chip(
-                  label: Text('Google Linked'),
-                  avatar: Icon(Icons.cloud_done, size: 16),
-                  backgroundColor: Color(0xFFE8F5E9), // shade 50/100ish
+                Chip(
+                  label: Text(
+                    widget.user.isPrimaryProvider('google.com')
+                        ? 'Google (Primary)'
+                        : 'Google (Backup)',
+                  ),
+                  avatar: const Icon(Icons.cloud_done, size: 16),
+                  backgroundColor: const Color(0xFFE8F5E9),
                 ),
               if (isGitHub)
                 Chip(
-                  label: Text(l10n.get('account_sync_github')),
+                  label: Text(
+                    widget.user.isPrimaryProvider('github.com')
+                        ? '${l10n.get('account_sync_github')} (Primary)'
+                        : '${l10n.get('account_sync_github')} (Backup)',
+                  ),
                   avatar: const Icon(Icons.code, size: 16),
                   backgroundColor: Colors.blue.shade100,
                 ),
@@ -299,7 +344,6 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
           ),
           const SizedBox(height: 48),
 
-          // ── Provider-specific sync tile ──
           if (isGuest) ...[
             ListTile(
               leading: const Icon(Icons.info_outline, color: Colors.orange),
@@ -342,9 +386,9 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                   (credential) {
                     final oauthCred = credential.credential as OAuthCredential?;
                     if (oauthCred?.accessToken != null) {
-                      ref
-                          .read(gistSyncServiceProvider)
-                          .setAccessToken(oauthCred!.accessToken!);
+                      final gistService = ref.read(gistSyncServiceProvider);
+                      gistService.setAccessToken(oauthCred!.accessToken!);
+                      _checkAndPromptRestore(context, gistService);
                     }
                   },
                 );
@@ -355,8 +399,25 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
               const _SectionLabel(label: 'GitHub Backup (Gist)'),
               ListTile(
                 leading: const Icon(Icons.backup),
-                title: Text(l10n.get('account_gist_backup_title')),
-                subtitle: Text(l10n.get('account_gist_backup_desc')),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.get('account_gist_backup_desc')),
+                    if (settings.lastBackupTime != null &&
+                        settings.lastBackupProvider == 'github')
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4.0),
+                        child: Text(
+                          'Last backup: ${settings.lastBackupTime!.toLocal().toString().split('.')[0]}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
                 trailing: IconButton(
                   icon: const Icon(Icons.cloud_upload),
                   onPressed: () => _backupToGist(context),
@@ -372,6 +433,16 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                 ),
               ),
               const Divider(),
+              SwitchListTile(
+                title: const Text('Auto Backup'),
+                subtitle: const Text('Automatically backup to GitHub daily'),
+                secondary: const Icon(Icons.sync),
+                value: settings.autoBackupEnabled,
+                onChanged: (val) {
+                  ref.read(settingsProvider.notifier).setAutoBackupEnabled(val);
+                },
+              ),
+              const Divider(),
             ],
             if (isGoogle) ...[
               const _SectionLabel(label: 'Google Account'),
@@ -383,8 +454,6 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
               ),
               const Divider(),
             ],
-
-            // ── Account Linking ──
             if (!isGoogle || !isGitHub) ...[
               const _SectionLabel(label: 'Link Additional Account'),
               if (!isGoogle)
@@ -438,9 +507,11 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                           final oauthCred =
                               credential.credential as OAuthCredential?;
                           if (oauthCred?.accessToken != null) {
-                            ref
-                                .read(gistSyncServiceProvider)
-                                .setAccessToken(oauthCred!.accessToken!);
+                            final gistService = ref.read(
+                              gistSyncServiceProvider,
+                            );
+                            gistService.setAccessToken(oauthCred!.accessToken!);
+                            _checkAndPromptRestore(context, gistService);
                           }
                           messenger.showSnackBar(
                             const SnackBar(
@@ -497,8 +568,6 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
     );
   }
 
-  // ── Gist helpers ──────────────────────────────────────────
-
   Future<void> _backupToGist(BuildContext context) async {
     final gistService = ref.read(gistSyncServiceProvider);
     final result = await gistService.backup();
@@ -539,6 +608,38 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
     );
   }
 
+  Future<void> _checkAndPromptRestore(
+    BuildContext context,
+    GistSyncService gistService,
+  ) async {
+    final timestamp = await gistService.getBackupTimestamp();
+    if (timestamp != null && context.mounted) {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Backup Found'),
+          content: Text(
+            'A backup from ${timestamp.toLocal().toString().split('.')[0]} was found on GitHub. Would you like to restore it now?\n\nThis will merge the cloud data with your local data.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Skip'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Restore Now'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirm == true && context.mounted) {
+        await _restoreFromGist(context);
+      }
+    }
+  }
+
   void _showError(
     BuildContext context,
     AppLocalizations l10n,
@@ -549,6 +650,31 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
       SnackBar(
         content: Text(l10n.getWith('account_sign_in_error', [message])),
         backgroundColor: Colors.red,
+      ),
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('error')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.getWith('account_sign_in_error', [message])),
+            const SizedBox(height: 16),
+            const Text(
+              'Please check the browser console for more details.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('ok')),
+          ),
+        ],
       ),
     );
   }
