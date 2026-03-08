@@ -1,9 +1,10 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'factquest_models.dart';
-export 'factquest_models.dart';
+import '../models/factquest_models.dart';
+import '../models/factquest_database.dart';
+
+export '../models/factquest_models.dart';
 
 class FactQuestStateNotifier extends Notifier<FactQuestGameState> {
   final List<FactQuestGameState> _history = [];
@@ -22,6 +23,11 @@ class FactQuestStateNotifier extends Notifier<FactQuestGameState> {
     if (_history.isNotEmpty) {
       state = _history.removeLast();
     }
+  }
+
+  void initPlayers(List<String> playerIds) {
+    _pushState();
+    state = state.copyWith(activePlayerIds: playerIds);
   }
 
   void toggleCategory(FactQuestCategory category) {
@@ -67,7 +73,3 @@ final factQuestStateProvider =
     NotifierProvider<FactQuestStateNotifier, FactQuestGameState>(
       FactQuestStateNotifier.new,
     );
-
-final List<FactQuestCard> factQuestDatabase = [
-  // ... (Full database would go here, omitting for brevity in this tool call, but ensuring the structure remains)
-];

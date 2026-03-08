@@ -74,7 +74,7 @@ class _VolleyballSignatureDialogState extends State<VolleyballSignatureDialog> {
           onPressed: () async {
             if (_controller.isEmpty) return;
             final Uint8List? data = await _controller.toPngBytes();
-            if (mounted) Navigator.pop(context, data);
+            if (context.mounted) Navigator.pop(context, data);
           },
           child: Text(l10n.get('ok')),
         ),

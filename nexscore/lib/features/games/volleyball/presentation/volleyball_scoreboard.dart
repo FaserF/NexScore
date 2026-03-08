@@ -283,7 +283,9 @@ class _SetSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+      color: Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -340,7 +342,7 @@ class _TeamScoreArea extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     return Expanded(
       child: Material(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         child: InkWell(
           onTap: () =>
               ref.read(volleyballStateProvider.notifier).addPoint(teamId),

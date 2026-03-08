@@ -96,8 +96,9 @@ class VolleyballPdfService {
                     if (!s.isFinished &&
                         index > 0 &&
                         s.scoreA == 0 &&
-                        s.scoreB == 0)
+                        s.scoreB == 0) {
                       return null;
+                    }
                     return pw.TableRow(
                       children: [
                         pw.Padding(
@@ -122,7 +123,7 @@ class VolleyballPdfService {
                         ),
                       ],
                     );
-                  }).whereType<pw.TableRow>().toList(),
+                  }).whereType<pw.TableRow>(),
                 ],
               ),
               pw.Spacer(),
