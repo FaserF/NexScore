@@ -1,7 +1,5 @@
-import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nexscore/core/i18n/app_localizations.dart';
 import 'package:nexscore/features/games/factquest/models/factquest_models.dart';
 import 'package:nexscore/features/games/factquest/models/factquest_database.dart';
 import 'package:nexscore/features/games/factquest/providers/factquest_provider.dart';
@@ -18,8 +16,8 @@ void main() {
         category: FactQuestCategory.randomFacts,
       );
 
-      final json = card.toJson();
-      final restored = FactQuestCard.fromJson(json);
+      final json = card.toMap();
+      final restored = FactQuestCard.fromMap(json);
 
       expect(restored.id, 'test1');
       expect(restored.text, 'Test fact');
@@ -183,7 +181,7 @@ void main() {
       expect(container.read(factQuestStateProvider).playedCards, isEmpty);
 
       // Draw first card
-      notifier.drawNextCard(AppLocalizations(const Locale('en')));
+      notifier.drawNextCard();
       expect(container.read(factQuestStateProvider).playedCards, hasLength(1));
       final firstCard = container
           .read(factQuestStateProvider)
@@ -191,7 +189,7 @@ void main() {
           .first;
 
       // Draw second card
-      notifier.drawNextCard(AppLocalizations(const Locale('en')));
+      notifier.drawNextCard();
       expect(container.read(factQuestStateProvider).playedCards, hasLength(2));
 
       // Undo

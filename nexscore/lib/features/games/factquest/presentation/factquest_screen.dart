@@ -230,7 +230,7 @@ class _FactQuestSetup extends ConsumerWidget {
             width: double.infinity,
             child: FilledButton.icon(
               onPressed: () {
-                ref.read(factQuestStateProvider.notifier).drawNextCard(l10n);
+                ref.read(factQuestStateProvider.notifier).drawNextCard();
               },
               icon: const Icon(Icons.play_arrow),
               label: Text(l10n.get('factquest_start')),
@@ -267,7 +267,7 @@ class _FactQuestGame extends ConsumerWidget {
     final categoryColor = _getCategoryColor(context, currentCard.category);
 
     return GestureDetector(
-      onTap: () => ref.read(factQuestStateProvider.notifier).drawNextCard(l10n),
+      onTap: () => ref.read(factQuestStateProvider.notifier).drawNextCard(),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(

@@ -12,6 +12,8 @@ import '../../features/games/phase10_digital/providers/phase10_digital_provider.
 import '../../features/games/sipdeck/providers/sipdeck_provider.dart';
 import '../../features/games/buzztap/providers/buzztap_provider.dart';
 import '../../features/games/wayquest/providers/wayquest_provider.dart';
+import '../../features/games/factquest/providers/factquest_provider.dart';
+import '../../features/games/volleyball/providers/volleyball_provider.dart';
 
 /// Handles saving the current active game state to persistent storage.
 class GameSaveManager {
@@ -41,6 +43,10 @@ class GameSaveManager {
         stateMap = ref.read(buzzTapStateProvider).toMap();
       } else if (gameId == 'wayquest') {
         stateMap = ref.read(wayQuestStateProvider).toMap();
+      } else if (gameId == 'factquest') {
+        stateMap = ref.read(factQuestStateProvider).toMap();
+      } else if (gameId == 'volleyball') {
+        stateMap = ref.read(volleyballStateProvider).toMap();
       }
 
       // schafkopf_digital omitted for now

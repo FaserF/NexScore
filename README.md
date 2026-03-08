@@ -45,6 +45,7 @@ NexScore supports a wide variety of card, dice, and strategy games with speciali
 - **BuzzTap (18+)**: High-energy, fast-paced tapping party game with automated sip tracking.
 - **WayQuest**: Entertaining questions and road challenges for long car rides.
 - **FactQuest**: True facts, "Dumb Ways to Die" stories, and detailed explanations with clickable source links – perfect for car rides.
+- **Volleyball**: Advanced score tracker for indoor and beach volleyball with sets, side-out tracking, and automatic side switching.
 
 ---
 

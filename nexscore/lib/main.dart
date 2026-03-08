@@ -15,6 +15,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/app_scroll_behavior.dart';
 import 'core/lifecycle/app_lifecycle_observer.dart';
 import 'core/utils/app_logger.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,9 +32,9 @@ void main() async {
     }
   };
 
-  // if (kIsWeb) {
-  //   usePathUrlStrategy();
-  // }
+  if (kIsWeb) {
+    setUrlStrategy(null);
+  }
 
   try {
     if (kIsWeb) {

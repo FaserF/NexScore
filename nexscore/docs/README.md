@@ -42,6 +42,7 @@ Trivia game for car rides. Features over 360 entries including "Random Facts" an
 ### 📘 User Guide
 - [General Game Setup & Rules](./README.md)
 - [FactQuest Guide](./user_guide/games/factquest.md)
+- [Volleyball Guide](./user_guide/games/volleyball.md)
 - [Multiplayer & Cloud Sync](./multiplayer.md)
 - [📸 Sharing & Social-To-Story](./sharing.md)
 - [🔊 Audio, SFX & Text-To-Speech](./sfx_tts.md)

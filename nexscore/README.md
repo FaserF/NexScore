@@ -14,7 +14,10 @@ NexScore is a premium, cross-platform score tracking application designed for se
 6.  **Darts X01** (301, 501, 701, 1001 with bust detection)
 7.  **Rommé** (Multi-round penalty tracking)
 8.  **Arschloch / President** (Rank tracking, card exchange rules)
-9.  **SipDeck** (Multiple cards, party-ready, 18+ warning)
+9.   **SipDeck** (Multiple cards, party-ready, 18+ warning)
+10.  **FactQuest** (Trivia for car rides with 360+ facts and "Black Stories" style bizarre deaths)
+11.  **Volleyball** (Official Indoor & Beach scoreboard with PDF match reports and digital signatures)
+12.  **WayQuest** (Interactive travel companion with location-based triggers)
 
 ... and more!
 

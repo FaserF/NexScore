@@ -172,4 +172,13 @@ class VolleyballStateNotifier extends Notifier<VolleyballGameState> {
     _pushState();
     state = state.copyWith(server: team);
   }
+
+  void resetGame() {
+    _pushState();
+    state = const VolleyballGameState();
+  }
+
+  void updateFromSync(VolleyballGameState newState) {
+    if (state != newState) state = newState;
+  }
 }
