@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/factquest_models.dart';
 import '../providers/factquest_provider.dart';
 import '../../../../core/i18n/app_localizations.dart';
 

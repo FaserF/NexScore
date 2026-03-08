@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nexscore/features/games/factquest/models/factquest_models.dart';
 import 'package:nexscore/features/games/factquest/models/factquest_database.dart';
 import 'package:nexscore/features/games/factquest/providers/factquest_provider.dart';
 
