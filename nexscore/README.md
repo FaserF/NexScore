@@ -1,4 +1,4 @@
-# NexScore 0.2.0 🏆
+# NexScore 0.5.0 🏆
 
 NexScore is a premium, cross-platform score tracking application designed for serious board and card game enthusiasts. Built with **Flutter 3.41.4**, it offers a seamless experience across **Web**, **iOS**, and **Android**.
 
@@ -26,6 +26,7 @@ NexScore is a premium, cross-platform score tracking application designed for se
 - **📸 Share-To-Story**: Capture beautiful game result scorecards and challenges to share on Instagram, WhatsApp, and more.
 - **🔊 Living Audio**: Integrated Sound Effects (SFX) and Text-To-Speech (TTS) for an immersive game night.
 - **🚀 Agile Releases**: Automated CI/CD pipelines and Docker production support.
+- **🦟 Debugging Tools**: Integrated global system logging and log export for easy troubleshooting.
 
 ## 🎵 Credits & Assets
 
@@ -45,6 +46,12 @@ The following community assets are used in NexScore:
 ## 📖 Documentation
 
 For detailed rules, architecture, and developer guides, see the [Documentation Hub](./docs/README.md).
+
+### 🛠 Troubleshooting & Support
+If you encounter issues, please:
+1. Enable **Debug Mode** in the app settings.
+2. Reproduced the issue.
+3. Use **Export Logs** to share a diagnostic file with the development team.
 
 ---
 © 2026 NexScore Team. Built for the ultimate game night experience.

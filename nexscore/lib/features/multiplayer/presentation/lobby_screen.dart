@@ -75,6 +75,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   const SizedBox(height: 12),
                   Text('• ${l10n.get('multiplayer_adblock_title')}'),
                   Text('• ${l10n.get('multiplayer_domains_title')}'),
+                  Text('• ${l10n.get('multiplayer_diagnostics_auth')}'),
+                  Text('• ${l10n.get('multiplayer_diagnostics_db')}'),
                   const SizedBox(height: 12),
                   Text(l10n.get('multiplayer_diagnostics_timeout')),
                 ],

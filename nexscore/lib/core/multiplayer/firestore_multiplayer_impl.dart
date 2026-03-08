@@ -43,24 +43,28 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
   Stream<Lobby?> get lobbyUpdates => _lobbyStreamController.stream;
 
   Future<void> _ensureAuth() async {
-    debugPrint('Multiplayer: Ensuring Auth...');
+    debugPrint('Multiplayer: [Auth] Ensuring Auth...');
     if (_uid != null) {
-      debugPrint('Multiplayer: Auth already ensured for uid: $_uid');
+      debugPrint('Multiplayer: [Auth] Already ensured for uid: $_uid');
       return;
     }
     try {
       if (_auth.currentUser == null) {
-        debugPrint('Multiplayer: Signing in anonymously...');
-        await _auth.signInAnonymously().timeout(const Duration(seconds: 10));
+        debugPrint('Multiplayer: [Auth] Signing in anonymously...');
+        await _auth.signInAnonymously().timeout(const Duration(seconds: 15));
       }
       _uid = _auth.currentUser?.uid;
-      debugPrint('Multiplayer: Auth successful, uid: $_uid');
-    } catch (e, stack) {
-      debugPrint('Multiplayer: Auth error: $e');
-      debugPrint('Stack trace: $stack');
-      // Fallback for environments where Auth fails or isn't set up yet
+      debugPrint('Multiplayer: [Auth] Successful, uid: $_uid');
+    } catch (e) {
+      debugPrint('Multiplayer: [Auth] Error ($e)');
+      if (e is FirebaseAuthException) {
+        debugPrint(
+          'Multiplayer: [Auth] Code: ${e.code}, Message: ${e.message}',
+        );
+      }
+      // Fallback for environments where Auth fails
       _uid ??= const Uuid().v4();
-      debugPrint('Multiplayer: Using fallback UUID: $_uid');
+      debugPrint('Multiplayer: [Auth] Using fallback UUID: $_uid');
     }
   }
 
@@ -81,61 +85,56 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     required String hostAvatarColor,
     int maxPlayers = 10,
   }) async {
-    debugPrint('Multiplayer: hostLobby called for $hostName');
+    debugPrint('Multiplayer: [Lobby] hostLobby called for $hostName');
+
+    // Diagnostic log of environment
+    debugPrint(
+      'Multiplayer: [System] Firestore persistence: ${_firestore.settings.persistenceEnabled}',
+    );
+    debugPrint('Multiplayer: [System] Firebase Apps: ${Firebase.apps.length}');
+
     await _ensureAuth();
     final uid = _uid!;
-    debugPrint('Multiplayer: Auth ensured, uid: $uid');
 
     // Generate unique code
     String roomCode = '';
     bool isUnique = false;
     int attempts = 0;
 
-    // Connectivity test
-    try {
-      debugPrint('Multiplayer: Running connectivity check...');
-      // Explicitly check if we can reach Firestore
-      await _firestore
-          .collection('lobbies')
-          .limit(1)
-          .get(const GetOptions(source: Source.serverAndCache))
-          .timeout(const Duration(seconds: 10));
-      debugPrint('Multiplayer: Connectivity check successful');
-    } catch (e) {
-      debugPrint('Multiplayer: Pre-flight connectivity check warning: $e');
-      // If we're offline but persistence is on, we might still "succeed" later,
-      // but usually timeouts here indicate major configuration or network issues.
-    }
-
     while (!isUnique && attempts < 5) {
       attempts++;
       roomCode = _generateRoomCode();
       debugPrint(
-        'Multiplayer: Checking room code uniqueness (attempt $attempts): $roomCode',
+        'Multiplayer: [Lobby] Checking room code uniqueness (attempt $attempts): $roomCode',
       );
       try {
+        // Query the server directly to avoid cache-related hangs
         final doc = await _firestore
             .collection('lobbies')
             .doc(roomCode)
             .get(const GetOptions(source: Source.server))
-            .timeout(const Duration(seconds: 15)); // Increased from 10s
+            .timeout(const Duration(seconds: 15));
+
         if (!doc.exists) {
           isUnique = true;
-          debugPrint('Multiplayer: Room code is unique: $roomCode');
+          debugPrint('Multiplayer: [Lobby] Room code is unique: $roomCode');
         } else {
-          debugPrint('Multiplayer: Room code collision: $roomCode');
+          debugPrint('Multiplayer: [Lobby] Room code collision: $roomCode');
         }
       } on TimeoutException {
         debugPrint(
-          'Multiplayer: Timeout while checking room code uniqueness at attempt $attempts',
+          'Multiplayer: [Lobby] Timeout while checking room code uniqueness at attempt $attempts',
         );
-        debugPrint(
-          'Multiplayer: Firestore persistence enabled: ${_firestore.settings.persistenceEnabled}',
-        );
-        throw Exception('firestore_timeout');
-      } catch (e, stack) {
-        debugPrint('Multiplayer: Error checking room code uniqueness: $e');
-        debugPrint('Stack trace: $stack');
+        if (attempts >= 5) {
+          throw Exception('firestore_timeout');
+        }
+      } catch (e) {
+        debugPrint('Multiplayer: [Lobby] Error checking uniqueness: $e');
+        if (e is FirebaseException) {
+          debugPrint(
+            'Multiplayer: [Lobby] Code: ${e.code}, Message: ${e.message}',
+          );
+        }
         rethrow;
       }
     }
@@ -180,6 +179,9 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     required String playerName,
     required String playerAvatarColor,
   }) async {
+    debugPrint(
+      'Multiplayer: [Join] joinLobby called for $roomCode by $playerName',
+    );
     await _ensureAuth();
     final uid = _uid!;
     roomCode = roomCode.toUpperCase();
@@ -187,12 +189,23 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     final docRef = _firestore.collection('lobbies').doc(roomCode);
     final DocumentSnapshot docSnap;
     try {
-      docSnap = await docRef.get().timeout(const Duration(seconds: 10));
+      debugPrint('Multiplayer: [Join] Fetching lobby doc $roomCode');
+      docSnap = await docRef.get().timeout(const Duration(seconds: 15));
     } on TimeoutException {
+      debugPrint('Multiplayer: [Join] Timeout fetching lobby doc');
       throw Exception('firestore_timeout');
+    } catch (e) {
+      debugPrint('Multiplayer: [Join] Error fetching lobby ($e)');
+      if (e is FirebaseException) {
+        debugPrint(
+          'Multiplayer: [Join] Code: ${e.code}, Message: ${e.message}',
+        );
+      }
+      rethrow;
     }
 
     if (!docSnap.exists) {
+      debugPrint('Multiplayer: [Join] Lobby $roomCode not found');
       throw Exception('Lobby not found');
     }
 
@@ -201,6 +214,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
 
     if (currentLobby.users.length >= currentLobby.maxPlayers &&
         !currentLobby.users.containsKey(uid)) {
+      debugPrint('Multiplayer: [Join] Lobby full');
       throw Exception('Lobby is full');
     }
 
@@ -214,11 +228,17 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
 
     // Atomic update to add the user
     try {
+      debugPrint('Multiplayer: [Join] Updating users list for $roomCode');
       await docRef
           .update({'users.$uid': joinUser.toMap()})
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15));
+      debugPrint('Multiplayer: [Join] Successfully joined $roomCode');
     } on TimeoutException {
+      debugPrint('Multiplayer: [Join] Timeout while updating users');
       throw Exception('firestore_timeout');
+    } catch (e) {
+      debugPrint('Multiplayer: [Join] Error updating users ($e)');
+      rethrow;
     }
 
     _listenToLobby(roomCode);

@@ -14,6 +14,7 @@ import '../../../core/utils/app_version.dart';
 import '../../../core/pwa/pwa_prompt.dart' as pwa;
 import '../../../core/pwa/pwa_install_dialog.dart';
 import '../../auth/providers/auth_providers.dart';
+import '../../../core/utils/app_logger.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -316,6 +317,79 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   const SizedBox(height: 24),
                 ],
+                _SectionHeader(title: l10n.get('settings_debug_mode')),
+                GlassContainer(
+                  borderRadius: 24,
+                  child: Column(
+                    children: [
+                      SwitchListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        secondary: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.error.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.bug_report,
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        title: Text(
+                          l10n.get('settings_debug_mode'),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          l10n.get('settings_debug_mode_desc'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        value: settings.debugMode,
+                        onChanged: (val) {
+                          ref.read(settingsProvider.notifier).setDebugMode(val);
+                        },
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.tertiary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.ios_share,
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ),
+                        ),
+                        title: Text(
+                          l10n.get('settings_export_logs'),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () async {
+                          await AppLogger.exportLogs();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
                 _SectionHeader(title: l10n.get('settings_data')),
                 AnimatedScaleButton(
                   onPressed: () => _confirmReset(context, ref, l10n),

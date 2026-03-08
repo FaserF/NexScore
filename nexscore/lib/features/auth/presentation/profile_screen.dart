@@ -397,7 +397,7 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
             ),
           ] else ...[
             if (isGitHub) ...[
-              const _SectionLabel(label: 'GitHub Backup (Gist)'),
+              _SectionLabel(label: l10n.get('account_github_backup_header')),
               ListTile(
                 leading: const Icon(Icons.backup),
                 subtitle: Column(
@@ -409,7 +409,11 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                       Padding(
                         padding: const EdgeInsets.only(top: 4.0),
                         child: Text(
-                          'Last backup: ${settings.lastBackupTime!.toLocal().toString().split('.')[0]}',
+                          l10n.getWith('account_last_backup', [
+                            settings.lastBackupTime!.toLocal().toString().split(
+                              '.',
+                            )[0],
+                          ]),
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -435,8 +439,8 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
               ),
               const Divider(),
               SwitchListTile(
-                title: const Text('Auto Backup'),
-                subtitle: const Text('Automatically backup to GitHub daily'),
+                title: Text(l10n.get('account_auto_backup_title')),
+                subtitle: Text(l10n.get('account_auto_backup_desc')),
                 secondary: const Icon(Icons.sync),
                 value: settings.autoBackupEnabled,
                 onChanged: (val) {
@@ -446,10 +450,10 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
               const Divider(),
             ],
             if (isGoogle) ...[
-              const _SectionLabel(label: 'Google Account'),
+              _SectionLabel(label: l10n.get('account_google_header')),
               ListTile(
                 leading: const Icon(Icons.account_circle),
-                title: const Text('Google Cloud Sync'),
+                title: Text(l10n.get('account_google_sync_title')),
                 subtitle: Text(l10n.get('account_sync_active')),
                 trailing: const Icon(Icons.check_circle, color: Colors.green),
               ),
@@ -477,8 +481,10 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                         },
                         (_) {
                           messenger.showSnackBar(
-                            const SnackBar(
-                              content: Text('Google account linked!'),
+                            SnackBar(
+                              content: Text(
+                                l10n.get('account_link_google_success'),
+                              ),
                             ),
                           );
                         },
@@ -516,8 +522,10 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                             _checkAndPromptRestore(context, gistService);
                           }
                           messenger.showSnackBar(
-                            const SnackBar(
-                              content: Text('GitHub account linked!'),
+                            SnackBar(
+                              content: Text(
+                                l10n.get('account_link_github_success'),
+                              ),
                             ),
                           );
                         },
@@ -571,19 +579,22 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
   }
 
   Future<void> _backupToGist(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final gistService = ref.read(gistSyncServiceProvider);
     final result = await gistService.backup();
     if (!context.mounted) return;
     result.fold(
       (failure) => ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Backup failed: ${failure.message}'),
+          content: Text(
+            l10n.getWith('account_backup_failed', [failure.message]),
+          ),
           behavior: SnackBarBehavior.floating,
         ),
       ),
       (_) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Backup to GitHub Gist complete ✓'),
+        SnackBar(
+          content: Text(l10n.get('account_backup_success')),
           behavior: SnackBarBehavior.floating,
         ),
       ),
@@ -591,13 +602,16 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
   }
 
   Future<void> _restoreFromGist(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final gistService = ref.read(gistSyncServiceProvider);
     final result = await gistService.restore();
     if (!context.mounted) return;
     result.fold(
       (failure) => ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Restore failed: ${failure.message}'),
+          content: Text(
+            l10n.getWith('account_restore_failed', [failure.message]),
+          ),
           behavior: SnackBarBehavior.floating,
         ),
       ),

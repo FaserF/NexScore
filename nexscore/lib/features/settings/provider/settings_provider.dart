@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/utils/app_logger.dart';
 
 /// Settings state model.
 class Settings {
@@ -11,6 +12,7 @@ class Settings {
   final String hostColor;
   final bool ttsEnabled;
   final bool sfxEnabled;
+  final bool debugMode;
   final bool autoBackupEnabled;
   final String autoBackupFrequency; // 'daily', 'weekly', 'manual'
   final DateTime? lastBackupTime;
@@ -23,6 +25,7 @@ class Settings {
     this.hostColor = '#4287f5',
     this.ttsEnabled = false,
     this.sfxEnabled = true,
+    this.debugMode = false,
     this.autoBackupEnabled = true,
     this.autoBackupFrequency = 'daily',
     this.lastBackupTime,
@@ -37,6 +40,7 @@ class Settings {
     String? hostColor,
     bool? ttsEnabled,
     bool? sfxEnabled,
+    bool? debugMode,
     bool? autoBackupEnabled,
     String? autoBackupFrequency,
     DateTime? lastBackupTime,
@@ -49,6 +53,7 @@ class Settings {
       hostColor: hostColor ?? this.hostColor,
       ttsEnabled: ttsEnabled ?? this.ttsEnabled,
       sfxEnabled: sfxEnabled ?? this.sfxEnabled,
+      debugMode: debugMode ?? this.debugMode,
       autoBackupEnabled: autoBackupEnabled ?? this.autoBackupEnabled,
       autoBackupFrequency: autoBackupFrequency ?? this.autoBackupFrequency,
       lastBackupTime: lastBackupTime ?? this.lastBackupTime,
@@ -69,6 +74,7 @@ class SettingsNotifier extends Notifier<Settings> {
   static const _hostColorKey = 'settings_host_color';
   static const _ttsEnabledKey = 'settings_tts_enabled';
   static const _sfxEnabledKey = 'settings_sfx_enabled';
+  static const _debugModeKey = 'settings_debug_mode';
   static const _autoBackupEnabledKey = 'settings_auto_backup_enabled';
   static const _autoBackupFreqKey = 'settings_auto_backup_freq';
   static const _lastBackupTimeKey = 'settings_last_backup_time';
@@ -102,6 +108,8 @@ class SettingsNotifier extends Notifier<Settings> {
     final hostColor = prefs.getString(_hostColorKey) ?? '#4287f5';
     final ttsEnabled = prefs.getBool(_ttsEnabledKey) ?? false;
     final sfxEnabled = prefs.getBool(_sfxEnabledKey) ?? true;
+    final debugMode = prefs.getBool(_debugModeKey) ?? false;
+    AppLogger.debugMode = debugMode;
     final autoBackupEnabled = prefs.getBool(_autoBackupEnabledKey) ?? true;
     final autoBackupFreq = prefs.getString(_autoBackupFreqKey) ?? 'daily';
     final lastBackupTimeStr = prefs.getString(_lastBackupTimeKey);
@@ -117,6 +125,7 @@ class SettingsNotifier extends Notifier<Settings> {
       hostColor: hostColor,
       ttsEnabled: ttsEnabled,
       sfxEnabled: sfxEnabled,
+      debugMode: debugMode,
       autoBackupEnabled: autoBackupEnabled,
       autoBackupFrequency: autoBackupFreq,
       lastBackupTime: lastBackupTime,
@@ -168,6 +177,13 @@ class SettingsNotifier extends Notifier<Settings> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_sfxEnabledKey, enabled);
     state = state.copyWith(sfxEnabled: enabled);
+  }
+
+  Future<void> setDebugMode(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_debugModeKey, enabled);
+    AppLogger.debugMode = enabled;
+    state = state.copyWith(debugMode: enabled);
   }
 
   Future<void> setAutoBackupEnabled(bool enabled) async {

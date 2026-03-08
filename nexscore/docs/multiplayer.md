@@ -76,3 +76,23 @@ The `MultiplayerClientOverlay` widget wraps each game's body and automatically:
 - Detects if the user is a client via `isHostProvider`
 - Disables all touch interactions with `IgnorePointer`
 - Shows a yellow "Spectating — Host controls the game" banner
+## Troubleshooting & Debugging
+
+If users experience connectivity issues (404s, timeouts, or infinite loading), NexScore provides built-in diagnostic tools.
+
+### 1. Diagnostic Dialog
+When a multiplayer action fails or times out (15s default), a **Multiplayer Diagnostics** dialog appears automatically. This guides users through:
+- Disabling AdBlockers or VPNs (which often block `firestore.googleapis.com`).
+- Checking if the domain is authorized in Firebase.
+- Verifying Anonymous Authentication is enabled.
+
+### 2. Debug Mode & Log Export
+For complex issues, users can enable **Debug Mode** in the settings:
+1. Go to **Settings** → **Debug Mode**.
+2. Toggle Debug Mode **ON**. This enables verbose system logging in the background.
+3. Tap **Export Logs** to share a `.txt` file containing the last 5000 system events.
+
+### 3. Developer Diagnostics
+All logs are captured globally. Developers can access them in the browser console (if Debug Mode is ON) or via the exported file.
+- **Log Source**: `lib/core/utils/app_logger.dart`
+- **Global Interceptor**: `lib/main.dart` (intercepts `debugPrint`)

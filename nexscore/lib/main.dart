@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'core/firebase/firebase_options_web.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -14,9 +14,22 @@ import 'features/settings/provider/settings_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_scroll_behavior.dart';
 import 'core/lifecycle/app_lifecycle_observer.dart';
+import 'core/utils/app_logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Intercept all debugPrint calls to route them into our AppLogger
+  final originalDebugPrint = debugPrint;
+  debugPrint = (String? message, {int? wrapWidth}) {
+    if (message != null) {
+      AppLogger.addLog(message);
+      // Only spam the console if the user explicitly enabled debug mode
+      if (AppLogger.debugMode || kDebugMode) {
+        originalDebugPrint(message, wrapWidth: wrapWidth);
+      }
+    }
+  };
 
   // if (kIsWeb) {
   //   usePathUrlStrategy();
@@ -49,12 +62,12 @@ void main() async {
 
   // Configure Firestore specifically to prevent Web timeouts
   try {
+    debugPrint('Firestore: Applying settings...');
     firestore.FirebaseFirestore.instance.settings = const firestore.Settings(
-      persistenceEnabled:
-          false, // Prevents hanging due to IndexedDB/ServiceWorker conflicts
+      persistenceEnabled: false,
     );
     debugPrint(
-      'Firestore settings applied: persistence disabled to prevent timeouts',
+      'Firestore settings applied: persistenceEnabled=${firestore.FirebaseFirestore.instance.settings.persistenceEnabled}',
     );
   } catch (e) {
     debugPrint('Firestore settings error: $e');

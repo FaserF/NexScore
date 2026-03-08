@@ -50,9 +50,44 @@ class _JoinLobbyScreenState extends ConsumerState<JoinLobbyScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${l10n.get('error')}: $e')));
+        final l10n = AppLocalizations.of(context);
+        String message = e.toString();
+        if (message.contains('firestore_timeout') ||
+            message.contains('unavailable')) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.get('multiplayer_diagnostics')),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.get('multiplayer_diagnostics_desc')),
+                  const SizedBox(height: 12),
+                  Text('• ${l10n.get('multiplayer_adblock_title')}'),
+                  Text('• ${l10n.get('multiplayer_domains_title')}'),
+                  Text('• ${l10n.get('multiplayer_diagnostics_auth')}'),
+                  const SizedBox(height: 12),
+                  Text(l10n.get('multiplayer_diagnostics_timeout')),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.get('ok')),
+                ),
+              ],
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                l10n.getWith('multiplayer_error_join', [e.toString()]),
+              ),
+            ),
+          );
+        }
       }
     } finally {
       if (mounted) {
