@@ -40,6 +40,9 @@ dependencies:
   audioplayers: ^6.1.0
   flutter_web_plugins:
     sdk: flutter
+  pdf: ^3.11.1
+  printing: ^5.13.2
+  signature: ^5.5.0
 
 dependency_overrides:
   _fe_analyzer_shared: 97.0.0

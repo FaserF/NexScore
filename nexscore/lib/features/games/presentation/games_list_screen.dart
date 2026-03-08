@@ -431,6 +431,16 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
         tag: l10n.get('home_tag_ext'),
       ),
       _GameEntry(
+        id: 'volleyball',
+        name: l10n.get('game_volleyball'),
+        description: l10n.get('vb_tagline'),
+        route: '/games/volleyball',
+        icon: Icons.sports_volleyball,
+        color: Colors.orange.shade800,
+        playerCount: '2–12',
+        tag: l10n.get('home_tag_volleyball'),
+      ),
+      _GameEntry(
         id: 'generic',
         name: l10n.get('game_generic'),
         description: l10n.get('desc_generic'),
