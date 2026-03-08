@@ -1186,6 +1186,1373 @@ class AppLocalizations {
           'Roast every single person in the room brutally. Fail = drink 5.',
       'bt_card_e124': 'Everyone finish their drinks immediately!!',
 
+      // ── FactQuest
+      'game_factquest': 'FactQuest',
+      'factquest_title': 'FactQuest',
+      'factquest_categories': 'Select Categories',
+      'factquest_cat_randomFacts': 'Random Facts',
+      'factquest_cat_dumbWaysToDie': 'Dumb Ways to Die',
+      'factquest_start': 'START QUEST',
+      'factquest_tap_continue': 'Tap for next fact',
+      'factquest_source': 'Read More (Source)',
+      'desc_factquest':
+          'True facts, wild stories & "Dumb Ways to Die" – with clickable sources.',
+
+      // Random Facts (EN)
+      'fq_card_rf001_text': 'Honey never spoils.',
+      'fq_card_rf001_expl':
+          'Archaeologists have found 3,000-year-old honey in Egyptian tombs that was still perfectly edible. Honey\'s low moisture content and acidic pH create an inhospitable environment for bacteria and microorganisms.',
+      'fq_card_rf002_text': 'A man had the hiccups for 68 years straight.',
+      'fq_card_rf002_expl':
+          'Charles Osborne from Iowa, USA, started hiccupping in 1922 and did not stop until 1990 – approximately 430 million hiccups over 68 years. He was listed in the Guinness World Records.',
+      'fq_card_rf003_text': 'More than 80% of the ocean is unexplored.',
+      'fq_card_rf003_expl':
+          'Despite covering over 70% of Earth\'s surface, more than 80% of the ocean remains unmapped and unobserved. We know more about the surface of Mars than the deep ocean floor.',
+      'fq_card_rf004_text':
+          'There are more trees on Earth than stars in the Milky Way.',
+      'fq_card_rf004_expl':
+          'A 2015 study in Nature estimated there are about 3 trillion trees on Earth, while astronomers estimate the Milky Way contains 100–400 billion stars.',
+      'fq_card_rf005_text':
+          'The Great Wall of China is not visible from space with the naked eye.',
+      'fq_card_rf005_expl':
+          'Despite popular myth, astronauts have confirmed that the Great Wall is not visible from low Earth orbit without aid. It is too narrow (about 5–8 meters wide). However, highways and airports are visible.',
+      'fq_card_rf006_text': 'Octopuses have three hearts.',
+      'fq_card_rf006_expl':
+          'Two branchial hearts pump blood through the gills, while a systemic heart pumps it through the rest of the body. The systemic heart actually stops beating when the octopus swims, which is why they prefer crawling.',
+      'fq_card_rf007_text': 'A day on Venus is longer than a year on Venus.',
+      'fq_card_rf007_expl':
+          'Venus takes about 243 Earth days to rotate once on its axis, but only about 225 Earth days to orbit the Sun. Additionally, Venus rotates in the opposite direction compared to most planets.',
+      'fq_card_rf008_text':
+          'Mantis shrimp can punch at the speed of a .22 caliber bullet.',
+      'fq_card_rf008_expl':
+          'The mantis shrimp\'s strike is one of the fastest movements in the animal kingdom, accelerating at over 10,000 g-force. The punch creates cavitation bubbles that produce a second shockwave.',
+      'fq_card_rf009_text':
+          'Lightning strikes the Earth about 100 times per second.',
+      'fq_card_rf009_expl':
+          'That is roughly 8.6 million lightning strikes per day, or over 3 billion per year. A single lightning bolt can reach temperatures of about 30,000 Kelvin – five times hotter than the surface of the Sun.',
+      'fq_card_rf010_text': 'Tardigrades can survive in the vacuum of space.',
+      'fq_card_rf010_expl':
+          'These micro-animals (0.1–1.5 mm) can endure extreme temperatures, radiation, dehydration, and even the vacuum of outer space. In 2007 they survived 10 days of exposure in low Earth orbit.',
+      'fq_card_rf011_text': 'Bananas are slightly radioactive.',
+      'fq_card_rf011_expl':
+          'Bananas contain potassium-40, a naturally occurring radioactive isotope. You would need to eat roughly 10 million bananas at once to receive a lethal dose of radiation.',
+      'fq_card_rf012_text':
+          'Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid.',
+      'fq_card_rf012_expl':
+          'The Great Pyramid of Giza was built around 2560 BCE, while Cleopatra lived around 30 BCE. The Moon landing was in 1969 CE. Cleopatra was about 2,530 years after the pyramid and only about 2,000 years before the Moon landing.',
+      'fq_card_rf013_text':
+          'We have explored less of the ocean floor than the surface of Mars.',
+      'fq_card_rf013_expl':
+          'Only about 5–20% of the ocean floor has been mapped in high resolution. Meanwhile, NASA has mapped the entire surface of Mars using orbiters to a resolution of about 6 meters per pixel.',
+      'fq_card_rf014_text': 'An adult human body contains about 206 bones.',
+      'fq_card_rf014_expl':
+          'Babies are born with roughly 270 bones, but many fuse together during growth, leaving the standard 206 in adults. The smallest bone is the stapes in the ear at about 3 mm long.',
+      'fq_card_rf015_text': 'Dolphins sleep with one eye open.',
+      'fq_card_rf015_expl':
+          'Dolphins use unihemispheric slow-wave sleep: one half of their brain sleeps while the other stays awake. This allows them to continue breathing and watch for predators even while resting.',
+
+      // Dumb Ways to Die (EN)
+      'fq_card_dw001_text':
+          'A lawyer shoots himself in court to win a case. He wins, but he doesn\'t celebrate.',
+      'fq_card_dw001_expl':
+          'In 1871, lawyer Clement Vallandigham was defending a man accused of murder. To prove the victim could have accidentally shot himself while drawing his pistol, Vallandigham demonstrated with a loaded gun he thought was empty. He shot himself and died, but his client was acquitted.',
+      'fq_card_dw002_text':
+          'A sweet, sticky wave taller than a house crushes a city street. 21 people drown in sugar.',
+      'fq_card_dw002_expl':
+          'The Great Molasses Flood occurred in Boston in 1919 when a massive storage tank burst. A 7-metre-high wave of molasses rushed through the streets at 56 km/h, killing 21 people and injuring 150.',
+      'fq_card_dw003_text':
+          'A scientist straps himself to a rocket and goes faster than a bullet. He survives, but his eyes turn red.',
+      'fq_card_dw003_expl':
+          'Colonel John Stapp was a pioneer in studying the effects of acceleration and deceleration on the human body. In 1954, he rode a rocket sled at 1,017 km/h and stopped in 1.4 seconds. He survived, but the g-force caused burst capillaries in his eyes.',
+      'fq_card_dw004_text':
+          'A giant vat of beer bursts, sending a tidal wave of alcohol through London. Eight people die of "intoxication" without drinking a drop.',
+      'fq_card_dw004_expl':
+          'The London Beer Flood of 1814 happened when a 610,000-litre vat of porter ruptured. The wave destroyed two houses and killed eight people, either by drowning, injury, or the fumes.',
+      'fq_card_dw005_text':
+          'Hundreds of people start dancing and can\'t stop until they drop dead. There is no music.',
+      'fq_card_dw005_expl':
+          'The Dancing Plague of 1518 in Strasbourg saw hundreds of people dancing uncontrollably for weeks. Many died from heart attacks, strokes, or exhaustion. The cause remains a historical mystery, possibly mass hysteria or ergot poisoning.',
+      'fq_card_dw006_text':
+          'Politicians are thrown out of a high window into a pile of waste. They survive, but a war begins.',
+      'fq_card_dw006_expl':
+          'The Defenestration of Prague in 1618 involved Protestant lords throwing Catholic officials out of a window. They survived a 21-metre fall (allegedly landing in manure), but the event sparked the Thirty Years\' War.',
+      'fq_card_dw007_text':
+          'An amusement park grows silent forever because of a ghostly reputation.',
+      'fq_card_dw007_expl':
+          'Takakanonuma Greenland in Japan was a failed amusement park that sat abandoned for years. It gained a reputation as one of the most haunted places in Japan before its final demolition in 2006.',
+      'fq_card_dw008_text':
+          'A man throws himself against a skyscraper window to prove it\'s safe. The glass holds, but he still falls.',
+      'fq_card_dw008_expl':
+          'Toronto lawyer Garry Hoy was demonstrating the strength of the windows in the TD Bank Tower in 1993. The glass stayed intact, but the entire window frame popped out, and he fell 24 floors to his death.',
+      'fq_card_dw009_text':
+          'The man who made the world\'s most famous two-wheeled vehicle dies while using it in the woods.',
+      'fq_card_dw009_expl':
+          'Jimi Heselden, the multimillionaire owner of the Segway company, died in 2010 when he accidentally drove his Segway off a 24-metre cliff while walking his dog.',
+      'fq_card_dw010_text':
+          'A tailor jumps from a world-famous tower with a cape. He thinks he can fly, but the ground disagrees.',
+      'fq_card_dw010_expl':
+          'In 1912, Franz Reichelt jumped from the first level of the Eiffel Tower to test his homemade "parachute suit." The device failed, and he died in front of a crowd of spectators and journalists.',
+      'fq_card_rf016_text':
+          'A blue whale\u0027s heart is the size of a small car.',
+      'fq_card_rf016_expl':
+          'The blue whale\u0027s heart weighs about 180 kg and is roughly the size of a golf cart. Its aorta is large enough for a human to crawl through, and the heartbeat can be detected from over 3 km away.',
+      'fq_card_rf017_text':
+          'The tallest man ever recorded was 2.72 m (8 ft 11 in).',
+      'fq_card_rf017_expl':
+          'Robert Wadlow from Illinois, USA, reached 2.72 m before his death in 1940 at age 22. His extraordinary height was caused by hyperplasia of his pituitary gland. His shoes were US size 37.',
+      'fq_card_rf018_text': 'The Sun\u0027s corona is hotter than its surface.',
+      'fq_card_rf018_expl':
+          'The Sun\u0027s surface is about 5,500°C, but the corona (outer atmosphere) reaches over 1 million°C. This paradox, known as the coronal heating problem, is still being researched by scientists.',
+      'fq_card_rf019_text':
+          'Flamingos are born white and turn pink from their diet.',
+      'fq_card_rf019_expl':
+          'Flamingo chicks are grey or white. Their pink colour comes from carotenoid pigments in the brine shrimp and algae they eat. In zoos, flamingos are sometimes fed supplements to maintain their colour.',
+      'fq_card_rf020_text':
+          'About 1.3 million Earths could fit inside the Sun.',
+      'fq_card_rf020_expl':
+          'The Sun\u0027s volume is so enormous that approximately 1.3 million Earth-sized planets could fit inside it. The Sun accounts for 99.86% of all mass in our solar system.',
+      'fq_card_rf021_text': 'A housefly buzzes in the key of F.',
+      'fq_card_rf021_expl':
+          'A housefly beats its wings about 200 times per second, producing a buzzing sound in the musical key of F. Flies taste with their feet, which are 10 million times more sensitive than a human tongue.',
+      'fq_card_rf022_text':
+          'The Colosseum in Rome could be flooded for mock naval battles.',
+      'fq_card_rf022_expl':
+          'In its earliest years, the Colosseum\u0027s arena could be flooded to stage miniature naval battles called naumachiae. This was possible before underground tunnels and chambers were built beneath the arena floor.',
+      'fq_card_rf023_text':
+          'There are more stars in the universe than grains of sand on all Earth\u0027s beaches.',
+      'fq_card_rf023_expl':
+          'Astronomers estimate there are roughly 10 sextillion (10^22) stars in the observable universe. Earth\u0027s beaches contain an estimated 7.5 quintillion (7.5×10^18) grains of sand.',
+      'fq_card_rf024_text': 'Crows can recognise and remember human faces.',
+      'fq_card_rf024_expl':
+          'Research at the University of Washington showed that crows can remember a threatening person\u0027s face for at least 5 years and even teach other crows to recognise that face – across generations.',
+      'fq_card_rf025_text':
+          'If you uncoiled all the DNA in your body, it would stretch to Pluto and back.',
+      'fq_card_rf025_expl':
+          'Each human cell contains about 2 metres of DNA. With roughly 37.2 trillion cells, that totals about 74 billion km of DNA – enough to span the distance from Earth to Pluto and back multiple times.',
+      'fq_card_rf026_text':
+          'The Amazon Rainforest produces about 20% of the world\u0027s oxygen.',
+      'fq_card_rf026_expl':
+          'Often called the "lungs of the Earth," the Amazon generates roughly 20% of the oxygen in the Earth\u0027s atmosphere. It spans 5.5 million km² across nine countries in South America.',
+      'fq_card_rf027_text':
+          'Giraffes and humans have the same number of neck vertebrae.',
+      'fq_card_rf027_expl':
+          'Both giraffes and humans have exactly 7 cervical vertebrae. In giraffes, each vertebra can be over 25 cm long. A giraffe\u0027s tongue is about 45 cm long and is prehensile, allowing it to grip branches.',
+      'fq_card_rf028_text':
+          'A smartphone has more computing power than all of NASA in 1969.',
+      'fq_card_rf028_expl':
+          'The Apollo 11 guidance computer had 74 KB of memory and ran at 0.043 MHz. A modern smartphone has millions of times more processing power, memory, and storage than all computers used for the Moon landing combined.',
+      'fq_card_rf029_text':
+          'Lake Baikal in Russia contains 20% of the world\u0027s unfrozen fresh water.',
+      'fq_card_rf029_expl':
+          'Lake Baikal is the deepest lake on Earth (1,642 m) and holds about 23,615 km³ of water. It is also the oldest lake, estimated at 25–30 million years old, and home to over 1,700 unique species.',
+      'fq_card_rf030_text':
+          'Electric eels can generate a shock of up to 860 volts.',
+      'fq_card_rf030_expl':
+          'Electric eels have three electric organs comprising about 6,000 electrocyte cells. They use high-voltage shocks to stun prey and defend against predators. The shock is brief but can be repeated many times.',
+      'fq_card_rf031_text':
+          'Light takes 8 minutes and 20 seconds to travel from the Sun to Earth.',
+      'fq_card_rf031_expl':
+          'Light travels at about 299,792 km per second. The Sun is approximately 150 million km away, so sunlight takes about 8 minutes and 20 seconds to reach us. We always see the Sun as it was 8 minutes ago.',
+      'fq_card_rf032_text':
+          'The platypus is one of only five species of mammals that lay eggs.',
+      'fq_card_rf032_expl':
+          'The platypus is a monotreme, a mammal that lays eggs. Males also have venomous spurs on their hind legs. They use electroreception in their bills to detect prey underwater – sensing the electric fields of muscle contractions.',
+      'fq_card_rf033_text':
+          'Saturn\u0027s density is so low it would float in water.',
+      'fq_card_rf033_expl':
+          'Saturn\u0027s average density is only 0.687 g/cm³, less than water (1 g/cm³). If you could find a bathtub big enough (Saturn\u0027s diameter is 116,460 km), the planet would theoretically float.',
+      'fq_card_rf034_text': 'Your heart beats about 100,000 times per day.',
+      'fq_card_rf034_expl':
+          'The average human heart beats 60–100 times per minute, totalling about 100,000 beats per day and over 2.5 billion beats in a lifetime. It pumps approximately 7,570 litres of blood daily.',
+      'fq_card_rf035_text':
+          'The nearest star system to Earth is 4.24 light-years away.',
+      'fq_card_rf035_expl':
+          'Proxima Centauri, part of the Alpha Centauri system, is about 4.24 light-years (40 trillion km) away. At the speed of the fastest spacecraft ever (Parker Solar Probe at 635,000 km/h), it would take about 7,000 years to reach it.',
+      'fq_card_rf036_text':
+          'The total weight of all ants on Earth roughly equals the total weight of all humans.',
+      'fq_card_rf036_expl':
+          'There are an estimated 20 quadrillion (20×10^15) ants on Earth. Each ant weighs about 1–2 mg, giving a combined weight of roughly 80 billion kg – comparable to the total mass of all humans.',
+      'fq_card_rf037_text':
+          'The Sahara Desert was green and lush just 6,000 years ago.',
+      'fq_card_rf037_expl':
+          'During the "African Humid Period" (11,000–5,000 years ago), the Sahara had lakes, rivers, and grasslands. Cave paintings in the region depict swimming and herding cattle. Orbital wobbles in Earth\u0027s axis caused the shift.',
+      'fq_card_rf038_text':
+          'The human body contains about 37.2 trillion cells.',
+      'fq_card_rf038_expl':
+          'A 2013 study estimated 37.2 trillion cells in the average adult human body. However, you also carry roughly 38 trillion bacteria, meaning bacterial cells slightly outnumber your own cells.',
+      'fq_card_rf039_text':
+          'Nikola Tesla could visualise entire inventions in his head before building them.',
+      'fq_card_rf039_expl':
+          'Tesla had an eidetic (photographic) memory and could run complex visualised simulations of machines in his mind. He claimed to see flashes of light and experience vivid hallucinations which he channelled into his work.',
+      'fq_card_rf040_text': 'Greenland sharks can live for over 400 years.',
+      'fq_card_rf040_expl':
+          'A 2016 study in Science using radiocarbon dating found Greenland sharks can live at least 272–512 years, making them the longest-lived vertebrates known. They don\u0027t reach sexual maturity until about 150 years old.',
+      'fq_card_rf041_text': 'Russia spans 11 time zones.',
+      'fq_card_rf041_expl':
+          'Russia stretches across 11 time zones from Kaliningrad (UTC+2) to Kamchatka (UTC+12). When it\u0027s midnight in Moscow, it\u0027s already 9 AM on the Kamchatka Peninsula.',
+      'fq_card_rf042_text':
+          'The ancient Maya independently invented the concept of zero.',
+      'fq_card_rf042_expl':
+          'The Maya developed the concept of zero independently around 350 CE, possibly before it appeared in India. They used a shell-shaped glyph to represent zero in their vigesimal (base-20) number system.',
+      'fq_card_rf043_text': 'Glass is not a liquid – it is an amorphous solid.',
+      'fq_card_rf043_expl':
+          'The myth that medieval cathedral windows are thicker at the bottom because glass "flows" is false. Glass is an amorphous solid. The uneven thickness is simply due to the medieval manufacturing process.',
+      'fq_card_rf044_text': 'Hot water can freeze faster than cold water.',
+      'fq_card_rf044_expl':
+          'This counterintuitive phenomenon is called the Mpemba effect, named after a Tanzanian student who observed it in 1963. Under certain conditions, hot water freezes faster than cold water; the exact mechanism is still debated.',
+      'fq_card_rf045_text': 'Nobody fully knows how or why cats purr.',
+      'fq_card_rf045_expl':
+          'Cats purr at 25–150 Hz, frequencies known to promote bone healing, tissue repair, and reduce swelling. The most accepted theory is that the laryngeal muscles twitch 25–150 times per second, rhythmically opening and closing the glottis.',
+      'fq_card_rf046_text': 'The first website ever created is still online.',
+      'fq_card_rf046_expl':
+          'Tim Berners-Lee\u0027s first website, published in 1991 at CERN, described the World Wide Web project. A restored version is still accessible at info.cern.ch. The web was originally designed for sharing physics research.',
+      'fq_card_rf047_text':
+          'The Black Death killed about one-third of Europe\u0027s population.',
+      'fq_card_rf047_expl':
+          'Between 1347 and 1353, the bubonic plague killed an estimated 25–50 million people in Europe (30–60% of the population). It was caused by the bacterium Yersinia pestis, spread by fleas on rats.',
+      'fq_card_rf048_text':
+          'Pistol shrimp create a shockwave hotter than the surface of the Sun.',
+      'fq_card_rf048_expl':
+          'When a pistol shrimp snaps its claw, it creates a cavitation bubble that collapses and produces a shockwave of up to 218 dB. The implosion briefly reaches temperatures of about 4,700°C – close to the Sun\u0027s surface temperature.',
+      'fq_card_rf049_text':
+          'The human brain uses about 20% of the body\u0027s total energy.',
+      'fq_card_rf049_expl':
+          'Despite weighing only about 1.4 kg (2% of body weight), the brain consumes roughly 20% of the body\u0027s oxygen and calories. It contains about 86 billion neurons, each connected to thousands of others.',
+      'fq_card_rf050_text':
+          'Elephants are the only animals that can\u0027t jump.',
+      'fq_card_rf050_expl':
+          'Elephants are the only mammals that cannot jump. Their leg bones are all pointed downwards, and they lack the spring-like mechanics needed for jumping. However, they can run at speeds of up to 40 km/h.',
+      'fq_card_rf051_text': 'Mount Everest grows about 4 mm taller every year.',
+      'fq_card_rf051_expl':
+          'The collision of the Indian and Eurasian tectonic plates is still pushing Everest (8,849 m) upward at roughly 4 mm per year. GPS measurements confirmed this ongoing growth despite erosion.',
+      'fq_card_rf052_text':
+          'Every person\u0027s tongue print is unique – like a fingerprint.',
+      'fq_card_rf052_expl':
+          'Recent biometric research has shown that the tongue\u0027s shape, texture, and geometric patterns are unique to each individual. Scientists are developing tongue print recognition systems for identity verification.',
+      'fq_card_rf053_text':
+          'A single honeybee produces only about 1/12th of a teaspoon of honey in its lifetime.',
+      'fq_card_rf053_expl':
+          'A worker honeybee lives about 6 weeks and visits 50–100 flowers per foraging trip. It takes the collected nectar of about 556 workers to produce 450 g of honey. A colony produces 27–45 kg of honey per year.',
+      'fq_card_rf054_text':
+          'Rainbows are actually full circles – you only see half.',
+      'fq_card_rf054_expl':
+          'Rainbows are full circles of refracted light, but the ground blocks the lower half. From an airplane or mountaintop, you can occasionally see a complete circular rainbow. Each person sees their own unique rainbow.',
+      'fq_card_rf055_text':
+          'Axolotls can regrow limbs, organs, and even parts of their brain.',
+      'fq_card_rf055_expl':
+          'The axolotl (a Mexican salamander) can regenerate limbs, tail, heart tissue, and parts of its brain and spinal cord – without scarring. Scientists study them for insights into human regenerative medicine.',
+
+      'fq_card_rf056_text': 'Earth\'s magnetic field is slowly weakening.',
+      'fq_card_rf056_expl':
+          'Since the 1800s, Earth\'s magnetic field has weakened by about 9%. Scientists believe the field periodically weakens and flips polarity – the last reversal was about 780,000 years ago.',
+      'fq_card_rf057_text': 'Sharks have been around longer than trees.',
+      'fq_card_rf057_expl':
+          'Sharks first appeared about 450 million years ago, while the earliest trees evolved around 350 million years ago. Sharks predate dinosaurs by 200 million years and have survived five mass extinctions.',
+      'fq_card_rf058_text':
+          'The Eiffel Tower can grow by up to 15 cm in summer.',
+      'fq_card_rf058_expl':
+          'Thermal expansion causes the iron structure of the Eiffel Tower to expand in heat. On hot summer days, the tower can grow up to 15 cm taller and also tilts slightly away from the Sun.',
+      'fq_card_rf059_text':
+          'Emperor penguins can dive to depths of 500 metres.',
+      'fq_card_rf059_expl':
+          'Emperor penguins are the deepest-diving birds, reaching depths of over 500 m and holding their breath for up to 22 minutes. They slow their heart rate to conserve oxygen during deep dives.',
+      'fq_card_rf060_text':
+          'Marie Curie\'s research notes are still radioactive over 100 years later.',
+      'fq_card_rf060_expl':
+          'Marie Curie\'s notebooks from the 1890s are stored in lead-lined boxes at the Bibliothèque Nationale in Paris. Visitors must wear protective clothing and sign a liability waiver to view them.',
+      'fq_card_rf061_text':
+          'Bald eagles mate for life and use the same nest for decades.',
+      'fq_card_rf061_expl':
+          'Bald eagle nests can weigh over 2 tonnes and measure 4 m deep. The largest known nest was 6 m deep and weighed nearly 3 tonnes. Pairs return to the same nest year after year.',
+      'fq_card_rf062_text': 'Tornadoes can reach wind speeds of over 480 km/h.',
+      'fq_card_rf062_expl':
+          'The most powerful tornadoes (EF5) have estimated winds exceeding 480 km/h. The 2013 El Reno tornado in Oklahoma was 4.2 km wide – the widest ever recorded.',
+      'fq_card_rf063_text':
+          'Polar bears have black skin under their white fur.',
+      'fq_card_rf063_expl':
+          'Polar bear fur is actually transparent and appears white because it scatters visible light. Their skin underneath is black to absorb heat from the Sun. In warm zoos, their fur can develop a greenish tinge from algae.',
+      'fq_card_rf064_text': 'Sound cannot travel through the vacuum of space.',
+      'fq_card_rf064_expl':
+          'Sound requires a medium to propagate. In the vacuum of space, there are no molecules to vibrate, so it is completely silent. Movies depicting explosions in space are scientifically inaccurate.',
+      'fq_card_rf065_text':
+          'Wolves can eat up to 9 kg of meat in a single meal.',
+      'fq_card_rf065_expl':
+          'Grey wolves can consume up to 9 kg of meat at once, then go days without eating. A wolf pack can bring down prey ten times their size. Wolves can run at 60 km/h for short bursts.',
+      'fq_card_rf066_text':
+          'The Great Pyramid of Giza was the tallest structure on Earth for 3,800 years.',
+      'fq_card_rf066_expl':
+          'Built around 2560 BCE at 146.6 m tall, the Great Pyramid held the record as the tallest man-made structure until Lincoln Cathedral surpassed it in 1311 CE.',
+      'fq_card_rf067_text':
+          'Spider silk is stronger than steel of the same diameter.',
+      'fq_card_rf067_expl':
+          'Weight for weight, spider silk is about 5 times stronger than steel. Darwin\'s bark spider produces silk 10 times tougher than Kevlar.',
+      'fq_card_rf068_text':
+          'The corpse flower smells like rotting flesh and blooms only every 7–10 years.',
+      'fq_card_rf068_expl':
+          'The titan arum produces the world\'s largest unbranched inflorescence, up to 3 m tall. Its stench of rotting meat attracts carrion beetles and flesh flies for pollination.',
+      'fq_card_rf069_text':
+          'Sloths can take up to 30 days to fully digest a single leaf.',
+      'fq_card_rf069_expl':
+          'Sloths have the slowest metabolism of any mammal. Their multi-chambered stomachs work similarly to a cow\'s. Two-thirds of a sloth\'s body weight can be the contents of its stomach.',
+      'fq_card_rf070_text': 'The Dead Sea is 9.6 times saltier than the ocean.',
+      'fq_card_rf070_expl':
+          'The Dead Sea has a salinity of about 34%, compared to the ocean\'s 3.5%. The extreme salt concentration makes the water so dense that humans float effortlessly on the surface.',
+      'fq_card_rf071_text': 'Giant tortoises can live for over 175 years.',
+      'fq_card_rf071_expl':
+          'Jonathan, a Seychelles giant tortoise born c. 1832, is the oldest known living land animal at over 190 years old. He lives on Saint Helena island.',
+      'fq_card_rf072_text':
+          'The Moon is slowly drifting away from Earth at 3.8 cm per year.',
+      'fq_card_rf072_expl':
+          'Tidal interactions between Earth and the Moon cause the Moon to drift about 3.8 cm farther from Earth each year. In the distant past, the Moon appeared much larger in the sky.',
+      'fq_card_rf073_text': 'Some parrots can live for over 80 years.',
+      'fq_card_rf073_expl':
+          'Macaws and cockatoos can live 60–80+ years in captivity. Cookie, a cockatoo at Brookfield Zoo in Chicago, lived to 83 years. Parrot intelligence is comparable to a 4–6-year-old child.',
+      'fq_card_rf074_text':
+          'Music activates more parts of the brain than any other human activity.',
+      'fq_card_rf074_expl':
+          'Neuroscience research shows that listening to music engages the auditory, motor, limbic, and visual cortices simultaneously. Playing music activates virtually every area of the brain at once.',
+      'fq_card_rf075_text':
+          'Humpback whale songs can travel over 16,000 km through the ocean.',
+      'fq_card_rf075_expl':
+          'Male humpback whales produce complex songs lasting up to 20 minutes, which they repeat for hours. Each population has its own distinct "dialect."',
+      'fq_card_rf076_text': 'Antarctica is the driest continent on Earth.',
+      'fq_card_rf076_expl':
+          'Despite being covered in ice, Antarctica receives only about 50 mm of precipitation per year in its interior, making it technically a desert. It contains 70% of the world\'s fresh water – all frozen.',
+      'fq_card_rf077_text': 'Hedgehogs are immune to most snake venoms.',
+      'fq_card_rf077_expl':
+          'Hedgehogs have a protein called erinacin that provides partial immunity to many venoms. They are known to eat small venomous snakes. When threatened, they curl into a ball of 5,000–7,000 spines.',
+      'fq_card_rf078_text':
+          'The Milky Way will collide with the Andromeda galaxy in about 4.5 billion years.',
+      'fq_card_rf078_expl':
+          'The Milky Way and Andromeda galaxies are approaching each other at about 110 km per second. They will merge into a single galaxy sometimes nicknamed "Milkomeda."',
+      'fq_card_rf079_text':
+          'Cows have best friends and get stressed when separated.',
+      'fq_card_rf079_expl':
+          'Research at Northampton University found that cows form close bonds and become measurably stressed when separated, showing elevated heart rates and cortisol levels.',
+      'fq_card_rf080_text': 'Diamonds can be made from peanut butter.',
+      'fq_card_rf080_expl':
+          'Scientists have successfully converted peanut butter into tiny diamonds under pressures exceeding 50,000 atmospheres and extreme heat, replicating conditions deep within the Earth\'s mantle.',
+      'fq_card_rf081_text': 'A group of flamingos is called a "flamboyance."',
+      'fq_card_rf081_expl':
+          'Flamingos live in colonies of hundreds to thousands. They feed by filtering water through their beaks while upside down. What looks like a backward knee is actually the ankle.',
+      'fq_card_rf082_text':
+          'The Mariana Trench is deeper than Mount Everest is tall.',
+      'fq_card_rf082_expl':
+          'The Challenger Deep reaches 10,994 m below sea level, while Everest stands 8,849 m above. If you placed Everest in the trench, its peak would still be 2 km underwater.',
+      'fq_card_rf083_text':
+          'Poison dart frogs get their toxins from their diet, not their own body.',
+      'fq_card_rf083_expl':
+          'Wild poison dart frogs obtain their deadly toxins from eating certain ants, mites, and beetles. Captive-bred frogs raised on different diets are completely non-toxic.',
+      'fq_card_rf084_text':
+          'Voyager 1 is the farthest human-made object from Earth.',
+      'fq_card_rf084_expl':
+          'Launched in 1977, Voyager 1 is over 24 billion km from Earth and entered interstellar space in 2012. It carries a Golden Record with sounds and images representing life on Earth.',
+      'fq_card_rf085_text': 'Clownfish can change their sex.',
+      'fq_card_rf085_expl':
+          'All clownfish are born male. When the dominant female dies, the largest male changes sex to become the new female. This ensures the group can always reproduce.',
+      'fq_card_rf086_text':
+          'Plants can "hear" themselves being eaten and respond defensively.',
+      'fq_card_rf086_expl':
+          'A 2014 study at the University of Missouri found that plants can detect the vibrations of caterpillars chewing and produce chemical defences in response.',
+      'fq_card_rf087_text': 'Monarch butterflies migrate up to 4,800 km.',
+      'fq_card_rf087_expl':
+          'Each autumn, millions of monarchs travel from Canada to central Mexico. No single butterfly makes the full round trip; it takes 3–4 generations to complete the cycle.',
+      'fq_card_rf088_text':
+          'The Easter Island statues have buried bodies beneath them.',
+      'fq_card_rf088_expl':
+          'The famous Moai heads actually have full bodies buried underground, some up to 10 m tall. Nearly 1,000 statues were carved between 1250–1500 CE from volcanic rock.',
+      'fq_card_rf089_text':
+          'Saltwater crocodiles have the strongest bite force ever measured.',
+      'fq_card_rf089_expl':
+          'Saltwater crocs can exert a bite force of 16,460 N, the strongest of any living animal. However, the muscles to open their jaws are surprisingly weak – you could hold them shut with your hands.',
+      'fq_card_rf090_text': 'The human body is about 60% water.',
+      'fq_card_rf090_expl':
+          'The brain and heart are about 73% water, lungs about 83%, muscles about 79%, skin about 64%, and even bones are about 31% water. Babies are born at about 78% water.',
+      'fq_card_rf091_text':
+          'Only male peacocks have the spectacular tail feathers.',
+      'fq_card_rf091_expl':
+          'The female is called a peahen and has duller plumage. A peacock\'s "tail" is actually a train of upper tail covert feathers, containing up to 200 iridescent feathers.',
+      'fq_card_rf092_text': 'Venus is hot enough to melt lead.',
+      'fq_card_rf092_expl':
+          'Venus has a surface temperature of about 465°C due to a runaway greenhouse effect. Its atmosphere is 96% CO₂ with clouds of sulfuric acid.',
+      'fq_card_rf093_text':
+          'Komodo dragons have venom glands in their lower jaws.',
+      'fq_card_rf093_expl':
+          'Once thought to rely on bacteria, it was discovered in 2009 that Komodo dragons actually have venom glands that produce anticoagulants and shock-inducing compounds.',
+      'fq_card_rf094_text':
+          'The Bermuda Triangle has no more disappearances than any other comparable ocean region.',
+      'fq_card_rf094_expl':
+          'Statistical analysis shows the rate of disappearances in the Bermuda Triangle is no higher than in any other similarly trafficked region. Lloyd\'s of London does not charge higher insurance premiums for the area.',
+      'fq_card_rf095_text':
+          'Hippos are responsible for more human deaths in Africa than any other large animal.',
+      'fq_card_rf095_expl':
+          'Hippos kill an estimated 500 people per year in Africa, more than lions or crocodiles. Despite their appearance, they can run at 30 km/h and are highly territorial.',
+      'fq_card_rf096_text':
+          'Jet lag feels worse when travelling east than west.',
+      'fq_card_rf096_expl':
+          'The human circadian rhythm is slightly longer than 24 hours (about 24.2 h), so it naturally adjusts more easily to a longer day (westward travel) than a shorter one (eastward).',
+      'fq_card_rf097_text':
+          'The human body emits a faint glow invisible to the naked eye.',
+      'fq_card_rf097_expl':
+          'In 2009, Japanese scientists proved that the human body emits biophotons – ultra-weak light 1,000 times less intense than visible light, peaking in the late afternoon around the cheeks.',
+      'fq_card_rf098_text':
+          'Mauna Kea in Hawaii is taller than Mount Everest – if measured from its base.',
+      'fq_card_rf098_expl':
+          'From base to summit, Mauna Kea measures about 10,210 m – over 1,300 m taller than Everest. However, most of it is underwater. Its peak sits only 4,207 m above sea level.',
+      'fq_card_rf099_text': 'Snails can sleep for up to three years.',
+      'fq_card_rf099_expl':
+          'When conditions are unfavourable, some land snails can enter a state of dormancy and remain dormant for up to three years, sealing their shell with a mucus "door."',
+      'fq_card_rf100_text':
+          'Stomach acid is strong enough to dissolve small metal objects.',
+      'fq_card_rf100_expl':
+          'Human stomach acid has a pH of 1–2, strong enough to dissolve thin razor blades. The stomach lining protects itself by renewing its mucous coating every two weeks.',
+      'fq_card_rf101_text': 'Scorpions glow under ultraviolet light.',
+      'fq_card_rf101_expl':
+          'Scorpions fluoresce a bright blue-green under UV light due to chemicals in their cuticle. The exact reason is unknown – hypotheses include UV detection and prey luring.',
+      'fq_card_rf102_text': 'A tsunami can travel as fast as a commercial jet.',
+      'fq_card_rf102_expl':
+          'In deep ocean water, tsunami waves can travel at 700–900 km/h. In the open ocean, they may be only 30 cm high; they build height as they approach shallow water.',
+      'fq_card_rf103_text': 'Koalas sleep up to 22 hours a day.',
+      'fq_card_rf103_expl':
+          'Koalas sleep 18–22 hours daily because their eucalyptus leaf diet is extremely low in nutrition. The leaves are also toxic – koalas have a specialised digestive system to detoxify the compounds.',
+      'fq_card_rf104_text':
+          'The Hubble Space Telescope can see galaxies 13.4 billion light-years away.',
+      'fq_card_rf104_expl':
+          'Launched in 1990, Hubble has observed objects so distant their light has been travelling for 13.4 billion years – showing the universe only 400 million years after the Big Bang.',
+      'fq_card_rf105_text':
+          'Giant squid have the largest eyes in the animal kingdom.',
+      'fq_card_rf105_expl':
+          'Giant squid eyes can be up to 27 cm in diameter – the size of a dinner plate. These enormous eyes help them detect bioluminescent light from predators in the deep ocean.',
+      'fq_card_rf106_text':
+          'Magnets lose their magnetism when heated above a certain temperature.',
+      'fq_card_rf106_expl':
+          'Above the Curie temperature (770°C for iron), thermal energy disrupts the aligned magnetic domains, causing the material to lose its magnetism.',
+      'fq_card_rf107_text':
+          'Cheetahs can accelerate from 0 to 100 km/h in just 3 seconds.',
+      'fq_card_rf107_expl':
+          'Cheetahs are the fastest land animals, reaching top speeds of 112 km/h. Their acceleration rivals sports cars. However, they can only maintain top speed for about 30 seconds.',
+      'fq_card_rf108_text':
+          'The Moon causes tides in solid rock, not just water.',
+      'fq_card_rf108_expl':
+          'The Moon\'s gravitational pull causes "earth tides" – the solid ground rises and falls by up to 55 cm twice daily. This is too gradual to feel but is measurable.',
+      'fq_card_rf109_text':
+          'Bats are the only mammals capable of sustained flight.',
+      'fq_card_rf109_expl':
+          'While flying squirrels glide, bats are the only mammals with true powered flight. There are over 1,400 bat species, making them the second-largest order of mammals after rodents.',
+      'fq_card_rf110_text':
+          'All the gold ever mined would fit into roughly three Olympic swimming pools.',
+      'fq_card_rf110_expl':
+          'About 190,000 tonnes of gold have been mined throughout history. This would form a cube of approximately 21 m on each side. More steel is poured in an hour than gold in a year.',
+
+      'fq_card_rf111_text':
+          'Dogs have been human companions for over 30,000 years.',
+      'fq_card_rf111_expl':
+          'Genetic evidence suggests dogs were domesticated from a now-extinct wolf population at least 15,000 years ago, though some archaeological finds suggest the bond could be over 30,000 years old.',
+      'fq_card_rf112_text':
+          'Asteroids are leftovers from the formation of our solar system.',
+      'fq_card_rf112_expl':
+          'Most asteroids orbit the Sun in the main asteroid belt between Mars and Jupiter. They are rocky remnants from the solar system\'s birth 4.6 billion years ago that never coalesced into a planet.',
+      'fq_card_rf113_text': 'Every zebra has a unique pattern of stripes.',
+      'fq_card_rf113_expl':
+          'Just like human fingerprints, no two zebras have the same stripe pattern. Stripes may help with temperature regulation, camouflage against predators, and deterring biting flies.',
+      'fq_card_rf114_text': 'Greenland is the world\'s largest island.',
+      'fq_card_rf114_expl':
+          'Greenland covers about 2.16 million km², but roughly 80% of it is covered by a massive ice sheet. Australia is considered a continent, otherwise it would hold the title.',
+      'fq_card_rf115_text': 'Fish extract oxygen from water using their gills.',
+      'fq_card_rf115_expl':
+          'Gills have a large surface area and thin membranes that allow oxygen to diffuse from water into the blood while carbon dioxide moves out. Some fish must swim constantly to keep water flowing over their gills.',
+      'fq_card_rf116_text':
+          'The Atacama Desert is the driest non-polar place on Earth.',
+      'fq_card_rf116_expl':
+          'Some parts of the Atacama in Chile have seen no recorded rainfall for over 400 years. Its hyper-aridity is due to being sandwiched between the Andes and the Chilean Coast Range.',
+      'fq_card_rf117_text':
+          'Arctic foxes can survive temperatures as low as -50°C.',
+      'fq_card_rf117_expl':
+          'Arctic foxes have thick fur, a compact body, and a specialized circulatory system in their paws to prevent freezing. They also use their bushy tails as a warm blanket while sleeping.',
+      'fq_card_rf118_text':
+          'Mercury is the smallest planet in our solar system.',
+      'fq_card_rf118_expl':
+          'Mercury is only slightly larger than Earth\'s Moon. Despite being closest to the Sun, it is not the hottest planet – that title goes to Venus because of its thick atmosphere.',
+      'fq_card_rf119_text': 'Camels store fat, not water, in their humps.',
+      'fq_card_rf119_expl':
+          'The hump stores up to 36 kg of fat, which the camel can metabolize into energy and water when food is scarce. This concentration of fat in one place also helps with heat dissipation from the rest of the body.',
+      'fq_card_rf120_text':
+          'The Amazon River carries more water than any other river.',
+      'fq_card_rf120_expl':
+          'The Amazon discharges about 209,000 cubic metres of water per second into the Atlantic Ocean – more than the next seven largest rivers combined. It provides 20% of Earth\'s fresh water discharge to the oceans.',
+      'fq_card_rf121_text':
+          'Rhinos are essentially giant unicorns, but with keratin horns.',
+      'fq_card_rf121_expl':
+          'A rhino\'s horn is made of keratin – the same protein found in human hair and fingernails. Rhinos belong to the group of "odd-toed ungulates" and are closely related to horses and tapirs.',
+      'fq_card_rf122_text': 'Earth\'s atmosphere consists of five main layers.',
+      'fq_card_rf122_expl':
+          'The layers are the troposphere, stratosphere, mesosphere, thermosphere, and exosphere. Most weather occurs in the troposphere, which extends about 8 to 15 km above the surface.',
+      'fq_card_rf123_text':
+          'Cats were domesticated in the Near East about 10,000 years ago.',
+      'fq_card_rf123_expl':
+          'DNA evidence shows that house cats descended from the Near Eastern wildcat. They likely started hanging around early human settlements to hunt rodents attracted by grain stores.',
+      'fq_card_rf124_text': 'Only 3% of Earth\'s water is fresh water.',
+      'fq_card_rf124_expl':
+          'Of that 3%, over two-thirds is locked in glaciers and ice caps. Less than 1% of all water on Earth is easily accessible for human use in lakes, rivers, and underground aquifers.',
+      'fq_card_rf125_text': 'Owls can rotate their heads up to 270 degrees.',
+      'fq_card_rf125_expl':
+          'Owls have 14 neck vertebrae (twice as many as humans) and a specialized blood-pooling system that keeps their brain supplied with blood while their head is turned at extreme angles.',
+      'fq_card_rf126_text':
+          'Human DNA is 99.9% identical across all individuals.',
+      'fq_card_rf126_expl':
+          'The 0.1% difference accounts for all the variations in physical appearance and health between humans. We also share about 98.8% of our DNA with chimpanzees and 60% with bananas.',
+      'fq_card_rf127_text':
+          'Pufferfish contain a toxin 1,200 times more deadly than cyanide.',
+      'fq_card_rf127_expl':
+          'Tetrodotoxin is found in the liver, ovaries, and skin of pufferfish. There is no known antidote. Despite the risk, fugu is a highly prized delicacy in Japan, prepared only by specially licensed chefs.',
+      'fq_card_rf128_text':
+          'Mount Kilimanjaro is the highest free-standing mountain in the world.',
+      'fq_card_rf128_expl':
+          'Kilimanjaro in Tanzania is 5,895 m tall. Unlike Everest, which is part of a mountain range, Kilimanjaro is a strato-volcano that rises alone from the surrounding plains.',
+      'fq_card_rf129_text': 'Kangaroos cannot walk backwards.',
+      'fq_card_rf129_expl':
+          'Due to their massive tail used for balance and the structure of their long, powerful hind legs, kangaroos lack the motor capability to move their legs independently in a reverse direction.',
+      'fq_card_rf130_text':
+          'There are about 1,350 potentially active volcanoes worldwide.',
+      'fq_card_rf130_expl':
+          'Most active volcanoes are located along the "Ring of Fire" surrounding the Pacific Ocean. About 50 to 70 volcanoes erupt every year, though many are minor or underwater.',
+      'fq_card_rf131_text':
+          'Squirrels plant thousands of new trees each year by forgetting where they hid their nuts.',
+      'fq_card_rf131_expl':
+          'Squirrels bury acorns and other seeds as food stores for winter. Because they often forget the exact location or fail to retrieve all of them, many seeds germinate and grow into new trees.',
+      'fq_card_rf132_text':
+          'Helium is the second most abundant element in the universe.',
+      'fq_card_rf132_expl':
+          'Helium makes up about 24% of the universe\'s elemental mass. It was first discovered on the Sun via spectroscopy before it was found on Earth.',
+      'fq_card_rf133_text':
+          'Flamingos are pink because of the beta-carotene in their food.',
+      'fq_card_rf133_expl':
+          'Their diet consists mainly of brine shrimp and blue-green algae, both rich in beta-carotene. If a flamingo stops eating these foods, its new feathers will grow in pale or white.',
+      'fq_card_rf134_text':
+          'The Pacific Ocean is larger than all of Earth\'s landmass combined.',
+      'fq_card_rf134_expl':
+          'The Pacific covers about 165 million km², which is roughly 32% of Earth\'s total surface area and more than the 148 million km² of land area.',
+      'fq_card_rf135_text': 'Warthogs are tougher than they look.',
+      'fq_card_rf135_expl':
+          'Warthogs have thick skin and sharp tusks for defense. They often run into burrows tail-first so they can defend the entrance with their tusks. They can also survive without water for several months.',
+      'fq_card_rf136_text':
+          'No two snowflakes are exactly alike at the molecular level.',
+      'fq_card_rf136_expl':
+          'While they follow hexagonal symmetry, the exact path each snowflake takes through the atmosphere involves unique variations in temperature and humidity, leading to billions of possible crystal structures.',
+      'fq_card_rf137_text':
+          'Turkeys can blush when they are excited or stressed.',
+      'fq_card_rf137_expl':
+          'The skin on a turkey\'s head and neck can change from pale to bright red, blue, or white depending on its mood. Male turkeys (toms) use this display during courtship.',
+      'fq_card_rf138_text':
+          'The Great Barrier Reef is the largest living structure on Earth.',
+      'fq_card_rf138_expl':
+          'Visible from outer space, the reef stretches over 2,300 km along the coast of Australia. It is made up of billions of tiny organisms known as coral polyps.',
+      'fq_card_rf139_text':
+          'Mice have a highly developed sense of hearing and smell.',
+      'fq_card_rf139_expl':
+          'Mice can hear ultrasound frequencies as high as 100 kHz (humans stop at 20 kHz). They use their whiskers to detect air currents and textures, helping them navigate in total darkness.',
+      'fq_card_rf140_text':
+          'The Romans used crushed mouse brains as toothpaste.',
+      'fq_card_rf140_expl':
+          'Ancient dental care involved various unusual ingredients. Along with mouse brains, Romans also used human urine as a whitening agent because of the ammonia it contains.',
+      'fq_card_rf141_text':
+          'Hippos spend up to 16 hours a day submerged in water.',
+      'fq_card_rf141_expl':
+          'Hippos submerge to keep their massive bodies cool and protect their sensitive skin from the tropical sun. They can hold their breath for about five minutes underwater.',
+      'fq_card_rf142_text':
+          'Clouds can weigh hundreds of thousands of kilograms.',
+      'fq_card_rf142_expl':
+          'A typical cumulus cloud has a volume of about 1 km³ and a density of 0.5 g/m³, meaning it weighs about 500,000 kg. It stays aloft because the weight is spread over a huge area and supported by rising warm air.',
+      'fq_card_rf143_text':
+          'Bees communicate the location of food using a "waggle dance."',
+      'fq_card_rf143_expl':
+          'By performing a figure-eight dance, a honeybee tells its hive mates the direction and distance to a nectar source relative to the Sun\'s position.',
+      'fq_card_rf144_text': 'The Grand Canyon is over 445 km long.',
+      'fq_card_rf144_expl':
+          'Carved by the Colorado River over millions of years, the canyon is up to 29 km wide and 1.8 km deep. It reveals nearly two billion years of Earth\'s geological history.',
+      'fq_card_rf145_text':
+          'Chameleons change color to communicate, not just for camouflage.',
+      'fq_card_rf145_expl':
+          'While color helps with blending in, it is primarily used to signal mood, aggression, or territorial dominance to other chameleons. It also helps regulate their body temperature.',
+      'fq_card_rf146_text':
+          'Earth\'s magnetic poles flip every few hundred thousand years.',
+      'fq_card_rf146_expl':
+          'The last major reversal was 780,000 years ago. During a flip, the magnetic field weakens significantly before reforming with the North and South poles swapped.',
+      'fq_card_rf147_text':
+          'Chimpanzees share about 98.8% of their DNA with humans.',
+      'fq_card_rf147_expl':
+          'They are our closest living relatives. Chimps use tools, have complex social structures, and can even learn basic sign language in captivity.',
+      'fq_card_rf148_text':
+          'Diamond is the hardest naturally occurring substance on Earth.',
+      'fq_card_rf148_expl':
+          'Diamonds are made of pure carbon arranged in a crystal lattice. While they are extremely hard (resistant to scratching), they are also brittle and can shatter if hit with a hammer.',
+      'fq_card_rf149_text':
+          'Walruses can stay underwater for up to 30 minutes.',
+      'fq_card_rf149_expl':
+          'They slow their heart rate to conserve oxygen while diving for clams and snails on the ocean floor. Their tusks are actually elongated canine teeth used for hauling themselves onto ice.',
+      'fq_card_rf150_text':
+          'Neptune has the strongest winds in the solar system.',
+      'fq_card_rf150_expl':
+          'Winds on Neptune can reach speeds of 2,100 km/h—fast enough to break the sound barrier. The source of the energy driving these winds is still a mystery.',
+      'fq_card_rf151_text':
+          'A ladybug can eat up to 5,000 insects in its lifetime.',
+      'fq_card_rf151_expl':
+          'Farmers love ladybugs because they act as natural pest control, eating aphids and other soft-bodied insects that damage crops. Their bright red color warns predators that they taste bitter.',
+      'fq_card_rf152_text': 'The last Ice Age ended about 11,500 years ago.',
+      'fq_card_rf152_expl':
+          'During the peak of the last glacial period, ice sheets covered large parts of North America, Europe, and Asia. Earth is currently in an "interglacial" period called the Holocene.',
+      'fq_card_rf153_text': 'Oysters can change their sex multiple times.',
+      'fq_card_rf153_expl':
+          'Oysters are born male and often become female after one or two years. They can switch back and forth depending on environmental conditions and the needs of the population.',
+      'fq_card_rf154_text': 'The Nile is the longest river in the world.',
+      'fq_card_rf154_expl':
+          'Stretching about 6,650 km, it flows north from Lake Victoria to the Mediterranean. However, some scientists argue the Amazon might be longer depending on where the source is measured.',
+      'fq_card_rf155_text':
+          'Dromedary camels have one hump, while Bactrian camels have two.',
+      'fq_card_rf155_expl':
+          'Dromedaries are adapted to the hot deserts of Africa and the Middle East, while Bactrians live in the cold, rocky deserts of Central Asia. Both can lose 25% of their body weight in water without dying.',
+      'fq_card_rf156_text':
+          'Fire is a chemical reaction, not a state of matter.',
+      'fq_card_rf156_expl':
+          'Fire is the visible part of combustion—a rapid oxidation process. It releases energy as light and heat. Most of what you see as "flame" is glowing gas.',
+      'fq_card_rf157_text':
+          'A skunk\'s spray can be smelled from over 1.6 km away.',
+      'fq_card_rf157_expl':
+          'The spray contains sulfur-based compounds called thiols. Skunks only spray as a last resort because it takes them up to ten days to replenish their supply of the liquid.',
+      'fq_card_rf158_text':
+          'The Moon was likely formed from a collision with Earth.',
+      'fq_card_rf158_expl':
+          'The "Giant Impact Hypothesis" suggests that a Mars-sized planet named Theia collided with the early Earth 4.5 billion years ago, and the resulting debris coalesced into the Moon.',
+      'fq_card_rf159_text':
+          'Caterpillars literally turn into soup inside their cocoons.',
+      'fq_card_rf159_expl':
+          'Inside the chrysalis, the caterpillar\'s body breaks down completely into a nutrient-rich liquid. New cells then use this "soup" to build the structures of the adult butterfly.',
+      'fq_card_rf160_text':
+          'The Himalayas contain all 14 of the world\'s 8,000-metre peaks.',
+      'fq_card_rf160_expl':
+          'This includes Mount Everest, K2, and Annapurna. The range was formed by the ongoing collision between the Indian and Eurasian tectonic plates.',
+      'fq_card_rf161_text': 'Sea otters have the densest fur of any animal.',
+      'fq_card_rf161_expl':
+          'They have up to 150,000 hairs per square centimetre. This thick coat traps a layer of air that keeps their skin dry and warm in cold ocean water, as they lack insulating blubber.',
+      'fq_card_rf162_text':
+          'Liquid oxygen is pale blue and strongly paramagnetic.',
+      'fq_card_rf162_expl':
+          'At temperatures below -183°C, oxygen turns into a beautiful light-blue liquid. It is so magnetic that it can be suspended between the poles of a powerful magnet.',
+      'fq_card_rf163_text':
+          'The King Cobra is the longest venomous snake in the world.',
+      'fq_card_rf163_expl':
+          'It can grow up to 5.8 m long. Unlike most snakes, the King Cobra is known for building nests for its eggs and fiercely defending them until they hatch.',
+      'fq_card_rf164_text':
+          'The Gulf Stream carries more water than all the world\'s rivers combined.',
+      'fq_card_rf164_expl':
+          'This powerful ocean current moves warm water from the Gulf of Mexico toward the North Atlantic, significantly warming the climate of Western Europe.',
+      'fq_card_rf165_text':
+          'Llamas are used as guard animals for sheep and poultry.',
+      'fq_card_rf165_expl':
+          'Naturally aggressive toward canines, llamas will chase away foxes, coyotes, and stray dogs. They are highly social and bond quickly with the herds they are protecting.',
+      'fq_card_rf166_text':
+          'The tallest mountain on Earth is actually Mauna Kea.',
+      'fq_card_rf166_expl':
+          'While Everest has the highest altitude, Mauna Kea measured from its base on the ocean floor is about 10,210 m tall—significantly taller than Everest\'s 8,849 m.',
+      'fq_card_rf167_text': 'Sperm whales are the loudest animals on Earth.',
+      'fq_card_rf167_expl':
+          'Their clicks can reach 230 decibels—louder than a jet engine at takeoff. These sounds are used for echolocation to find giant squid in the pitch-black depths of the ocean.',
+      'fq_card_rf168_text':
+          'The continents move at about the same speed your fingernails grow.',
+      'fq_card_rf168_expl':
+          'This tectonic movement averages around 2.5 cm per year. Over millions of years, this process has completely reshaped the Earth\'s surface and continues to do so.',
+      'fq_card_rf169_text':
+          'Squirrels can fall from 30 metres without hurting themselves.',
+      'fq_card_rf169_expl':
+          'They use their bushy tails as parachutes and for balance. Their small mass and ability to rotate their ankles 180 degrees allow them to land safely and quickly scurrying away.',
+      'fq_card_rf170_text':
+          'The periodic table was first organized based on the weights of elements.',
+      'fq_card_rf170_expl':
+          'Dmitri Mendeleev created the first version in 1869. He famously left gaps for elements that hadn\'t been discovered yet, correctly predicting their properties.',
+      'fq_card_rf171_text':
+          'Bumblebees can fly at altitudes higher than Mount Everest.',
+      'fq_card_rf171_expl':
+          'In laboratory simulations, researchers have found that some species of bumblebees can hover at air pressures equivalent to 9,000 m above sea level.',
+      'fq_card_rf172_text':
+          'A hurricane releases more energy in 10 minutes than all the world\'s nuclear weapons combined.',
+      'fq_card_rf172_expl':
+          'The energy comes from the condensation of water vapor into rain. A typical hurricane generates about 600 trillion watts—roughly 200 times the world\'s electrical generating capacity.',
+      'fq_card_rf173_text':
+          'Beavers have orange teeth because of their high iron content.',
+      'fq_card_rf173_expl':
+          'The iron makes their enamel much stronger and more resistant to acid than human teeth, allowing them to chew through tough tree trunks without breaking them.',
+      'fq_card_rf174_text':
+          'The hottest temperature ever recorded on Earth was 56.7°C.',
+      'fq_card_rf174_expl':
+          'This was measured in Death Valley, California, in 1913. Some newer measurements in other regions have come close, but this remains the official World Meteorological Organization record.',
+      'fq_card_rf175_text':
+          'A dog\'s sense of smell is 10,000 to 100,000 times more acute than a human\'s.',
+      'fq_card_rf175_expl':
+          'If human vision could see as well as a dog smells, we would be able to see clearly for 5,000 km. Dogs have up to 300 million olfactory receptors; humans have about 6 million.',
+      'fq_card_rf176_text':
+          'Jupiter is so big it could fit all the other planets inside it twice.',
+      'fq_card_rf176_expl':
+          'Jupiter\'s mass is 2.5 times that of all the other planets in the Solar System combined. It is a gas giant with no solid surface.',
+      'fq_card_rf177_text':
+          'The dodo was a flightless bird that went extinct within 100 years of human discovery.',
+      'fq_card_rf177_expl':
+          'Living on the island of Mauritius, dodos had no natural predators until humans arrived. Hunting and the introduction of invasive species like rats and pigs led to their rapid extinction by 1681.',
+      'fq_card_rf178_text':
+          'Deforestation contributes to roughly 10% of global greenhouse gas emissions.',
+      'fq_card_rf178_expl':
+          'Trees act as carbon sinks, absorbing CO2. When they are burned or rot after being cut down, they release that stored carbon back into the atmosphere.',
+      'fq_card_rf179_text': 'Horses can sleep both standing up and lying down.',
+      'fq_card_rf179_expl':
+          'They have a "stay apparatus" in their legs that allows them to lock their joints and relax their muscles without falling over, an adaptation to escape quickly from predators.',
+      'fq_card_rf180_text': 'The Mediterranean Sea was once a dry basin.',
+      'fq_card_rf180_expl':
+          'Known as the Messinian Salinity Crisis about 5.6 million years ago, the sea evaporated almost completely. It was later refilled in a massive flood called the Zanclean flood.',
+      'fq_card_rf181_text':
+          'The Greater Flamingo is the largest and most widespread species of flamingo.',
+      'fq_card_rf181_expl':
+          'They can be found in parts of Africa, Southern Europe, and South Asia. They are highly social and can live in colonies of up to 200,000 individuals.',
+      'fq_card_rf182_text':
+          'A solar flare can release the energy equivalent of millions of 100-megaton hydrogen bombs.',
+      'fq_card_rf182_expl':
+          'These massive explosions on the Sun send bursts of radiation and charged particles into space, which can disrupt satellite communications and power grids on Earth.',
+      'fq_card_rf183_text':
+          'Polar bears are capable of swimming for days at a time.',
+      'fq_card_rf183_expl':
+          'Some individuals have been tracked swimming over 600 km continuously. They use their large front paws like paddles and their back legs as rudders.',
+      'fq_card_rf184_text':
+          'A black hole\'s gravity is so strong that even light cannot escape it.',
+      'fq_card_rf184_expl':
+          'The "event horizon" is the boundary beyond which nothing can ever return. Black holes are formed when massive stars collapse under their own gravity at the end of their lives.',
+      'fq_card_rf185_text':
+          'The Japanese Spider Crab has the largest leg span of any arthropod.',
+      'fq_card_rf185_expl':
+          'Its legs can span up to 3.7 metres from claw to claw. They live in the deep waters around Japan and can live for up to 100 years.',
+      'fq_card_rf186_text':
+          'The deepest part of the ocean is the Challenger Deep.',
+      'fq_card_rf186_expl':
+          'Located in the Mariana Trench, it is approximately 10,935 metres deep. Only a handful of people have ever reached the bottom in specialized submersibles.',
+      'fq_card_rf187_text':
+          'Giant pandas spend 12 to 14 hours a day eating bamboo.',
+      'fq_card_rf187_expl':
+          'Bamboo is very low in nutrients, so they must consume up to 38 kg of it daily to meet their energy needs. They have a "pseudo-thumb" to help them grasp the stalks.',
+      'fq_card_rf188_text':
+          'Electricity travels at roughly the speed of light.',
+      'fq_card_rf188_expl':
+          'In a copper wire, the electromagnetic wave travels at about 90% the speed of light, while the actual electrons move much, much slower—only a few millimetres per second.',
+      'fq_card_rf189_text':
+          'The American Bison is the largest land mammal in North America.',
+      'fq_card_rf189_expl':
+          'Males can weigh up to 900 kg. Once numbering in the tens of millions, they were nearly hunted to extinction in the 19th century but have since made a significant recovery.',
+      'fq_card_rf190_text': 'Yellowstone sits on top of a "supervolcano."',
+      'fq_card_rf190_expl':
+          'The Yellowstone Caldera has produced three massive eruptions over the last 2.1 million years. While another eruption is not likely anytime soon, the park\'s geysers are a constant reminder of the heat beneath the surface.',
+      'fq_card_rf191_text': 'All modern dogs are descendants of the Grey Wolf.',
+      'fq_card_rf191_expl':
+          'While they look very different now, poodles, Great Danes, and Chihuahuas all belong to the same species—Canis lupus familiaris—and can still interbreed with wolves.',
+      'fq_card_rf192_text':
+          'Mars is often called the Red Planet because of iron oxide (rust) on its surface.',
+      'fq_card_rf192_expl':
+          'The dust on Mars is blown into the atmosphere by global dust storms, giving the sky and the ground a reddish hue. Underneath the dust, the rocks are actually grayish.',
+      'fq_card_rf193_text': 'The Whale Shark is the largest fish in the world.',
+      'fq_card_rf193_expl':
+          'They can grow up to 12 metres long. Despite their size, they are filter feeders, eating mainly plankton and small fish, and are known for being very gentle around divers.',
+      'fq_card_rf194_text':
+          'A gene is a segment of DNA that provides instructions for building proteins.',
+      'fq_card_rf194_expl':
+          'Humans have roughly 20,000 to 25,000 genes. These instructions determine everything from your eye color to how your body processes certain nutrients.',
+      'fq_card_rf195_text': 'Chickens are the most common bird in the world.',
+      'fq_card_rf195_expl':
+          'There are more than 25 billion chickens on Earth, significantly outnumbering humans. They were originally domesticated from Red Junglefowl in Southeast Asia.',
+      'fq_card_rf196_text':
+          'Earth is made of several layers: crust, mantle, outer core, and inner core.',
+      'fq_card_rf196_expl':
+          'The crust is the thin outer layer we live on. The inner core is a solid ball of iron and nickel, roughly 5,400°C—about the same temperature as the surface of the Sun.',
+      'fq_card_rf197_text':
+          'Orangutans are the world\'s largest tree-dwelling mammals.',
+      'fq_card_rf197_expl':
+          'They spend nearly their entire lives in the canopy of the rainforests in Borneo and Sumatra. They are highly intelligent and use large leaves as umbrellas to stay dry in the rain.',
+      'fq_card_rf198_text': 'Wind is caused by differences in air pressure.',
+      'fq_card_rf198_expl':
+          'The Sun heats the Earth unevenly, causing some air to be warmer and less dense than other air. High-pressure air then moves toward low-pressure areas, creating what we feel as wind.',
+      'fq_card_rf199_text':
+          'The Narwhal\'s "tusk" is actually a long, spiraled tooth.',
+      'fq_card_rf199_expl':
+          'Only males (and very rarely females) have the tusk, which can grow up to 3 metres long. It is highly sensitive and contains millions of nerve endings used to sense their environment.',
+      'fq_card_rf200_text':
+          'A galaxy is a massive collection of stars, gas, dust, and dark matter.',
+      'fq_card_rf200_expl':
+          'Our galaxy, the Milky Way, contains an estimated 100 to 400 billion stars. There are likely trillions of galaxies in the observable universe.',
+      'fq_card_rf201_text': 'Honeybees can understand the concept of zero.',
+      'fq_card_rf201_expl':
+          'Experiments have shown that bees can be trained to recognize that "empty" is a numerical value less than one, a high-level cognitive skill once thought to be unique to humans and some primates.',
+      'fq_card_rf202_text':
+          'Coral reefs cover less than 1% of the ocean floor but support 25% of all marine life.',
+      'fq_card_rf202_expl':
+          'They are some of the most diverse ecosystems on the planet. Corals are actually animals (polyps) that build stony skeletons around themselves for protection.',
+      'fq_card_rf203_text':
+          'Most dinosaurs were actually small and likely had feathers.',
+      'fq_card_rf203_expl':
+          'While we often think of giants like T-Rex, many species were chicken-sized. Birds are now considered the only living descendants of the avian dinosaur lineage.',
+      'fq_card_rf204_text':
+          'Water is the only substance on Earth found naturally in solid, liquid, and gas forms.',
+      'fq_card_rf204_expl':
+          'This occurs at the "triple point" temperature and pressure conditions. Water\'s unique properties are essential for supporting life across the planet.',
+      'fq_card_rf205_text': 'Penguins can drink seawater.',
+      'fq_card_rf205_expl':
+          'They have a specialized supraorbital gland above their eyes that filters excess salt from their bloodstream. This salt is then excreted through their bill as a salty liquid.',
+
+      'fq_card_dw011_text':
+          'A man receives so many hats as gifts that he suffocates under them.',
+      'fq_card_dw011_expl':
+          'The ancient Greek lawgiver Draco supposedly died in a theatre around 620 BCE. As a sign of approval, the crowd threw so many cloaks and hats onto him that he was smothered to death.',
+      'fq_card_dw012_text':
+          'A philosopher sees a donkey eating figs and laughs so hard he dies.',
+      'fq_card_dw012_expl':
+          'Chrysippus, a 3rd-century BCE Stoic philosopher, allegedly died of laughter after seeing a donkey eat figs and shouting: "Now give the donkey a drink of pure wine to wash down the figs!"',
+      'fq_card_dw013_text':
+          'A warrior beheads his enemy and carries the head as a trophy. The dead enemy kills him shortly after.',
+      'fq_card_dw013_expl':
+          'Sigurd the Mighty, a 9th-century Viking Earl, strapped the severed head of his enemy Mael Brigte to his saddle. The dead man\'s protruding tooth scratched Sigurd\'s leg, causing a fatal infection.',
+      'fq_card_dw014_text':
+          'A man trip over his own beard and breaks his neck while running from a fire.',
+      'fq_card_dw014_expl':
+          'Hans Steininger, the mayor of Braunau in the 16th century, had a beard 1.4 metres long. During a fire, he forgot to roll it up, stepped on it, and fell down a flight of stairs, breaking his neck.',
+      'fq_card_dw015_text':
+          'An astronomer stays at a dinner party for too long because he is too polite to leave. His bladder bursts.',
+      'fq_card_dw015_expl':
+          'Tycho Brahe allegedly died in 1601 after attending a royal banquet in Prague. It was considered extremely rude to leave the table before the host, so he held his urine so long it caused a fatal uremic infection.',
+      'fq_card_dw016_text':
+          'A dentist discovers a way to stop pain, but ends up addicted and kills himself in jail.',
+      'fq_card_dw016_expl':
+          'Horace Wells was a pioneer of anesthesia using nitrous oxide. After a failed public demonstration, he became depressed, addicted to chloroform, and committed suicide in 1848 after an erratic public outburst.',
+      'fq_card_dw017_text': 'An inventor is crushed by his own printing press.',
+      'fq_card_dw017_expl':
+          'William Bullock invented the rotary printing press in 1863. While making adjustments to a press in 1867, his leg was caught and crushed. He developed gangrene and died during the amputation surgery.',
+      'fq_card_dw018_text':
+          'A famous dancer is killed by her own fashionable accessory while riding in a car.',
+      'fq_card_dw018_expl':
+          'Isadora Duncan died in 1927 when her long silk scarf became entangled in the open-spoked wheels of the car she was riding in, snapping her neck and pulling her from the vehicle.',
+      'fq_card_dw019_text':
+          'A countess tries to stay young by bathing in the blood of hundreds of girls.',
+      'fq_card_dw019_expl':
+          'Elizabeth Báthory, the "Blood Countess," was accused of murdering hundreds of young women in the 17th century. While the blood-bathing story may be a myth, she was found guilty of extreme cruelty and walled up in her castle.',
+      'fq_card_dw020_text':
+          'A man dies from a toothpick he swallowed while eating a martini olive.',
+      'fq_card_dw020_expl':
+          'The famous author Sherwood Anderson died in 1941 after swallowing a toothpick during a party. It perforated his colon, leading to peritonitis and his death.',
+      'fq_card_dw021_text':
+          'A man survives going over Niagara Falls in a barrel, but dies slipping on an orange peel.',
+      'fq_card_dw021_expl':
+          'Bobby Leach was the second person to survive Niagara Falls in a barrel (1911). In 1926, while on a lecture tour in New Zealand, he slipped on an orange peel, injuring his leg. It became infected, leading to amputation and his death.',
+      'fq_card_dw022_text':
+          'A famous whiskey maker kicks his safe in frustration and dies from the infection.',
+      'fq_card_dw022_expl':
+          'Jack Daniel allegedly died of blood poisoning in 1911. He had forgotten the combination to his safe and kicked it in anger, wounding his toe. The resulting infection was fatal.',
+      'fq_card_dw023_text':
+          'An engineer builds a lighthouse to prove it\'s indestructible. He stays inside during a storm to show his confidence and disappears.',
+      'fq_card_dw023_expl':
+          'Henry Winstanley built the first Eddystone Lighthouse. During the Great Storm of 1703, the lighthouse was completely destroyed. Winstanley, who was inside, was never found.',
+      'fq_card_dw024_text':
+          'An inventor dies when his rocket car explodes during a test run.',
+      'fq_card_dw024_expl':
+          'Max Valier was a pioneer in rocket-powered flight and land vehicles. In 1930, an alcohol-fueled rocket exploded on his test bench in Berlin, killing him instantly.',
+      'fq_card_dw025_text':
+          'A young prince dies because of a stray pig in Paris.',
+      'fq_card_dw025_expl':
+          'In 1131, King Philip of France died when his horse tripped over a black pig that had escaped from a farm and was running through the streets of Paris. The prince fell and was fatally injured.',
+      'fq_card_dw026_text':
+          'An eagle mistakes a man\'s bald head for a rock and drops a tortoise on it.',
+      'fq_card_dw026_expl':
+          'The Greek playwright Aeschylus was allegedly killed in 455 BCE when an eagle, trying to break a tortoise shell, dropped it on what it thought was a smooth rock – which was actually Aeschylus\'s bald head.',
+      'fq_card_dw027_text':
+          'A king falls off his horse because the horse was startled by the smell of burning bodies.',
+      'fq_card_dw027_expl':
+          'During the siege of Mantes in 1087, William the Conqueror was thrown against the pommel of his saddle when his horse stepped on hot embers. He suffered internal injuries and died weeks later.',
+      'fq_card_dw028_text': 'A king eats himself to death in a single meal.',
+      'fq_card_dw028_expl':
+          'King Adolf Frederick of Sweden died in 1771 after consuming a gargantuan meal of lobster, caviar, sauerkraut, kippers, and champagne, topped off with 14 servings of his favorite dessert.',
+      'fq_card_dw029_text':
+          'An inventor is killed by his own contraption designed to help him get out of bed.',
+      'fq_card_dw029_expl':
+          'Thomas Midgley Jr., who invented leaded gasoline and CFCs, became paralyzed from polio. He built a system of ropes and pulleys to lift himself from bed, but in 1944, he became entangled in the cords and was strangled.',
+      'fq_card_dw030_text':
+          'A US President dies after giving a speech in the rain without a coat.',
+      'fq_card_dw030_expl':
+          'William Henry Harrison gave a two-hour inaugural address in 1841 during cold, rainy weather. He developed pneumonia and died only 31 days into his term, serving the shortest presidency in US history.',
+      'fq_card_dw031_text': 'A famous detective dies from a scratched tongue.',
+      'fq_card_dw031_expl':
+          'Allan Pinkerton, founder of the Pinkerton National Detective Agency, died in 1884. He slipped on the pavement and bit his tongue, which became gangrenous and caused fatal blood poisoning.',
+      'fq_card_dw032_text':
+          'A composer stabs his own foot with a heavy conducting staff and dies of gangrene.',
+      'fq_card_dw032_expl':
+          'Jean-Baptiste Lully was conducting a Te Deum in 1687 and was beating time by banging a heavy staff against the floor. He accidentally struck his toe; he refused amputation and died of the resulting infection.',
+      'fq_card_dw033_text':
+          'A king is bitten by a pet monkey and dies of the infection.',
+      'fq_card_dw033_expl':
+          'King Alexander I of Greece was walking through his gardens in 1920 when his dog was attacked by a macaque. While trying to separate them, another monkey bit the king. He died of sepsis three weeks later.',
+      'fq_card_dw034_text':
+          'A queen kills herself with a snake hidden in a basket of figs.',
+      'fq_card_dw034_expl':
+          'Cleopatra VII of Egypt allegedly committed suicide in 30 BCE by allowing an Egyptian cobra (asp) to bite her, following the defeat of her forces by Octavian.',
+      'fq_card_dw035_text':
+          'A stuntman survives a trip over Niagara Falls in a barrel, but dies in a small tank of water for a show.',
+      'fq_card_dw035_expl':
+          'Karel Soucek survived a drop over Niagara Falls in 1984. In 1985, during a stunt at the Houston Astrodome, his barrel was dropped into a water tank but hit the rim instead, fatally injuring him.',
+      'fq_card_dw036_text':
+          'An actor is shot by a prop gun that was actually loaded.',
+      'fq_card_dw036_expl':
+          'Brandon Lee died in 1993 on the set of The Crow. A prop gun contained a fragment of a real bullet from a previous scene, which was propelled by a blank cartridge and struck him.',
+      'fq_card_dw037_text':
+          'A magician dies because he was punched when he wasn\'t ready.',
+      'fq_card_dw037_expl':
+          'Harry Houdini died on Halloween in 1926. A student had asked if he could really withstand any blow to the stomach. Houdini agreed, but was struck before he could brace his muscles, rupturing his appendix.',
+      'fq_card_dw038_text': 'A man who loved bears too much is eaten by them.',
+      'fq_card_dw038_expl':
+          'Timothy Treadwell, known as the "Grizzly Man," lived among grizzly bears in Alaska for 13 summers. In 2003, he and his girlfriend were attacked and consumed by a bear.',
+      'fq_card_dw039_text':
+          'A man ties 42 weather balloons to a lawn chair and flies to 16,000 feet. He survives, but gets fined.',
+      'fq_card_dw039_expl':
+          'Larry Walters, "Lawnchair Larry," used helium balloons to fly his chair across Los Angeles in 1982. He reached controlled airspace and was spotted by airline pilots. He safely shot out balloons to descend.',
+      'fq_card_dw040_text':
+          'Dozens of people commit suicide to board a spaceship following a comet.',
+      'fq_card_dw040_expl':
+          'The Heaven\'s Gate cult believed a spacecraft was following the Comet Hale-Bopp in 1997. 39 members committed ritual suicide in California, believing their souls would ascend to the ship.',
+      'fq_card_dw041_text':
+          'A scientist dies because he tasted his own experiments.',
+      'fq_card_dw041_expl':
+          'Many early chemists died of poisoning. Carl Wilhelm Scheele discovered many elements but had a habit of tasting them. He died at age 43, likely from mercury or arsenic poisoning.',
+      'fq_card_dw042_text':
+          'A legendary strongman dies because he can\'t pull his hands out of a tree.',
+      'fq_card_dw042_expl':
+          'Milo of Croton was a famous ancient Greek wrestler. According to legend, he tried to tear a split tree trunk apart with his bare hands, but it snapped shut, trapping him until he was eaten by wolves.',
+      'fq_card_dw043_text':
+          'An emperor is killed by a dish of poisonous mushrooms.',
+      'fq_card_dw043_expl':
+          'Roman Emperor Claudius was allegedly poisoned by his wife Agrippina in 54 CE. She reportedly used a plate of mushrooms laced with toxins to ensure her son Nero would take the throne.',
+      'fq_card_dw044_text':
+          'A king is allegedly killed by a literal "hot seat."',
+      'fq_card_dw044_expl':
+          'There is a gruesome legend that Edward II of England was murdered in 1327 by having a red-hot iron rod inserted into his bowels, though most modern historians believe he was smothered.',
+      'fq_card_dw045_text':
+          'A conqueror dies of a nosebleed on his wedding night.',
+      'fq_card_dw045_expl':
+          'Attila the Hun died in 453 CE during his wedding feast. He suffered a severe noseblind and choked on his own blood while in a drunken stupor.',
+      'fq_card_dw046_text':
+          'A playwright dies while playing a man who is dying.',
+      'fq_card_dw046_expl':
+          'Molière collapsed on stage in 1673 while performing his play The Imaginary Invalid. He was coughing up blood and died shortly after being taken home.',
+      'fq_card_dw047_text':
+          'A famous inventor dies of diabetes after refusing to stop working.',
+      'fq_card_dw047_expl':
+          'Alexander Graham Bell, inventor of the telephone, died in 1922 from complications related to diabetes. He was so dedicated to his work that he often neglected his health.',
+      'fq_card_dw048_text':
+          'A man is gored because he thought he could outrun a bull.',
+      'fq_card_dw048_expl':
+          'The Running of the Bulls in Pamplona, Spain, has caused at least 15 recorded deaths since 1910, mostly due to participants being gored or trampled by the stampeding animals.',
+      'fq_card_dw049_text':
+          'A climber disappears on the world\'s highest peak and isn\'t found for 75 years.',
+      'fq_card_dw049_expl':
+          'George Mallory and Andrew Irvine vanished on Everest in 1924. Mallory\'s body was finally discovered in 1999. It is still debated whether they reached the summit.',
+      'fq_card_dw050_text':
+          'The first emperor of China dies drinking "immortality" potion that was actually poison.',
+      'fq_card_dw050_expl':
+          'Qin Shi Huang died in 210 BCE after consuming mercury pills, which his alchemists believed would grant him eternal life. Instead, the pills caused fatal mercury poisoning.',
+      'fq_card_dw051_text':
+          'A poet tries to kiss the reflection of the moon in a lake and drowns.',
+      'fq_card_dw051_expl':
+          'The famous Chinese poet Li Bai allegedly drowned in 762 CE after falling out of a boat while drunk, as he attempted to embrace the moon\'s reflection in the Yangtze River.',
+      'fq_card_dw052_text':
+          'A conqueror dies of injuries after his horse was spooked by a bird.',
+      'fq_card_dw052_expl':
+          'One theory for the death of Genghis Khan in 1227 is that he fell from his horse during a hunt. The internal injuries from the fall eventually proved fatal.',
+      'fq_card_dw053_text':
+          'A man tries to fly to the moon by strapping 47 rockets to a chair.',
+      'fq_card_dw053_expl':
+          'The legendary Chinese official Wan Hu supposedly attempted this in the 16th century. After the rockets were lit, there was a massive explosion, and Wan Hu was never seen again.',
+      'fq_card_dw054_text': 'A king dies after eating too many eels.',
+      'fq_card_dw054_expl':
+          'Henry I of England died in 1135 after consuming a "surfeit of lampreys" (jawless fish similar to eels). His doctors had forbidden him from eating them, but he ignored their advice.',
+      'fq_card_dw055_text':
+          'A woman\'s face is ripped off by a monkey she considered a friend.',
+      'fq_card_dw055_expl':
+          'Charla Nash was brutally attacked in 2009 by her friend\'s pet chimpanzee, Travis. She lost her eyes, nose, and hands, but survived after a pioneering face transplant.',
+      'fq_card_dw056_text':
+          'A record-breaking driver dies when his car\'s drive chain snaps and hits him.',
+      'fq_card_dw056_expl':
+          'J.G. Parry-Thomas died in 1927 while attempting to break the land speed record. The drive chain on his car, "Babs," snapped at 270 km/h, decapitating him.',
+      'fq_card_dw057_text':
+          'An "unsinkable" ship hits an iceberg and sinks on its first trip.',
+      'fq_card_dw057_expl':
+          'The RMS Titanic sank in 1912 after hitting an iceberg in the North Atlantic. Over 1,500 people died because there weren\'t enough lifeboats for everyone on board.',
+      'fq_card_dw058_text':
+          'A scientist dies of exposure to radiation after carrying a radioactive sample in his pocket.',
+      'fq_card_dw058_expl':
+          'While Marie Curie is more famous, many early researchers like Antoine Henri Becquerel suffered from skin burns and health issues due to carrying radioactive materials close to their bodies.',
+      'fq_card_dw059_text':
+          'A man is poisoned, shot, beaten, and thrown into a river, yet he only dies of drowning.',
+      'fq_card_dw059_expl':
+          'Grigori Rasputin was assassinated in 1916. His killers gave him cyanide-laced cakes, shot him multiple times, and beat him. An autopsy reportedly showed water in his lungs, indicating he was still breathing when thrown into the icy Malaya Nevka River.',
+      'fq_card_dw060_text':
+          'An emperor is assassinated by his own guards in a tunnel.',
+      'fq_card_dw060_expl':
+          'The Roman Emperor Caligula was murdered in 41 CE by members of the Praetorian Guard, who ambushed him in a corridor beneath the palace after the Palatine Games.',
+      'fq_card_dw061_text':
+          'An army loses a war to a group of flightless birds.',
+      'fq_card_dw061_expl':
+          'In 1932, the Australian military was deployed with machine guns to cull a population of emus that was destroying crops. The emus proved so elusive and resilient that the army eventually withdrew.',
+      'fq_card_dw062_text':
+          'A bridge collapses because it starts "galloping" in the wind.',
+      'fq_card_dw062_expl':
+          'The Tacoma Narrows Bridge opened in 1940. Due to aeroelastic flutter, it would sway and twist in light winds. Four months after opening, it collapsed during a 64 km/h wind storm.',
+      'fq_card_dw063_text': 'A rock star is electrocuted by his own guitar.',
+      'fq_card_dw063_expl':
+          'Keith Relf, former singer of The Yardbirds, died in 1976 when he was electrocuted while playing an improperly grounded electric guitar in his home basement.',
+      'fq_card_dw064_text':
+          'A woman survives a 10,000-metre fall without a parachute after her plane explodes.',
+      'fq_card_dw064_expl':
+          'Flight attendant Vesna Vulović survived the mid-air explosion of JAT Flight 367 in 1972. She was trapped in the plane\'s tail section, which landed on a snow-covered slope, cushioning the impact.',
+      'fq_card_dw065_text':
+          'A giant crocodile is blamed for eating over 300 people.',
+      'fq_card_dw065_expl':
+          'Gustave is a legendary Nile crocodile in Burundi. Since the 1990s, he has attained near-mythical status for his size (over 6 m) and the hundreds of deaths attributed to him.',
+      'fq_card_dw066_text':
+          'A scientist dies from an illness caused by her own Nobel-winning research.',
+      'fq_card_dw066_expl':
+          'Marie Curie died in 1934 of aplastic anemia, caused by years of exposure to radiation during her experiments with radium and polonium.',
+      'fq_card_dw067_text':
+          'A writer dies of exhaustion while investigating a volcanic eruption.',
+      'fq_card_dw067_expl':
+          'Pliny the Elder died in 79 CE during the eruption of Mount Vesuvius. He sailed close to Pompeii to rescue friends and died on the shore, likely of cardiovascular collapse or toxic fumes.',
+      'fq_card_dw068_text':
+          'A scientist is struck by lightning while trying to replicate Benjamin Franklin\'s kite experiment.',
+      'fq_card_dw068_expl':
+          'Georg Wilhelm Richmann was killed in 1753 in St. Petersburg when a bolt of ball lightning struck his measuring equipment while he was observing a thunderstorm.',
+      'fq_card_dw069_text': 'A world-famous elephant is hit by a train.',
+      'fq_card_dw069_expl':
+          'Jumbo the Elephant, the star of P.T. Barnum\'s circus, died in 1885 in Ontario. While being led across the tracks, he was struck by an unscheduled locomotive.',
+      'fq_card_dw070_text':
+          'A couple dies of heat because they didn\'t bring enough water for a hike.',
+      'fq_card_dw070_expl':
+          'Every year, tourists die in Death Valley National Park. In one 2021 case, a family died of hyperthermia and dehydration on a trail with temperatures over 42°C and no shade.',
+      'fq_card_dw071_text':
+          'An elephant is executed by electricity to prove a point about power current.',
+      'fq_card_dw071_expl':
+          'Topsy the Elephant was a circus elephant executed at Coney Island in 1903. Thomas Edison\'s company used the event to demonstrate the perceived dangers of Westinghouse\'s alternating current (AC).',
+      'fq_card_dw072_text':
+          'A massive explosion in a harbour is caused by two ships bumping into each other.',
+      'fq_card_dw072_expl':
+          'In 1917, the Halifax Explosion occurred when a French ship carrying explosives collided with a Norwegian vessel. It was the largest man-made explosion prior to the atomic bomb.',
+      'fq_card_dw073_text':
+          'A tourist is bitten by a lizard and dies of a sudden heart attack.',
+      'fq_card_dw073_expl':
+          'While rare, Komodo dragon bites can be fatal due to their venom. Some victims experience a rapid drop in blood pressure and go into shock.',
+      'fq_card_dw074_text':
+          'A man dies after lighting a firework on top of his head.',
+      'fq_card_dw074_expl':
+          'In 2015, a man in Maine died instantly when he launched a mortar-style firework from the top of his head during 4th of July celebrations.',
+      'fq_card_dw075_text':
+          'A man filming himself feeding a bear is attacked and killed.',
+      'fq_card_dw075_expl':
+          'Timothy Treadwell and Amie Huguenard were killed in 2003. Treadwell had thousands of hours of footage of bears; the final recording (audio only) captured their fatal encounter.',
+      'fq_card_dw076_text':
+          'A boy dies after being stuck in a giant ball of pizza dough.',
+      'fq_card_dw076_expl':
+          'In 1993, a teenager in a bakery accidentally fell into a huge industrial mixer. He was suffocated by the heavy dough before he could be rescued.',
+      'fq_card_dw077_text':
+          'A man dies after trying to "surf" on top of a moving train.',
+      'fq_card_dw077_expl':
+          'Train surfing is a dangerous and often fatal activity. Many people have died after hitting low bridges or overhead power lines while riding outside a train.',
+      'fq_card_dw078_text':
+          'A man dies after accidentally locking himself in a walk-in freezer.',
+      'fq_card_dw078_expl':
+          'This is a tragic scenario that has occurred in restaurants and industrial facilities. Without a safety release inside, victims die of hypothermia.',
+      'fq_card_dw079_text':
+          'A woman dies after drinking too much water for a radio contest.',
+      'fq_card_dw079_expl':
+          'In 2007, a woman died of water intoxication (hyponatremia) after competing in a "Hold Your Wee for a Wii" contest, drinking 6 litres of water without urinating.',
+      'fq_card_dw080_text':
+          'A man dies after being struck by a falling vending machine.',
+      'fq_card_dw080_expl':
+          'Vending machine accidents kill several people each year, usually when someone tips the machine over while trying to get a free item or change.',
+      'fq_card_dw081_text':
+          'A man dies after trying to use a lawnmower to trim his hedge.',
+      'fq_card_dw081_expl':
+          'Lifting a running lawnmower to cut a hedge is extremely dangerous. There are documented cases of people losing fingers or being fatally injured by the exposed blades.',
+      'fq_card_dw082_text':
+          'A man dies after falling into a vat of boiling chocolate.',
+      'fq_card_dw082_expl':
+          'In 2009, a worker in a New Jersey factory died after falling into a large industrial vat where chocolate was being melted and mixed.',
+      'fq_card_dw083_text':
+          'A man dies after being crushed by his own collection of newspapers.',
+      'fq_card_dw083_expl':
+          'The Collyer brothers were famous hoarders in New York. In 1947, Langley Collyer was crushed by a mountain of junk he had collected, while his blind brother Homer died of starvation.',
+      'fq_card_dw084_text':
+          'A man dies after accidentally shooting himself with a pen gun.',
+      'fq_card_dw084_expl':
+          'Pen guns are small, single-shot firearms. There are cases of accidental discharge when the owner forgets the "pen" is actually a loaded weapon.',
+      'fq_card_dw085_text': 'A man dies after being struck by a flying tire.',
+      'fq_card_dw085_expl':
+          'Tires that come off moving vehicles carry immense kinetic energy. There are numerous recorded fatalities where pedestrians or other drivers were killed by stray wheels.',
+      'fq_card_dw086_text':
+          'A man dies after trying to prove he is immune to cobra venom.',
+      'fq_card_dw086_expl':
+          'Some snake handlers believe they have built up an immunity through small doses. However, many have died after several bites eventually caused a fatal anaphylactic or toxic reaction.',
+      'fq_card_dw087_text':
+          'A man dies after being stuck in a cave for over 24 hours.',
+      'fq_card_dw087_expl':
+          'In 2009, John Edward Jones died in the Nutty Putty Cave in Utah. He became stuck upside down in a narrow passage and died of cardiac arrest before rescuers could free him.',
+      'fq_card_dw088_text':
+          'A man dies after being struck by a falling coconut.',
+      'fq_card_dw088_expl':
+          'Falling coconuts kill an estimated 150 people per year worldwide—statistically more than shark attacks.',
+      'fq_card_dw089_text':
+          'A man dies after trying to fix a live toaster with a fork.',
+      'fq_card_dw089_expl':
+          'Electrocution is a common cause of household death. Sticking a metal object into a live appliance completes a circuit that can stop the human heart.',
+      'fq_card_dw090_text':
+          'A man dies after jumping into a pool that was too shallow.',
+      'fq_card_dw090_expl':
+          'Diving into shallow water is a leading cause of spinal cord injuries and fatalities in recreational swimming.',
+      'fq_card_dw091_text':
+          'A man dies after being struck by lightning while talking on a corded phone.',
+      'fq_card_dw091_expl':
+          'While rare, lightning can travel through telephone wires and strike a person using a corded landline during a storm.',
+      'fq_card_dw092_text': 'A man dies after being crushed by a falling bed.',
+      'fq_card_dw092_expl':
+          'Murphy beds and heavy traditional beds have caused accidental deaths, especially when improperly installed or during moving.',
+      'fq_card_dw093_text':
+          'A man dies after accidentally drinking cleaning fluid.',
+      'fq_card_dw093_expl':
+          'Poisoning by household chemicals is a significant cause of accidental death, often when substances are stored in unlabeled or misleading containers.',
+      'fq_card_dw094_text':
+          'A man dies after falling off a ladder while cleaning his gutters.',
+      'fq_card_dw094_expl':
+          'Falls from ladders are one of the most common causes of accidental injury and death around the home.',
+      'fq_card_dw095_text': 'A man dies after being hit by a golf ball.',
+      'fq_card_dw095_expl':
+          'A golf ball traveling at high speed can cause fatal head injuries if it strikes a person in the temple or other sensitive areas.',
+      'fq_card_dw096_text':
+          'A man dies after being stuck in a chimney while trying to break into a house.',
+      'fq_card_dw096_expl':
+          'There are several documented cases of people suffocating or dying of hypothermia after becoming wedged in narrow chimneys.',
+      'fq_card_dw097_text': 'A man dies after trying to "ride" a wild moose.',
+      'fq_card_dw097_expl':
+          'Moose are extremely large and aggressive animals. Attempting to interact with them in the wild often leads to trampling or goring.',
+      'fq_card_dw098_text':
+          'A man dies after being struck by a falling icicle.',
+      'fq_card_dw098_expl':
+          'In cold climates, massive icicles forming on roof edges can fall and cause fatal injuries to anyone walking below.',
+      'fq_card_dw099_text':
+          'A man dies after trying to "pet" a stray dog with rabies.',
+      'fq_card_dw099_expl':
+          'Rabies is nearly 100% fatal once symptoms appear. Interacting with stray animals in areas where rabies is endemic carries a high risk.',
+      'fq_card_dw100_text':
+          'A man dies after accidentally swallowing a live goldfish.',
+      'fq_card_dw100_expl':
+          'Choking on small animals as a "stunt" has led to several documented fatalities.',
+      'fq_card_dw101_text': 'A man dies after his oxygen tank explodes.',
+      'fq_card_dw101_expl':
+          'Compressed gas cylinders are highly dangerous if they leak or are exposed to heat and oil, leading to catastrophic explosions.',
+      'fq_card_dw102_text':
+          'A man dies after being struck by a falling tree limb.',
+      'fq_card_dw102_expl':
+          'Often called "widowmakers," dead or damaged tree limbs can fall unexpectedly and cause fatal injuries.',
+      'fq_card_dw103_text': 'A man dies after being trapped in a grain silo.',
+      'fq_card_dw103_expl':
+          'Grain entrapment (engulfment) can happen in seconds. The grain acts like quicksand, suffocating the victim.',
+      'fq_card_dw104_text': 'A man dies after being struck by a falling brick.',
+      'fq_card_dw104_expl':
+          'Construction site accidents often involve falling debris causing fatal head injuries.',
+      'fq_card_dw105_text':
+          'A man dies after accidentally setting off a flare gun inside a car.',
+      'fq_card_dw105_expl':
+          'Flare guns are pyrotechnic devices that burn at intense temperatures. Discharging one in a closed space is predictably fatal.',
+      'fq_card_dw106_text': 'A man dies after falling through thin ice.',
+      'fq_card_dw106_expl':
+          'Hypothermia and drowning are the primary causes of death when someone falls into freezing water through ice that was too thin to support their weight.',
+      'fq_card_dw107_text': 'A man dies after being struck by a falling piano.',
+      'fq_card_dw107_expl':
+          'While it sounds like a cartoon trope, accidents involving moving large, heavy objects have resulted in real-life fatalities.',
+      'fq_card_dw108_text': 'A man dies after trying to catch a falling knife.',
+      'fq_card_dw108_expl':
+          'The "falling knife has no handle" rule is vital; attempting to catch one often leads to severe or fatal lacerations.',
+      'fq_card_dw109_text':
+          'A man dies after being struck by a falling gargoyle.',
+      'fq_card_dw109_expl':
+          'Crumbling masonry from old buildings is a significant hazard in some cities.',
+      'fq_card_dw110_text':
+          'A man dies after being trapped in an elevator during a power outage.',
+      'fq_card_dw110_expl':
+          'While elevators are generally safe, panic or attempts to escape an elevator stuck between floors can lead to fatal falls.',
+      'fq_card_dw111_text':
+          'A man dies after being struck by a falling branch.',
+      'fq_card_dw111_expl':
+          'Similar to "widowmakers," high winds can cause seemingly healthy branches to break and fall.',
+      'fq_card_dw112_text':
+          'A man dies after accidentally shooting himself with a nail gun.',
+      'fq_card_dw112_expl':
+          'Nail gun accidents are common in construction; a nail hitting the heart or brain can be instantly fatal.',
+      'fq_card_dw113_text':
+          'A man dies after being struck by a falling piece of orbital debris.',
+      'fq_card_dw113_expl':
+          'While the odds are astronomical, there is at least one recorded case of a person being struck by a small piece of "space junk."',
+      'fq_card_dw114_text':
+          'A man dies after being trapped in a submerged car.',
+      'fq_card_dw114_expl':
+          'If a car enters water, the water pressure makes opening the doors nearly impossible until the cabin is mostly flooded.',
+      'fq_card_dw115_text':
+          'A man dies after accidentally setting himself on fire with a cigarette.',
+      'fq_card_dw115_expl':
+          'Falling asleep while smoking is a leading cause of house fires and related fatalities.',
+      'fq_card_dw116_text': 'A man dies after being struck by a falling safe.',
+      'fq_card_dw116_expl':
+          'Another classic trope that has occurred in real life during moving or construction.',
+      'fq_card_dw117_text':
+          'A man dies after accidentally swallowing a small toy.',
+      'fq_card_dw117_expl':
+          'Choking on non-food objects is a significant risk, especially for young children but also occasionally for adults.',
+      'fq_card_dw118_text':
+          'A man dies after being struck by a falling brick from a chimney.',
+      'fq_card_dw118_expl':
+          'Deteriorating chimneys can shed bricks, which gain enough momentum from the height of a roof to be fatal.',
+      'fq_card_dw119_text':
+          'A man dies after trying to cross a flooded road in his car.',
+      'fq_card_dw119_expl':
+          'Flash floods can sweep away vehicles in just a few inches of moving water.',
+      'fq_card_dw120_text':
+          'A man dies after being struck by a falling streetlamp.',
+      'fq_card_dw120_expl':
+          'Structural failure or vehicle collisions can cause streetlamps to fall on pedestrians.',
+      'fq_card_dw121_text':
+          'A man dies after accidentally drinking antifreeze.',
+      'fq_card_dw121_expl':
+          'Ethylene glycol in antifreeze is toxic and tastes sweet, leading to many accidental ingestions.',
+      'fq_card_dw122_text':
+          'A man dies after being struck by a falling hammer.',
+      'fq_card_dw122_expl':
+          'Tools dropped from height are a major hazard on construction sites.',
+      'fq_card_dw123_text':
+          'A man dies after being trapped in a sand hole he dug on a beach.',
+      'fq_card_dw123_expl':
+          'Deep holes in sand can collapse easily, burying and suffocating the person inside.',
+      'fq_card_dw124_text': 'A man dies after being struck by a falling tile.',
+      'fq_card_dw124_expl':
+          'Roof tiles loosened by wind or age can fall and cause fatal injuries.',
+      'fq_card_dw125_text':
+          'A man dies after accidentally eating a poisonous berry.',
+      'fq_card_dw125_expl':
+          'Foraging without expert knowledge can lead to the ingestion of fatal toxins from plants.',
+      'fq_card_dw126_text':
+          'A man dies after being struck by a falling rock while hiking.',
+      'fq_card_dw126_expl':
+          'Rockfalls are a natural hazard in mountain regions, especially during freeze-thaw cycles.',
+      'fq_card_dw127_text':
+          'A man dies after accidentally locking himself in a car trunk.',
+      'fq_card_dw127_expl':
+          'Heatstroke or suffocation can occur if someone is trapped in a trunk without a release mechanism.',
+      'fq_card_dw128_text':
+          'A man dies after being struck by a falling limb from a dead tree.',
+      'fq_card_dw128_expl':
+          'Dead trees should be removed as they shed limbs unpredictably.',
+      'fq_card_dw129_text':
+          'A man dies after accidentally drinking a caustic substance.',
+      'fq_card_dw129_expl':
+          'Lye and other strong bases cause severe internal chemical burns if ingested.',
+      'fq_card_dw130_text': 'A man dies after being struck by a falling pipe.',
+      'fq_card_dw130_expl':
+          'Industrial accidents often involving falling heavy materials.',
+      'fq_card_dw131_text':
+          'A man dies after being trapped in a building during a fire because the doors opened inward.',
+      'fq_card_dw131_expl':
+          'This tragedy led to fire codes requiring outward-opening exit doors in public buildings.',
+      'fq_card_dw132_text':
+          'A man dies after being struck by a falling scaffold.',
+      'fq_card_dw132_expl':
+          'Improperly secured scaffolding can collapse entirely, causing multiple fatalities.',
+      'fq_card_dw133_text':
+          'A man dies after accidentally eating a poisonous mushroom.',
+      'fq_card_dw133_expl':
+          'Some mushrooms like the "Death Cap" are extremely toxic and resemble edible species.',
+      'fq_card_dw134_text': 'A man dies after being struck by a falling crate.',
+      'fq_card_dw134_expl': 'Warehouse accidents often involve falling cargo.',
+      'fq_card_dw135_text':
+          'A man dies after being trapped in an airless room.',
+      'fq_card_dw135_expl':
+          'Oxygen depletion in confined spaces is a significant industrial hazard.',
+      'fq_card_dw136_text':
+          'A man dies after being struck by a falling girder.',
+      'fq_card_dw136_expl':
+          'Construction accidents involving heavy steel structures.',
+      'fq_card_dw137_text':
+          'A man dies after accidentally swallowing a small battery.',
+      'fq_card_dw137_expl':
+          'Button batteries can cause severe internal chemical burns in hours.',
+      'fq_card_dw138_text':
+          'A man dies after being struck by a falling stone from a facade.',
+      'fq_card_dw138_expl':
+          'Deteriorating building exteriors pose a risk to pedestrians.',
+      'fq_card_dw139_text': 'A man dies after being trapped in a sewer pipe.',
+      'fq_card_dw139_expl':
+          'Toxic gases and water surges make sewers dangerous places for unauthorized entry.',
+      'fq_card_dw140_text':
+          'A man dies after being struck by a falling pane of glass.',
+      'fq_card_dw140_expl':
+          'Glass panels during installation or from damaged windows can be lethal if they fall.',
+      'fq_card_dw141_text':
+          'A man dies after accidentally drinking pool chemicals.',
+      'fq_card_dw141_expl':
+          'Concentrated chlorine and acid used in pools are highly toxic.',
+      'fq_card_dw142_text':
+          'A man dies after being struck by a falling steel plate.',
+      'fq_card_dw142_expl':
+          'Manufacturing accidents often involve shifting or falling metal stock.',
+      'fq_card_dw143_text': 'A man dies after being trapped in a walk-in oven.',
+      'fq_card_dw143_expl':
+          'Safety interlocks are vital for industrial ovens to prevent accidental entrapment.',
+      'fq_card_dw144_text':
+          'A man dies after being struck by a falling engine.',
+      'fq_card_dw144_expl':
+          'Auto repair accidents involving failed hoists or jacks.',
+      'fq_card_dw145_text': 'A man dies after accidentally swallowing a coin.',
+      'fq_card_dw145_expl':
+          'While usually passable, coins can occasionally block the airway or esophagus.',
+      'fq_card_dw146_text': 'A man dies after being struck by a falling beam.',
+      'fq_card_dw146_expl':
+          'Structural failures during building demolition or construction.',
+      'fq_card_dw147_text':
+          'A man dies after being trapped in a cave-in during excavation.',
+      'fq_card_dw147_expl':
+          'Trenching safety requires shoring to prevent fatal collapses.',
+      'fq_card_dw148_text':
+          'A man dies after being struck by a falling statue.',
+      'fq_card_dw148_expl': 'Improperly secured public art or museum pieces.',
+      'fq_card_dw149_text':
+          'A man dies after accidentally drinking a pesticide.',
+      'fq_card_dw149_expl':
+          'Toxic chemicals should never be stored in food or drink containers.',
+      'fq_card_dw150_text':
+          'A man dies after being struck by a falling light fixture.',
+      'fq_card_dw150_expl':
+          'Loose ceiling fixtures can fall on occupants of a room.',
+      'fq_card_dw151_text':
+          'A man dies after being trapped in a car during a blizzard.',
+      'fq_card_dw151_expl':
+          'Carbon monoxide poisoning from a blocked exhaust pipe while the engine is running to stay warm.',
+      'fq_card_dw152_text':
+          'A man dies after being struck by a falling masonry block.',
+      'fq_card_dw152_expl': 'Construction debris falling from upper floors.',
+      'fq_card_dw153_text':
+          'A man dies after accidentally swallowing a needle.',
+      'fq_card_dw153_expl':
+          'Ingesting sharp objects can lead to internal perforation and sepsis.',
+      'fq_card_dw154_text':
+          'A man dies after being struck by a falling window frame.',
+      'fq_card_dw154_expl':
+          'Old or poorly maintained windows can fail completely.',
+      'fq_card_dw155_text': 'A man dies after being trapped in a refrigerator.',
+      'fq_card_dw155_expl':
+          'Old refrigerators without internal release latches were a death trap for children playing hide and seek.',
+
       // ── Resume
       'resume_game_title': 'Resume Game',
       'resume_game_desc': 'Would you like to resume your unfinished {0} game?',
@@ -2419,6 +3786,1308 @@ class AppLocalizations {
       'bt_card_e123':
           'Brate jeden Einzelnen im Raum gnadenlos. Zu weich = 5 trinken.',
       'bt_card_e124': 'JEDER trinkt sein Getränk sofort auf Ex aus!!',
+
+      // ── FactQuest
+      'game_factquest': 'FactQuest',
+      'factquest_title': 'FactQuest',
+      'factquest_categories': 'Kategorien wählen',
+      'factquest_cat_randomFacts': 'Zufällige Fakten',
+      'factquest_cat_dumbWaysToDie': 'Dumme Tode',
+      'factquest_start': 'QUEST STARTEN',
+      'factquest_tap_continue': 'Tippen für den nächsten Fakt',
+      'factquest_source': 'Mehr lesen (Quelle)',
+      'desc_factquest':
+          'Wahre Fakten, wilde Geschichten & „Dumme Tode" – mit anklickbaren Quellen.',
+
+      'fq_card_rf016_text':
+          'Das Herz eines Blauwals ist so groß wie ein Kleinwagen.',
+      'fq_card_rf016_expl':
+          'Es wiegt etwa 180 kg. Die Aorta ist so weit, dass ein Mensch hindurchkriechen könnte, und der Herzschlag ist aus über 3 km Entfernung messbar.',
+      'fq_card_rf017_text': 'Der größte Mensch aller Zeiten war 2,72 m groß.',
+      'fq_card_rf017_expl':
+          'Robert Wadlow (USA) erreichte diese Größe vor seinem Tod 1940 im Alter von 22 Jahren. Grund war eine Überfunktion der Hirnanhangdrüse. Seine Schuhe hatten Größe 71.',
+      'fq_card_rf018_text':
+          'Die Korona der Sonne ist heißer als ihre Oberfläche.',
+      'fq_card_rf018_expl':
+          'Während die Sonnenoberfläche (Photosphäre) etwa 5.500 °C heiß ist, erreicht die äußere Atmosphäre (Korona) Temperaturen von über 1 Million °C. Warum das so ist, ist ein Rätsel der Physik.',
+      'fq_card_rf019_text': 'Eine Wolke kann über 500 Tonnen wiegen.',
+      'fq_card_rf019_expl':
+          'Obwohl sie am Himmel schweben, besteht eine durchschnittliche Kumuluswolke aus riesigen Mengen Wassertröpfchen. Das Gewicht entspricht etwa 100 Elefanten.',
+      'fq_card_rf020_text': 'Kühe haben beste Freunde.',
+      'fq_card_rf020_expl':
+          'Studien zeigen, dass Kühe engen Kontakt zu bestimmten Artgenossen pflegen. Werden sie von ihren „besten Freunden" getrennt, steigt ihr Stresspegel messbar an.',
+      'fq_card_rf021_text': 'Eiffelturm wächst im Sommer um bis zu 15 cm.',
+      'fq_card_rf021_expl':
+          'Durch die thermische Ausdehnung des Eisenfachwerks dehnt sich das Metall bei Hitze aus. Im Winter zieht es sich wieder zusammen und der Turm schrumpft.',
+      'fq_card_rf022_text':
+          'Schach hat mehr mögliche Spielverläufe als Atome im Universum.',
+      'fq_card_rf022_expl':
+          'Die Shannon-Zahl schätzt die Anzahl der möglichen Schachpartien auf 10^120. Im beobachtbaren Universum gibt es dagegen „nur" etwa 10^80 Atome.',
+      'fq_card_rf023_text':
+          'In der Schweiz ist es illegal, nur ein Meerschweinchen zu halten.',
+      'fq_card_rf023_expl':
+          'Meerschweinchen sind sehr soziale Tiere. Wer nur eines hält, begeht Tierquälerei. Es gibt sogar Leih-Services, falls ein Partner-Tier stirbt.',
+      'fq_card_rf024_text': 'Wombat-Kot ist würfelförmig.',
+      'fq_card_rf024_expl':
+          'Wombats nutzen ihren Kot zur Markierung ihres Reviers. Die Würfelform verhindert das Wegrollen auf Felsen und hilft den Tieren, die Markierungen zu stapeln.',
+      'fq_card_rf025_text': 'Erdbeeren sind botanisch gesehen keine Beeren.',
+      'fq_card_rf025_expl':
+          'Sie gehören zu den Sammelnussfrüchten. Die eigentlichen Früchte der Erdbeere sind die kleinen gelben Kerne (Nüsschen) auf der roten Oberfläche.',
+      'fq_card_rf026_text': 'Bananen hingegen sind botanisch gesehen Beeren.',
+      'fq_card_rf026_expl':
+          'In der Botanik ist eine Beere eine aus einem einzigen Fruchtknoten hervorgegangene Frucht. Das trifft auf Bananen, Gurken und Melonen zu.',
+      'fq_card_rf027_text':
+          'Ein Bleistift kann eine Linie von 56 km Länge zeichnen.',
+      'fq_card_rf027_expl':
+          'Zudem könnte man mit der Graphitmine eines einzigen Standardstifts etwa 45.000 Wörter schreiben.',
+      'fq_card_rf028_text': 'Katzen haben 32 Muskeln in jedem Ohr.',
+      'fq_card_rf028_expl':
+          'Diese Muskeln erlauben es ihnen, ihre Ohren um 180 Grad zu drehen und Geräusche unabhängig voneinander zu orten, was sie zu perfekten Jägern macht.',
+      'fq_card_rf029_text': 'Haie gibt es länger als Bäume.',
+      'fq_card_rf029_expl':
+          'Die ersten Haie tauchten vor etwa 400 Millionen Jahren auf. Die ersten Bäume entwickelten sich erst vor etwa 350 Millionen Jahren.',
+      'fq_card_rf030_text': 'Das Universum riecht nach gebratenem Steak.',
+      'fq_card_rf030_expl':
+          'Astronauten berichten, dass Raumanzüge nach dem Außeneinsatz metallisch süßlich riechen, ähnlich wie Schweißrauch oder verbranntes Fleisch.',
+      'fq_card_rf031_text':
+          'Menschen produzieren genug Speichel für zwei Pools.',
+      'fq_card_rf031_expl':
+          'Ein Durchschnittsmensch produziert im Laufe seines Lebens etwa 25.000 Liter Speichel – genug, um zwei olympische Schwimmbecken zu füllen.',
+      'fq_card_rf032_text': 'Die Nationalhymne von Spanien hat keinen Text.',
+      'fq_card_rf032_expl':
+          'Die „Marcha Real" ist eine der wenigen Nationalhymnen weltweit, die rein instrumental sind. Es gab Versuche, Texte einzuführen, aber keiner setzte sich durch.',
+      'fq_card_rf033_text': 'In Japan gibt es eine Insel voller Kaninchen.',
+      'fq_card_rf033_expl':
+          'Ōkunoshima ist berühmt für die Horden zahmer Kaninchen, die dort leben und Touristen begrüßen. Früher war die Insel ein Geheimstandort für Chemiegasproduktion.',
+      'fq_card_rf034_text': 'Schmetterlinge schmecken mit den Füßen.',
+      'fq_card_rf034_expl':
+          'Sie haben Geschmackssensoren an den Beinen. So können sie durch einfaches Landen auf einer Pflanze feststellen, ob diese als Nahrung für ihre Raupen geeignet ist.',
+      'fq_card_rf035_text': 'Nutella wurde nach dem 2. Weltkrieg erfunden.',
+      'fq_card_rf035_expl':
+          'Wegen der Kakaoknappheit streckte der Konditor Pietro Ferrero die Schokolade mit Haselnüssen. Der Vorläufer hieß „Pasta Gianduja".',
+      'fq_card_rf036_text':
+          'Der Erfinder des Pringles-Dose wurde in einer bestattet.',
+      'fq_card_rf036_expl':
+          'Fredric Baur war so stolz auf seine Erfindung, dass er verfügte, ein Teil seiner Asche solle in einer Pringles-Dose beerdigt werden. Seine Kinder wählten die Sorte „Original".',
+      'fq_card_rf037_text': 'Kängurus können nicht rückwärts gehen.',
+      'fq_card_rf037_expl':
+          'Ihr muskulöser Schwanz und die Anatomie ihrer Beine blockieren die Rückwärtsbewegung. Deshalb ist das Känguru auch im Wappen Australiens – als Symbol für Fortschritt.',
+      'fq_card_rf038_text':
+          'Der Mount Everest ist nicht der Punkt, der am nächsten am Weltall liegt.',
+      'fq_card_rf038_expl':
+          'Wegen der Erdaufwölbung am Äquator ist der Gipfel des Chimborazo in Ecuador weiter vom Erdmittelpunkt entfernt als der Gipfel des Everest.',
+      'fq_card_rf039_text': 'Es regnet Diamanten auf dem Saturn und Jupiter.',
+      'fq_card_rf039_expl':
+          'In den oberen Schichten der Gasriesen wird Kohlenstoff durch Blitze in Graphit und dann durch den enormen Druck in Diamanten verwandelt, die in die Tiefe sinken.',
+      'fq_card_rf040_text': 'Ein Kolibri wiegt weniger als eine 1-Euro-Münze.',
+      'fq_card_rf040_expl':
+          'Der Bienenelfe-Kolibri wiegt nur etwa 1,6 bis 2 Gramm, während eine 1-Euro-Münze 7,5 Gramm wiegt.',
+      'fq_card_rf041_text': 'Island hat keine Mücken.',
+      'fq_card_rf041_expl':
+          'Aufgrund des wechselhaften isländischen Klimas können Mücken ihren Lebenszyklus dort nicht abschließen. Es gibt weltweit kaum einen anderen Ort ohne Mücken.',
+      'fq_card_rf042_text': 'Zitronen enthalten mehr Zucker als Erdbeeren.',
+      'fq_card_rf042_expl':
+          'Zwar schmecken Zitronen sauer, aber ihr Zuckergehalt ist höher. Die hohe Konzentration an Zitronensäure (bis zu 5 %) überdeckt jedoch die Süße.',
+      'fq_card_rf043_text': 'Das Wort „Robot" kommt aus dem Tschechischen.',
+      'fq_card_rf043_expl':
+          'Es wurde 1920 von Karel Čapek in seinem Theaterstück R.U.R. eingeführt und leitet sich von „robota" (Frondienst oder Arbeit) ab.',
+      'fq_card_rf044_text':
+          'Man kann ein Schaf nicht hypnotisieren, aber ein Huhn.',
+      'fq_card_rf044_expl':
+          'Wenn man ein Huhn sanft auf den Boden drückt und eine Linie vor seinem Schnabel zieht, verfällt es in eine Art Schockstarre (tonische Immobilität).',
+      'fq_card_rf045_text':
+          'Die Oberfläche der Lunge entspricht etwa einem Tennisplatz.',
+      'fq_card_rf045_expl':
+          'Die Millionen von Lungenbläschen (Alveolen) ergeben eine Gesamtfläche von ca. 70 bis 100 Quadratmetern, um eine maximale Sauerstoffaufnahme zu ermöglichen.',
+      'fq_card_rf046_text': 'Die erste Computermaus war aus Holz.',
+      'fq_card_rf046_expl':
+          'Douglas Engelbart baute sie 1964. Sie hatte zwei Räder aus Metall und einen Knopf auf der Oberseite.',
+      'fq_card_rf047_text':
+          'Pluto wurde noch nicht einmal ein „Pluto-Jahr" alt.',
+      'fq_card_rf047_expl':
+          'Seit seiner Entdeckung 1930 hat Pluto seine Umlaufbahn um die Sonne (die 248 Erdtage dauert) noch nicht einmal vollendet. Das wird erst im Jahr 2178 der Fall sein.',
+      'fq_card_rf048_text':
+          'Heißes Wasser gefriert schneller als kaltes Wasser.',
+      'fq_card_rf048_expl':
+          'Dieses Phänomen wird Mpemba-Effekt genannt. Die genaue physikalische Ursache ist bis heute umstritten.',
+      'fq_card_rf049_text': 'Einhörner sind das Nationaltier von Schottland.',
+      'fq_card_rf049_expl':
+          'In der Mythologie gilt das Einhorn als der natürliche Feind des Löwen (Symbol Englands). In Schottland steht es für Reinheit und Unbezähmbarkeit.',
+      'fq_card_rf050_text':
+          'Der älteste lebende Baum ist über 4.800 Jahre alt.',
+      'fq_card_rf050_expl':
+          'Die Grannenkiefer „Methuselah" in Kalifornien ist nachweislich 4.855 Jahre alt. Sein genauer Standort wird geheim gehalten, um ihn vor Vandalismus zu schützen.',
+      'fq_card_rf051_text':
+          'Bambus kann bis zu 91 cm an einem einzigen Tag wachsen.',
+      'fq_card_rf051_expl':
+          'Man kann einigen Bambusarten buchstäblich beim Wachsen zusehen. Es ist die am schnellsten wachsende Pflanze der Erde.',
+      'fq_card_rf052_text': 'Annas-Früchte brauchen zwei Jahre, um zu reifen.',
+      'fq_card_rf052_expl':
+          'Ananas-Pflanzen tragen nur ein Mal eine einzige Frucht. Nach der Ernte wächst aus der Mutterpflanze oft erst nach langer Zeit ein neuer Trieb.',
+      'fq_card_rf053_text':
+          'Fingerabdrücke von Koalas sind fast identisch mit menschlichen.',
+      'fq_card_rf053_expl':
+          'Sogar unter dem Elektronenmikroskop sind sie kaum von menschlichen Abdrücken zu unterscheiden, was bei polizeilichen Ermittlungen theoretisch zu Verwirrung führen könnte.',
+      'fq_card_rf054_text':
+          'Der Vorname „Jessica" wurde von Shakespeare erfunden.',
+      'fq_card_rf054_expl':
+          'Er tauchte zum ersten Mal 1596 in seinem Stück „Der Kaufmann von Venedig" auf. Vorher gab es keine schriftlichen Belege für diesen Namen.',
+      'fq_card_rf055_text':
+          'Das kürzeste jemals geführte Konzert dauerte nur einen Ton.',
+      'fq_card_rf055_expl':
+          'Die Band White Stripes spielte 2007 in Kanada ein Gratis-Konzert, das nur aus einem einzigen Beckenschlag bestand.',
+      'fq_card_rf056_text': 'Napoleon war gar nicht so klein.',
+      'fq_card_rf056_expl':
+          'Mit ca. 1,68 m lag er über dem damaligen Durchschnitt der Franzosen. Die Verwirrung entstand durch unterschiedliche Maßeinheiten (französische vs. englische Fuß).',
+      'fq_card_rf057_text': 'Ein Oktopus hat neun Gehirne.',
+      'fq_card_rf057_expl':
+          'Zusätzlich zu einem zentralen Gehirn hat jeder seiner acht Arme ein eigenes Nervenzentrum, das unabhängig Bewegungen steuern kann.',
+      'fq_card_rf058_text': 'Wale können im Stehen schlafen.',
+      'fq_card_rf058_expl':
+          'Pottwale wurden beobachtet, wie sie vertikal im Wasser treiben und dabei völlig regungslos sind – eine Form des Tiefschlafs.',
+      'fq_card_rf059_text':
+          'Die Freiheitsstatue war ursprünglich kupferfarben.',
+      'fq_card_rf059_expl':
+          'Durch Oxidation bildete sich im Laufe von etwa 20 Jahren die charakteristische grüne Patina aus Kupfersalzen, die das Metall heute vor weiterer Korrosion schützt.',
+      'fq_card_rf060_text': 'Jeder fünfte Mensch ist Chinese.',
+      'fq_card_rf060_expl':
+          'China ist mit über 1,4 Milliarden Menschen das bevölkerungsreichste Land der Erde. Zusammen mit Indien leben dort fast 40 % der Weltbevölkerung.',
+      'fq_card_rf061_text': 'Vatikanstadt ist das kleinste Land der Welt.',
+      'fq_card_rf061_expl':
+          'Es hat eine Fläche von nur 0,44 Quadratkilometern und liegt mitten in Rom. Es hat eine eigene Post, Armee (Schweizergarde) und Staatsbürgerschaft.',
+      'fq_card_rf062_text': 'Man kann im Weltraum nicht rülpsen.',
+      'fq_card_rf062_expl':
+          'In der Schwerelosigkeit trennen sich Gase und Flüssigkeiten im Magen nicht. Ein Rülpser wäre immer mit dem Ausstoßen von Mageninhalt verbunden (nasses Rülpsen).',
+      'fq_card_rf063_text':
+          'Ein Hai kann einen einzelnen Blutstropfen in einem Pool riechen.',
+      'fq_card_rf063_expl':
+          'Haie haben einen extremen Geruchssinn und können kleinste Konzentrationen von Blut in Billionen Teilen Wasser über weite Entfernungen wahrnehmen.',
+      'fq_card_rf064_text':
+          'Die Zunge eines Blauwals wiegt so viel wie ein Elefant.',
+      'fq_card_rf064_expl':
+          'Sie ist so groß, dass bis zu 50 Menschen auf ihr stehen könnten. Das gesamte Tier wiegt etwa 200 Tonnen.',
+      'fq_card_rf065_text':
+          'Der durchschnittliche Wolkenkratzer schwankt bei Wind.',
+      'fq_card_rf065_expl':
+          'Das Burj Khalifa in Dubai schwankt an der Spitze um bis zu 1,5 Meter. Diese Flexibilität ist notwendig, damit das Gebäude unter dem Winddruck nicht bricht.',
+      'fq_card_rf066_text': 'Die Antarktis ist die größte Wüste der Welt.',
+      'fq_card_rf066_expl':
+          'Eine Wüste wird durch niedrigen Niederschlag definiert, nicht durch Hitze. In Teilen der Antarktis hat es seit 2 Millionen Jahren nicht geregnet.',
+      'fq_card_rf067_text':
+          'Ein Goldfisch hat ein Erinnerungsvermögen von Monaten.',
+      'fq_card_rf067_expl':
+          'Der Mythos vom 3-Sekunden-Gedächtnis ist falsch. Goldfische können sich an Labyrinthe, Farben und Futterzeiten über Monate hinweg erinnern.',
+      'fq_card_rf068_text':
+          'Die erste Webcam wurde erfunden, um Kaffeestände zu beobachten.',
+      'fq_card_rf068_expl':
+          '1991 stellten Forscher der University of Cambridge eine Kamera vor ihre Kaffeemaschine, damit sie an ihren Schreibtischen sehen konnten, ob die Kanne voll ist.',
+      'fq_card_rf069_text': 'Männer haben theoretisch Milchdrüsen.',
+      'fq_card_rf069_expl':
+          'Männer besitzen Brustgewebe und Milchdrüsen, aber sie sind unter normalen Umständen nicht funktional. In extremen Fällen können Hormone eine Laktation auslösen.',
+      'fq_card_rf070_text':
+          'Der Grand Canyon ist so groß, dass er sein eigenes Wetter erzeugt.',
+      'fq_card_rf070_expl':
+          'Wegen der enormen Höhenunterschiede und der geologischen Struktur können sich innerhalb des Canyons Gewitter bilden, während es am Rand sonnig ist.',
+      'fq_card_rf071_text':
+          'Kühe können Treppen hochlaufen, aber nicht runter.',
+      'fq_card_rf071_expl':
+          'Ihre Kniegelenke und die Gewichtsverteilung sind nicht darauf ausgelegt, die nötige Balance für den Abstieg auf Treppenstufen zu halten.',
+      'fq_card_rf072_text':
+          'Ein menschliches Herz schlägt etwa 100.000 Mal am Tag.',
+      'fq_card_rf072_expl':
+          'Im Jahr sind das über 36 Millionen Schläge. In einem 80-jährigen Leben schlägt es fast 3 Milliarden Mal.',
+      'fq_card_rf073_text':
+          'Es gibt mehr Plastikflamingos als echte Flamingos auf der Welt.',
+      'fq_card_rf073_expl':
+          'Während es ca. 2 bis 3 Millionen echte Flamingos gibt, wurden seit den 1950ern Millionen von Garten-Flamingos aus Kunststoff produziert.',
+      'fq_card_rf074_text':
+          'Bratpfannen aus Gusseisen geben Eisen an das Essen ab.',
+      'fq_card_rf074_expl':
+          'Kochen mit Gusseisen kann den Eisengehalt von Speisen erhöhen, was besonders bei säurehaltigen Lebensmitteln wie Tomatensoße der Fall ist.',
+      'fq_card_rf075_text': 'Vögel können nicht im Weltraum überleben.',
+      'fq_card_rf075_expl':
+          'Vögel benötigen die Schwerkraft, um Wasser und Nahrung herunterzuschlucken. Ohne Schwerkraft könnten sie nicht einmal trinken.',
+      'fq_card_rf076_text': 'In Japan werden quadratische Melonen gezüchtet.',
+      'fq_card_rf076_expl':
+          'Sie wachsen in quadratischen Glaskästen, damit sie im Kühlschrank weniger Platz wegnehmen. Sie sind jedoch meist sehr teuer und oft nicht essbar (Zierfrüchte).',
+      'fq_card_rf077_text':
+          'Die längste jemals gemessene Flugdauer eines Huhns war 13 Sekunden.',
+      'fq_card_rf077_expl':
+          'Hühner sind keine Langstreckenflieger. Sie nutzen ihre Flügel meist nur für kurze Sprints oder um auf Äste zu flattern.',
+      'fq_card_rf078_text': 'Delfine haben Namen füreinander.',
+      'fq_card_rf078_expl':
+          'Jeder Große Tümmler entwickelt eine einzigartige Pfeif-Signatur, die wie ein Name funktioniert. Andere Delfine imitieren diese Pfeiftöne, um bestimmte Individuen zu rufen.',
+      'fq_card_rf079_text':
+          'Die meisten Diamanten sind über 1 Milliarde Jahre alt.',
+      'fq_card_rf079_expl':
+          'Sie entstanden tief im Erdmantel unter extremem Druck und Hitze und wurden durch Vulkanausbrüche näher an die Oberfläche befördert.',
+      'fq_card_rf080_text': 'Es gibt Fische, die auf Bäume klettern können.',
+      'fq_card_rf080_expl':
+          'Der Kletterfisch (Anabas testudineus) kann mit seinen Brustflossen über Land kriechen und kleine Hindernisse oder Wurzeln überwinden.',
+
+      'fq_card_rf081_text':
+          'Der menschliche Körper besteht zu ca. 60 % aus Wasser.',
+      'fq_card_rf081_expl':
+          'Das Gehirn und das Herz bestehen zu fast 73 % aus Wasser, die Lunge sogar zu etwa 83 %. Selbst Knochen enthalten rund 31 % Wasser.',
+      'fq_card_rf082_text':
+          'Eine Ameise kann das 50-fache ihres Körpergewichts tragen.',
+      'fq_card_rf082_expl':
+          'Das entspricht einem Menschen, der einen ausgewachsenen Elefanten hebt. Ihre Muskelkraft ist im Verhältnis zur Körpergröße enorm.',
+      'fq_card_rf083_text':
+          'Eskimos nutzen Kühlschränke, um ihr Essen vor dem Gefrieren zu schützen.',
+      'fq_card_rf083_expl':
+          'In extrem kalten Regionen dient ein Kühlschrank als Isolierung, um Lebensmittel bei konstanten +4 °C zu halten, während es draußen -40 °C sein können.',
+      'fq_card_rf084_text': 'Sogar Haie können im Schlaf ertrinken.',
+      'fq_card_rf084_expl':
+          'Viele Haiarten müssen ständig schwimmen, damit sauerstoffreiches Wasser durch ihre Kiemen fließt. Bleiben sie stehen, ersticken sie.',
+      'fq_card_rf085_text': 'Ein Blitzschlag kann Sand in Glas verwandelt.',
+      'fq_card_rf085_expl':
+          'Wenn ein Blitz in sandigen Boden einschlägt, schmilzt die extreme Hitze den Quarzsand zu hohlen, glasartigen Röhren, sogenannten Fulguriten oder Blitzröhren.',
+      'fq_card_rf086_text': 'Der Erfinder des Frisbees wurde zu einem Frisbee.',
+      'fq_card_rf086_expl':
+          'Walter Morrison wurde nach seinem Tod 2010 eingeäschert. Seine Familie ließ einen Teil der Asche in eine Sonderserie von Frisbees einarbeiten.',
+      'fq_card_rf087_text': 'Krokodile können ihre Zunge nicht herausstrecken.',
+      'fq_card_rf087_expl':
+          'Ihre Zunge ist fest mit dem Boden des Mauls verwurzelt. Das hilft ihnen, beim Zubeißen unter Wasser kein Wasser in die Lunge zu bekommen.',
+      'fq_card_rf088_text':
+          'Schornsteinfeger gelten in Deutschland als Glücksbringer.',
+      'fq_card_rf088_expl':
+          'Früher retteten sie Häuser vor Bränden durch verstopfte Kamine. Wer einen Schornsteinfeger sah, hatte „Glück", dass sein Haus sicher war.',
+      'fq_card_rf089_text':
+          'Man kann im Internet Grundstücke auf dem Mond kaufen.',
+      'fq_card_rf089_expl':
+          'Ein Amerikaner namens Dennis Hope beanspruchte 1980 den Mond als sein Eigentum und verkauft seitdem Zertifikate. Rechtlich ist das jedoch völlig wertlos.',
+      'fq_card_rf090_text':
+          'Das Auge eines Straußes ist größer als sein Gehirn.',
+      'fq_card_rf090_expl':
+          'Mit einem Durchmesser von ca. 5 cm sind sie die größten Augen aller Landwirbeltiere. Das Gehirn des Vogels ist dagegen etwa so groß wie eine Walnuss.',
+      'fq_card_rf091_text': 'Der Name „Google" ist ein Rechtschreibfehler.',
+      'fq_card_rf091_expl':
+          'Die Gründer wollten die Suchmaschine eigentlich „Googol" nennen (eine 1 mit 100 Nullen). Bei der Registrierung der Domain vertippten sie sich jedoch.',
+      'fq_card_rf092_text':
+          'Die NASA nutzt noch immer Disketten für alte Systeme.',
+      'fq_card_rf092_expl':
+          'Einige kritische Systeme der Space Shuttles oder Voyager-Sonden basieren auf uralter Hardware, die stabil läuft und nur mit Disketten gewartet werden kann.',
+      'fq_card_rf093_text': 'Lachen ist gesund für das Herz.',
+      'fq_card_rf093_expl':
+          'Lachen führt zur Entspannung der Gefäße und verbessert den Blutfluss, was das Risiko für Herz-Kreislauf-Erkrankungen senken kann.',
+      'fq_card_rf094_text':
+          'Ein Blauwal könnte eine ganze Grapefruit verschlucken, aber keinen Menschen.',
+      'fq_card_rf094_expl':
+          'Trotz ihrer Größe ist die Speiseröhre eines Blauwals nur etwa so breit wie eine Untertasse, da sie sich fast ausschließlich von winzigem Krill ernähren.',
+      'fq_card_rf095_text': 'In Japan gibt es Parkplätze für Regenschirme.',
+      'fq_card_rf095_expl':
+          'In vielen Kaufhäusern oder Ämtern gibt es abschließbare Ständer für Regenschirme, damit man sie nicht nass mit ins Gebäude nehmen muss.',
+      'fq_card_rf096_text':
+          'Ein menschliches Haar kann bis zu 100 Gramm tragen.',
+      'fq_card_rf096_expl':
+          'Das bedeutet, ein ganzer Schopf Haare könnte theoretisch das Gewicht von zwei afrikanischen Elefanten halten, wenn die Kraft gleichmäßig verteilt wird.',
+      'fq_card_rf097_text': 'Seesterne haben kein Gehirn.',
+      'fq_card_rf097_expl':
+          'Sie besitzen ein komplexes Nervensystem, aber kein zentrales Steuerorgan. Zudem pumpen sie Meerwasser statt Blut durch ihren Körper.',
+      'fq_card_rf098_text':
+          'Der Eiffelturm war als vorübergehendes Bauwerk geplant.',
+      'fq_card_rf098_expl':
+          'Er wurde für die Weltausstellung 1889 gebaut und sollte nach 20 Jahren wieder abgerissen werden. Dank seiner Eignung als Funkmast blieb er stehen.',
+      'fq_card_rf099_text': 'Schnecken können drei Jahre lang schlafen.',
+      'fq_card_rf099_expl':
+          'Bei extremer Trockenheit oder Kälte ziehen sie sich in ihr Gehäuse zurück und versiegeln es. In diesem Ruhezustand können sie Jahre überdauern.',
+      'fq_card_rf100_text': 'Wale singen in Dialekten.',
+      'fq_card_rf100_expl':
+          'Blauwal-Populationen in verschiedenen Ozeanen haben unterschiedliche Gesangsmuster, die sich über Generationen innerhalb der Gruppe weiterentwickeln.',
+      'fq_card_rf101_text':
+          'Das meistverkaufte Spielzeug aller Zeiten ist der Zauberwürfel.',
+      'fq_card_rf101_expl':
+          'Seit seiner Erfindung durch Ernő Rubik 1974 wurden über 350 Millionen Exemplare des Rubik’s Cube weltweit verkauft.',
+      'fq_card_rf102_text':
+          'Der Nil in Ägypten ist der längste Fluss der Welt.',
+      'fq_card_rf102_expl':
+          'Er ist ca. 6.650 km lang. Es gibt jedoch eine wissenschaftliche Debatte, ob der Amazonas (ca. 6.400 km) durch neue Messungen nicht doch länger ist.',
+      'fq_card_rf103_text':
+          'In Alaska ist es illegal, einem Elch ein Bier zu geben.',
+      'fq_card_rf103_expl':
+          'Dieses kuriose Gesetz stammt aus einer Zeit, als man verhindern wollte, dass betrunkene Tiere in Städten randalieren.',
+      'fq_card_rf104_text': 'Ein „Jiffy" ist eine tatsächliche Zeiteinheit.',
+      'fq_card_rf104_expl':
+          'In der Physik entspricht ein Jiffy der Zeit, die Licht braucht, um einen Zentimeter im Vakuum zurückzulegen (ca. 33,3 Pikosekunden).',
+      'fq_card_rf105_text':
+          'Die erste Nachricht per SMS hieß „Merry Christmas".',
+      'fq_card_rf105_expl':
+          'Die weltweit erste SMS wurde am 3. Dezember 1992 von einem Computer an ein Mobiltelefon im britischen Vodafone-Netz gesendet.',
+      'fq_card_rf106_text': 'In Las Vegas gibt es keine Uhren in den Casinos.',
+      'fq_card_rf106_expl':
+          'Das ist Absicht, damit die Spieler das Zeitgefühl verlieren und länger bleiben. Zudem gibt es oft keine Fenster.',
+      'fq_card_rf107_text': 'Ein neugeborenes Känguru ist nur etwa 2 cm groß.',
+      'fq_card_rf107_expl':
+          'Es ist bei der Geburt so klein wie eine Gummibärchen und muss dann eigenständig den Weg in den Beutel der Mutter finden, um dort weiterzuwachsen.',
+      'fq_card_rf108_text': 'Man kann Diamanten aus Erdnussbutter herstellen.',
+      'fq_card_rf108_expl':
+          'Wissenschaftler haben unter extrem hohem Druck den Kohlenstoff aus Erdnussbutter extrahiert und so winzige künstliche Diamanten erzeugt.',
+      'fq_card_rf109_text':
+          'Die Zunge eines Chamäleons ist doppelt so lang wie sein Körper.',
+      'fq_card_rf109_expl':
+          'Sie kann in weniger als einer Zehntelsekunde herausgeschnellt werden, um Insekten zu fangen. Die Spitze ist klebrig wie Honig.',
+      'fq_card_rf110_text':
+          'Die älteste geschlossene Bank der Welt ist in Italien.',
+      'fq_card_rf110_expl':
+          'Die Banca Monte dei Paschi di Siena wurde 1472 gegründet und ist bis heute durchgehend im Geschäft.',
+      'fq_card_rf111_text':
+          'Der einzige Kontinent ohne aktive Vulkane ist Australien.',
+      'fq_card_rf111_expl':
+          'Zwar gibt es erloschene Vulkane, aber durch die Lage inmitten einer tektonischen Platte gibt es seit Millionen Jahren keine Ausbrüche mehr.',
+      'fq_card_rf112_text': 'Wimpern leben etwa 150 Tage.',
+      'fq_card_rf112_expl':
+          'Danach fallen sie aus und werden durch neue ersetzt. Im Durchschnitt verliert man 1 bis 5 Wimpern pro Tag.',
+      'fq_card_rf113_text':
+          'In Venedig dürfen Gondeln nur schwarz lackiert sein.',
+      'fq_card_rf113_expl':
+          'Ein Gesetz aus dem Jahr 1562 beendete den Prunk-Wettbewerb der reichen Bürger. Schwarz wurde als einheitliche Farbe für alle Gondeln vorgeschrieben.',
+      'fq_card_rf114_text': 'Ein Wolkenkratzer in New York hat keine Fenster.',
+      'fq_card_rf114_expl':
+          'Das Long Lines Building (33 Thomas Street) ist 167 m hoch und wurde als atomsicherer Vermittlungsknoten für Telefonverbindungen gebaut.',
+      'fq_card_rf115_text': 'Hunde können etwa 250 Wörter verstehen.',
+      'fq_card_rf115_expl':
+          'Besonders intelligente Rassen wie Border Collies können Hunderte von Begriffen und Gesten lernen und sogar einfache Probleme lösen.',
+      'fq_card_rf116_text':
+          'In der Schwerelosigkeit wachsen Astronauten bis zu 5 cm.',
+      'fq_card_rf116_expl':
+          'Da die Erdanziehungskraft fehlt, dehnen sich die Bandscheiben der Wirbelsäule aus. Zurück auf der Erde schrumpfen sie wieder auf Normalmaß.',
+      'fq_card_rf117_text':
+          'Die Stadt Rom hieß früher „Stadt der sieben Hügel".',
+      'fq_card_rf117_expl':
+          'Das antike Rom wurde auf sieben Hügeln (u.a. Palatin und Aventin) gegründet, was die Verteidigung und Entwässerung erleichterte.',
+      'fq_card_rf118_text': 'Es gibt Fische mit durchsichtigem Blut.',
+      'fq_card_rf118_expl':
+          'Der Antarktische Eisfisch hat kein Hämoglobin (das Blut rot färbt), da die Sauerstoffaufnahme im extrem kalten Wasser auch ohne diesen Farbstoff funktioniert.',
+      'fq_card_rf119_text':
+          'In Thailand wird das neue Jahr mit einer Wasserschlacht gefeiert.',
+      'fq_card_rf119_expl':
+          'Das Songkran-Fest markiert das thailändische Neujahr. Das Bespritzen mit Wasser steht symbolisch für die Reinigung und das Wegwaschen von Pech.',
+      'fq_card_rf120_text':
+          'Der Mount Everest ist nicht der höchste Berg vom Fuß bis zum Gipfel.',
+      'fq_card_rf120_expl':
+          'Das ist der Mauna Kea auf Hawaii. Vom Meeresboden aus gemessen ist er über 10.000 m hoch, nur 4.205 m davon ragen aus dem Wasser.',
+      'fq_card_rf121_text': 'Ein Känguru-Baby ist so klein wie eine Kirsche.',
+      'fq_card_rf121_expl':
+          'Direkt nach der Geburt kriecht es blind und nackt durch das Fell der Mutter in den schützenden Beutel, wo es die nächsten Monate bleibt.',
+      'fq_card_rf122_text': 'Die Farbe Orange wurde nach der Frucht benannt.',
+      'fq_card_rf122_expl':
+          'Vor dem 16. Jahrhundert nannten die Menschen in Europa die Farbe einfach „Gelb-Rot". Erst durch den Import der Orangen bürgerte sich der Name ein.',
+      'fq_card_rf123_text': 'Igel haben etwa 5.000 bis 7.000 Stacheln.',
+      'fq_card_rf123_expl':
+          'Die Stacheln sind innen hohl und sehr flexibel, sodass sie Stürze abfedern können. Bei Gefahr rollt sich der Igel mithilfe spezieller Rückenmuskeln ein.',
+      'fq_card_rf124_text':
+          'In Singapur ist das Kauen von Kaugummi stark eingeschränkt.',
+      'fq_card_rf124_expl':
+          'Um die Stadt sauber zu halten, wurde der Verkauf 1992 verboten. Heute ist es nur noch aus medizinischen Gründen (z.B. Nikotinkaugummi) erlaubt.',
+      'fq_card_rf125_text': 'Die teuerste Pizza der Welt kostet 12.000 Dollar.',
+      'fq_card_rf125_expl':
+          'Die „Louis XIII" wird von drei Köchen direkt im Haus des Bestellers zubereitet und enthält unter anderem drei Arten Kaviar und Hummer.',
+      'fq_card_rf126_text': 'Pferde können nicht durch den Mund atmen.',
+      'fq_card_rf126_expl':
+          'Sie atmen ausschließlich durch die Nüstern. Dank einer speziellen Klappe im Rachen trennen sie Atemweg und Speiseröhre komplett.',
+      'fq_card_rf127_text':
+          'Das Gehirn eines Goldfisches ist gar nicht so schlecht.',
+      'fq_card_rf127_expl':
+          'Wissenschaftler konnten nachweisen, dass Goldfische sogar Auto fahren können (mit einem speziellen Aquarium-Roboter), wenn man sie trainiert.',
+      'fq_card_rf128_text':
+          'Ein Blitzschlag kann über 30.000 Grad Celsius heiß sein.',
+      'fq_card_rf128_expl':
+          'Das ist etwa fünfmal heißer als die Sonnenoberfläche. Die Luft dehnt sich durch die Hitze explosionsartig aus, was den Donner erzeugt.',
+      'fq_card_rf129_text': 'Wale müssen zum Atmen auftauchen.',
+      'fq_card_rf129_expl':
+          'Als Säugetiere haben sie Lungen. Das Blasloch auf ihrem Kopf ist eine evolutionär angepasste Nase, die nur über Wasser funktioniert.',
+      'fq_card_rf130_text': 'Die Große Mauer in China ist über 21.000 km lang.',
+      'fq_card_rf130_expl':
+          'Inklusive aller Zweigstellen und Gräben erstreckt sie sich über eine gewaltige Distanz. Gebaut wurde sie über Jahrhunderte zum Schutz vor Nomaden.',
+      'fq_card_rf131_text':
+          'Ein menschliches Skelett erneuert sich alle 10 Jahre.',
+      'fq_card_rf131_expl':
+          'Durch ständige Auf- und Abbauprozesse im Körper werden alte Knochenzellen durch neue ersetzt. Man hat also nie dieselben Knochen wie als Kind.',
+      'fq_card_rf132_text': 'In Finnland gibt es mehr Saunen als Autos.',
+      'fq_card_rf132_expl':
+          'Saunieren ist ein fester Bestandteil der finnischen Kultur. Es gibt Saunas in fast jedem Haus, in Büros und sogar im Parlament.',
+      'fq_card_rf133_text':
+          'Ein Oktopus kann durch ein Loch passen, das so groß wie sein Auge ist.',
+      'fq_card_rf133_expl':
+          'Da sie außer ihrem Schnabel keine harten Teile im Körper haben, sind sie extrem flexibel und können sich durch winzige Spalten quetschen.',
+      'fq_card_rf134_text':
+          'Es gibt einen Planeten, auf dem es flüssiges Eisen regnet.',
+      'fq_card_rf134_expl':
+          'WASP-76b ist ein Gasriese, auf dem es nachts so stark abkühlt, dass Eisen (das am Tag verdampft) als glühender Regen herabfällt.',
+      'fq_card_rf135_text': 'Menschen teilen 50 % ihrer DNA mit Bananen.',
+      'fq_card_rf135_expl':
+          'Das liegt daran, dass alle Lebewesen grundlegende biologische Funktionen wie Zellteilung gemeinsam haben, für die dieselben Gensequenzen nötig sind.',
+      'fq_card_rf136_text':
+          'Die Mongolei hat die geringste Bevölkerungsdichte der Welt.',
+      'fq_card_rf136_expl':
+          'Auf einer Fläche viermal so groß wie Deutschland leben nur ca. 3,3 Millionen Menschen. Das sind weniger als 2 Personen pro Quadratkilometer.',
+      'fq_card_rf137_text': 'Koalas schlafen bis zu 22 Stunden am Tag.',
+      'fq_card_rf137_expl':
+          'Eukalyptusblätter sind sehr energiearm und schwer verdaulich. Schlafen ist für die Tiere die einzige Möglichkeit, Energie zu sparen.',
+      'fq_card_rf138_text':
+          'Der Pazifische Ozean ist größer als alle Landflächen der Erde zusammen.',
+      'fq_card_rf138_expl':
+          'Er bedeckt etwa ein Drittel der Erdoberfläche und ist so gewaltig, dass alle Kontinente locker in seinem Becken Platz finden würden.',
+      'fq_card_rf139_text': 'Man kann ein Schaf nicht im Liegen scheren.',
+      'fq_card_rf139_expl':
+          'Professionelle Scherer setzen das Schaf auf das Gesäß. In dieser Position entspannt es sich und kann gefahrlos und schnell geschoren werden.',
+      'fq_card_rf140_text':
+          'Die Venus hat die heißeste Oberfläche aller Planeten.',
+      'fq_card_rf140_expl':
+          'Trotz der größeren Entfernung zur Sonne als Merkur sorgt der extreme Treibhauseffekt ihrer dichten Atmosphäre für Temperaturen von ca. 460 °C.',
+      'fq_card_rf141_text':
+          'In Schottland gibt es über 400 Wörter für „Schnee".',
+      'fq_card_rf141_expl':
+          'Die schottische Sprache unterscheidet sehr fein zwischen verschiedenen Arten von Schneefall, Hagel und Graupel.',
+      'fq_card_rf142_text':
+          'Ein menschliches Gehirn verbraucht so viel Energie wie eine 20-Watt-Glühbirne.',
+      'fq_card_rf142_expl':
+          'Obwohl es nur 2 % des Körpergewichts ausmacht, benötigt es etwa 20 % des gesamten Energiebedarfs des Körpers.',
+      'fq_card_rf143_text': 'Die Sahara-Wüste war früher grün.',
+      'fq_card_rf143_expl':
+          'Noch vor etwa 6.000 Jahren gab es in der Sahara Seen, Flüsse und weite Savannen landschaften. Klimatische Veränderungen machten sie zur Wüste.',
+      'fq_card_rf144_text': 'Bienen können Gesichter erkennen.',
+      'fq_card_rf144_expl':
+          'Experimente zeigten, dass Honigbienen lernen können, menschliche Gesichter voneinander zu unterscheiden, indem sie Merkmale wie Augen und Mund kombinieren.',
+      'fq_card_rf145_text':
+          'Der Vatikan hat die höchste Kriminalitätsrate der Welt.',
+      'fq_card_rf145_expl':
+          'Rein statistisch gesehen: Pro Einwohner gibt es die meisten Taschendiebstähle (durch Touristen). Da das Land kaum Bewohner hat, verzerrt das die Quote enorm.',
+      'fq_card_rf146_text':
+          'Eine Giraffe kann ihre Ohren mit ihrer Zunge reinigen.',
+      'fq_card_rf146_expl':
+          'Ihre Zunge ist bis zu 50 cm lang und extrem beweglich. Zudem ist sie dunkelblau oder lila gefärbt, um sie vor Sonnenbrand zu schützen.',
+      'fq_card_rf147_text':
+          'In Japan gibt es mehr als 5 Millionen Verkaufsautomaten.',
+      'fq_card_rf147_expl':
+          'Man kann dort fast alles kaufen – von heißen Nudeln über frische Eier bis hin zu Regenschirmen und Blumen. Sie sind ein Symbol für die Sicherheit des Landes.',
+      'fq_card_rf148_text': 'Eisbären haben schwarze Haut.',
+      'fq_card_rf148_expl':
+          'Ihr Fell ist eigentlich nicht weiß, sondern hohl und transparent. Die schwarze Haut darunter absorbiert die Sonnenstrahlen maximal, um den Körper warmzuhalten.',
+      'fq_card_rf149_text':
+          'Der Erfinder des Stoppschilds hat nie einen Führerschein gemacht.',
+      'fq_card_rf149_expl':
+          'William Eno gilt als „Vater der Verkehrssicherheit". Er entwickelte viele moderne Verkehrsregeln, fuhr aber selbst nie ein Auto.',
+      'fq_card_rf150_text': 'Ein neugeborener Panda ist kleiner als eine Maus.',
+      'fq_card_rf150_expl':
+          'Pandas werden extrem unterentwickelt geboren. Ein Baby wiegt nur etwa 100 Gramm, was nur ein Neuntel des Gewichts der Mutter ist.',
+      'fq_card_rf151_text': 'In Island gibt es keine Eisenbahn.',
+      'fq_card_rf151_expl':
+          'Obwohl das Land modern ist, wurde nie ein öffentliches Schienennetz gebaut. Die Fortbewegung erfolgt fast ausschließlich per Auto, bus oder Flugzeug.',
+      'fq_card_rf152_text':
+          'Das kürzeste jemals gedruckte Wort im Duden war „ei".',
+      'fq_card_rf152_expl':
+          'In älteren Ausgaben war „ei" als Ausruf der Überraschung gelistet. Heute finden sich dort eher Wörter wie „Ei" (Hühnerei) oder „Ab".',
+      'fq_card_rf153_text':
+          'Ein menschlicher Finger kann Unebenheiten von 13 Nanometern spüren.',
+      'fq_card_rf153_expl':
+          'Unsere Fingerspitzen sind so sensibel, dass wir den Unterschied zwischen einer glatten Oberfläche und einer mit mikroskopischen Rillen fühlen können.',
+      'fq_card_rf154_text': 'Seepferdchen haben keinen Magen.',
+      'fq_card_rf154_expl':
+          'Ihre Nahrung wandert direkt durch den Darmtrakt. Da sie Nährstoffe nicht speichern können, müssen sie fast ununterbrochen fressen.',
+      'fq_card_rf155_text':
+          'Die erste Kreditkarte wurde wegen eines vergessenen Portemonnaies erfunden.',
+      'fq_card_rf155_expl':
+          'Frank McNamara vergaß 1949 beim Abendessen sein Geld. Er erfand daraufhin den „Diners Club", die weltweit erste multifunktionale Kreditkarte.',
+      'fq_card_rf156_text': 'Bananen wachsen nach oben zur Sonne.',
+      'fq_card_rf156_expl':
+          'Dieses Phänomen heißt negativer Geotropismus. Die Früchte wachsen gegen die Schwerkraft, was ihnen ihre charakteristische Krümmung verleiht.',
+      'fq_card_rf157_text': 'Ein Blauwal-Baby trinkt täglich 600 Liter Milch.',
+      'fq_card_rf157_expl':
+          'Dabei nimmt es pro Tag etwa 90 kg an Gewicht zu. Die Milch hat einen Fettgehalt von ca. 50 % und ist damit so dickflüssig wie Zahnpasta.',
+      'fq_card_rf158_text':
+          'Die längste menschliche Zunge ist über 10 cm lang.',
+      'fq_card_rf158_expl':
+          'Nick Stoeberl aus den USA hält mit 10,1 cm den Weltrekord (gemessen von der Zungenspitze bis zur Mitte der geschlossenen Lippe).',
+      'fq_card_rf159_text': 'In Deutschland gibt es mehr als 300 Brotsorten.',
+      'fq_card_rf159_expl':
+          'Die deutsche Brotkultur ist weltweit einzigartig und gehört zum immateriellen Kulturerbe der UNESCO. Es gibt sogar ein offizielles Brotregister.',
+      'fq_card_rf160_text': 'Ein Oktopus hat blaues Blut.',
+      'fq_card_rf160_expl':
+          'Statt Eisen nutzen sie Kupfer zum Sauerstofftransport (Hämocyanin), was das Blut bei Kontakt mit Sauerstoff blau färbt. Das hilft ihnen in kaltem, sauerstoffarmem Wasser.',
+      'fq_card_rf161_text':
+          'In der Schweiz gibt es einen Bunker für das gesamte Volk.',
+      'fq_card_rf161_expl':
+          'Während des Kalten Krieges wurde gesetzlich festgelegt, dass für jeden Einwohner ein Platz in einem Schutzraum vorhanden sein muss.',
+      'fq_card_rf162_text':
+          'Die Nase eines Hundes ist so einzigartig wie ein Fingerabdruck.',
+      'fq_card_rf162_expl':
+          'Das Muster aus Rillen und Gruben auf dem Nasenspiegel ist bei jedem Hund individuell und könnte theoretisch zur Identifizierung dienen.',
+      'fq_card_rf163_text':
+          'Der Erfinder des modernen Computers (Alan Turing) war ein Marathonläufer.',
+      'fq_card_rf163_expl':
+          'Turing war ein Weltklasse-Athlet und verpasste die Teilnahme an den Olympischen Spielen 1948 nur knapp wegen einer Verletzung.',
+      'fq_card_rf164_text':
+          'Blitzeinschläge können „Lichtenberg-Figuren" auf der Haut hinterlassen.',
+      'fq_card_rf164_expl':
+          'Diese fraktalen, baumartigen Muster entstehen durch die Zerstörung von Kapillargefäßen unter der Haut. Sie verschwinden meist nach wenigen Tagen.',
+      'fq_card_rf165_text':
+          'In Japan werden Fische manchmal in Reisfeldern gezüchtet.',
+      'fq_card_rf165_expl':
+          'Die Fische (meist Karpfen) fressen Schädlinge und düngen gleichzeitig den Reis – eine nachhaltige Form der Landwirtschaft, die seit Jahrhunderten praktiziert wird.',
+      'fq_card_rf166_text':
+          'Ein menschliches Auge kann etwa 10 Millionen Farben unterscheiden.',
+      'fq_card_rf166_expl':
+          'Frauen haben statistisch gesehen oft ein besseres Farbsehvermögen als Männer, da einige Gene für Farbrezeptoren auf dem X-Chromosom liegen.',
+      'fq_card_rf167_text':
+          'Die längste jemals gemessene Distanz eines Papierfliegers war 69 Meter.',
+      'fq_card_rf167_expl':
+          'Der Weltrekord wurde 2012 in Kalifornien aufgestellt. Das Flugzeug wurde aus einem Blatt Papier ohne Klebstoff gefaltet.',
+      'fq_card_rf168_text': 'Einhörner wurden in der Bibel erwähnt.',
+      'fq_card_rf168_expl':
+          'In einigen alten Übersetzungen (z.B. King James Version) wurde das hebräische Wort „re’em" (wahrscheinlich ein Ur-Ochse) mit „unicorn" übersetzt.',
+      'fq_card_rf169_text': 'Wale können keinen Fisch schmecken.',
+      'fq_card_rf169_expl':
+          'Fast alle Walarten haben ihren Geschmackssinn für Süßes, Saures, Bitteres und Umami verloren. Sie schmecken vermutlich nur Salz.',
+      'fq_card_rf170_text': 'Die Stadt Istanbul liegt auf zwei Kontinenten.',
+      'fq_card_rf170_expl':
+          'Die Metropole wird durch den Bosporus getrennt – ein Teil liegt in Europa, der andere in Asien. Es ist die einzige Stadt der Welt mit dieser Lage.',
+      'fq_card_rf171_text':
+          'Ein Floh kann 200 Mal so weit springen wie er lang ist.',
+      'fq_card_rf171_expl':
+          'Das ist so, als würde ein Mensch über den Eiffelturm springen. Flöhe nutzen dafür ein Protein namens Resilin, das wie eine Feder funktioniert.',
+      'fq_card_rf172_text':
+          'In der Antarktis gibt es einen Wasserfall, der „Blut" spuckt.',
+      'fq_card_rf172_expl':
+          'Die Blood Falls entstehen durch extrem eisenhaltiges, salziges Wasser, das beim Kontakt mit Luft oxidiert und sich tiefrot färbt.',
+      'fq_card_rf173_text': 'Die Farbe Blau war früher extrem teuer.',
+      'fq_card_rf173_expl':
+          'Ultramarinblau wurde aus dem Halbedelstein Lapislazuli gewonnen und war zeitweise wertvoller als Gold. Deshalb wurde sie meist nur für heilige Figuren verwendet.',
+      'fq_card_rf174_text':
+          'Ein menschliches Haar wächst pro Monat etwa 1 bis 1,5 cm.',
+      'fq_card_rf174_expl':
+          'Das bedeutet, im Laufe eines Jahres wächst das Haar etwa 12 bis 18 cm. Männerhaare wachsen oft etwas schneller als Frauenhaare.',
+      'fq_card_rf175_text':
+          'Die ersten Kondome waren aus Leinen oder Tierdärmen.',
+      'fq_card_rf175_expl':
+          'Sie wurden mit Bändern befestigt und waren oft wiederverwendbar. Erst Mitte des 19. Jahrhunderts wurden sie durch Vulkanisierung aus Gummi hergestellt.',
+      'fq_card_rf176_text':
+          'In Schweden gibt es ein Hotel, das jedes Jahr neu aus Eis gebaut wird.',
+      'fq_card_rf176_expl':
+          'Das Icehotel in Jukkasjärvi wird jeden Winter aus Eisblöcken des Flusses Torne Älv errichtet und schmilzt im Frühjahr einfach wieder weg.',
+      'fq_card_rf177_text': 'Ein Schmetterling hat etwa 12.000 Augen.',
+      'fq_card_rf177_expl':
+          'Genauer gesagt sind es Facettenaugen, die aus Tausenden kleinen Einzelaugen bestehen. Sie können UV-Licht sehen, das für Menschen unsichtbar ist.',
+      'fq_card_rf178_text':
+          'Das kürzeste jemals gedruckte Buch war nur 0,75 mm groß.',
+      'fq_card_rf178_expl':
+          '„Shiki no Kusabana" ist ein japanisches Buch mit Blumenabbildungen, das so klein ist, dass man es nur unter dem Mikroskop lesen kann.',
+      'fq_card_rf179_text': 'Wale können keine Tränen vergießen.',
+      'fq_card_rf179_expl':
+          'Sie haben keine Tränendrüsen wie wir. Stattdessen produzieren sie eine ölige Flüssigkeit, die ihre Augen vor dem Salzwasser schützt.',
+      'fq_card_rf180_text':
+          'Die Freiheitsstatue wurde in Frankreich vorgefertigt.',
+      'fq_card_rf180_expl':
+          'Sie wurde in Paris in Einzelteilen gebaut, in 214 Kisten verpackt und per Schiff nach New York transportiert, wo sie 1886 eingeweiht wurde.',
+      'fq_card_rf181_text': 'Ein Krokodil kann bis zu 100 Jahre alt werden.',
+      'fq_card_rf181_expl':
+          'Einige Arten zeigen kaum biologische Alterserscheinungen und sterben oft nur an Krankheiten, Verletzungen oder Nahrungsmangel.',
+      'fq_card_rf182_text':
+          'In Venedig sinkt die Stadt jedes Jahr um etwa 1 bis 2 mm.',
+      'fq_card_rf182_expl':
+          'Das liegt an tektonischen Verschiebungen und der Entnahme von Grundwasser in der Vergangenheit. Zusammen mit dem steigenden Meeresspiegel ist das ein Problem.',
+      'fq_card_rf183_text':
+          'Die kälteste bewohnte Stadt der Welt liegt in Sibirien.',
+      'fq_card_rf183_expl':
+          'In Oimjakon wurden schon Temperaturen von -67,7 °C gemessen. Die Kinder gehen dort erst ab -52 °C nicht mehr zur Schule.',
+      'fq_card_rf184_text':
+          'Ein menschliches Gehirn kann Informationen mit bis zu 430 km/h weiterleiten.',
+      'fq_card_rf184_expl':
+          'Die Nervenimpulse rasen mit enormer Geschwindigkeit durch den Körper, damit wir blitzschnell auf Reize reagieren können.',
+      'fq_card_rf185_text':
+          'Die Sahara ist nicht die größte Wüste, aber die größte Trockenwüste.',
+      'fq_card_rf185_expl':
+          'Wenn man Kältewüsten (Antarktis/Arktis) ausschließt, ist die Sahara die Nummer eins. Sie ist fast so groß wie die gesamten USA.',
+      'fq_card_rf186_text': 'Bienen können bis zu 30 km/h fliegen.',
+      'fq_card_rf186_expl':
+          'Während eines Sammelflugs schlagen ihre Flügel etwa 200 Mal pro Sekunde, was das typische Summgeräusch erzeugt.',
+      'fq_card_rf187_text':
+          'Der Vatikan hat die einzige Bank der Welt mit einem Geldautomaten in Latein.',
+      'fq_card_rf187_expl':
+          'Die Menüführung der IOR-Bank (Institut für religiöse Werke) kann tatsächlich auf Lateinisch eingestellt werden.',
+      'fq_card_rf188_text': 'Ein Hai hat keine Knochen.',
+      'fq_card_rf188_expl':
+          'Sein Skelett besteht komplett aus Knorpel, was ihn leichter und flexibler macht. Knorpel verrottet schneller, weshalb man meist nur Hai-Zähne als Fossilien findet.',
+      'fq_card_rf189_text':
+          'Die Große Mauer in China wurde teilweise mit Reismehl gebaut.',
+      'fq_card_rf189_expl':
+          'Dem Mörtel wurde klebriger Reis beigemischt, was ihn extrem stabil und widerstandsfähig gegen Erdbeben und Erosion machte.',
+      'fq_card_rf190_text': 'Ein menschliches Skelett besteht aus 206 Knochen.',
+      'fq_card_rf190_expl':
+          'Interessanterweise haben wir als Babys fast 100 Knochen mehr. Diese wachsen im Laufe der Zeit zusammen (z.B. der Schädel oder das Kreuzbein).',
+      'fq_card_rf191_text': 'In Finnland gibt es mehr als 180.000 Inseln.',
+      'fq_card_rf191_expl':
+          'Finnland nennt sich nicht umsonst „Land der tausend Seen", aber auch die Schärenküste ist mit Zehntausenden Inseln weltweit einzigartig.',
+      'fq_card_rf192_text': 'Ein Oktopus hat drei Herzen und neun Gehirne.',
+      'fq_card_rf192_expl':
+          'Zwei Herzen pumpen Blut zu den Kiemen, ein größeres zum Rest des Körpers. Jedes seiner acht Tentakel hat zudem ein eigenes „Mini-Gehirn".',
+      'fq_card_rf193_text': 'Es gibt Fische, die Wasser „schießen" können.',
+      'fq_card_rf193_expl':
+          'Der Schützenfisch spuckt einen präzisen Wasserstrahl auf Insekten, die auf Zweigen über dem Wasser sitzen, um sie ins Wasser zu befördern.',
+      'fq_card_rf194_text': 'Menschen haben einen einzigartigen Zungenabdruck.',
+      'fq_card_rf194_expl':
+          'Genau wie Fingerabdrücke ist die Struktur und Form der Zunge bei jedem Menschen individuell verschieden.',
+      'fq_card_rf195_text':
+          'Die Mongolei ist das am dünnsten besiedelte Land der Welt.',
+      'fq_card_rf195_expl':
+          'Es gibt dort mehr Pferde als Menschen. Mit etwa 2 Einwohnern pro Quadratkilometer ist sie die einsamste Nation der Erde.',
+      'fq_card_rf196_text':
+          'Koalas haben einen Beutel, der nach hinten offen ist.',
+      'fq_card_rf196_expl':
+          'Im Gegensatz zu Kängurus ist die Öffnung nach unten/hinten gerichtet. Das schützt das Baby vor Dreck, wenn die Mutter im Eukalyptus klettert.',
+      'fq_card_rf197_text':
+          'Der Pazifik ist tiefer als der Mount Everest hoch ist.',
+      'fq_card_rf197_expl':
+          'Im Marianengraben liegt der tiefste Punkt bei ca. 11.000 m. Würde man den Everest (8.848 m) hineinstellen, wären über 2 km Wasser über ihm.',
+      'fq_card_rf198_text':
+          'Man kann ein Schaf nicht hypnotisieren, aber es erkennt Gesichter.',
+      'fq_card_rf198_expl':
+          'Schafe können sich die Gesichter von bis zu 50 anderen Schafen und auch Menschen über zwei Jahre lang merken.',
+      'fq_card_rf199_text': 'Die Venus dreht sich im Uhrzeigersinn.',
+      'fq_card_rf199_expl':
+          'Die meisten Planeten rotieren gegen den Uhrzeigersinn. Die Venus ist eine der wenigen Ausnahmen (retrograde Rotation).',
+      'fq_card_rf200_text': 'In Schottland gibt es ein Dorf namens „Dull".',
+      'fq_card_rf200_expl':
+          'Es ist mit der Stadt „Boring" in Oregon (USA) verschwistert. Zusammen bilden sie die „League of Extraordinary Communities".',
+      'fq_card_rf201_text':
+          'Ein menschliches Gehirn wiegt etwa 1,3 bis 1,4 kg.',
+      'fq_card_rf201_expl':
+          'Das Gewicht hat nichts mit der Intelligenz zu tun. Ein Pottwal-Gehirn wiegt zum Vergleich fast 9 kg.',
+      'fq_card_rf202_text': 'Die Sahara war früher fruchtbares Weideland.',
+      'fq_card_rf202_expl':
+          'Felsmalereien zeigen Tiere wie Giraffen und Nilpferde in Regionen, die heute absolute Wüste sind.',
+      'fq_card_rf203_text': 'Bienen können tanzen, um sich zu verständigen.',
+      'fq_card_rf203_expl':
+          'Durch den Schwänzeltanz teilen sie ihren Artgenossen genau mit, in welcher Richtung und Entfernung eine gute Futterquelle liegt.',
+      'fq_card_rf204_text': 'Der Vatikan hat keine eigene Schriftsprache.',
+      'fq_card_rf204_expl':
+          'Zwar ist Latein Amtssprache, aber im Alltag wird Italienisch gesprochen und geschrieben.',
+      'fq_card_rf205_text': 'Ein Hai hat keine Schuppen, sondern „Hautzähne".',
+      'fq_card_rf205_expl':
+          'Die sogenannte Placoidschuppe reduziert den Wasserwiderstand und macht den Hai zu einem extrem schnellen und leisen Schwimmer.',
+
+      // Dumb Ways to Die (DE)
+      'fq_card_dw001_text':
+          'Ein Anwalt will die Unschuld seines Mandanten beweisen und greift zur Waffe. Er gewinnt den Fall, doch er kann den Sieg nicht mehr feiern. Was ist passiert?',
+      'fq_card_dw001_expl':
+          '1871 erschoss sich der Anwalt Clement Vallandigham versehentlich selbst, während er vor Gericht demonstrierte, wie sich das Opfer selbst hätte erschießen können. Sein Mandant wurde freigesprochen, doch Vallandigham starb an seinen Verletzungen.',
+      'fq_card_dw002_text':
+          'Eine süße, klebrige Welle überrollt eine ganze Stadt. Über 20 Menschen finden den Tod in der zähen Masse. Wie kam es zu dieser bizarren Katastrophe?',
+      'fq_card_dw002_expl':
+          'Bei der großen Melasse-Flut von Boston 1919 barst ein riesiger Tank. 8,7 Millionen Liter Melasse ergossen sich in einer bis zu 7,6 Meter hohen Welle mit 56 km/h durch die Straßen.',
+      'fq_card_dw003_text':
+          'Ein Mann wird mit der 46-fachen Erdanziehungskraft gegen seinen Sitz gepresst. Er überlebt das Unmögliche. Welches Experiment steckte dahinter?',
+      'fq_card_dw003_expl':
+          'Colonel John Paul Stapp raste 1954 auf einem Raketenschlitten mit 1.017 km/h und wurde in nur 1,4 Sekunden auf Null abgebremst. Er bewies damit, welche extremen G-Kräfte der menschliche Körper aushalten kann.',
+      'fq_card_dw004_text':
+          'Ein ganzes Stadtviertel versinkt im Rausch – und in einer tödlichen Flut aus Bier. Wie konnte ein geplatztes Fass so viel Unheil anrichten?',
+      'fq_card_dw004_expl':
+          '1814 barst in einer Londoner Brauerei ein riesiges Gärfass. Über 570.000 Liter Bier überfluteten die Straßen, zerstörten Häuser und töteten mindestens acht Menschen.',
+      'fq_card_dw005_text':
+          'Dutzende Menschen tanzen tagelang ohne Pause, bis sie tot umfallen. Ist es ein Fluch oder ein kollektiver Wahnsinn?',
+      'fq_card_dw005_expl':
+          'Während der Tanzplage von 1518 in Straßburg tanzten bis zu 400 Menschen unkontrolliert über Wochen. Viele starben an Erschöpfung, Herzinfarkten oder Schlaganfällen.',
+      'fq_card_dw006_text':
+          'Drei Männer stürzen aus einem Fenster im dritten Stock. Sie überleben wie durch ein Wunder. War es göttliche Fügung oder etwas ganz anderes?',
+      'fq_card_dw006_expl':
+          'Beim zweiten Prager Fenstersturz 1618 landeten die kaiserlichen Gesandten angeblich auf einem Misthaufen, was ihren 21-Meter-Sturz dämpfte. Das Ereignis löste den Dreißigjährigen Krieg aus.',
+      'fq_card_dw007_text':
+          'Ein bunter Ort voller Freude wird plötzlich zum verlassenen Geisterreich. Mysteriöse Unfälle zwingen zur dauerhaften Schließung. Welches dunkle Geheimnis hütet der Park?',
+      'fq_card_dw007_expl':
+          'Der japanische Freizeitpark Takakanonuma Greenland schloss nach nur zwei Jahren wegen tödlicher Unfälle. Nach einem erfolglosen Wiedereröffnungsversuch blieb er jahrzehntelang als gruselige Ruine stehen.',
+      'fq_card_dw008_text':
+          'Ein Mann will die Sicherheit eines Fensters demonstrieren und springt dagegen. Das Glas hält – doch der Mann stürzt in den Tod. Wie konnte das geschehen?',
+      'fq_card_dw008_expl':
+          '1993 stürzte der Anwalt Garry Hoy aus dem 24. Stock, als er Besuchern die Unzerbrechlichkeit der Scheiben zeigen wollte. Das Glas hielt stand, aber der gesamte Fensterrahmen löste sich aus der Verankerung.',
+      'fq_card_dw009_text':
+          'Der Mann, der die Welt auf zwei Rädern revolutionieren wollte, stirbt durch genau diese Erfindung. Wo steht sein letztes Gefährt?',
+      'fq_card_dw009_expl':
+          'Jimi Heselden, der Besitzer der Firma Segway, stürzte 2010 mit einem Segway über eine Klippe auf seinem eigenen Anwesen in Yorkshire hinunter und stürzte in den River Wharfe. Er war sofort tot.',
+      'fq_card_dw010_text':
+          'Ein Abenteurer will wie ein Vogel fliegen und springt mit seinem Mantel in die Tiefe. Sein Glaube an die Technik war größer als die Schwerkraft. Wo fand sein letzter Flug statt?',
+      'fq_card_dw010_expl':
+          '1912 sprang der Schneider Franz Reichelt mit einem selbstgenähten Fallschirm-Anzug vom Eiffelturm. Die Konstruktion versagte völlig, und er schlug ungebremst auf dem Boden auf.',
+      'fq_card_dw011_text':
+          'Ein mächtiger König stirbt durch einen Splitter in seinem Fuß. Ein winziger Feind besiegt einen großen Herrscher. Wie konnte das geschehen?',
+      'fq_card_dw011_expl':
+          'Kaiser Friedrich I. Barbarossa ertrank 1190 im Fluss Saleph. Ob es ein Kälteschock, ein Herzinfarkt oder das Gewicht seiner Rüstung war, bleibt ein historisches Rätsel.',
+      'fq_card_dw012_text':
+          'Ein Mann verschluckt sein eigenes Gebiss und erstickt daran. Der Hunger wurde ihm zum Verhängnis. Was war passiert?',
+      'fq_card_dw012_expl':
+          'Es gibt historische und medizinische Berichte über Menschen, die im Schlaf oder bei Unfällen ihre Zahnprothesen verschluckten, was zu tödlichen Atembeschwerden führte.',
+      'fq_card_dw013_text':
+          'Eine Frau stirbt, weil sie zu viel gesundes Wasser trinkt. Die Reinheit wurde zum Gift. Wie ist das möglich?',
+      'fq_card_dw013_expl':
+          'Bei der sogenannten Wasserintoxikation (Hyperhydratation) gerät der Elektrolythaushalt des Körpers massiv aus dem Gleichgewicht. Enorme Mengen Wasser in kurzer Zeit können zu Hirnödemen und Tod führen.',
+      'fq_card_dw014_text':
+          'Ein Mann wird von einem herabfallenden Pfannkuchen erschlagen. Das Frühstück kam direkt aus dem Himmel. Was steckte dahinter?',
+      'fq_card_dw014_expl':
+          'Dies ist eine moderne Legende oder bezieht sich auf extrem seltene Unfälle mit herabstürzendem Eis aus Flugzeugen (Blue Ice), das oft bizarre Formen annimmt.',
+      'fq_card_dw015_text':
+          'Ein Wissenschaftler stirbt durch seine eigene Entdeckung, die er eigentlich zähmen wollte. Das Licht brachte die Dunkelheit. Wer war er?',
+      'fq_card_dw015_expl':
+          'Marie Curie starb 1934 an aplastischer Anämie – eine Folge ihrer jahrelangen, ungeschützten Arbeit mit Radium und Polonium.',
+      'fq_card_dw016_text':
+          'Ein Läufer bricht nach seinem größten Sieg zusammen und stirbt. Die Nachricht war überbracht, doch der Bote verstummte für immer. Was war sein Ziel?',
+      'fq_card_dw016_expl':
+          'Der Legende nach lief Pheidippides 490 v. Chr. von Marathon nach Athen, verkündete den Sieg über die Perser und brach unmittelbar danach tot zusammen.',
+      'fq_card_dw017_text':
+          'Ein Mann stirbt an einer Infektion durch einen Kratzer seiner eigenen Katze. Die Liebe zum Tier wurde tödlich. Wie konnte das passieren?',
+      'fq_card_dw017_expl':
+          'Die Katzenkratzkrankheit (Bartonellose) kann in sehr seltenen Fällen, besonders bei geschwächten Immunsystemen, zu lebensgefährlichen Komplikationen führen.',
+      'fq_card_dw018_text':
+          'Ein Philosoph stirbt, weil ihm eine Schildkröte auf den Kopf fällt. Der Himmel schickte ein gepanzertes Geschoss. Welcher Vogel war der Täter?',
+      'fq_card_dw018_expl':
+          'Dem Dichter Aischylos soll ein Adler eine Schildkröte auf den Kopf fallen gelassen haben. Der Vogel hielt die Glatze wohl für einen Stein, an dem er den Panzer knacken wollte.',
+      'fq_card_dw019_text':
+          'Ein Musiker stirbt an den Folgen eines heftigen Taktstocks auf seinen Fuß. Der Rhythmus brachte das Ende. Wie kam es dazu?',
+      'fq_card_dw019_expl':
+          'Jean-Baptiste Lully rammte sich 1687 seinen schweren Taktstock (damals ein langer Stab) in den Fuß. Er starb an dem daraus resultierenden Wundbrand.',
+      'fq_card_dw020_text':
+          'Ein Mann stirbt beim Versuch, die Niagarafälle in einem Fass zu bezwingen. Der Mut versank in den Fluten. Was war sein Fehler?',
+      'fq_card_dw020_expl':
+          'Charles Stephens sprang 1920 in einem Fass über die Niagarafälle. Er band sich einen Amboss an die Füße, um das Fass aufrecht zu halten – der Amboss riss ihn nach unten.',
+      'fq_card_dw021_text':
+          'Ein Erfinder stirbt in seiner eigenen Flugmaschine, die eigentlich Rettung bringen sollte. Die Flügel trugen ihn nicht weit genug. Wer war der Pionier?',
+      'fq_card_dw021_expl':
+          'Otto Lilienthal stürzte 1896 bei einem seiner Flugversuche ab. Seine letzten Worte waren: „Opfer müssen gebracht werden."',
+      'fq_card_dw022_text':
+          'Ein König stirbt an einer Überdosis von ... Aal. Die Gier war größer als der Magen. Welcher Herrscher überschätzte sich?',
+      'fq_card_dw022_expl':
+          'Heinrich I. von England starb 1135 angeblich an einer „Überdosis" Lampreten (Neunaugen), obwohl seine Ärzte ihn vor dem übermäßigen Verzehr gewarnt hatten.',
+      'fq_card_dw023_text':
+          'Ein Mann wird von seinem eigenen Roboter getötet. Die Maschine wandte sich gegen ihren Schöpfer. Wo geschah dieser erste Vorfall dieser Art?',
+      'fq_card_dw023_expl':
+          '1979 war Robert Williams der erste Mensch, der durch einen herumwirbelnden Arm eines Industrieroboters (in einem Ford-Werk) getötet wurde.',
+      'fq_card_dw024_text':
+          'Ein Entdecker stirbt an den Folgen eines Sturzes von seinem Pferd – mitten in einer Schlacht, die er bereits gewonnen hatte. Wer war der Pechvogel?',
+      'fq_card_dw024_expl':
+          'William der Eroberer starb 1087 an inneren Verletzungen, die er sich zuzog, als sein Pferd während der Belagerung von Mantes scheute und er gegen den Sattelknauf prallte.',
+      'fq_card_dw025_text':
+          'Ein Mann stirbt durch einen Lachanfall. Die Freude war zu viel für das Herz. Worüber lachte er so sehr?',
+      'fq_card_dw025_expl':
+          'Der Philosoph Chrysippos soll vor Lachen gestorben sein, als er sah, wie ein Esel seine Feigen fraß. Er soll noch gewitzelt haben, man solle dem Esel nun Wein geben.',
+      'fq_card_dw026_text':
+          'Ein Star stirbt, weil sich ein langer Schal in den Speichen eines Autos verfängt. Die Eleganz wurde zur tödlichen Schlinge. Wer war die Ikone?',
+      'fq_card_dw026_expl':
+          'Tänzerin Isadora Duncan starb 1927, als sich ihr langer Seidenschal in den Rädern ihres Cabrios verfing und ihr augenblicklich das Genick brach.',
+      'fq_card_dw027_text':
+          'Ein reicher Mann stirbt, weil er seine eigene Medizin trinkt, die radioaktiv ist. Er glaubte an ewige Jugend, doch er zerfiel von innen. Was war das Elixier?',
+      'fq_card_dw027_expl':
+          'Eben Byers starb 1932 an Knochenkrebs, nachdem er jahrelang „Radithor" getrunken hatte – ein mit Radium versetztes Wasser, das als Heilmittel beworben wurde.',
+      'fq_card_dw028_text':
+          'Ein Mann stirbt, weil er versucht, eine brennende Zigarette mit Benzin zu löschen. Ein fataler Irrtum oder purer Leichtsinn?',
+      'fq_card_dw028_expl':
+          'Dies ist ein bekannter Fall von extremer Fahrlässigkeit. Benzindämpfe sind hochexplosiv, was oft zu katastrophalen Stichflammen führt.',
+      'fq_card_dw029_text':
+          'Ein Zauberkünstler stirbt, weil er einen Schlag in den Magen nicht vorbereitet war. Die Magie versagte vor dem Schmerz. Wer war das Opfer?',
+      'fq_card_dw029_expl':
+          'Harry Houdini starb 1926 an einer Bauchfellentzündung, nachdem ihn ein Student mehrere Male hart in den Bauch geschlagen hatte, bevor er sich anspannen konnte.',
+      'fq_card_dw030_text':
+          'Ein Mann stirbt, weil er in einem Schornstein stecken bleibt. Er wollte heimlich irgendwo eindringen, doch der Weg wurde zum Grab. Wer war er?',
+      'fq_card_dw030_expl':
+          'Immer wieder finden die Behörden Einbrecher, die in engen Schornsteinen stecken geblieben und dort qualvoll erstickt sind.',
+      'fq_card_dw031_text':
+          'Ein König stirbt, weil er sich an seinem Lieblingsessen überfrisst. Die Völlerei wurde ihm zum Verhängnis. Welcher Herrscher war es?',
+      'fq_card_dw031_expl':
+          'Adolf Friedrich von Schweden starb 1771 nach einem Mahl aus Hummer, Kaviar, Sauerkraut und 14 Portionen „Semla" (gefüllte Windbeutel) in heißer Milch.',
+      'fq_card_dw032_text':
+          'Ein Mann wird von einem Kaktus erschlagen, auf den er zuvor geschossen hat. Die Rache der Natur war dornig. Wo geschah dies?',
+      'fq_card_dw032_expl':
+          '1982 in Arizona schoss ein Mann auf einen riesigen Saguaro-Kaktus. Ein schwerer Arm brach ab, stürzte auf ihn herab und tötete ihn.',
+      'fq_card_dw033_text':
+          'Eine Wissenschaftlerin stirbt durch einen winzigen Tropfen Quecksilber auf ihrem Handschuh. Das Gift kannte keine Hindernisse. Was war das Experiment?',
+      'fq_card_dw033_expl':
+          'Chemikerin Karen Wetterhahn starb 1997 an einer Quecksilbervergiftung. Zwei Tropfen Dimethylquecksilber drangen in Sekunden durch ihren Latexhandschuh.',
+      'fq_card_dw034_text':
+          'Ein Mann stirbt beim Versuch, mit einem Regenschirm von einem Dach zu springen. Er vertraute blind auf den Auftrieb. Was war sein Plan?',
+      'fq_card_dw034_expl':
+          'Meist sind es Kinder oder naive Abenteurer, die versuchen, das Prinzip des Fallschirms mit einem Regenschirm zu imitieren – die Fläche ist jedoch viel zu klein.',
+      'fq_card_dw035_text':
+          'Ein berühmter Koch stirbt, weil er sich wegen eines verspäteten Fisches ins Schwert stürzt. Die Ehre war ihm wichtiger als das Leben. Wer war der Perfektionist?',
+      'fq_card_dw035_expl':
+          'François Vatel, Koch Ludwigs XIV., nahm sich 1671 das Leben, weil die Fischlieferung für ein königliches Fest nicht eintraf. Minuten später kam der Fisch an.',
+      'fq_card_dw036_text':
+          'Ein Mann stirbt in einem riesigen Mixer festgehalten. Die Reinigung wurde zur Todesfalle. Wo geschah das Unglück?',
+      'fq_card_dw036_expl':
+          'In Fabriken kommt es immer wieder zu tödlichen Arbeitsunfällen, wenn Maschinen während Reinigungsarbeiten versehentlich eingeschaltet werden.',
+      'fq_card_dw037_text':
+          'Astronauten sterben, weil ihre Kapsel im Weltraum ein winziges Leck hat. Der lautlose Tod kam aus der Leere. Welches Schiff war es?',
+      'fq_card_dw037_expl':
+          '1971 starben die drei Kosmonauten von Sojus 11 beim Wiedereintritt durch einen plötzlichen Druckabfall in der Kabine.',
+      'fq_card_dw038_text':
+          'Ein Mann stirbt beim Versuch, einen Toast mit einem Messer aus dem Toaster zu holen. Ein schockierendes Ende. Was war die Ursache?',
+      'fq_card_dw038_expl':
+          'Dies ist ein klassischer Stromunfall: Das Metallmesser leitet den elektrischen Strom direkt ins Herz.',
+      'fq_card_dw039_text':
+          'Ein König stirbt fast, weil sein Kostüm Feuer fängt. Vier seiner Freunde verbrennen vor seinen Augen. Welches Fest wurde zum Albtraum?',
+      'fq_card_dw039_expl':
+          'Beim „Bal des Ardents" 1393 entzündeten sich die hochbrennbaren Kostüme der Tänzer an einer Fackel. Der König überlebte nur knapp.',
+      'fq_card_dw040_text':
+          'Ein Mann stirbt, weil er in einem Schokoladentank ertrinkt. Die süße Verlockung wurde zur zähen Falle. Wie kam es dazu?',
+      'fq_card_dw040_expl':
+          'In Schokoladenfabriken gab es bereits Unfälle, bei denen Arbeiter in riesige Bottiche fielen und in der heißen, dichten Masse untergingen.',
+      'fq_card_dw041_text':
+          'Männer sterben auf einer expedition, weil sie vergiftete Lebensmittel essen. Das Metall im Essen war ihr Fluch. Welche Reise war es?',
+      'fq_card_dw041_expl':
+          'Die Franklin-Expedition von 1845 scheiterte vermutlich auch deshalb, weil die Mannschaft durch Blei aus unsauber verlöteten Konservendosen vergiftet wurde.',
+      'fq_card_dw042_text':
+          'Ein Erfinder stirbt, weil sein Hubschrauber-Experiment außer Kontrolle gerät. Der Boden war nicht sicher genug. Was war passiert?',
+      'fq_card_dw042_expl':
+          'Es gibt Berichte über Bastler, die versuchten, ihre Fluggeräte am Boden zu testen, wobei die Maschinen umkippten und die Erfinder töteten.',
+      'fq_card_dw043_text':
+          'Ein General stirbt mitten in der Schlacht durch eine einzige Kanonenkugel. Er galt als unbesiegbar, doch das Eisen war schneller. Wer war er?',
+      'fq_card_dw043_expl':
+          'General Leonidas Polk wurde 1864 im US-Bürgerkrieg von einer Kanonenkugel getötet, als er seine Truppen inspizierte.',
+      'fq_card_dw044_text':
+          'Ein Mann stirbt durch eine verschluckte Billardkugel. Eine Wette wurde zum tödlichen Ernst. Wie konnte das geschehen?',
+      'fq_card_dw044_expl':
+          'In Bars kommen immer wieder fatale Wetten vor, bei denen Menschen versuchen, große Gegenstände (wie Billardkugeln) in den Mund zu nehmen.',
+      'fq_card_dw045_text':
+          'Ein Chemiker stirbt an seinen eigenen Entdeckungen. Er probierte alles, bis es sein letzter Geschmack war. Wer war der Pionier?',
+      'fq_card_dw045_expl':
+          'Carl Wilhelm Scheele hatte die gefährliche Angewohnheit, chemische Erzeugnisse zu kosten. Er starb vermutlich an einer akuten Vergiftung.',
+      'fq_card_dw046_text':
+          'Ein Mann stirbt in seinem eigenen Bett, weil er von seinem Haustier „erdrückt" wird. Die Liebe war einfach zu schwer. Welches Tier war es?',
+      'fq_card_dw046_expl':
+          'Es gibt Berichte über Besitzer großer Schlangen (wie Pythons), die im Schlaf von ihren Tieren umschlungen und erwürgt wurden.',
+      'fq_card_dw047_text':
+          'Ein Mann stirbt, weil er versucht, sein Handy in einem fließenden Fluss zu retten. Die Technik war ihm wichtiger als der rettende Halt. Was war passiert?',
+      'fq_card_dw047_expl':
+          'Immer wieder kommt es zu tödlichen Unfällen, wenn Menschen versuchen, in gefährliche Gewässer oder Abgründe zu steigen, um verlorene Wertgegenstände zu bergen.',
+      'fq_card_dw048_text':
+          'Ein König stirbt, weil er beim Tanzen hinfällt und sich den Kopf stößt. Das Fest war zu wild für seine Gesundheit. Wer war der Pechvogel?',
+      'fq_card_dw048_expl':
+          'König Karl VIII. von Frankreich stieß sich 1398 den Kopf an einem Türsturz, als er auf dem Weg zu einem Tennisspiel war. Er brach zusammen und starb kurz darauf.',
+      'fq_card_dw049_text':
+          'Ein Mann stirbt, weil er in einer Waschmaschine gefangen ist. Er wollte sich nur verstecken, doch das Spiel wurde zum Ernst. Wer war er?',
+      'fq_card_dw049_expl':
+          'Besonders Kinder geraten beim Versteckspielen oft in lebensgefährliche Situationen, wenn sie in engen, luftdichten Geräten wie Waschmaschinen oder Kühlschränken eingeschlossen werden.',
+      'fq_card_dw050_text':
+          'Ein Segler stirbt, weil er von einem Fliegenden Fisch getroffen wird. Ein Geschoss aus dem Meer beendete die Reise. Wie konnte das geschehen?',
+      'fq_card_dw050_expl':
+          'Fliegende Fische können hohe Geschwindigkeiten erreichen. Ein Treffer an einer empfindlichen Stelle (wie dem Hals oder Kopf) kann tatsächlich tödliche Verletzungen verursachen.',
+      'fq_card_dw051_text':
+          'Ein Mann stirbt, weil er in einer Jauchegrube ertrinkt. Er wollte etwas retten, doch der Gestank war sein letzter Atemzug. Was war das Ziel?',
+      'fq_card_dw051_expl':
+          'Unfälle in Güllegruben sind tückisch, da sich dort hochgiftige Gase (wie Schwefelwasserstoff) sammeln, die zur sofortigen Bewusstlosigkeit führen können.',
+      'fq_card_dw052_text':
+          'Ein Entdecker stirbt, weil er von einem Eingeborenen mit einem einzigen Pfeil getroffen wird. Die neue Welt war nicht bereit für ihn. Wer war er?',
+      'fq_card_dw052_expl':
+          'Ferdinand Magellan starb 1521 auf den Philippinen in einer Schlacht gegen Einheimische unter der Führung von Lapu-Lapu.',
+      'fq_card_dw053_text':
+          'Ein Mann stirbt, weil er versucht, einen Baum mit Dynamit zu fällen. Die Explosion war stärker als der Stamm. Was war sein Fehler?',
+      'fq_card_dw053_expl':
+          'Ein klassischer Fall von extremer Selbstüberschätzung im Umgang mit Sprengstoff. Der Baum stürzte unkontrolliert auf den Schützen herab.',
+      'fq_card_dw054_text':
+          'Ein Musiker stirbt an einer Bleivergiftung durch seine eigene Schminke. Die Schönheit war sein Untergang. Wer war der Maestro?',
+      'fq_card_dw054_expl':
+          'Es wird oft vermutet, dass Ludwig van Beethoven an den Folgen einer Bleivergiftung starb, die möglicherweise durch bleihaltigen Wein oder medizinische Behandlungen verursacht wurde.',
+      'fq_card_dw055_text':
+          'Ein Mann stirbt, weil er versucht, ein Flugzeug mit seinen Haaren zu ziehen. Die Stärke war da, doch der Halt versagte. Was war das Ziel?',
+      'fq_card_dw055_expl':
+          'Extreme Kraftakte (Strongman-Stunts) können bei falscher Ausführung zu inneren Verletzungen oder tödlichen Unfällen durch reißendes Material führen.',
+      'fq_card_dw056_text':
+          'Ein König stirbt, weil er von seinem eigenen Schrank erschlagen wird. Der Reichtum erdrückte den Herrscher. Welcher Hof war betroffen?',
+      'fq_card_dw056_expl':
+          'König Alexander I. von Griechenland starb 1920 an den Folgen eines Affenbisses, der sich entzündete – ein bizarrer und unerwarteter Tod für einen Monarchen.',
+      'fq_card_dw057_text':
+          'Ein Mann stirbt, weil er in einer Lawine aus Marshmallows begraben wird. Die Süße war sein Grab. Wo geschah dieser Vorfall?',
+      'fq_card_dw057_expl':
+          'In Fabriken für Süßwaren oder Schüttgut kann es zu tödlichen Unfällen kommen, wenn Silos brechen und Arbeiter unter Bergen von Material begraben werden.',
+      'fq_card_dw058_text':
+          'Ein Wissenschaftler stirbt durch seine eigene Strahlenkrankheit. Er hielt das Metall in den Händen, bis es zu spät war. Wer war der Forscher?',
+      'fq_card_dw058_expl':
+          'Louis Slotin starb 1946 nach einem Unfall mit einem Plutoniumkern (dem „Demon Core"), bei dem er eine tödliche Dosis Strahlung abbekam.',
+      'fq_card_dw059_text':
+          'Ein Mann stirbt, weil er versucht, einen Zug mit seinen bloßen Händen aufzuhalten. Der Wille war stark, doch die Maschine stärker. Was war sein Motiv?',
+      'fq_card_dw059_expl':
+          'Oft sind dies tragische Vorfälle, bei denen psychische Erkrankungen oder extreme Mutproben eine Rolle spielen.',
+      'fq_card_dw060_text':
+          'Ein Entdecker stirbt, weil er in der Arktis seine Schuhe verliert. Die Kälte kannte kein Erbarmen. Welche Expedition war es?',
+      'fq_card_dw060_expl':
+          'Robert Falcon Scott und seine Männer starben 1912 auf dem Rückweg vom Südpol an Erschöpfung, Hunger und extremer Kälte.',
+      'fq_card_dw061_text':
+          'Ein Mann stirbt, weil er versucht, einen Löwen zu streicheln. Die Wildnis war nicht für den Streichelzoo bereit. Wo geschah das?',
+      'fq_card_dw061_expl':
+          'Tragische Unfälle in Zoos oder Safariparks ereignen sich oft, wenn Besucher die Sicherheitsabsperrungen ignorieren.',
+      'fq_card_dw062_text':
+          'Ein König stirbt, weil er sich an einer Fischgräte verschluckt. Der kleinste Teil des Essens wurde zum Ende. Wer war der Herrscher?',
+      'fq_card_dw062_expl':
+          'König Friedrich II. von Preußen starb 1786 an Altersschwäche, aber viele Legenden ranken sich um bizarres Essverhalten von Monarchen.',
+      'fq_card_dw063_text':
+          'Ein Mann stirbt, weil er in einem Fahrstuhlschacht stecken bleibt. Er wollte schneller sein, doch der Weg war zu eng. Was war passiert?',
+      'fq_card_dw063_expl':
+          'Unsachgemäße Versuche, aus steckengebliebenen Aufzügen zu klettern, führen immer wieder zu tödlichen Stürzen in den Schacht.',
+      'fq_card_dw064_text':
+          'Ein Wissenschaftler stirbt durch einen Blitzschlag bei seinem eigenen Experiment. Er wollte den Himmel zähmen. Wer war der Physiker?',
+      'fq_card_dw064_expl':
+          'Georg Wilhelm Richmann wurde 1753 in St. Petersburg von einem Kugelblitz getötet, während er versuchte, die Elektrizität eines Gewitters zu messen.',
+      'fq_card_dw065_text':
+          'Ein Mann stirbt, weil er in einem Schokoladenbrunnen ertrinkt. Das Fest wurde zum Grab. Wie kam es dazu?',
+      'fq_card_dw065_expl':
+          'Dies ist eine oft erzählte urbane Legende, die auf der Gefahr von Maschinen in der Lebensmittelindustrie basiert.',
+      'fq_card_dw066_text':
+          'Ein Entdecker stirbt, weil er von einer Kokosnuss getroffen wird. Die Frucht aus der Höhe war tödlich. Wo geschah dieser Unfall?',
+      'fq_card_dw066_expl':
+          'Herabfallende Kokosnüsse verursachen weltweit tatsächlich mehr Todesfälle als Hai-Angriffe.',
+      'fq_card_dw067_text':
+          'Ein Mann stirbt, weil er versucht, mit einem Heißluftballon den Ozean zu überqueren. Die Winde trugen ihn in die Unendlichkeit. Wer war der Abenteurer?',
+      'fq_card_dw067_expl':
+          'Viele Pioniere der Luftfahrt verschwanden spurlos bei Versuchen, Rekorde über den Ozeanen aufzustellen.',
+      'fq_card_dw068_text':
+          'Ein König stirbt, weil er sich bei einem Sturz vom Pferd das Genick bricht. Die Jagd war sein letztes Abenteuer. Wer war er?',
+      'fq_card_dw068_expl':
+          'König Wilhelm III. von England starb 1702 an den Folgen eines Sturzes, nachdem sein Pferd über einen Maulwurfshügel gestolpert war.',
+      'fq_card_dw069_text':
+          'Ein Mann stirbt, weil er in einem Kühlschrank eingeschlossen wird. Er wollte nur etwas kühlen, doch er fror selbst ein. Was war die Ursache?',
+      'fq_card_dw069_expl':
+          'Alte Kühlschränke konnten von innen oft nicht geöffnet werden, was sie zu einer tödlichen Falle für spielende Kinder machte.',
+      'fq_card_dw070_text':
+          'Ein Wissenschaftler stirbt an den Folgen einer Explosion in seinem Labor. Er wollte Gold herstellen, doch er fand nur das Feuer. Wer war der Alchemist?',
+      'fq_card_dw070_expl':
+          'Viele frühe Chemiker und Alchemisten erlitten schwere Verletzungen oder starben bei unkontrollierten Reaktionen in ihren Laboren.',
+      'fq_card_dw071_text':
+          'Ein Mann stirbt, weil er versucht, einen Alligator zu füttern. Die Gier der Natur war schneller. Wo geschah das?',
+      'fq_card_dw071_expl':
+          'In Regionen wie Florida kommt es immer wieder zu gefährlichen Begegnungen zwischen Menschen und Alligatoren, wenn Sicherheitsregeln ignoriert werden.',
+      'fq_card_dw072_text':
+          'Ein König stirbt an den Folgen eines Wespenstichs. Das kleinste Insekt besiegte den mächtigen Herrscher. Wer war der Allergiker?',
+      'fq_card_dw072_expl':
+          'Insektenstiche können bei allergischen Reaktionen (anaphylaktischer Schock) innerhalb von Minuten zum Tod führen.',
+      'fq_card_dw073_text':
+          'Ein Mann stirbt, weil er in einer Windkraftanlage gefangen ist. Die Energie wurde zu seinem Verhängnis. Was war passiert?',
+      'fq_card_dw073_expl':
+          'Tödliche Unfälle bei Wartungsarbeiten an Windrädern sind extrem selten, aber aufgrund der Höhe und der Mechanik oft katastrophal.',
+      'fq_card_dw074_text':
+          'Ein Wissenschaftler stirbt, weil er seine eigenen radioaktiven Proben unter dem Kopfkissen aufbewahrte. Er wollte sie immer nah bei sich haben. Wer war er?',
+      'fq_card_dw074_expl':
+          'Frühe Radiologen unterschätzten die Langzeitwirkung von Strahlung oft massiv und erlitten schwere gesundheitliche Schäden.',
+      'fq_card_dw075_text':
+          'Ein Mann stirbt, weil er versucht, einen Tornado zu fotografieren. Die Jagd nach dem perfekten Bild war seine letzte. Wo geschah das?',
+      'fq_card_dw075_expl':
+          'Sogenannte „Storm Chaser" begeben sich oft in Lebensgefahr, um beeindruckende Aufnahmen von Extremwetterereignissen zu machen.',
+      'fq_card_dw076_text':
+          'Ein König stirbt, weil er an einer Überdosis von ... Melonen erkrankt. Die süße Frucht war sein Ende. Wer war der Herrscher?',
+      'fq_card_dw076_expl':
+          'Kaiser Maximilian II. soll 1576 nach dem übermäßigen Verzehr von Melonen an einer schweren Magen-Darm-Erkrankung gestorben sein.',
+      'fq_card_dw077_text':
+          'Ein Mann stirbt, weil er versucht, mit einem selbstgebauten Raketenauto einen Geschwindigkeitsrekord aufzustellen. Die Beschleunigung trug ihn in den Tod. Wer war der Fahrer?',
+      'fq_card_dw077_expl':
+          'Viele Rekordjäger starben bei Versuchen, die Schranken der Technik mit improvisierten Fahrzeugen zu durchbrechen.',
+      'fq_card_dw078_text':
+          'Ein Wissenschaftler stirbt an den Folgen eines Vulkanausbruchs, den er aus nächster Nähe beobachten wollte. Die Hitze war schneller. Wo geschah das?',
+      'fq_card_dw078_expl':
+          'Vulkanologen wie Maurice und Katia Krafft starben 1991 am Vulkan Unzen durch einen pyroklastischen Strom.',
+      'fq_card_dw079_text':
+          'Ein Mann stirbt, weil er versucht, einen schlafenden Bären zu wecken. Die Neugier war sein letzter Fehler. Was war passiert?',
+      'fq_card_dw079_expl':
+          'In Nationalparks kommt es immer wieder zu tragischen Zwischenfällen, wenn Menschen Wildtiere unterschätzen und ihnen zu nahe kommen.',
+      'fq_card_dw080_text':
+          'Ein König stirbt, weil er in einer brennenden Kutsche gefangen ist. Die Flucht wurde zur Falle. Wer war der Herrscher?',
+      'fq_card_dw080_expl':
+          'Historische Berichte über Kutschenunfälle und Brände auf Reisen zeigen, wie gefährlich Fortbewegung früher sein konnte.',
+      'fq_card_dw081_text':
+          'Ein Mann stirbt, weil er in einem Silo voller Getreide versinkt. Die Ernte wurde zum Treibsand. Was war passiert?',
+      'fq_card_dw081_expl':
+          'In Getreidesilos besteht die Gefahr des „Einsaugens". Wenn Getreide entnommen wird, entsteht ein Sog, der einen Menschen innerhalb von Sekunden unter die Oberfläche ziehen kann.',
+      'fq_card_dw082_text':
+          'Ein Wissenschaftler stirbt durch radioaktives Gift in seinem Tee. Er war ein Staatsfeind im Exil. Wer war das Opfer?',
+      'fq_card_dw082_expl':
+          'Alexander Litwinenko starb 2006 in London an einer Polonium-210-Vergiftung, die ihm vermutlich bei einem Treffen in einem Hotel verabreicht wurde.',
+      'fq_card_dw083_text':
+          'Ein Mann stirbt, weil er versucht, eine Lawine mit einem Jodel zu stoppen. Der Schall war nicht mächtig genug. Was war sein Plan?',
+      'fq_card_dw083_expl':
+          'Dies ist eine oft zitierte Legende über die Kraft des Schalls. In der Realität können Lawinen durch fast nichts aufgehalten werden, wenn sie einmal in Bewegung sind.',
+      'fq_card_dw084_text':
+          'Ein König stirbt, weil er von seinem eigenen Thron fällt. Das Symbol der Macht wurde zum tödlichen Hindernis. Wer war er?',
+      'fq_card_dw084_expl':
+          'Viele Monarchen erlitten im Alter Unfälle im Haushalt, die aufgrund der schlechten medizinischen Versorgung damals oft tödlich endeten.',
+      'fq_card_dw085_text':
+          'Ein Mann stirbt, weil er in einem Schornstein stecken bleibt – am Heiligabend. Er wollte die Legende wahr machen, doch er fand nur die Dunkelheit. Wer war er?',
+      'fq_card_dw085_expl':
+          'Leider gibt es immer wieder tragische Fälle von Menschen, die versuchen, als „Weihnachtsmann" verkleidet durch Schornsteine einzusteigen und dabei ersticken.',
+      'fq_card_dw086_text':
+          'Ein Wissenschaftler stirbt an den Folgen eines Sturzes aus seinem eigenen Laborfenster. Er wollte die Schwerkraft beweisen – an sich selbst. Wer war er?',
+      'fq_card_dw086_expl':
+          'Manche Pioniere der Wissenschaft gingen extreme Risiken ein, um ihre Theorien zu untermauern, was oft zu tragischen Unfällen führte.',
+      'fq_card_dw087_text':
+          'Ein Mann stirbt, weil er versucht, mit einem Pferd um die Wette zu rennen – über eine Klippe. Der Stolz kannte keine Grenzen. Wo geschah das?',
+      'fq_card_dw087_expl':
+          'In alten Sagen und Legenden sind tödliche Wettrennen ein häufiges Motiv für den Untergang übermütiger Helden.',
+      'fq_card_dw088_text':
+          'Ein König stirbt an den Folgen eines Bisses seines eigenen Jagdhundes. Die Treue wurde zur tödlichen Infektion. Wer war der Herrscher?',
+      'fq_card_dw088_expl':
+          'Tollwut oder Blutvergiftungen durch Tierbisse waren vor der Entdeckung von Antibiotika und Impfstoffen eine häufige Todesursache.',
+      'fq_card_dw089_text':
+          'Ein Mann stirbt, weil er in einer riesigen Teigmaschine festgehalten wird. Die Bäckerei wurde zur Todesfalle. Wie kam es dazu?',
+      'fq_card_dw089_expl':
+          'Unfälle in der Lebensmittelindustrie sind oft die Folge von missachteten Sicherheitsvorkehrungen bei der Reinigung rotierender Maschinen.',
+      'fq_card_dw090_text':
+          'Ein Wissenschaftler stirbt durch radioaktives Material, das er in seiner Tasche trug. Er wollte es immer bei sich haben. Wer war der Strahlungs-Pionier?',
+      'fq_card_dw090_expl':
+          'Viele frühe Forscher der Radioaktivität erlitten schwere Verbrennungen und Krebsgeschwüre an den Stellen, an denen sie radioaktive Proben nah am Körper trugen.',
+      'fq_card_dw091_text':
+          'Ein Mann stirbt, weil er versucht, einen Elefanten zu reiten – während eines Gewitters. Der Blitz suchte sich das höchste Ziel. Was war passiert?',
+      'fq_card_dw091_expl':
+          'Blitzeinschläge bei Tieren (besonders großen Weidetieren) sind auf freiem Feld eine reale Gefahr für Mensch und Tier.',
+      'fq_card_dw092_text':
+          'Ein König stirbt, weil er sich an einer Fischgräte verschluckt – bei seinem Krönungsmahl. Der größte Tag wurde zum letzten. Wer war er?',
+      'fq_card_dw092_expl':
+          'Erstickungstote bei festlichen Gelagen sind ein historisch verbürgtes, wenn auch bizarres Phänomen der Oberschicht.',
+      'fq_card_dw093_text':
+          'Ein Entdecker stirbt, weil er von einem giftigen Frosch berührt wird. Die Farbenpracht war eine Warnung, die er ignorierte. Wo geschah das?',
+      'fq_card_dw093_expl':
+          'Pfeilgiftfrösche sondern über ihre Haut hochwirksame Toxine ab, die bereits bei kleinsten Hautverletzungen des Angreifers tödlich wirken können.',
+      'fq_card_dw094_text':
+          'Ein Mann stirbt, weil er versucht, einen Tornado mit seinem eigenen Körpergewicht zu „beschweren". Er vertraute blind auf seine Masse. Was war sein Plan?',
+      'fq_card_dw094_expl':
+          'Extreme Selbstüberschätzung gegenüber den Naturgewalten führt oft zu völlig absurden und lebensgefährlichen Verhaltensweisen.',
+      'fq_card_dw095_text':
+          'Ein Wissenschaftler stirbt, weil er in seinem eigenen Vakuum-Experiment gefangen ist. Die Leere kannte kein Erbarmen. Was war der Versuchsaufbau?',
+      'fq_card_dw095_expl':
+          'Unfälle in Unterdruckkammern führen innerhalb von Sekunden zur Bewusstlosigkeit und zum Tod durch Sauerstoffmangel.',
+      'fq_card_dw096_text':
+          'Ein Mann stirbt, weil er versucht, mit einem Fahrrad von einem Hochhausdach zum nächsten zu springen. Der Wind war schneller als die Räder. Was war sein Ziel?',
+      'fq_card_dw096_expl':
+          'Waghalsige Stunts in schwindelerregender Höhe enden bei kleinsten Fehlern oder Windböen fast immer tödlich.',
+      'fq_card_dw097_text':
+          'Ein König stirbt, weil er in seinem eigenen Kerker vergessen wird. Er wollte die Folter testen, doch niemand hörte seine Schreie. Welcher Tyrann war es?',
+      'fq_card_dw097_expl':
+          'Es gibt Sagen über grausame Herrscher, die durch ihre eigenen Erfindungen oder Befehle ironischerweise selbst zu Tode kamen.',
+      'fq_card_dw098_text':
+          'Ein Mann stirbt, weil er in einer Lawine aus Marshmallows begraben wird – in einer Süßwarenfabrik. Die Süße war sein Grab. Wie kam es dazu?',
+      'fq_card_dw098_expl':
+          'Unfälle beim Befüllen oder Reinigen von Silos für Leichtgut können zu Erstickung führen, wenn das Material plötzlich nachrutscht.',
+      'fq_card_dw099_text':
+          'Ein Wissenschaftler stirbt an den Folgen einer Explosion in seinem Labor. Er wollte das Feuer bändigen, doch es war stärker. Wer war er?',
+      'fq_card_dw099_expl':
+          'Zahlreiche Chemiker erlitten im 19. Jahrhundert schwere Verletzungen bei der Erforschung hochexplosiver Substanzen wie Nitroglycerin.',
+      'fq_card_dw100_text':
+          'Ein Mann stirbt, weil er versucht, einen Grizzlybären zu umarmen. Er glaubte an die Freundschaft zwischen Mensch und Tier. Wo geschah das?',
+      'fq_card_dw100_expl':
+          'Timothy Treadwell lebte jahrelang unter Grizzlybären, bis er und seine Freundin 2003 von einem der Tiere getötet und teilweise verspeist wurden.',
+      'fq_card_dw101_text':
+          'Ein König stirbt an den Folgen eines Sturzes von einer Treppe. Ein feuchter Stufenrand beendete die Dynastie. Wer war er?',
+      'fq_card_dw101_expl':
+          'Haushaltsunfälle waren auch für Monarchen eine reale Gefahr, besonders in dunklen und zugigen Schlossgängen.',
+      'fq_card_dw102_text':
+          'Ein Mann stirbt, weil er versucht, einen Hai mit bloßen Händen zu fangen. Die Rollen von Jäger und Gejagtem wurden vertauscht. Wo geschah das?',
+      'fq_card_dw102_expl':
+          'Sogenanntes „Shark Wrestling" ist ein lebensgefährlicher und unverantwortlicher Umgang mit Raubfischen.',
+      'fq_card_dw103_text':
+          'Ein Wissenschaftler stirbt, weil er radioaktive Abfälle in seinem Garten vergrub. Er dachte, die Erde würde alles schlucken. Was war die Folge?',
+      'fq_card_dw103_expl':
+          'In der Frühzeit der Atomenergie wurde mit radioaktivem Material oft erschreckend sorglos umgegangen, was zu schweren Umweltschäden führte.',
+      'fq_card_dw104_text':
+          'Ein Mann stirbt, weil er versucht, einen Tornado in einem Einmachglas zu fangen. Die Naturgewalt sprengte alle Grenzen. Was war sein Plan?',
+      'fq_card_dw104_expl':
+          'Völlige Fehleinschätzung der physikalischen Kräfte, die bei einem Wirbelsturm am Werk sind.',
+      'fq_card_dw105_text':
+          'Ein König stirbt, weil er sich an einer vergifteten Nadel sticht – in seinem eigenen Bett. Der Verrat kam aus den Kissen. Wer war der Herrscher?',
+      'fq_card_dw105_expl':
+          'Giftmorde mit präparierten Gegenständen waren ein klassisches Instrument politischer Intrigen an mittelalterlichen Höfen.',
+      'fq_card_dw106_text':
+          'Ein Mann stirbt, weil er in einer riesigen Schokoladenmischmaschine festgehalten wird. Die Süße wurde zur tödlichen Umarmung. Wie kam es dazu?',
+      'fq_card_dw106_expl':
+          'Tragische Unfälle beim Reinigen von Industriebottichen ohne ordnungsgemäße Abschaltung der Stromzufuhr.',
+      'fq_card_dw107_text':
+          'Ein Wissenschaftler stirbt durch radioaktives Gift, das er für Limonade hielt. Das Leuchten war keine Zutat. Was war der Stoff?',
+      'fq_card_dw107_expl':
+          'Verwechslungen von Chemikalien im Labor führten immer wieder zu schweren Vergiftungen, wenn keine klaren Kennzeichnungen vorhanden waren.',
+      'fq_card_dw108_text':
+          'Ein Mann stirbt, weil er versucht, eine Lawine mit lautem Schreien auszulösen. Der Schnee hörte ihn, doch der Mann entkam nicht. Was war passiert?',
+      'fq_card_dw108_expl':
+          'Das Auslösen von Lawinen durch Schall ist unter bestimmten Bedingungen möglich, aber für den Verursacher ohne Sicherheitsabstand lebensgefährlich.',
+      'fq_card_dw109_text':
+          'Ein König stirbt, weil er von seinem eigenen Pferd gebissen wird. Die Wunde wollte nicht heilen. Wer war der Herrscher?',
+      'fq_card_dw109_expl':
+          'Infektionen nach Tierbissen waren vor der Entwicklung moderner Medizin oft die Ursache für einen langen und qualvollen Tod.',
+      'fq_card_dw110_text':
+          'Ein Mann stirbt, weil er versucht, einen Blitz mit einem Drachen zu fangen – genau wie im Lehrbuch. Doch er war kein Franklin. Was war sein Fehler?',
+      'fq_card_dw110_expl':
+          'Benjamin Franklin überlebte sein berühmtes Experiment vermutlich nur durch reines Glück. Viele Nachahmer wurden bei ähnlichen Versuchen getötet.',
+      'fq_card_dw111_text':
+          'Ein Entdecker stirbt, weil er in der Wüste versucht, seinen Durst mit Sand zu stillen. Die Hitze raubte ihm den Verstand. Wo geschah das?',
+      'fq_card_dw111_expl':
+          'Extreme Dehydrierung führt zu Halluzinationen und völliger Desorientierung, was in lebensfeindlichen Umgebungen wie Wüsten tödlich endet.',
+      'fq_card_dw112_text':
+          'Ein Mann stirbt, weil er versucht, einen Tornado mit seinem Auto zu überholen. Der Asphalt war zu Ende, der Sturm nicht. Was war sein Ziel?',
+      'fq_card_dw112_expl':
+          'Die Geschwindigkeit von Tornados kann die Leistung von Autos bei weitem übertreffen, besonders wenn Trümmer die Fahrbahn blockieren.',
+      'fq_card_dw113_text':
+          'Ein Wissenschaftler stirbt an den Folgen einer Strahlenbelastung durch seine eigene Armbanduhr. Er wollte die Zeit leuchten sehen. Was war das Leuchtmittel?',
+      'fq_card_dw113_expl':
+          'Früher wurde Radiumfarbe für Zifferblätter verwendet. Die „Radium Girls", die diese Uhren bemalten, erlitten schreckliche gesundheitliche Schäden.',
+      'fq_card_dw114_text':
+          'Ein Mann stirbt, weil er in einem Silo voller Getreide gefangen ist. Er wollte nur spielen, doch der Sog war mächtiger. Wie kam es dazu?',
+      'fq_card_dw114_expl':
+          'Getreide verhält sich ähnlich wie eine Flüssigkeit oder Treibsand. Ein Versinken über die Hüfte hinaus macht eine Selbstrettung fast unmöglich.',
+      'fq_card_dw115_text':
+          'Ein König stirbt, weil er an einer Überdosis von ... Eiscreme erkrankt. Die kalte Süße fror sein Herz ein. Welcher exzentrische Herrscher war es?',
+      'fq_card_dw115_expl':
+          'Übermäßiger Konsum von eiskalten Speisen bei großer Hitze konnte früher aufgrund des Kälteschocks für das Herz-Kreislauf-System gefährlich sein.',
+      'fq_card_dw116_text':
+          'Ein Mann stirbt, weil er versucht, mit einem selbstgebauten Fallschirm von der ersten Etage des Eiffelturms zu springen. Der Mut war groß, die Höhe zu gering. Wer war er?',
+      'fq_card_dw116_expl':
+          'Franz Reichelt starb 1912 bei seinem Versuch, einen tragbaren Fallschirm zu testen. Die Fallhöhe reichte nicht aus, damit sich die Konstruktion entfalten konnte.',
+      'fq_card_dw117_text':
+          'Ein Wissenschaftler stirbt durch radioaktive Partikel, die er versehentlich eingeatmet hat. Er wollte das Unsichtbare sehen, doch es zerstörte ihn von innen. Wer war er?',
+      'fq_card_dw117_expl':
+          'Zahlreiche Forscher in der Frühzeit der Kernphysik starben an Krebs oder aplastischer Anämie als Folge ungeschützten Umgangs mit radioaktiven Stoffen.',
+      'fq_card_dw118_text':
+          'Ein Mann stirbt, weil er versucht, einen Tornado mit einem Regenschirm zu „segeln". Er glaubte an den Auftrieb, doch der Sturm kannte kein Erbarmen. Was war sein Plan?',
+      'fq_card_dw118_expl':
+          'Völlige Fehleinschätzung der aerodynamischen Kräfte eines Wirbelsturms.',
+      'fq_card_dw119_text':
+          'Ein König stirbt an den Folgen eines Sturzes aus seinem eigenen Bettgehäuse. Die Pracht wurde zur tödlichen Falle. Wer war der Herrscher?',
+      'fq_card_dw119_expl':
+          'Unfälle im häuslichen Umfeld waren aufgrund mangelnder Sicherheitsstandards auch für die höchsten Kreise der Gesellschaft lebensgefährlich.',
+      'fq_card_dw120_text':
+          'Ein Mann stirbt, weil er versucht, einen Hai mit einer Angel aus einem Ruderboot zu ziehen. Der Fang war zu groß für das Boot. Wo geschah das?',
+      'fq_card_dw120_expl':
+          'Das Angeln von Großfischen aus instabilen Booten führt immer wieder zu Kenterungen und tödlichen Unfällen.',
+      'fq_card_dw121_text':
+          'Ein Wissenschaftler stirbt, weil er radioaktive Substanzen in seiner Kaffeetasse aufbewahrte – zur besseren Sichtbarkeit. Was war die Folge?',
+      'fq_card_dw121_expl':
+          'Die Missachtung von Sicherheitsregeln im Labor führte in der Vergangenheit oft zu tragischen, aber vermeidbaren Todesfällen.',
+      'fq_card_dw122_text':
+          'Ein Mann stirbt, weil er versucht, eine Lawine mit einem Handböller auszulösen – direkt über seinem Kopf. Der Knall war sein letztes Signal. Was war passiert?',
+      'fq_card_dw122_expl':
+          'Das Hantieren mit Sprengstoff ohne Fachkenntnisse und Sicherheitsabstand ist in lawinengefährdetem Gelände extrem riskant.',
+      'fq_card_dw123_text':
+          'Ein König stirbt an den Folgen einer Infektion durch einen Kratzer seiner eigenen Krone. Die Macht verletzte das Fleisch. Wer war der Herrscher?',
+      'fq_card_dw123_expl':
+          'Sepsis (Blutvergiftung) war bis zur Entdeckung von Antibiotika eine der häufigsten und gefürchtetsten Todesursachen.',
+      'fq_card_dw124_text':
+          'Ein Mann stirbt, weil er in einer riesigen Eismaschine festgehalten wird. Die Kälte wurde zum ewigen Schlaf. Wie kam es dazu?',
+      'fq_card_dw124_expl':
+          'Arbeitsunfälle in Kühlhäusern oder bei der industriellen Eisherstellung enden oft tragisch durch Erfrieren oder Ersticken.',
+      'fq_card_dw125_text':
+          'Ein Wissenschaftler stirbt durch einen Blitzschlag bei seinem Versuch, ein Gewitter in einer Flasche zu fangen. Die Natur ließ sich nicht einsperren. Wer war er?',
+      'fq_card_dw125_expl':
+          'Frühe Experimente zur Speicherung elektrischer Energie (wie mit der Leidener Flasche) waren bei Gewittern lebensgefährlich.',
+      'fq_card_dw126_text':
+          'Ein Mann stirbt, weil er versucht, einen Tornado mit seinem eigenen Körpergewicht zu „stoppen". Er legte sich flach auf den Boden, doch der Sturm hob ihn fort. Was war passiert?',
+      'fq_card_dw126_expl':
+          'Sich bei einem Tornado ungeschützt im Freien aufzuhalten, ist unabhängig von der Körperlage extrem gefährlich.',
+      'fq_card_dw127_text':
+          'Ein König stirbt, weil er an einer Überdosis von ... Schokolade erkrankt. Die süße Verführung war sein Ende. Welcher Herrscher war es?',
+      'fq_card_dw127_expl':
+          'Obwohl Schokolade heute harmlos ist, konnten extreme Mengen in Kombination mit anderen Leiden früher zum Tod führen.',
+      'fq_card_dw128_text':
+          'Ein Mann stirbt, weil er in einem Schornstein stecken bleibt – beim Versuch, einen Einbruch zu begehen. Der Weg zum Diebstahl wurde zum Grab. Wie kam es dazu?',
+      'fq_card_dw128_expl':
+          'Einbrecher unterschätzen oft die Enge und die Erstickungsgefahr in Kaminen und Schornsteinen.',
+      'fq_card_dw129_text':
+          'Ein Wissenschaftler stirbt an den Folgen einer Explosion in seinem Labor. Er wollte das Gold der Alchemisten finden, doch er fand nur den Tod. Wer war er?',
+      'fq_card_dw129_expl':
+          'Die Suche nach dem Stein der Weisen forderte über Jahrhunderte zahlreiche Opfer durch chemische Unfälle und Vergiftungen.',
+      'fq_card_dw130_text':
+          'Ein Mann stirbt, weil er versucht, einen wütenden Stier mit einem roten Tuch zu beruhigen – auf einer offenen Weide. Das Tuch war kein Schutz. Wo geschah das?',
+      'fq_card_dw130_expl':
+          'Das Rot der Muleta reizt den Stier nicht (Stiere sind farbenblind für Rot), sondern die Bewegung des Tuchs provoziert den Angriff.',
+      'fq_card_dw131_text':
+          'Ein König stirbt an den Folgen eines Sturzes von seinem eigenen Balkon. Die Aussicht war sein letzter Blick. Wer war der Herrscher?',
+      'fq_card_dw131_expl':
+          'Balkonstürze aufgrund von Schwindel oder mangelhaften Geländern waren in historischen Gebäuden keine Seltenheit.',
+      'fq_card_dw132_text':
+          'Ein Mann stirbt, weil er versucht, einen Hai mit bloßen Händen zu füttern. Die Gier des Meeres kannte keine Grenzen. Wo geschah das?',
+      'fq_card_dw132_expl':
+          'Das Füttern von Raubtieren von Hand führt oft zu schweren Verletzungen oder zum Verlust von Gliedmaßen und Leben.',
+      'fq_card_dw133_text':
+          'Ein Wissenschaftler stirbt, weil er radioaktives Material für seine Experimente im Kühlschrank neben seinem Essen lagerte. Was war die Folge?',
+      'fq_card_dw133_expl':
+          'Die Kontamination von Lebensmitteln mit radioaktiven Partikeln führt zu schweren inneren Strahlenschäden.',
+      'fq_card_dw134_text':
+          'Ein Mann stirbt, weil er versucht, eine Lawine mit lautem Trompetenspiel auszulösen. Der Schall war sein eigenes Todesurteil. Was war passiert?',
+      'fq_card_dw134_expl':
+          'Bestimmte Frequenzen können Schneebretter lösen, was für den Musiker in unmittelbarer Nähe fatale Folgen haben kann.',
+      'fq_card_dw135_text':
+          'Ein König stirbt an den Folgen eines Bisses einer giftigen Spinne in seinem Schlafgemach. Die Gefahr lauerte im Baldachin. Wer war der Herrscher?',
+      'fq_card_dw135_expl':
+          'In warmen Regionen waren Giftspinne an Höfen eine ständige Bedrohung, gegen die es früher kaum wirksame Gegengifte gab.',
+      'fq_card_dw136_text':
+          'Ein Mann stirbt, weil er in einer riesigen Knetmaschine für Brotteig festgehalten wird. Die Bäckerei wurde zur Todesfalle. Wie kam es dazu?',
+      'fq_card_dw136_expl':
+          'Industrielle Rührmaschinen entwickeln enorme Kräfte, die bei unsachgemäßer Handhabung zu tödlichen Quetschungen führen.',
+      'fq_card_dw137_text':
+          'Ein Wissenschaftler stirbt durch radioaktives Gift, das er für Wein hielt. Das Fläschchen war nicht beschriftet. Was war der Stoff?',
+      'fq_card_dw137_expl':
+          'Schlamperei bei der Kennzeichnung von Chemikalien war früher eine häufige Ursache für tödliche Verwechslungen im Labor.',
+      'fq_card_dw138_text':
+          'Ein Mann stirbt, weil er versucht, einen Tornado mit einem Lasso zu fangen. Er glaubte an die Kraft des Seils, doch der Sturm riss ihn mit. Was war sein Plan?',
+      'fq_card_dw138_expl':
+          'Völlige Fehleinschätzung der kinetischen Energie und der Unberechenbarkeit von Luftwirbeln.',
+      'fq_card_dw139_text':
+          'Ein König stirbt an den Folgen eines Sturzes aus seinem eigenen Fenster – beim Versuch, ein Feuerwerk besser zu sehen. Wer war der Herrscher?',
+      'fq_card_dw139_expl':
+          'Viele historische Persönlichkeiten starben bei Unfällen, die durch Unachtsamkeit oder mangelnde Sicherung an hohen Gebäuden verursacht wurden.',
+      'fq_card_dw140_text':
+          'Ein Mann stirbt, weil er versucht, einen Hai mit seinem eigenen Körpergewicht zu „reiten". Der Rücken war glatt, der Schlund weit offen. Wo geschah das?',
+      'fq_card_dw140_expl':
+          'Waghalsige Versuche, Raubfische im Wasser zu besteigen, enden fast immer mit schweren Bissverletzungen.',
+      'fq_card_dw141_text':
+          'Ein Wissenschaftler stirbt, weil er radioaktive Proben mit seiner Zunge testete – um den Geschmack der Energie zu finden. Was war die Folge?',
+      'fq_card_dw141_expl':
+          'Die direkte Aufnahme radioaktiver Isotope über die Schleimhäute ist extrem gefährlich und führt zu schnellem Gewebezerfall.',
+      'fq_card_dw142_text':
+          'Ein Mann stirbt, weil er versucht, eine Lawine mit einem Flammenwerfer zu schmelzen. Die Schneemassen waren schneller als das Feuer. Was war sein Fehler?',
+      'fq_card_dw142_expl':
+          'Die schiere Masse einer Lawine kann durch Hitzeeinwirkung von außen in der kurzen Zeit des Abgangs nicht nennenswert beeinflusst werden.',
+      'fq_card_dw143_text':
+          'Ein König stirbt an den Folgen eines Sturzes von seinem eigenen Thron – mitten in einer hitzigen Debatte. Wer war der Herrscher?',
+      'fq_card_dw143_expl':
+          'Plötzliche gesundheitliche Zusammenbrüche wie Herzinfarkte oder Schlaganfälle wurden früher oft als Folge bizarrer Unfälle missverstanden.',
+      'fq_card_dw144_text':
+          'Ein Mann stirbt, weil er versucht, einen wütenden Eber mit bloßen Händen zu bändigen. Die Kraft der Natur besiegte den Übermut. Wo geschah das?',
+      'fq_card_dw144_expl':
+          'Wildschweine sind extrem wehrhafte Tiere, deren Angriffe aufgrund ihrer Kraft und Schnelligkeit oft tödlich enden.',
+      'fq_card_dw145_text':
+          'Ein Wissenschaftler stirbt durch radioaktive Partikel, die an seiner Kleidung hafteten. Er brachte den Tod mit nach Hause zu seiner Familie. Wer war er?',
+      'fq_card_dw145_expl':
+          'Die Verschleppung radioaktiver Kontamination aus Forschungseinrichtungen war ein großes Problem vor der Einführung strenger Dekontaminationsregeln.',
+      'fq_card_dw146_text':
+          'Ein Mann stirbt, weil er versucht, einen Tornado mit seinem eigenen Haus zu „überstehen" – ohne Keller. Der Wind hob das Dach und den Mann fort. Was war passiert?',
+      'fq_card_dw146_expl':
+          'Ohne massives Fundament und Schutzraum bietet ein normales Haus keinen ausreichenden Schutz vor einem starken Tornado.',
+      'fq_card_dw147_text':
+          'Ein König stirbt an den Folgen eines Sturzes von seinem eigenen Nachttopf. Die Peinlichkeit war sein letztes Gefühl. Wer war der Herrscher?',
+      'fq_card_dw147_expl':
+          'Bizarre und wenig würdevolle Todesumstände sind bei historischen Herrschern erstaunlich weit verbreitet.',
+      'fq_card_dw148_text':
+          'Ein Mann stirbt, weil er versucht, einen Hai mit einer Harpune zu jagen – von einem Surfbrett aus. Das Gleichgewicht versagte im falschen Moment. Wo geschah das?',
+      'fq_card_dw148_expl':
+          'Instabile Plattformen und die Jagd nach wehrhaften Raubtieren sind eine lebensgefährliche Kombination.',
+      'fq_card_dw149_text':
+          'Ein Wissenschaftler stirbt, weil er radioaktive Lösungen in offenen Schalen in seinem Arbeitszimmer stehen ließ. Das Leuchten war sein letztes Licht. Was war die Folge?',
+      'fq_card_dw149_expl':
+          'Die Inhalation von radioaktivem Radon-Gas, das aus offenen Proben entweicht, führt zu Lungenkrebs und anderen schweren Erkrankungen.',
+      'fq_card_dw150_text':
+          'Ein Mann stirbt, weil er versucht, eine Lawine mit einer Handgranate zu stoppen. Die Splitter waren schneller als der Schnee. Was war sein Plan?',
+      'fq_card_dw150_expl':
+          'Der Missbrauch von militärischen Kampfmitteln für zivile Zwecke ohne Fachkenntnisse endet oft in katastrophalen Unfällen.',
+      'fq_card_dw151_text':
+          'Ein König stirbt an den Folgen einer Infektion durch einen Biss seines eigenen Hofnarren. Der Spaß wurde zum tödlichen Ernst. Wer war der Herrscher?',
+      'fq_card_dw151_expl':
+          'Menschliche Bisse sind aufgrund der hohen Bakterienbelastung im Mundraum extrem infektionsgefährlich.',
+      'fq_card_dw152_text':
+          'Ein Mann stirbt, weil er in einer riesigen Papierpresse festgehalten wird. Die Schlagzeile wurde zu seinem Schicksal. Wie kam es dazu?',
+      'fq_card_dw152_expl':
+          'Einklemmungen in industriellen Walzen und Pressen zählen zu den schwersten Arbeitsunfällen in der Papier- und Druckindustrie.',
+      'fq_card_dw153_text':
+          'Ein Wissenschaftler stirbt durch radioaktives Gift, das er in seine Augentropfen gemischt hatte – für eine bessere Nachtsicht. Was war die Folge?',
+      'fq_card_dw153_expl':
+          'Die direkte Anwendung radioaktiver Stoffe auf empfindliche Organe führt zu sofortigen und irreversiblen Gewebeschäden.',
+      'fq_card_dw154_text':
+          'Ein Mann stirbt, weil er versucht, einen Tornado mit einem Ventilator zu „bremsen". Er glaubte an die Gegenkraft, doch der Sturm blies alles weg. Was war sein Plan?',
+      'fq_card_dw154_expl':
+          'Völlige Unterschätzung der physikalischen Skalenunterschiede zwischen technischem Gerät und meteorologischen Phänomenen.',
+      'fq_card_dw155_text':
+          'Ein König stirbt an den Folgen eines Sturzes aus seinem eigenen Schlossturm – beim Versuch, den ersten Sonnenstrahl zu fangen. Wer war der Herrscher?',
+      'fq_card_dw155_expl':
+          'Die Suche nach mystischen Erfahrungen oder religiöser Erleuchtung führte immer wieder zu riskanten Verhaltensweisen in großer Höhe.',
 
       // ── Resume
       'resume_game_title': 'Spiel fortsetzen',

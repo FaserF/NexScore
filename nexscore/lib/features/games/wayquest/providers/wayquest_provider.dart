@@ -6,10 +6,26 @@ import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
 
 class WayQuestStateNotifier extends Notifier<WayQuestGameState> {
+  final List<WayQuestGameState> _history = [];
+
   @override
   WayQuestGameState build() => const WayQuestGameState();
 
+  void _pushState() {
+    _history.add(state);
+    if (_history.length > 20) _history.removeAt(0);
+  }
+
+  bool get canUndo => _history.isNotEmpty;
+
+  void undo() {
+    if (_history.isNotEmpty) {
+      state = _history.removeLast();
+    }
+  }
+
   void toggleCategory(WayQuestCategory cat) {
+    _pushState();
     final cats = List<WayQuestCategory>.from(state.selectedCategories);
     if (cats.contains(cat)) {
       if (cats.length > 1) cats.remove(cat);
@@ -20,6 +36,7 @@ class WayQuestStateNotifier extends Notifier<WayQuestGameState> {
   }
 
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
+    _pushState();
     final available = wayQuestDatabase.where((c) {
       final isCategorySelected = state.selectedCategories.contains(c.category);
       if (!isCategorySelected) return false;
@@ -73,10 +90,12 @@ class WayQuestStateNotifier extends Notifier<WayQuestGameState> {
   }
 
   void resetGame() {
+    _pushState();
     state = state.copyWith(playedCards: []);
   }
 
   void initPlayers(List<String> playerIds) {
+    _pushState();
     state = state.copyWith(activePlayerIds: playerIds);
   }
 }

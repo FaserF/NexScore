@@ -94,6 +94,16 @@ WayQuest is the perfect companion for long car rides, offering entertainment for
 - **Categories**: Deep Talks, Would You Rather, Road Challenges, Hypotheticals, and Story Starters.
 - **Interaction**: Simply tap to progress through randomized questions and tasks designed to pass the time.
 
+## 💡 FactQuest
+
+FactQuest is the ultimate trivia companion for road trips – present true, verified facts and bizarre "Dumb Ways to Die" stories with detailed explanations and clickable source links so you can learn more.
+
+- **Player Limits**: 1+ players (solo or group).
+- **Categories**: Random Facts, Dumb Ways to Die.
+- **Verified Sources**: Every single card includes a clickable URL to the original source (Wikipedia, National Geographic, Smithsonian, BBC, etc.).
+- **Detailed Explanations**: Each fact comes with a rich, multi-sentence explanation giving context and background.
+- **Multiplayer Support**: Plays seamlessly in a group – just pass the phone around or use the multiplayer hub.
+
 ---
 
 !!! info "Suggestions?"

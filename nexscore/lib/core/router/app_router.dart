@@ -15,6 +15,7 @@ import '../../features/games/extras/presentation/darts_screen.dart';
 import '../../features/games/extras/presentation/romme_screen.dart';
 import '../../features/games/buzztap/presentation/buzztap_screen.dart';
 import '../../features/games/wayquest/presentation/wayquest_screen.dart';
+import '../../features/games/factquest/presentation/factquest_screen.dart';
 import '../../features/leaderboards/presentation/leaderboard_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/help/presentation/help_screen.dart';
@@ -103,6 +104,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'wayquest',
                     builder: (context, state) => const WayQuestScreen(),
+                  ),
+                  GoRoute(
+                    path: 'factquest',
+                    builder: (context, state) => const FactQuestScreen(),
                   ),
                   GoRoute(
                     path: 'generic',

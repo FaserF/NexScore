@@ -73,11 +73,19 @@ class _WayQuestScreenState extends ConsumerState<WayQuestScreen> {
             },
             tooltip: l10n.get('tts_toggle'),
           ),
-          if (state.playedCards.isNotEmpty)
+          if (state.playedCards.isNotEmpty) ...[
+            IconButton(
+              icon: const Icon(Icons.undo),
+              tooltip: l10n.get('game_undo'),
+              onPressed: ref.read(wayQuestStateProvider.notifier).canUndo
+                  ? () => ref.read(wayQuestStateProvider.notifier).undo()
+                  : null,
+            ),
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => _confirmReset(context, ref, l10n),
             ),
+          ],
         ],
       ),
       body: MultiplayerClientOverlay(

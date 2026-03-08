@@ -34,10 +34,14 @@ Supports starting scores from 301 to 1001. Features bust detection and a special
 ### 5. Arschloch / President
 Tracks ranks (President, Arschloch, etc.) across rounds. Automated card exchange logic based on player count (President gives Arschloch, etc.).
 
+### 6. FactQuest
+Trivia game for car rides. Features over 360 entries including "Random Facts" and "Dumb Ways to Die" (Black Stories style). Supports sources with clickable URLs and category filtering.
+
 ## 🚢 Deployment & CI/CD
 
 ### 📘 User Guide
 - [General Game Setup & Rules](./README.md)
+- [FactQuest Guide](./user_guide/games/factquest.md)
 - [Multiplayer & Cloud Sync](./multiplayer.md)
 - [📸 Sharing & Social-To-Story](./sharing.md)
 - [🔊 Audio, SFX & Text-To-Speech](./sfx_tts.md)

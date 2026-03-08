@@ -44,6 +44,7 @@ NexScore supports a wide variety of card, dice, and strategy games with speciali
 - **SipDeck (18+)**: Dynamic drinking game with 50+ challenges and automated sip tracking.
 - **BuzzTap (18+)**: High-energy, fast-paced tapping party game with automated sip tracking.
 - **WayQuest**: Entertaining questions and road challenges for long car rides.
+- **FactQuest**: True facts, "Dumb Ways to Die" stories, and detailed explanations with clickable source links – perfect for car rides.
 
 ---
 

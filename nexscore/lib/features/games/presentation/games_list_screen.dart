@@ -421,6 +421,16 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
         tag: l10n.get('home_tag_ext'),
       ),
       _GameEntry(
+        id: 'factquest',
+        name: l10n.get('game_factquest'),
+        description: l10n.get('desc_factquest'),
+        route: '/games/factquest',
+        icon: Icons.lightbulb,
+        color: Colors.teal.shade700,
+        playerCount: '1+',
+        tag: l10n.get('home_tag_ext'),
+      ),
+      _GameEntry(
         id: 'generic',
         name: l10n.get('game_generic'),
         description: l10n.get('desc_generic'),
