@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/i18n/app_localizations.dart';
 import '../../../core/multiplayer/providers/multiplayer_provider.dart';
+import '../../settings/provider/settings_provider.dart';
 
 class JoinLobbyScreen extends ConsumerStatefulWidget {
   const JoinLobbyScreen({super.key});
@@ -13,7 +14,9 @@ class JoinLobbyScreen extends ConsumerStatefulWidget {
 
 class _JoinLobbyScreenState extends ConsumerState<JoinLobbyScreen> {
   final _codeController = TextEditingController();
-  final _nameController = TextEditingController();
+  late final _nameController = TextEditingController(
+    text: ref.read(settingsProvider).hostName,
+  );
   bool _isJoining = false;
 
   void _join(AppLocalizations l10n) async {

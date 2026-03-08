@@ -20,18 +20,26 @@ void main() async {
   try {
     if (kIsWeb) {
       if (FirebaseOptionsWeb.isConfigured) {
+        debugPrint(
+          'Firebase Web: Initializing with projectId: ${FirebaseOptionsWeb.projectId}',
+        );
         await Firebase.initializeApp(
           options: FirebaseOptionsWeb.currentPlatform,
         );
+        debugPrint('Firebase Web: Initialization successful');
       } else {
-        debugPrint('Firebase Web: Initialization skipped (No config)');
+        debugPrint(
+          'Firebase Web: Initialization skipped (No config detected in environment)',
+        );
       }
     } else {
-      // Basic initialization for mobile (uses google-services.json / plist)
+      debugPrint('Firebase Mobile: Initializing...');
       await Firebase.initializeApp();
+      debugPrint('Firebase Mobile: Initialization successful');
     }
-  } catch (e) {
+  } catch (e, stack) {
     debugPrint('Firebase initialization error: $e');
+    debugPrint('Stack trace: $stack');
   }
 
   runApp(const ProviderScope(child: NexScoreApp()));

@@ -68,6 +68,11 @@ class AppLocalizations {
       'settings_language': 'Language',
       'settings_language_en': 'English',
       'settings_language_de': 'German',
+      'settings_tts': 'Text-To-Speech',
+      'settings_tts_desc': 'Automatically read out digital card texts',
+      'tts_toggle': 'Toggle Text-To-Speech',
+      'tts_active': 'TTS Active',
+      'tts_inactive': 'TTS Inactive',
       'settings_data': 'Data Management',
       'settings_db_reset': 'Reset Database',
       'settings_db_reset_confirm':
@@ -669,7 +674,21 @@ class AppLocalizations {
       'account_sign_in_error': 'Sign-in failed: {0}',
       'account_data_stay_note':
           'Your local data remains on this device when you sign out.',
+      'account_privacy_info':
+          'NexScore is serverless. Data is stored locally or in your private cloud (Firestore/Gist).',
+      'account_privacy_link': 'Privacy & Permissions Documentation',
       'error_name_taken': 'A player with this name already exists.',
+
+      'privacy_title': 'Privacy & Permissions',
+      'privacy_no_server_title': 'Serverless Architecture',
+      'privacy_no_server_body':
+          'NexScore does not have a central server. All your data is processed locally on your device or synchronized directly to your authorized cloud providers (Google/GitHub). We never see, sell, or share your data.',
+      'privacy_google_title': 'Google Permissions (Firestore)',
+      'privacy_google_body':
+          'Requested: Basic profile (Email/Name). Used to identify your account and sync your players and game history to Google Cloud Firestore, enabling multi-device support.',
+      'privacy_github_title': 'GitHub Permissions (Gists)',
+      'privacy_github_body':
+          'Requested: Gist scope. Used to create a private backup of your data on your GitHub account. Only Gists created by NexScore are accessed.',
 
       // ── SipDeck Cards (EN)
       'sd_card_w001':
@@ -1195,6 +1214,11 @@ class AppLocalizations {
       'settings_language': 'Sprache',
       'settings_language_en': 'Englisch',
       'settings_language_de': 'Deutsch',
+      'settings_tts': 'Vorlesen (TTS)',
+      'settings_tts_desc': 'Digitale Kartentexte automatisch vorlesen',
+      'tts_toggle': 'Vorlesen umschalten',
+      'tts_active': 'Vorlesen aktiv',
+      'tts_inactive': 'Vorlesen inaktiv',
       'settings_data': 'Datenverwaltung',
       'settings_db_reset': 'Datenbank zurücksetzen',
       'settings_db_reset_confirm':
@@ -1825,8 +1849,22 @@ class AppLocalizations {
       'account_gist_restore_desc': 'Lade deine Daten von GitHub herunter',
       'account_sign_in_error': 'Anmeldung fehlgeschlagen: {0}',
       'account_data_stay_note':
-          'Deine lokalen Daten bleiben beim Abmelden auf diesem Gerät gespeichert.',
+          'Deine lokalen Daten bleiben beim Abmelden auf diesem Gerät erhalten.',
+      'account_privacy_info':
+          'NexScore ist serverlos. Daten werden lokal oder in deiner privaten Cloud (Firestore/Gist) gespeichert.',
+      'account_privacy_link': 'Datenschutz & Berechtigungen Dokumentation',
       'error_name_taken': 'Ein Spieler mit diesem Namen existiert bereits.',
+
+      'privacy_title': 'Datenschutz & Berechtigungen',
+      'privacy_no_server_title': 'Serverlose Architektur',
+      'privacy_no_server_body':
+          'NexScore hat keinen zentralen Server. Alle Daten werden lokal auf deinem Gerät verarbeitet oder direkt mit deinen autorisierten Cloud-Anbietern (Google/GitHub) synchronisiert. Wir sehen, verkaufen oder teilen deine Daten niemals.',
+      'privacy_google_title': 'Google Berechtigungen (Firestore)',
+      'privacy_google_body':
+          'Angefragt: Basis-Profil (E-Mail/Name). Wird verwendet, um dein Konto zu identifizieren und deine Spieler sowie den Spielverlauf mit Google Cloud Firestore zu synchronisieren für Multi-Geräte-Unterstützung.',
+      'privacy_github_title': 'GitHub Berechtigungen (Gists)',
+      'privacy_github_body':
+          'Angefragt: Gist-Berechtigung. Wird verwendet, um ein privates Backup deiner Daten in deinem GitHub-Konto zu erstellen. Es wird nur auf von NexScore erstellte Gists zugegriffen.',
 
       // ── SipDeck Cards (DE)
       'sd_card_w001':

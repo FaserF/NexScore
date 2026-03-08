@@ -6,20 +6,68 @@ import '../../../../core/providers/active_players_provider.dart';
 import '../models/wayquest_models.dart';
 import '../providers/wayquest_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../core/providers/tts_provider.dart';
+import '../../../settings/provider/settings_provider.dart';
 
-class WayQuestScreen extends ConsumerWidget {
+class WayQuestScreen extends ConsumerStatefulWidget {
   const WayQuestScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WayQuestScreen> createState() => _WayQuestScreenState();
+}
+
+class _WayQuestScreenState extends ConsumerState<WayQuestScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final settings = ref.read(settingsProvider);
+      ref.read(ttsActiveProvider.notifier).setEnabled(settings.ttsEnabled);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(wayQuestStateProvider);
     final l10n = AppLocalizations.of(context);
+
+    ref.listen<WayQuestGameState>(wayQuestStateProvider, (previous, next) {
+      if (next.playedCards.length > (previous?.playedCards.length ?? 0)) {
+        if (ref.read(ttsActiveProvider)) {
+          final card = next.currentCard;
+          if (card != null) {
+            final ttsService = ref.read(ttsServiceProvider);
+            final settings = ref.read(settingsProvider);
+            final locale = settings.locale?.languageCode ?? 'en';
+            ttsService.setLanguage(locale);
+            ttsService.speak(card.text);
+          }
+        }
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.get('game_wayquest')),
         leading: BackButton(onPressed: () => context.go('/games')),
         actions: [
+          IconButton(
+            icon: Icon(
+              ref.watch(ttsActiveProvider) ? Icons.volume_up : Icons.volume_off,
+              color: ref.watch(ttsActiveProvider)
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
+            ),
+            onPressed: () {
+              ref.read(ttsActiveProvider.notifier).toggle();
+              final active = ref.read(ttsActiveProvider);
+              if (!active) {
+                ref.read(ttsServiceProvider).stop();
+              }
+            },
+            tooltip: l10n.get('tts_toggle'),
+          ),
           if (state.playedCards.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.refresh),

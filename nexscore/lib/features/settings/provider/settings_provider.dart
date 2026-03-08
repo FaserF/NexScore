@@ -9,12 +9,14 @@ class Settings {
   final Locale? locale;
   final String hostName;
   final String hostColor;
+  final bool ttsEnabled;
 
   const Settings({
     required this.themeMode,
     this.locale,
     this.hostName = 'Player',
     this.hostColor = '#4287f5',
+    this.ttsEnabled = false,
   });
 
   Settings copyWith({
@@ -23,12 +25,14 @@ class Settings {
     bool clearLocale = false,
     String? hostName,
     String? hostColor,
+    bool? ttsEnabled,
   }) {
     return Settings(
       themeMode: themeMode ?? this.themeMode,
       locale: clearLocale ? null : (locale ?? this.locale),
       hostName: hostName ?? this.hostName,
       hostColor: hostColor ?? this.hostColor,
+      ttsEnabled: ttsEnabled ?? this.ttsEnabled,
     );
   }
 }
@@ -43,6 +47,7 @@ class SettingsNotifier extends Notifier<Settings> {
   static const _localeKey = 'settings_locale';
   static const _hostNameKey = 'settings_host_name';
   static const _hostColorKey = 'settings_host_color';
+  static const _ttsEnabledKey = 'settings_tts_enabled';
 
   @override
   Settings build() {
@@ -52,6 +57,7 @@ class SettingsNotifier extends Notifier<Settings> {
     return Settings(
       themeMode: ThemeMode.system,
       hostName: _generateDefaultName(),
+      ttsEnabled: false,
     );
   }
 
@@ -68,12 +74,14 @@ class SettingsNotifier extends Notifier<Settings> {
 
     final hostName = prefs.getString(_hostNameKey) ?? _generateDefaultName();
     final hostColor = prefs.getString(_hostColorKey) ?? '#4287f5';
+    final ttsEnabled = prefs.getBool(_ttsEnabledKey) ?? false;
 
     state = Settings(
       themeMode: themeMode,
       locale: locale,
       hostName: hostName,
       hostColor: hostColor,
+      ttsEnabled: ttsEnabled,
     );
   }
 
@@ -109,5 +117,20 @@ class SettingsNotifier extends Notifier<Settings> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_hostColorKey, color);
     state = state.copyWith(hostColor: color);
+  }
+
+  Future<void> setTtsEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_ttsEnabledKey, enabled);
+    state = state.copyWith(ttsEnabled: enabled);
+  }
+
+  /// Updates hostName if it currently follows the 'Player#12345' default pattern.
+  Future<void> updateHostNameIfDefault(String newName) async {
+    final name = state.hostName;
+    final defaultPattern = RegExp(r'^Player#\d{5}$');
+    if (defaultPattern.hasMatch(name) && newName.isNotEmpty) {
+      await setHostName(newName);
+    }
   }
 }

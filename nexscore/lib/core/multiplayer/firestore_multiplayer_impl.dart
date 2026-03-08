@@ -42,16 +42,24 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
   Stream<Lobby?> get lobbyUpdates => _lobbyStreamController.stream;
 
   Future<void> _ensureAuth() async {
-    if (_uid != null) return;
+    debugPrint('Multiplayer: Ensuring Auth...');
+    if (_uid != null) {
+      debugPrint('Multiplayer: Auth already ensured for uid: $_uid');
+      return;
+    }
     try {
       if (_auth.currentUser == null) {
-        await _auth.signInAnonymously();
+        debugPrint('Multiplayer: Signing in anonymously...');
+        await _auth.signInAnonymously().timeout(const Duration(seconds: 10));
       }
       _uid = _auth.currentUser?.uid;
-    } catch (e) {
-      debugPrint('Error signing in anonymously: $e');
+      debugPrint('Multiplayer: Auth successful, uid: $_uid');
+    } catch (e, stack) {
+      debugPrint('Multiplayer: Auth error: $e');
+      debugPrint('Stack trace: $stack');
       // Fallback for environments where Auth fails or isn't set up yet
       _uid ??= const Uuid().v4();
+      debugPrint('Multiplayer: Using fallback UUID: $_uid');
     }
   }
 
@@ -80,24 +88,51 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     // Generate unique code
     String roomCode = '';
     bool isUnique = false;
-    while (!isUnique) {
+    int attempts = 0;
+
+    // Connectivity test
+    try {
+      debugPrint('Multiplayer: Running connectivity check...');
+      await _firestore
+          .collection('lobbies')
+          .limit(1)
+          .get(const GetOptions(source: Source.server))
+          .timeout(const Duration(seconds: 5));
+      debugPrint('Multiplayer: Server connection OK');
+    } catch (e) {
+      debugPrint('Multiplayer: Pre-flight connection check failed: $e');
+      // We continue, but it's a strong indicator of what's wrong
+    }
+
+    while (!isUnique && attempts < 5) {
+      attempts++;
       roomCode = _generateRoomCode();
-      debugPrint('Multiplayer: Checking room code uniqueness: $roomCode');
+      debugPrint(
+        'Multiplayer: Checking room code uniqueness (attempt $attempts): $roomCode',
+      );
       try {
         final doc = await _firestore
             .collection('lobbies')
             .doc(roomCode)
-            .get()
+            .get(const GetOptions(source: Source.server))
             .timeout(const Duration(seconds: 10));
         if (!doc.exists) {
           isUnique = true;
           debugPrint('Multiplayer: Room code is unique: $roomCode');
+        } else {
+          debugPrint('Multiplayer: Room code collision: $roomCode');
         }
       } on TimeoutException {
-        debugPrint('Multiplayer: Timeout while checking room code uniqueness');
+        debugPrint(
+          'Multiplayer: Timeout while checking room code uniqueness at attempt $attempts',
+        );
+        debugPrint(
+          'Multiplayer: Firestore persistence enabled: ${_firestore.settings.persistenceEnabled}',
+        );
         throw Exception('firestore_timeout');
-      } catch (e) {
+      } catch (e, stack) {
         debugPrint('Multiplayer: Error checking room code uniqueness: $e');
+        debugPrint('Stack trace: $stack');
         rethrow;
       }
     }

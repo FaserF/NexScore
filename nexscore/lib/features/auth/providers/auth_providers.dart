@@ -120,6 +120,80 @@ class AuthService {
     }
   }
 
+  Future<Result<UserCredential>> linkWithGoogle() async {
+    final stopwatch = Stopwatch()..start();
+    try {
+      final user = _auth.currentUser;
+      if (user == null)
+        return Result.failure(const AuthFailure('No user logged in'));
+
+      final googleProvider = GoogleAuthProvider();
+      UserCredential credential;
+      if (kIsWeb) {
+        credential = await user.linkWithPopup(googleProvider);
+      } else {
+        credential = await user.linkWithProvider(googleProvider);
+      }
+      AppLogger.info(
+        'Google linking successful',
+        tag: 'Auth',
+        metadata: {
+          'duration': '${stopwatch.elapsedMilliseconds}ms',
+          'uid': credential.user?.uid,
+        },
+      );
+      return Result.success(credential);
+    } catch (e, stack) {
+      AppLogger.error(
+        'Google linking failed',
+        tag: 'Auth',
+        error: e,
+        stackTrace: stack,
+      );
+      return Result.failure(
+        AuthFailure('Linking failed', error: e, stackTrace: stack),
+      );
+    }
+  }
+
+  Future<Result<UserCredential>> linkWithGithub() async {
+    final stopwatch = Stopwatch()..start();
+    try {
+      final user = _auth.currentUser;
+      if (user == null)
+        return Result.failure(const AuthFailure('No user logged in'));
+
+      final githubProvider = GithubAuthProvider();
+      githubProvider.addScope('gist');
+
+      UserCredential credential;
+      if (kIsWeb) {
+        credential = await user.linkWithPopup(githubProvider);
+      } else {
+        credential = await user.linkWithProvider(githubProvider);
+      }
+      AppLogger.info(
+        'GitHub linking successful',
+        tag: 'Auth',
+        metadata: {
+          'duration': '${stopwatch.elapsedMilliseconds}ms',
+          'uid': credential.user?.uid,
+        },
+      );
+      return Result.success(credential);
+    } catch (e, stack) {
+      AppLogger.error(
+        'GitHub linking failed',
+        tag: 'Auth',
+        error: e,
+        stackTrace: stack,
+      );
+      return Result.failure(
+        AuthFailure('GitHub linking failed', error: e, stackTrace: stack),
+      );
+    }
+  }
+
   Future<Result<void>> signOut() async {
     try {
       await _auth.signOut();

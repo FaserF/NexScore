@@ -224,17 +224,23 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
   bool _isGoogleLoading = false;
   bool _isGithubLoading = false;
 
-  /// Returns true when the current user signed in via GitHub.
-  bool get _isGitHubProvider {
+  bool get _isGitHubLinked {
     return widget.user.providerData.any(
       (info) => info.providerId == 'github.com',
+    );
+  }
+
+  bool get _isGoogleLinked {
+    return widget.user.providerData.any(
+      (info) => info.providerId == 'google.com',
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final isGitHub = _isGitHubProvider;
+    final isGoogle = _isGoogleLinked;
+    final isGitHub = _isGitHubLinked;
     final isGuest = widget.user.isAnonymous;
 
     return Padding(
@@ -265,24 +271,31 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
               widget.user.email ?? '',
               style: const TextStyle(color: Colors.grey),
             ),
-          const SizedBox(height: 8),
-          Chip(
-            label: Text(
-              isGuest
-                  ? l10n.get('account_guest_sync_label')
-                  : (isGitHub
-                        ? l10n.get('account_sync_github')
-                        : l10n.get('account_sync_active')),
-            ),
-            avatar: Icon(
-              isGuest
-                  ? Icons.cloud_off
-                  : (isGitHub ? Icons.code : Icons.cloud_done),
-              size: 16,
-            ),
-            backgroundColor: isGuest
-                ? Colors.orange.shade100
-                : Colors.green.shade100,
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            children: [
+              if (isGuest)
+                Chip(
+                  label: Text(l10n.get('account_guest_sync_label')),
+                  avatar: const Icon(Icons.cloud_off, size: 16),
+                  backgroundColor: Colors.orange.shade100,
+                ),
+              if (isGoogle)
+                const Chip(
+                  label: Text('Google Linked'),
+                  avatar: Icon(Icons.cloud_done, size: 16),
+                  backgroundColor: Color(0xFFE8F5E9), // shade 50/100ish
+                ),
+              if (isGitHub)
+                Chip(
+                  label: Text(l10n.get('account_sync_github')),
+                  avatar: const Icon(Icons.code, size: 16),
+                  backgroundColor: Colors.blue.shade100,
+                ),
+            ],
           ),
           const SizedBox(height: 48),
 
@@ -294,47 +307,134 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
               subtitle: Text(l10n.get('account_signed_out_body')),
             ),
             const SizedBox(height: 32),
-            OutlinedButton.icon(
-              onPressed: _isGoogleLoading || _isGithubLoading
-                  ? null
-                  : () async {
+            _AuthButton(
+              label: l10n.get('account_sign_in_google'),
+              icon: Icons.login,
+              isLoading: _isGoogleLoading,
+              onPressed: () async {
+                setState(() => _isGoogleLoading = true);
+                final messenger = ScaffoldMessenger.of(context);
+                final result = await ref
+                    .read(authServiceProvider)
+                    .signInWithGoogleNative();
+                if (mounted) setState(() => _isGoogleLoading = false);
+                result.fold((failure) {
+                  _showError(context, l10n, failure.message, messenger);
+                }, (_) {});
+              },
+            ),
+            const SizedBox(height: 12),
+            _AuthButton(
+              label: l10n.get('account_sign_in_github'),
+              icon: Icons.code,
+              isLoading: _isGithubLoading,
+              onPressed: () async {
+                setState(() => _isGithubLoading = true);
+                final messenger = ScaffoldMessenger.of(context);
+                final result = await ref
+                    .read(authServiceProvider)
+                    .signInWithGithub();
+                if (mounted) setState(() => _isGithubLoading = false);
+                result.fold(
+                  (failure) {
+                    _showError(context, l10n, failure.message, messenger);
+                  },
+                  (credential) {
+                    final oauthCred = credential.credential as OAuthCredential?;
+                    if (oauthCred?.accessToken != null) {
+                      ref
+                          .read(gistSyncServiceProvider)
+                          .setAccessToken(oauthCred!.accessToken!);
+                    }
+                  },
+                );
+              },
+            ),
+          ] else ...[
+            if (isGitHub) ...[
+              const _SectionLabel(label: 'GitHub Backup (Gist)'),
+              ListTile(
+                leading: const Icon(Icons.backup),
+                title: Text(l10n.get('account_gist_backup_title')),
+                subtitle: Text(l10n.get('account_gist_backup_desc')),
+                trailing: IconButton(
+                  icon: const Icon(Icons.cloud_upload),
+                  onPressed: () => _backupToGist(context),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.cloud_download),
+                title: Text(l10n.get('account_gist_restore_title')),
+                subtitle: Text(l10n.get('account_gist_restore_desc')),
+                trailing: IconButton(
+                  icon: const Icon(Icons.download),
+                  onPressed: () => _restoreFromGist(context),
+                ),
+              ),
+              const Divider(),
+            ],
+            if (isGoogle) ...[
+              const _SectionLabel(label: 'Google Account'),
+              ListTile(
+                leading: const Icon(Icons.account_circle),
+                title: const Text('Google Cloud Sync'),
+                subtitle: Text(l10n.get('account_sync_active')),
+                trailing: const Icon(Icons.check_circle, color: Colors.green),
+              ),
+              const Divider(),
+            ],
+
+            // ── Account Linking ──
+            if (!isGoogle || !isGitHub) ...[
+              const _SectionLabel(label: 'Link Additional Account'),
+              if (!isGoogle)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: _AuthButton(
+                    label: 'Link Google Account',
+                    icon: Icons.add_link,
+                    isLoading: _isGoogleLoading,
+                    onPressed: () async {
                       setState(() => _isGoogleLoading = true);
                       final messenger = ScaffoldMessenger.of(context);
                       final result = await ref
                           .read(authServiceProvider)
-                          .signInWithGoogleNative();
+                          .linkWithGoogle();
                       if (mounted) setState(() => _isGoogleLoading = false);
-                      result.fold((failure) {
-                        _showError(context, l10n, failure.message, messenger);
-                      }, (_) {});
+                      result.fold(
+                        (failure) {
+                          _showError(context, l10n, failure.message, messenger);
+                        },
+                        (_) {
+                          messenger.showSnackBar(
+                            const SnackBar(
+                              content: Text('Google account linked!'),
+                            ),
+                          );
+                        },
+                      );
                     },
-              icon: _isGoogleLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.login),
-              label: Text(l10n.get('account_sign_in_google')),
-              style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: _isGoogleLoading || _isGithubLoading
-                  ? null
-                  : () async {
+                  ),
+                ),
+              if (!isGitHub)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: _AuthButton(
+                    label: 'Link GitHub Account',
+                    icon: Icons.code,
+                    isLoading: _isGithubLoading,
+                    onPressed: () async {
                       setState(() => _isGithubLoading = true);
                       final messenger = ScaffoldMessenger.of(context);
                       final result = await ref
                           .read(authServiceProvider)
-                          .signInWithGithub();
+                          .linkWithGithub();
                       if (mounted) setState(() => _isGithubLoading = false);
                       result.fold(
                         (failure) {
                           _showError(context, l10n, failure.message, messenger);
                         },
                         (credential) {
-                          // Handle GitHub token persistence if needed
                           final oauthCred =
                               credential.credential as OAuthCredential?;
                           if (oauthCred?.accessToken != null) {
@@ -342,47 +442,34 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                                 .read(gistSyncServiceProvider)
                                 .setAccessToken(oauthCred!.accessToken!);
                           }
+                          messenger.showSnackBar(
+                            const SnackBar(
+                              content: Text('GitHub account linked!'),
+                            ),
+                          );
                         },
                       );
                     },
-              icon: _isGithubLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.code),
-              label: Text(l10n.get('account_sign_in_github')),
-              style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
-            ),
-          ] else if (isGitHub) ...[
-            ListTile(
-              leading: const Icon(Icons.backup),
-              title: Text(l10n.get('account_gist_backup_title')),
-              subtitle: Text(l10n.get('account_gist_backup_desc')),
-              trailing: IconButton(
-                icon: const Icon(Icons.cloud_upload),
-                onPressed: () => _backupToGist(context),
-              ),
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.cloud_download),
-              title: Text(l10n.get('account_gist_restore_title')),
-              subtitle: Text(l10n.get('account_gist_restore_desc')),
-              trailing: IconButton(
-                icon: const Icon(Icons.download),
-                onPressed: () => _restoreFromGist(context),
-              ),
-            ),
-          ] else ...[
-            ListTile(
-              leading: const Icon(Icons.cloud_sync),
-              title: const Text('Google Cloud Sync'),
-              subtitle: Text(l10n.get('account_sync_active')),
-              trailing: const Icon(Icons.check_circle, color: Colors.green),
-            ),
+                  ),
+                ),
+              const Divider(),
+            ],
           ],
+          const Divider(),
+          _SectionLabel(label: l10n.get('help_title')),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              l10n.get('account_privacy_info'),
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: Text(l10n.get('account_privacy_link')),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/profile/docs'),
+          ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.settings_outlined),
@@ -462,6 +549,57 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
       SnackBar(
         content: Text(l10n.getWith('account_sign_in_error', [message])),
         backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
+
+class _AuthButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  const _AuthButton({
+    required this.label,
+    required this.icon,
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: isLoading ? null : onPressed,
+      icon: isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(icon),
+      label: Text(label),
+      style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  final String label;
+  const _SectionLabel({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }

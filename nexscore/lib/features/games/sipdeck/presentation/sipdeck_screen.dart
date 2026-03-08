@@ -10,6 +10,8 @@ import '../models/sipdeck_models.dart';
 import '../providers/sipdeck_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../../../../shared/widgets/swipeable_card.dart';
+import '../../../../core/providers/tts_provider.dart';
+import '../../../settings/provider/settings_provider.dart';
 
 class SipDeckScreen extends ConsumerStatefulWidget {
   const SipDeckScreen({super.key});
@@ -31,6 +33,10 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
       ref
           .read(sipDeckStateProvider.notifier)
           .toggleFilterMultiplayerOnly(players.length == 2);
+
+      // Initialize TTS toggle from global settings
+      final settings = ref.read(settingsProvider);
+      ref.read(ttsActiveProvider.notifier).setEnabled(settings.ttsEnabled);
     });
   }
 
@@ -53,10 +59,39 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
       }
     });
 
+    ref.listen<SipDeckGameState>(sipDeckStateProvider, (previous, next) {
+      if (next.playedCards.length > (previous?.playedCards.length ?? 0)) {
+        if (ref.read(ttsActiveProvider)) {
+          final card = next.playedCards.last;
+          final ttsService = ref.read(ttsServiceProvider);
+          final settings = ref.read(settingsProvider);
+          final locale = settings.locale?.languageCode ?? 'en';
+          ttsService.setLanguage(locale);
+          ttsService.speak(card.text);
+        }
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.get('sipdeck_title')),
         actions: [
+          IconButton(
+            icon: Icon(
+              ref.watch(ttsActiveProvider) ? Icons.volume_up : Icons.volume_off,
+              color: ref.watch(ttsActiveProvider)
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
+            ),
+            onPressed: () {
+              ref.read(ttsActiveProvider.notifier).toggle();
+              final active = ref.read(ttsActiveProvider);
+              if (!active) {
+                ref.read(ttsServiceProvider).stop();
+              }
+            },
+            tooltip: l10n.get('tts_toggle'),
+          ),
           IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: () {
