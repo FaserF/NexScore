@@ -3859,6 +3859,62 @@ class AppLocalizations {
       'desc_factquest':
           'Wahre Fakten, wilde Geschichten & „Dumme Tode" – mit anklickbaren Quellen.',
 
+      // Zufällige Fakten (DE)
+      'fq_card_rf001_text': 'Honig verdirbt nie.',
+      'fq_card_rf001_expl':
+          'Archäologen haben in ägyptischen Gräbern 3.000 Jahre alten Honig gefunden, der noch vollkommen essbar war. Der niedrige Feuchtigkeitsgehalt und der saure pH-Wert des Honigs schaffen eine Umgebung, in der Bakterien und Mikroorganismen nicht überleben können.',
+      'fq_card_rf002_text': 'Ein Mann hatte 68 Jahre lang am Stück Schluckauf.',
+      'fq_card_rf002_expl':
+          'Charles Osborne aus Iowa, USA, begann 1922 zu schlucken und hörte erst 1990 wieder auf – das sind etwa 430 Millionen Schluckauf-Anfälle über 68 Jahre. Er steht damit im Guinness-Buch der Rekorde.',
+      'fq_card_rf003_text': 'Mehr als 80 % der Ozeane sind unerforscht.',
+      'fq_card_rf003_expl':
+          'Obwohl die Ozeane über 70 % der Erdoberfläche bedecken, sind mehr als 80 % davon noch nicht kartiert oder beobachtet worden. Wir wissen mehr über die Oberfläche des Mars als über den tiefen Meeresboden.',
+      'fq_card_rf004_text':
+          'Es gibt auf der Erde mehr Bäume als Sterne in der Milchstraße.',
+      'fq_card_rf004_expl':
+          'Eine Studie aus dem Jahr 2015 in Nature schätzt, dass es etwa 3 Billionen Bäume auf der Erde gibt, während Astronomen die Anzahl der Sterne in der Milchstraße auf 100 bis 400 Milliarden schätzen.',
+      'fq_card_rf005_text':
+          'Die Chinesische Mauer ist vom Weltraum aus nicht mit bloßem Auge sichtbar.',
+      'fq_card_rf005_expl':
+          'Trotz eines populären Mythos haben Astronauten bestätigt, dass die Chinesische Mauer aus einer niedrigen Erdumlaufbahn ohne Hilfsmittel nicht sichtbar ist. Sie ist zu schmal (etwa 5–8 Meter breit). Autobahnen und Flughäfen hingegen sind sichtbar.',
+      'fq_card_rf006_text': 'Oktupusse haben drei Herzen.',
+      'fq_card_rf006_expl':
+          'Zwei Kiemenherzen pumpen Blut durch die Kiemen, während ein Systemherz es durch den Rest des Körpers pumpt. Das Systemherz hört tatsächlich auf zu schlagen, wenn der Oktopus schwimmt, weshalb sie das Krabbeln bevorzugen.',
+      'fq_card_rf007_text':
+          'Ein Tag auf der Venus ist länger als ein Jahr auf der Venus.',
+      'fq_card_rf007_expl':
+          'Die Venus benötigt etwa 243 Erdtage für eine Drehung um die eigene Achse, aber nur etwa 225 Erdtage für einen Umlauf um die Sonne. Zudem dreht sich die Venus im Vergleich zu den meisten anderen Planeten in die entgegengesetzte Richtung.',
+      'fq_card_rf008_text':
+          'Fangschreckenkrebse können mit der Geschwindigkeit einer Kugel vom Kaliber .22 zuschlagen.',
+      'fq_card_rf008_expl':
+          'Der Schlag des Fangschreckenkrebses ist eine der schnellsten Bewegungen im Tierreich und beschleunigt mit über 10.000 g. Der Schlag erzeugt Kavitationsblasen, die eine zweite Schockwelle auslösen.',
+      'fq_card_rf009_text':
+          'Blitze schlagen etwa 100 Mal pro Sekunde auf der Erde ein.',
+      'fq_card_rf009_expl':
+          'Das sind etwa 8,6 Millionen Blitzeinschläge pro Tag oder über 3 Milliarden pro Jahr. Ein einzelner Blitzschlag kann Temperaturen von etwa 30.000 Kelvin erreichen – fünfmal heißer als die Oberfläche der Sonne.',
+      'fq_card_rf010_text':
+          'Bärtierchen können im Vakuum des Weltraums überleben.',
+      'fq_card_rf010_expl':
+          'Diese Kleinsttiere (0,1–1,5 mm) können extreme Temperaturen, Strahlung, Austrocknung und sogar das Vakuum des Weltraums überstehen. Im Jahr 2007 überlebten sie 10 Tage lang in einer niedrigen Erdumlaufbahn.',
+      'fq_card_rf011_text': 'Bananen sind leicht radioaktiv.',
+      'fq_card_rf011_expl':
+          'Bananen enthalten Kalium-40, ein natürlich vorkommendes radioaktives Isotop. Man müsste jedoch etwa 10 Millionen Bananen auf einmal essen, um eine tödliche Dosis Strahlung zu erhalten.',
+      'fq_card_rf012_text':
+          'Kleopatra lebte zeitlich näher an der Mondlandung als am Bau der Großen Pyramide.',
+      'fq_card_rf012_expl':
+          'Die Große Pyramide von Gizeh wurde um 2560 v. Chr. erbaut, während Kleopatra um 30 v. Chr. lebte. Die Mondlandung war 1969 n. Chr. Kleopatra lebte etwa 2.530 Jahre nach der Pyramide und nur etwa 2.000 Jahre vor der Mondlandung.',
+      'fq_card_rf013_text':
+          'Wir haben weniger vom Meeresboden erforscht als von der Oberfläche des Mars.',
+      'fq_card_rf013_expl':
+          'Nur etwa 5–20 % des Meeresbodens sind hochauflösend kartiert. Die NASA hat dagegen die gesamte Oberfläche des Mars mit einer Auflösung von etwa 6 Metern pro Pixel kartiert.',
+      'fq_card_rf014_text':
+          'Der Körper eines erwachsenen Menschen besteht aus etwa 206 Knochen.',
+      'fq_card_rf014_expl':
+          'Babys werden mit etwa 270 Knochen geboren, aber viele wachsen im Laufe des Wachstums zusammen, sodass Erwachsene noch 206 haben. Der kleinste Knochen ist der Steigbügel im Ohr mit etwa 3 mm Länge.',
+      'fq_card_rf015_text': 'Delfine schlafen mit einem offenen Auge.',
+      'fq_card_rf015_expl':
+          'Delfine nutzen den unihemisphärischen Schlaf: Eine Gehirnhälfte schläft, während die andere wach bleibt. So können sie weiteratmen und nach Fressfeinden Ausschau halten, während sie ruhen.',
+
       'fq_card_rf016_text':
           'Das Herz eines Blauwals ist so groß wie ein Kleinwagen.',
       'fq_card_rf016_expl':

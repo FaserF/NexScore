@@ -33,6 +33,8 @@ void main() async {
   };
 
   if (kIsWeb) {
+    // For GitHub Pages compatibility, the Hash strategy is preferred.
+    //   usePathUrlStrategy();
     setUrlStrategy(null);
   }
 
