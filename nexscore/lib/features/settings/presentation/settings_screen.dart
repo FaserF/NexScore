@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -41,7 +42,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final settings = ref.watch(settingsProvider);
-    final canInstall = pwa.canShowInstallPrompt();
+    final showPwaInstall = kIsWeb && !pwa.isStandalone();
     final authUser = ref.watch(authUserProvider).asData?.value;
 
     // Auto-sync host name from account if it's still the default
@@ -262,7 +263,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                if (canInstall) ...[
+                if (showPwaInstall) ...[
                   _SectionHeader(title: l10n.get('settings_pwa_install')),
                   AnimatedScaleButton(
                     onPressed: () async {

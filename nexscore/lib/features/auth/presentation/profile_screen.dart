@@ -135,11 +135,12 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
                         (credential) {
                           final oauthCred =
                               credential.credential as OAuthCredential?;
-                          if (oauthCred?.accessToken != null) {
+                          if (oauthCred != null &&
+                              oauthCred.accessToken != null) {
                             final gistService = ref.read(
                               gistSyncServiceProvider,
                             );
-                            gistService.setAccessToken(oauthCred!.accessToken!);
+                            gistService.setAccessToken(oauthCred.accessToken!);
                             _checkAndPromptRestore(context, gistService);
                           }
                         },
@@ -212,7 +213,7 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
           SnackBar(content: Text(l10n.get('account_gist_restore_success'))),
         );
       } else {
-        _showError(context, l10n, result.failure!.message, messenger);
+        _showError(context, l10n, result.failure.message, messenger);
       }
     }
   }
@@ -385,9 +386,9 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                   },
                   (credential) {
                     final oauthCred = credential.credential as OAuthCredential?;
-                    if (oauthCred?.accessToken != null) {
+                    if (oauthCred != null && oauthCred.accessToken != null) {
                       final gistService = ref.read(gistSyncServiceProvider);
-                      gistService.setAccessToken(oauthCred!.accessToken!);
+                      gistService.setAccessToken(oauthCred.accessToken!);
                       _checkAndPromptRestore(context, gistService);
                     }
                   },
@@ -506,11 +507,12 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                         (credential) {
                           final oauthCred =
                               credential.credential as OAuthCredential?;
-                          if (oauthCred?.accessToken != null) {
+                          if (oauthCred != null &&
+                              oauthCred.accessToken != null) {
                             final gistService = ref.read(
                               gistSyncServiceProvider,
                             );
-                            gistService.setAccessToken(oauthCred!.accessToken!);
+                            gistService.setAccessToken(oauthCred.accessToken!);
                             _checkAndPromptRestore(context, gistService);
                           }
                           messenger.showSnackBar(

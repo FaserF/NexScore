@@ -3,6 +3,9 @@ import 'package:flutter/foundation.dart';
 /// Returns true if the PWA install prompt can be shown.
 bool canShowInstallPrompt() => false;
 
+/// Returns true if the app is running in standalone mode (PWA installed).
+bool isStandalone() => false;
+
 /// Shows the PWA install prompt. Returns true if accepted or shown.
 Future<bool> showInstallPrompt() async {
   debugPrint('PWA install prompt is not available on this platform.');

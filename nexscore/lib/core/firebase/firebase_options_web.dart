@@ -22,7 +22,11 @@ class FirebaseOptionsWeb {
   );
   static const String appId = String.fromEnvironment('FIREBASE_APP_ID');
 
-  static bool get isConfigured => apiKey.isNotEmpty && appId.isNotEmpty;
+  static bool get isConfigured =>
+      apiKey.isNotEmpty &&
+      apiKey != 'PLACEHOLDER_FIREBASE_API_KEY' &&
+      appId.isNotEmpty &&
+      appId != 'PLACEHOLDER_FIREBASE_APP_ID';
 
   static FirebaseOptions get currentPlatform {
     return const FirebaseOptions(

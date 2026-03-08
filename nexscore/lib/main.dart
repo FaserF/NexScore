@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_web_plugins/url_strategy.dart' show usePathUrlStrategy;
 import 'core/firebase/firebase_options_web.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -18,9 +17,9 @@ import 'core/lifecycle/app_lifecycle_observer.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (kIsWeb) {
-    usePathUrlStrategy();
-  }
+  // if (kIsWeb) {
+  //   usePathUrlStrategy();
+  // }
 
   try {
     if (kIsWeb) {

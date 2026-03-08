@@ -78,15 +78,21 @@ void main() {
       // Verify pre-flight check logic is present
       expect(content, contains('Running connectivity check...'));
       expect(content, contains('.limit(1)'));
-      expect(content, contains('.get()'));
+      expect(
+        content,
+        contains('.get(const GetOptions(source: Source.serverAndCache))'),
+      );
     });
 
-    test('Main should use Path URL Strategy for better anchor support', () {
-      final file = File('lib/main.dart');
-      expect(file.existsSync(), isTrue, reason: 'Main file should exist');
+    test(
+      'Main should NOT use Path URL Strategy for better GitHub Pages compatibility',
+      () {
+        final file = File('lib/main.dart');
+        expect(file.existsSync(), isTrue, reason: 'Main file should exist');
 
-      final content = file.readAsStringSync();
-      expect(content, contains('usePathUrlStrategy()'));
-    });
+        final content = file.readAsStringSync();
+        expect(content, contains('// usePathUrlStrategy()'));
+      },
+    );
   });
 }

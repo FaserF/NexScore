@@ -674,6 +674,7 @@ class AppLocalizations {
       'account_gist_backup_desc': 'Backup your data to a private Gist',
       'account_gist_restore_title': 'Restore from Gist',
       'account_gist_restore_desc': 'Download your data from GitHub',
+      'account_gist_restore_success': 'Data restored successfully from GitHub',
       'account_sign_in_error': 'Sign-in failed: {0}',
       'account_data_stay_note':
           'Your local data remains on this device when you sign out.',
@@ -1853,6 +1854,8 @@ class AppLocalizations {
       'account_gist_backup_desc': 'Sichere deine Daten in einem privaten Gist',
       'account_gist_restore_title': 'Wiederherstellen von Gist',
       'account_gist_restore_desc': 'Lade deine Daten von GitHub herunter',
+      'account_gist_restore_success':
+          'Daten erfolgreich von GitHub wiederhergestellt',
       'account_sign_in_error': 'Anmeldung fehlgeschlagen: {0}',
       'account_data_stay_note':
           'Deine lokalen Daten bleiben beim Abmelden auf diesem Gerät erhalten.',

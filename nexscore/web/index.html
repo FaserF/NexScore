@@ -10,8 +10,8 @@
 
   <!-- SEO & Description -->
   <meta name="description"
-    content="NexScore – Score tracker for Wizard, Qwixx, Schafkopf, Kniffel, Phase 10, Darts, Rommé & Picolo. Play and track scores cross-platform.">
-  <meta name="keywords" content="score tracker, Wizard, Qwixx, Schafkopf, Kniffel, Picolo, card games, board games">
+    content="NexScore – Score tracker for Wizard, Qwixx, Schafkopf, Kniffel, Phase 10, Darts, Rommé & SipDeck. Play and track scores cross-platform.">
+  <meta name="keywords" content="score tracker, Wizard, Qwixx, Schafkopf, Kniffel, SipDeck, card games, board games">
   <meta name="author" content="Fabi Seitz">
 
   <!-- PWA – Android / Chrome -->
@@ -34,7 +34,7 @@
   <!-- Open Graph (social sharing preview) -->
   <meta property="og:title" content="NexScore">
   <meta property="og:description"
-    content="Score tracker for Wizard, Qwixx, Schafkopf, Kniffel, Phase 10, Darts, Rommé & Picolo.">
+    content="Score tracker for Wizard, Qwixx, Schafkopf, Kniffel, Phase 10, Darts, Rommé & SipDeck.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://faserf.github.io/NexScore/">
   <meta property="og:image" content="icons/Icon-512.png">
@@ -180,17 +180,15 @@
     };
 
     window.flutterShowInstallPrompt = function () {
-      return new Promise(function (resolve) {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then(function (choiceResult) {
-            console.log('User response: ' + choiceResult.outcome);
-            deferredPrompt = null;
-            resolve(choiceResult.outcome === 'accepted');
-          });
-        } else {
-          resolve(false);
-        }
+      if (!deferredPrompt) {
+        return Promise.resolve(false);
+      }
+      const promptEvent = deferredPrompt;
+      deferredPrompt = null;
+      promptEvent.prompt();
+      return promptEvent.userChoice.then(function (choiceResult) {
+        console.log('User response: ' + choiceResult.outcome);
+        return choiceResult.outcome === 'accepted';
       });
     };
   </script>

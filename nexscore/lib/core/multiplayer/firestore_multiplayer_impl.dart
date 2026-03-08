@@ -23,6 +23,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
 
   void _checkFirebase() {
     if (Firebase.apps.isEmpty) {
+      debugPrint('Multiplayer: Firebase not initialized!');
       throw Exception('FIREBASE_NOT_CONFIGURED');
     }
   }
@@ -93,16 +94,17 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     // Connectivity test
     try {
       debugPrint('Multiplayer: Running connectivity check...');
-      // Remove strict Source.server for pre-flight to allow faster checks
+      // Explicitly check if we can reach Firestore
       await _firestore
           .collection('lobbies')
           .limit(1)
-          .get() // Allow default source (cache + server)
-          .timeout(const Duration(seconds: 15)); // Increased from 5s
-      debugPrint('Multiplayer: Connectivity check finished');
+          .get(const GetOptions(source: Source.serverAndCache))
+          .timeout(const Duration(seconds: 10));
+      debugPrint('Multiplayer: Connectivity check successful');
     } catch (e) {
       debugPrint('Multiplayer: Pre-flight connectivity check warning: $e');
-      // We continue, as this might just be a slow initial handshake
+      // If we're offline but persistence is on, we might still "succeed" later,
+      // but usually timeouts here indicate major configuration or network issues.
     }
 
     while (!isUnique && attempts < 5) {

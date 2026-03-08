@@ -24,13 +24,22 @@ bool canShowInstallPrompt() {
   }
 }
 
-/// Shows the PWA install prompt. Returns true if accepted or shown.
-Future<bool> showInstallPrompt() async {
+/// Returns true if the app is running in standalone mode (PWA installed).
+bool isStandalone() {
   try {
-    final result = await _flutterShowInstallPrompt().toDart;
-    return result.toDart;
+    // In our JS, flutterCanShowInstallPrompt returns !isStandalone
+    return !_flutterCanShowInstallPrompt().toDart;
+  } catch (e) {
+    return false;
+  }
+}
+
+/// Shows the PWA install prompt. Returns true if accepted or shown.
+Future<bool> showInstallPrompt() {
+  try {
+    return _flutterShowInstallPrompt().toDart.then((result) => result.toDart);
   } catch (e) {
     debugPrint('Error showing PWA prompt: $e');
+    return Future.value(false);
   }
-  return false;
 }
