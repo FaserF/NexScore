@@ -23,10 +23,10 @@ class FactQuestCard {
   });
 
   /// Localization key for the fact text.
-  String get textKey => 'fq_card_${id}_text';
+  String get textKey => 'fq_card_\${id}_text';
 
   /// Localization key for the detailed explanation.
-  String get explanationKey => 'fq_card_${id}_expl';
+  String get explanationKey => 'fq_card_\${id}_expl';
 
   Map<String, dynamic> toMap() => {
     'id': id,
@@ -57,7 +57,6 @@ class FactQuestGameState {
   final List<String> activePlayerIds;
   final List<FactQuestCategory> selectedCategories;
   final List<FactQuestCard> playedCards;
-  final Map<String, int> playerSips; // Track drinks for multiplayer clients
 
   const FactQuestGameState({
     this.activePlayerIds = const [],
@@ -66,20 +65,17 @@ class FactQuestGameState {
       FactQuestCategory.dumbWaysToDie,
     ],
     this.playedCards = const [],
-    this.playerSips = const {},
   });
 
   FactQuestGameState copyWith({
     List<String>? activePlayerIds,
     List<FactQuestCategory>? selectedCategories,
     List<FactQuestCard>? playedCards,
-    Map<String, int>? playerSips,
   }) {
     return FactQuestGameState(
       activePlayerIds: activePlayerIds ?? this.activePlayerIds,
       selectedCategories: selectedCategories ?? this.selectedCategories,
       playedCards: playedCards ?? this.playedCards,
-      playerSips: playerSips ?? this.playerSips,
     );
   }
 
@@ -87,7 +83,6 @@ class FactQuestGameState {
     'activePlayerIds': activePlayerIds,
     'selectedCategories': selectedCategories.map((e) => e.name).toList(),
     'playedCards': playedCards.map((e) => e.toMap()).toList(),
-    'playerSips': playerSips,
   };
 
   factory FactQuestGameState.fromMap(Map<String, dynamic> map) =>
@@ -99,7 +94,6 @@ class FactQuestGameState {
         playedCards: (map['playedCards'] as List? ?? [])
             .map((e) => FactQuestCard.fromMap(e as Map<String, dynamic>))
             .toList(),
-        playerSips: Map<String, int>.from(map['playerSips'] ?? {}),
       );
 
   FactQuestCard? get currentCard =>

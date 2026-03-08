@@ -106,9 +106,13 @@ void main() {
 
       // Win 2 sets for A
       // Set 1
-      for (int i = 0; i < 21; i++) notifier.addPoint('A');
+      for (int i = 0; i < 21; i++) {
+        notifier.addPoint('A');
+      }
       // Set 2
-      for (int i = 0; i < 21; i++) notifier.addPoint('A');
+      for (int i = 0; i < 21; i++) {
+        notifier.addPoint('A');
+      }
 
       final state = container.read(volleyballStateProvider);
       expect(state.matchFinished, isTrue);

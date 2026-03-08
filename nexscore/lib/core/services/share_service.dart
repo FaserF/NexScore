@@ -43,18 +43,13 @@ class ShareService {
       );
 
       if (kIsWeb) {
-        await SharePlus.instance.share(
-          ShareParams(
-            files: [
-              XFile.fromData(
-                imageBytes,
-                mimeType: 'image/png',
-                name: 'nexscore_share_${const Uuid().v4().substring(0, 8)}.png',
-              ),
-            ],
-            subject: text,
+        await Share.shareXFiles([
+          XFile.fromData(
+            imageBytes,
+            mimeType: 'image/png',
+            name: 'nexscore_share_${const Uuid().v4().substring(0, 8)}.png',
           ),
-        );
+        ], subject: text);
       } else {
         final tempDir = await getTemporaryDirectory();
         final file = await File(
@@ -62,9 +57,7 @@ class ShareService {
         ).create();
         await file.writeAsBytes(imageBytes);
 
-        await SharePlus.instance.share(
-          ShareParams(files: [XFile(file.path)], subject: text),
-        );
+        await Share.shareXFiles([XFile(file.path)], subject: text);
       }
     } catch (e) {
       debugPrint('Share error: $e');
@@ -78,9 +71,7 @@ class ShareService {
 
   /// Shares a captured file path directly.
   Future<void> shareFile(String filePath, {String? text}) async {
-    await SharePlus.instance.share(
-      ShareParams(files: [XFile(filePath)], subject: text),
-    );
+    await Share.shareXFiles([XFile(filePath)], subject: text);
   }
 }
 

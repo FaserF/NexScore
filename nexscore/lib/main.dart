@@ -92,15 +92,13 @@ class NexScoreApp extends ConsumerWidget {
     final ThemeData lightTheme = AppTheme.lightTheme;
     final ThemeData darkTheme = AppTheme.darkTheme;
 
-    final router = ref.watch(routerProvider);
-
     return MaterialApp.router(
       title: 'NexScore',
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: themeMode,
       locale: locale,
-      routerConfig: router,
+      routerConfig: ref.watch(routerProvider),
       scrollBehavior: AppScrollBehavior(),
       supportedLocales: const [
         Locale('en', ''), // English
