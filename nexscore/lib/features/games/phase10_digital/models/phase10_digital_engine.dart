@@ -122,6 +122,22 @@ class Phase10Card {
   /// Color index for display purposes (0=Red, 1=Blue, 2=Green, 3=Yellow).
   int get colorIndex => colorIdx;
 
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'value': value,
+    'colorIdx': colorIdx,
+    'isWild': isWild,
+    'isSkip': isSkip,
+  };
+
+  factory Phase10Card.fromMap(Map<String, dynamic> map) => Phase10Card(
+    id: map['id'],
+    value: map['value'],
+    colorIdx: map['colorIdx'],
+    isWild: map['isWild'] ?? false,
+    isSkip: map['isSkip'] ?? false,
+  );
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) || other is Phase10Card && id == other.id;
@@ -163,6 +179,25 @@ class Phase10DigitalPlayerState {
       totalPoints: totalPoints ?? this.totalPoints,
     );
   }
+
+  Map<String, dynamic> toMap() => {
+    'hand': hand.map((e) => e.toMap()).toList(),
+    'currentPhase': currentPhase,
+    'hasLaidPhase': hasLaidPhase,
+    'hasDrawn': hasDrawn,
+    'totalPoints': totalPoints,
+  };
+
+  factory Phase10DigitalPlayerState.fromMap(Map<String, dynamic> map) =>
+      Phase10DigitalPlayerState(
+        hand: (map['hand'] as List? ?? [])
+            .map((e) => Phase10Card.fromMap(e as Map<String, dynamic>))
+            .toList(),
+        currentPhase: map['currentPhase'] ?? 1,
+        hasLaidPhase: map['hasLaidPhase'] ?? false,
+        hasDrawn: map['hasDrawn'] ?? false,
+        totalPoints: map['totalPoints'] ?? 0,
+      );
 }
 
 /// Full game state.
@@ -208,6 +243,41 @@ class Phase10DigitalState {
       roundNumber: roundNumber ?? this.roundNumber,
     );
   }
+
+  Map<String, dynamic> toMap() => {
+    'phase': phase.name,
+    'playerOrder': playerOrder,
+    'playerStates': playerStates.map((k, v) => MapEntry(k, v.toMap())),
+    'drawPile': drawPile.map((e) => e.toMap()).toList(),
+    'discardPile': discardPile.map((e) => e.toMap()).toList(),
+    'currentPlayerId': currentPlayerId,
+    'currentPlayerIndex': currentPlayerIndex,
+    'roundNumber': roundNumber,
+  };
+
+  factory Phase10DigitalState.fromMap(Map<String, dynamic> map) =>
+      Phase10DigitalState(
+        phase: Phase10DigitalPhase.values.firstWhere(
+          (e) => e.name == map['phase'],
+          orElse: () => Phase10DigitalPhase.setup,
+        ),
+        playerOrder: List<String>.from(map['playerOrder'] ?? []),
+        playerStates: (map['playerStates'] as Map<String, dynamic>? ?? {}).map(
+          (k, v) => MapEntry(
+            k,
+            Phase10DigitalPlayerState.fromMap(v as Map<String, dynamic>),
+          ),
+        ),
+        drawPile: (map['drawPile'] as List? ?? [])
+            .map((e) => Phase10Card.fromMap(e as Map<String, dynamic>))
+            .toList(),
+        discardPile: (map['discardPile'] as List? ?? [])
+            .map((e) => Phase10Card.fromMap(e as Map<String, dynamic>))
+            .toList(),
+        currentPlayerId: map['currentPlayerId'],
+        currentPlayerIndex: map['currentPlayerIndex'] ?? 0,
+        roundNumber: map['roundNumber'] ?? 1,
+      );
 }
 
 /// Core Phase 10 engine.

@@ -12,6 +12,7 @@ import 'core/presentation/environment_banner.dart';
 import 'features/settings/provider/settings_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_scroll_behavior.dart';
+import 'core/lifecycle/app_lifecycle_observer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +43,9 @@ class NexScoreApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
+
+    // Initialize the lifecycle observer to auto-save games
+    ref.watch(appLifecycleObserverProvider);
     final themeMode = settings.themeMode;
     final locale = settings.locale;
 

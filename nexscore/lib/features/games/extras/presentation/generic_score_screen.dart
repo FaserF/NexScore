@@ -80,7 +80,12 @@ class GenericScoreScreen extends ConsumerWidget {
               child: Text(
                 p.name,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.bold, color: p.color),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(
+                    int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+                  ),
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -169,7 +174,9 @@ class GenericScoreScreen extends ConsumerWidget {
                     height: 4,
                     width: 30,
                     decoration: BoxDecoration(
-                      color: p.color,
+                      color: Color(
+                        int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+                      ),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),

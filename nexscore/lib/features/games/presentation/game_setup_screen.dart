@@ -8,6 +8,7 @@ import '../../../core/models/player_group.dart';
 import '../../players/repository/player_repository.dart';
 import '../../players/repository/player_group_repository.dart';
 import '../../../core/providers/active_players_provider.dart';
+import '../../../core/providers/persistence_provider.dart';
 
 class GameSetupScreen extends ConsumerStatefulWidget {
   final String gameId;
@@ -166,6 +167,7 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
         .toList();
 
     ref.read(activePlayersProvider.notifier).setPlayers(selectedPlayers);
+    ref.read(activeGameIdProvider.notifier).state = widget.gameId;
 
     // Support legacy providers where still needed (e.g. Wizard) until refactored
     if (widget.gameId == 'wizard') {
@@ -233,17 +235,18 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
               name: name,
               playerIds: _selectedPlayerIds.toList(),
             );
+            final messenger = ScaffoldMessenger.of(context);
             final result = await ref
                 .read(playerGroupsProvider.notifier)
                 .addGroup(group);
 
             if (mounted) {
               if (result.isSuccess) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                messenger.showSnackBar(
                   SnackBar(content: Text(l10n.get('presets_save_success'))),
                 );
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
+                messenger.showSnackBar(
                   SnackBar(content: Text(l10n.get('presets_save_error'))),
                 );
               }

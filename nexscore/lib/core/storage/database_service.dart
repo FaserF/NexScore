@@ -241,6 +241,7 @@ CREATE TABLE player_groups (
     final db = await _db;
     await db.delete('players');
     await db.delete('sessions');
+    await db.delete('player_groups');
   }
 
   Future<void> close() async {

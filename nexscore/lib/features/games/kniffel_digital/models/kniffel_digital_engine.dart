@@ -46,6 +46,26 @@ class KniffelDigitalPlayerState {
     );
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'scores': scores.map((k, v) => MapEntry(k.name, v)),
+      'bonusKniffels': bonusKniffels,
+    };
+  }
+
+  factory KniffelDigitalPlayerState.fromMap(Map<String, dynamic> map) {
+    final scoresMap = (map['scores'] as Map<String, dynamic>? ?? {}).map(
+      (k, v) => MapEntry(
+        KniffelCategory.values.firstWhere((e) => e.name == k),
+        v as int?,
+      ),
+    );
+    return KniffelDigitalPlayerState(
+      scores: scoresMap,
+      bonusKniffels: map['bonusKniffels'] ?? 0,
+    );
+  }
+
   /// Upper section sum (ones through sixes).
   int get upperSum {
     int total = 0;
@@ -137,6 +157,42 @@ class KniffelDigitalState {
       rollsLeft: rollsLeft ?? this.rollsLeft,
       currentPlayerIndex: currentPlayerIndex ?? this.currentPlayerIndex,
       roundNumber: roundNumber ?? this.roundNumber,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'phase': phase.name,
+      'playerOrder': playerOrder,
+      'playerStates': playerStates.map((k, v) => MapEntry(k, v.toMap())),
+      'currentPlayerId': currentPlayerId,
+      'dice': dice,
+      'held': held,
+      'rollsLeft': rollsLeft,
+      'currentPlayerIndex': currentPlayerIndex,
+      'roundNumber': roundNumber,
+    };
+  }
+
+  factory KniffelDigitalState.fromMap(Map<String, dynamic> map) {
+    return KniffelDigitalState(
+      phase: KniffelDigitalPhase.values.firstWhere(
+        (e) => e.name == map['phase'],
+        orElse: () => KniffelDigitalPhase.setup,
+      ),
+      playerOrder: List<String>.from(map['playerOrder'] ?? []),
+      playerStates: (map['playerStates'] as Map<String, dynamic>? ?? {}).map(
+        (k, v) => MapEntry(
+          k,
+          KniffelDigitalPlayerState.fromMap(v as Map<String, dynamic>),
+        ),
+      ),
+      currentPlayerId: map['currentPlayerId'],
+      dice: List<int>.from(map['dice'] ?? [1, 1, 1, 1, 1]),
+      held: List<bool>.from(map['held'] ?? [false, false, false, false, false]),
+      rollsLeft: map['rollsLeft'] ?? 3,
+      currentPlayerIndex: map['currentPlayerIndex'] ?? 0,
+      roundNumber: map['roundNumber'] ?? 1,
     );
   }
 }

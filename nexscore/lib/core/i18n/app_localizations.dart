@@ -1138,6 +1138,12 @@ class AppLocalizations {
       'bt_card_e123':
           'Roast every single person in the room brutally. Fail = drink 5.',
       'bt_card_e124': 'Everyone finish their drinks immediately!!',
+
+      // ── Resume
+      'resume_game_title': 'Resume Game',
+      'resume_game_desc': 'Would you like to resume your unfinished {0} game?',
+      'resume': 'Resume',
+      'discard': 'Discard',
     },
     'de': {
       // ── Navigation
@@ -2318,6 +2324,13 @@ class AppLocalizations {
       'bt_card_e123':
           'Brate jeden Einzelnen im Raum gnadenlos. Zu weich = 5 trinken.',
       'bt_card_e124': 'JEDER trinkt sein Getränk sofort auf Ex aus!!',
+
+      // ── Resume
+      'resume_game_title': 'Spiel fortsetzen',
+      'resume_game_desc':
+          'Möchtest du dein unvollendetes {0}-Spiel fortsetzen?',
+      'resume': 'Fortsetzen',
+      'discard': 'Verwerfen',
     },
   };
 

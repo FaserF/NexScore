@@ -74,6 +74,23 @@ class WayQuestGameState {
     );
   }
 
+  Map<String, dynamic> toMap() => {
+    'activePlayerIds': activePlayerIds,
+    'selectedCategories': selectedCategories.map((e) => e.name).toList(),
+    'playedCards': playedCards.map((e) => e.toJson()).toList(),
+  };
+
+  factory WayQuestGameState.fromMap(Map<String, dynamic> map) =>
+      WayQuestGameState(
+        activePlayerIds: List<String>.from(map['activePlayerIds'] ?? []),
+        selectedCategories: (map['selectedCategories'] as List? ?? [])
+            .map((e) => WayQuestCategory.values.firstWhere((c) => c.name == e))
+            .toList(),
+        playedCards: (map['playedCards'] as List? ?? [])
+            .map((e) => WayQuestCard.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+
   WayQuestCard? get currentCard =>
       playedCards.isNotEmpty ? playedCards.last : null;
 }

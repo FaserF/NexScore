@@ -51,6 +51,11 @@ class RommeCard {
       identical(this, other) || other is RommeCard && id == other.id;
   @override
   int get hashCode => id.hashCode;
+
+  Map<String, dynamic> toMap() => {'id': id, 'suit': suit, 'rank': rank};
+
+  factory RommeCard.fromMap(Map<String, dynamic> map) =>
+      RommeCard(id: map['id'], suit: map['suit'], rank: map['rank']);
 }
 
 /// A meld (Auslage) in Rommé — either a set (same rank) or a run (same suit sequence).
@@ -100,6 +105,16 @@ class RommeMeld {
   bool get isValid => isValidSet || isValidRun;
 
   int get totalPoints => cards.fold(0, (s, c) => s + c.points);
+
+  Map<String, dynamic> toMap() => {
+    'cards': cards.map((c) => c.toMap()).toList(),
+  };
+
+  factory RommeMeld.fromMap(Map<String, dynamic> map) => RommeMeld(
+    cards: (map['cards'] as List? ?? [])
+        .map((c) => RommeCard.fromMap(c as Map<String, dynamic>))
+        .toList(),
+  );
 }
 
 /// Player state.
@@ -129,6 +144,25 @@ class RommeDigitalPlayerState {
       deadwoodPoints: deadwoodPoints ?? this.deadwoodPoints,
     );
   }
+
+  Map<String, dynamic> toMap() => {
+    'hand': hand.map((c) => c.toMap()).toList(),
+    'melds': melds.map((m) => m.toMap()).toList(),
+    'hasDrawn': hasDrawn,
+    'deadwoodPoints': deadwoodPoints,
+  };
+
+  factory RommeDigitalPlayerState.fromMap(Map<String, dynamic> map) =>
+      RommeDigitalPlayerState(
+        hand: (map['hand'] as List? ?? [])
+            .map((c) => RommeCard.fromMap(c as Map<String, dynamic>))
+            .toList(),
+        melds: (map['melds'] as List? ?? [])
+            .map((m) => RommeMeld.fromMap(m as Map<String, dynamic>))
+            .toList(),
+        hasDrawn: map['hasDrawn'] ?? false,
+        deadwoodPoints: map['deadwoodPoints'] ?? 0,
+      );
 }
 
 /// Full game state.
@@ -178,6 +212,43 @@ class RommeDigitalState {
       totalScores: totalScores ?? this.totalScores,
     );
   }
+
+  Map<String, dynamic> toMap() => {
+    'phase': phase.name,
+    'playerOrder': playerOrder,
+    'playerStates': playerStates.map((k, v) => MapEntry(k, v.toMap())),
+    'drawPile': drawPile.map((c) => c.toMap()).toList(),
+    'discardPile': discardPile.map((c) => c.toMap()).toList(),
+    'currentPlayerId': currentPlayerId,
+    'currentPlayerIndex': currentPlayerIndex,
+    'roundNumber': roundNumber,
+    'totalScores': totalScores,
+  };
+
+  factory RommeDigitalState.fromMap(Map<String, dynamic> map) =>
+      RommeDigitalState(
+        phase: RommeDigitalPhase.values.firstWhere(
+          (e) => e.name == map['phase'],
+          orElse: () => RommeDigitalPhase.setup,
+        ),
+        playerOrder: List<String>.from(map['playerOrder'] ?? []),
+        playerStates: (map['playerStates'] as Map<String, dynamic>? ?? {}).map(
+          (k, v) => MapEntry(
+            k,
+            RommeDigitalPlayerState.fromMap(v as Map<String, dynamic>),
+          ),
+        ),
+        drawPile: (map['drawPile'] as List? ?? [])
+            .map((c) => RommeCard.fromMap(c as Map<String, dynamic>))
+            .toList(),
+        discardPile: (map['discardPile'] as List? ?? [])
+            .map((c) => RommeCard.fromMap(c as Map<String, dynamic>))
+            .toList(),
+        currentPlayerId: map['currentPlayerId'],
+        currentPlayerIndex: map['currentPlayerIndex'] ?? 0,
+        roundNumber: map['roundNumber'] ?? 1,
+        totalScores: Map<String, int>.from(map['totalScores'] ?? {}),
+      );
 }
 
 /// Core Rommé engine.

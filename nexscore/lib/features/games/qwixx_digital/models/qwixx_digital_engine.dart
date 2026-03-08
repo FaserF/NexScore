@@ -34,6 +34,18 @@ class QwixxRowState {
     );
   }
 
+  Map<String, dynamic> toMap() => {
+    'color': color.name,
+    'crossedNumbers': crossedNumbers,
+    'isLocked': isLocked,
+  };
+
+  factory QwixxRowState.fromMap(Map<String, dynamic> map) => QwixxRowState(
+    color: QwixxColor.values.firstWhere((e) => e.name == map['color']),
+    crossedNumbers: List<int>.from(map['crossedNumbers'] ?? []),
+    isLocked: map['isLocked'] ?? false,
+  );
+
   /// Numbers in the row (left to right).
   List<int> get numbers {
     if (color == QwixxColor.red || color == QwixxColor.yellow) {
@@ -87,6 +99,22 @@ class QwixxDigitalPlayerState {
       penalties: penalties ?? this.penalties,
     );
   }
+
+  Map<String, dynamic> toMap() => {
+    'rows': rows.map((k, v) => MapEntry(k.name, v.toMap())),
+    'penalties': penalties,
+  };
+
+  factory QwixxDigitalPlayerState.fromMap(Map<String, dynamic> map) =>
+      QwixxDigitalPlayerState(
+        rows: (map['rows'] as Map<String, dynamic>? ?? {}).map(
+          (k, v) => MapEntry(
+            QwixxColor.values.firstWhere((e) => e.name == k),
+            QwixxRowState.fromMap(v as Map<String, dynamic>),
+          ),
+        ),
+        penalties: map['penalties'] ?? 0,
+      );
 
   /// Initialize fresh rows.
   static QwixxDigitalPlayerState initial() {
@@ -155,6 +183,41 @@ class QwixxDigitalState {
       globalLockedRows: globalLockedRows ?? this.globalLockedRows,
     );
   }
+
+  Map<String, dynamic> toMap() => {
+    'phase': phase.name,
+    'playerOrder': playerOrder,
+    'playerStates': playerStates.map((k, v) => MapEntry(k, v.toMap())),
+    'activePlayerId': activePlayerId,
+    'currentPlayerIndex': currentPlayerIndex,
+    'whiteDice': whiteDice,
+    'colorDice': colorDice,
+    'roundNumber': roundNumber,
+    'globalLockedRows': globalLockedRows.map((e) => e.name).toList(),
+  };
+
+  factory QwixxDigitalState.fromMap(Map<String, dynamic> map) =>
+      QwixxDigitalState(
+        phase: QwixxDigitalPhase.values.firstWhere(
+          (e) => e.name == map['phase'],
+          orElse: () => QwixxDigitalPhase.setup,
+        ),
+        playerOrder: List<String>.from(map['playerOrder'] ?? []),
+        playerStates: (map['playerStates'] as Map<String, dynamic>? ?? {}).map(
+          (k, v) => MapEntry(
+            k,
+            QwixxDigitalPlayerState.fromMap(v as Map<String, dynamic>),
+          ),
+        ),
+        activePlayerId: map['activePlayerId'],
+        currentPlayerIndex: map['currentPlayerIndex'] ?? 0,
+        whiteDice: List<int>.from(map['whiteDice'] ?? [1, 1]),
+        colorDice: List<int>.from(map['colorDice'] ?? [1, 1, 1, 1]),
+        roundNumber: map['roundNumber'] ?? 1,
+        globalLockedRows: (map['globalLockedRows'] as List? ?? [])
+            .map((e) => QwixxColor.values.firstWhere((c) => c.name == e))
+            .toSet(),
+      );
 
   /// White dice sum.
   int get whiteSum => whiteDice[0] + whiteDice[1];

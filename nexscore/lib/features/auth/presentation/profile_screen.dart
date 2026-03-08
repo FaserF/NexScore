@@ -43,9 +43,9 @@ class ProfileScreen extends ConsumerWidget {
               ),
               data: (user) {
                 if (user == null) {
-                  return _SignedOutView(ref: ref);
+                  return const _SignedOutView();
                 }
-                return _SignedInView(user: user, ref: ref);
+                return _SignedInView(user: user);
               },
             ),
           ),
@@ -56,8 +56,7 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 class _SignedOutView extends ConsumerStatefulWidget {
-  const _SignedOutView({required this.ref});
-  final WidgetRef ref;
+  const _SignedOutView();
 
   @override
   ConsumerState<_SignedOutView> createState() => _SignedOutViewState();
@@ -213,21 +212,30 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
   }
 }
 
-class _SignedInView extends StatelessWidget {
-  const _SignedInView({required this.user, required this.ref});
+class _SignedInView extends ConsumerStatefulWidget {
+  const _SignedInView({required this.user});
   final User user;
-  final WidgetRef ref;
+
+  @override
+  ConsumerState<_SignedInView> createState() => _SignedInViewState();
+}
+
+class _SignedInViewState extends ConsumerState<_SignedInView> {
+  bool _isGoogleLoading = false;
+  bool _isGithubLoading = false;
 
   /// Returns true when the current user signed in via GitHub.
   bool get _isGitHubProvider {
-    return user.providerData.any((info) => info.providerId == 'github.com');
+    return widget.user.providerData.any(
+      (info) => info.providerId == 'github.com',
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isGitHub = _isGitHubProvider;
-    final isGuest = user.isAnonymous;
+    final isGuest = widget.user.isAnonymous;
 
     return Padding(
       padding: const EdgeInsets.all(24.0),
@@ -238,10 +246,10 @@ class _SignedInView extends StatelessWidget {
           CircleAvatar(
             radius: 48,
             backgroundColor: isGuest ? Colors.grey.shade200 : null,
-            backgroundImage: !isGuest && user.photoURL != null
-                ? NetworkImage(user.photoURL!)
+            backgroundImage: !isGuest && widget.user.photoURL != null
+                ? NetworkImage(widget.user.photoURL!)
                 : null,
-            child: isGuest || user.photoURL == null
+            child: isGuest || widget.user.photoURL == null
                 ? Icon(isGuest ? Icons.person_outline : Icons.person, size: 48)
                 : null,
           ),
@@ -249,11 +257,14 @@ class _SignedInView extends StatelessWidget {
           Text(
             isGuest
                 ? l10n.get('account_guest')
-                : (user.displayName ?? l10n.get('account_default_name')),
+                : (widget.user.displayName ?? l10n.get('account_default_name')),
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           if (!isGuest)
-            Text(user.email ?? '', style: const TextStyle(color: Colors.grey)),
+            Text(
+              widget.user.email ?? '',
+              style: const TextStyle(color: Colors.grey),
+            ),
           const SizedBox(height: 8),
           Chip(
             label: Text(
@@ -281,6 +292,68 @@ class _SignedInView extends StatelessWidget {
               leading: const Icon(Icons.info_outline, color: Colors.orange),
               title: Text(l10n.get('account_guest_status')),
               subtitle: Text(l10n.get('account_signed_out_body')),
+            ),
+            const SizedBox(height: 32),
+            OutlinedButton.icon(
+              onPressed: _isGoogleLoading || _isGithubLoading
+                  ? null
+                  : () async {
+                      setState(() => _isGoogleLoading = true);
+                      final messenger = ScaffoldMessenger.of(context);
+                      final result = await ref
+                          .read(authServiceProvider)
+                          .signInWithGoogleNative();
+                      if (mounted) setState(() => _isGoogleLoading = false);
+                      result.fold((failure) {
+                        _showError(context, l10n, failure.message, messenger);
+                      }, (_) {});
+                    },
+              icon: _isGoogleLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.login),
+              label: Text(l10n.get('account_sign_in_google')),
+              style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _isGoogleLoading || _isGithubLoading
+                  ? null
+                  : () async {
+                      setState(() => _isGithubLoading = true);
+                      final messenger = ScaffoldMessenger.of(context);
+                      final result = await ref
+                          .read(authServiceProvider)
+                          .signInWithGithub();
+                      if (mounted) setState(() => _isGithubLoading = false);
+                      result.fold(
+                        (failure) {
+                          _showError(context, l10n, failure.message, messenger);
+                        },
+                        (credential) {
+                          // Handle GitHub token persistence if needed
+                          final oauthCred =
+                              credential.credential as OAuthCredential?;
+                          if (oauthCred?.accessToken != null) {
+                            ref
+                                .read(gistSyncServiceProvider)
+                                .setAccessToken(oauthCred!.accessToken!);
+                          }
+                        },
+                      );
+                    },
+              icon: _isGithubLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.code),
+              label: Text(l10n.get('account_sign_in_github')),
+              style: OutlinedButton.styleFrom(minimumSize: const Size(280, 52)),
             ),
           ] else if (isGitHub) ...[
             ListTile(
@@ -375,6 +448,20 @@ class _SignedInView extends StatelessWidget {
           content: Text('Restore from GitHub Gist complete ✓'),
           behavior: SnackBarBehavior.floating,
         ),
+      ),
+    );
+  }
+
+  void _showError(
+    BuildContext context,
+    AppLocalizations l10n,
+    String message,
+    ScaffoldMessengerState messenger,
+  ) {
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l10n.getWith('account_sign_in_error', [message])),
+        backgroundColor: Colors.red,
       ),
     );
   }

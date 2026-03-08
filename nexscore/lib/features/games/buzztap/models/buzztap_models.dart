@@ -110,6 +110,36 @@ class BuzzTapGameState {
     );
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'selectedCategories': selectedCategories.map((e) => e.name).toList(),
+      'playedCards': playedCards.map((e) => e.toJson()).toList(),
+      'playerSips': playerSips,
+      'optimizeForTwoPlayers': optimizeForTwoPlayers,
+      'intensity': intensity.name,
+      'customIntensityMultiplier': customIntensityMultiplier,
+    };
+  }
+
+  factory BuzzTapGameState.fromMap(Map<String, dynamic> map) {
+    return BuzzTapGameState(
+      selectedCategories: (map['selectedCategories'] as List? ?? [])
+          .map((e) => BuzzTapCategory.values.firstWhere((c) => c.name == e))
+          .toList(),
+      playedCards: (map['playedCards'] as List? ?? [])
+          .map((e) => BuzzTapCard.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      playerSips: Map<String, int>.from(map['playerSips'] ?? {}),
+      optimizeForTwoPlayers: map['optimizeForTwoPlayers'] ?? false,
+      intensity: DrinkIntensity.values.firstWhere(
+        (e) => e.name == map['intensity'],
+        orElse: () => DrinkIntensity.normal,
+      ),
+      customIntensityMultiplier:
+          (map['customIntensityMultiplier'] as num? ?? 1.0).toDouble(),
+    );
+  }
+
   BuzzTapCard? get currentCard =>
       playedCards.isNotEmpty ? playedCards.last : null;
 }

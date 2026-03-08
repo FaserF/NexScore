@@ -9,6 +9,7 @@ import '../../../core/theme/widgets/glass_container.dart';
 import '../../../core/utils/app_version.dart';
 import '../../../core/pwa/pwa_prompt.dart' as pwa;
 import '../../../core/theme/widgets/pwa_update_banner.dart';
+import 'widgets/resume_banner.dart';
 
 /// The main game selection screen shown at app start.
 /// Displays all supported games as rich cards with name, icon, and description.
@@ -225,6 +226,7 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
               ),
             ],
           ),
+          const SliverToBoxAdapter(child: ResumeBanner()),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(24, 0, 24, 140),
             sliver: SliverList(

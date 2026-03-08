@@ -72,14 +72,17 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     required String hostAvatarColor,
     int maxPlayers = 10,
   }) async {
+    debugPrint('Multiplayer: hostLobby called for $hostName');
     await _ensureAuth();
     final uid = _uid!;
+    debugPrint('Multiplayer: Auth ensured, uid: $uid');
 
     // Generate unique code
     String roomCode = '';
     bool isUnique = false;
     while (!isUnique) {
       roomCode = _generateRoomCode();
+      debugPrint('Multiplayer: Checking room code uniqueness: $roomCode');
       try {
         final doc = await _firestore
             .collection('lobbies')
@@ -88,10 +91,13 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
             .timeout(const Duration(seconds: 10));
         if (!doc.exists) {
           isUnique = true;
+          debugPrint('Multiplayer: Room code is unique: $roomCode');
         }
       } on TimeoutException {
+        debugPrint('Multiplayer: Timeout while checking room code uniqueness');
         throw Exception('firestore_timeout');
       } catch (e) {
+        debugPrint('Multiplayer: Error checking room code uniqueness: $e');
         rethrow;
       }
     }
@@ -114,12 +120,15 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     );
 
     try {
+      debugPrint('Multiplayer: Setting lobby document for $roomCode');
       await _firestore
           .collection('lobbies')
           .doc(roomCode)
           .set(lobby.toMap())
           .timeout(const Duration(seconds: 10));
+      debugPrint('Multiplayer: Lobby document set successfully');
     } on TimeoutException {
+      debugPrint('Multiplayer: Timeout while setting lobby document');
       throw Exception('firestore_timeout');
     }
     _listenToLobby(roomCode);

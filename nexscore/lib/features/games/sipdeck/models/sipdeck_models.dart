@@ -142,6 +142,48 @@ class SipDeckGameState {
     );
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'activePlayerIds': activePlayerIds,
+      'selectedCategories': selectedCategories.map((e) => e.name).toList(),
+      'disabledTags': disabledTags.map((e) => e.name).toList(),
+      'playedCards': playedCards.map((e) => e.toJson()).toList(),
+      'activeViruses': activeViruses.map((e) => e.toJson()).toList(),
+      'filterMultiplayerOnly': filterMultiplayerOnly,
+      'playerSips': playerSips,
+      'intensity': intensity.name,
+      'customIntensityMultiplier': customIntensityMultiplier,
+      'enableHydrationCards': enableHydrationCards,
+    };
+  }
+
+  factory SipDeckGameState.fromMap(Map<String, dynamic> map) {
+    return SipDeckGameState(
+      activePlayerIds: List<String>.from(map['activePlayerIds'] ?? []),
+      selectedCategories: (map['selectedCategories'] as List? ?? [])
+          .map((e) => SipDeckCategory.values.firstWhere((c) => c.name == e))
+          .toList(),
+      disabledTags: (map['disabledTags'] as List? ?? [])
+          .map((e) => SipDeckTaskTag.values.firstWhere((c) => c.name == e))
+          .toSet(),
+      playedCards: (map['playedCards'] as List? ?? [])
+          .map((e) => SipDeckCard.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      activeViruses: (map['activeViruses'] as List? ?? [])
+          .map((e) => SipDeckCard.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      filterMultiplayerOnly: map['filterMultiplayerOnly'] ?? true,
+      playerSips: Map<String, int>.from(map['playerSips'] ?? {}),
+      intensity: DrinkIntensity.values.firstWhere(
+        (e) => e.name == map['intensity'],
+        orElse: () => DrinkIntensity.normal,
+      ),
+      customIntensityMultiplier:
+          (map['customIntensityMultiplier'] as num? ?? 1.0).toDouble(),
+      enableHydrationCards: map['enableHydrationCards'] ?? true,
+    );
+  }
+
   SipDeckCard? get currentCard =>
       playedCards.isNotEmpty ? playedCards.last : null;
 }

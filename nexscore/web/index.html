@@ -84,76 +84,75 @@
 </head>
 
 <body>
-  <script>
-    // Force CanvasKit renderer for native-like performance on high-refresh rate mobile devices
-    window.flutterWebRenderer = "canvaskit";
-    window.flutterConfiguration = {
-      canvasKitMaximumSurfaces: 1, // Minimize overhead
-      buildTarget: 'wasm',
-    };
+  // We rely on standard flutter_bootstrap.js for configuration now.
+  // Deprecated window.flutterConfiguration and window.flutterWebRenderer removed.
 
-    // PWA Update Detection
-    let newServiceWorker;
-    window.flutterUpdateAvailable = false;
+  // PWA Update Detection
+  let newServiceWorker;
+  window.flutterUpdateAvailable = false;
 
-    window.addEventListener('load', function () {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('flutter_service_worker.js?v=' + new Date().getTime()).then(reg => {
-          reg.addEventListener('updatefound', () => {
-            newServiceWorker = reg.installing;
-            newServiceWorker.addEventListener('statechange', () => {
-              if (newServiceWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('New update available (PWA)');
-                window.flutterUpdateAvailable = true;
-                // Notify Flutter if it's already running and has registered a callback
-                if (window.onFlutterUpdateAvailable) {
-                  window.onFlutterUpdateAvailable();
-                }
-              }
-            });
-          });
-        });
-      }
-    });
+  window.addEventListener('load', function () {
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('flutter_service_worker.js?v=' + new Date().getTime()).then(reg => {
+  reg.addEventListener('updatefound', () => {
+  newServiceWorker = reg.installing;
+  newServiceWorker.addEventListener('statechange', () => {
+  if (newServiceWorker.state === 'installed' && navigator.serviceWorker.controller) {
+  console.log('New update available (PWA)');
+  window.flutterUpdateAvailable = true;
+  // Notify Flutter if it's already running and has registered a callback
+  if (window.onFlutterUpdateAvailable) {
+  window.onFlutterUpdateAvailable();
+  }
+  }
+  });
+  });
+  });
+  }
+  });
 
-    window.flutterReloadApp = () => {
-      if (newServiceWorker) {
-        newServiceWorker.postMessage({ type: 'SKIP_WAITING' });
-      }
-      window.location.reload();
-    };
+  window.flutterReloadApp = () => {
+  if (newServiceWorker) {
+  newServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+  }
+  window.location.reload();
+  };
 
-    // PWA Install Prompt handling
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      deferredPrompt = e;
-      console.log('beforeinstallprompt event captured');
+  // PWA Install Prompt handling
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent the mini-infobar from appearing on mobile
+  e.preventDefault();
+  // Stash the event so it can be triggered later.
+  deferredPrompt = e;
+  console.log('beforeinstallprompt event captured');
 
-      // Notify Flutter if it wants to know when the prompt is ready
-      if (window.onFlutterInstallPromptReady) {
-        window.onFlutterInstallPromptReady();
-      }
-    });
+  // Notify Flutter if it wants to know when the prompt is ready
+  if (window.onFlutterInstallPromptReady) {
+  window.onFlutterInstallPromptReady();
+  }
+  });
 
-    window.flutterCanShowInstallPrompt = () => {
-      // Return true if we're on web and not already standalone
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-      return !isStandalone;
-    };
+  window.flutterCanShowInstallPrompt = () => {
+  // Return true if we're on web and not already standalone
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  return !isStandalone;
+  };
 
-    window.flutterShowInstallPrompt = async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
-        deferredPrompt = null;
-        return outcome === 'accepted';
-      }
-      return false;
-    };
+  window.flutterShowInstallPrompt = function () {
+  return new Promise(function (resolve) {
+  if (deferredPrompt) {
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function (choiceResult) {
+  console.log('User response: ' + choiceResult.outcome);
+  deferredPrompt = null;
+  resolve(choiceResult.outcome === 'accepted');
+  });
+  } else {
+  resolve(false);
+  }
+  });
+  };
   </script>
 
   <!-- Firebase SDKs & Analytics -->

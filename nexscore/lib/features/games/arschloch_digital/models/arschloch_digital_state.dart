@@ -45,6 +45,28 @@ class ArschlochDigitalPlayerState {
       totalPoints: totalPoints ?? this.totalPoints,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'hand': hand.map((e) => e.toMap()).toList(),
+      'currentRank': currentRank?.name,
+      'finishOrder': finishOrder,
+      'totalPoints': totalPoints,
+    };
+  }
+
+  factory ArschlochDigitalPlayerState.fromMap(Map<String, dynamic> map) {
+    return ArschlochDigitalPlayerState(
+      hand: (map['hand'] as List? ?? [])
+          .map((e) => StandardCard.fromMap(e as Map<String, dynamic>))
+          .toList(),
+      currentRank: map['currentRank'] != null
+          ? ArschlochRank.values.firstWhere((e) => e.name == map['currentRank'])
+          : null,
+      finishOrder: map['finishOrder'] ?? 0,
+      totalPoints: map['totalPoints'] ?? 0,
+    );
+  }
 }
 
 /// Full state of the digital Arschloch game.
@@ -100,6 +122,48 @@ class ArschlochDigitalState {
       roundNumber: roundNumber ?? this.roundNumber,
       finishedCount: finishedCount ?? this.finishedCount,
       finishOrder: finishOrder ?? this.finishOrder,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'phase': phase.name,
+      'playerOrder': playerOrder,
+      'playerStates': playerStates.map((k, v) => MapEntry(k, v.toMap())),
+      'currentPile': currentPile.map((e) => e.toMap()).toList(),
+      'currentPileRank': currentPileRank,
+      'currentPileCount': currentPileCount,
+      'currentPlayerId': currentPlayerId,
+      'consecutivePasses': consecutivePasses,
+      'roundNumber': roundNumber,
+      'finishedCount': finishedCount,
+      'finishOrder': finishOrder,
+    };
+  }
+
+  factory ArschlochDigitalState.fromMap(Map<String, dynamic> map) {
+    return ArschlochDigitalState(
+      phase: ArschlochDigitalPhase.values.firstWhere(
+        (e) => e.name == map['phase'],
+        orElse: () => ArschlochDigitalPhase.setup,
+      ),
+      playerOrder: List<String>.from(map['playerOrder'] ?? []),
+      playerStates: (map['playerStates'] as Map<String, dynamic>? ?? {}).map(
+        (k, v) => MapEntry(
+          k,
+          ArschlochDigitalPlayerState.fromMap(v as Map<String, dynamic>),
+        ),
+      ),
+      currentPile: (map['currentPile'] as List? ?? [])
+          .map((e) => StandardCard.fromMap(e as Map<String, dynamic>))
+          .toList(),
+      currentPileRank: map['currentPileRank'] ?? 0,
+      currentPileCount: map['currentPileCount'] ?? 0,
+      currentPlayerId: map['currentPlayerId'],
+      consecutivePasses: map['consecutivePasses'] ?? 0,
+      roundNumber: map['roundNumber'] ?? 0,
+      finishedCount: map['finishedCount'] ?? 0,
+      finishOrder: List<String>.from(map['finishOrder'] ?? []),
     );
   }
 }
