@@ -1,5 +1,5 @@
 # Stage 1: Build Flutter Web application (Optional if pre-built)
-FROM ubuntu:24.04 AS build-env
+FROM ubuntu:24.04@sha256:d1e2e92c075e5ca139d51a140fff46f84315c0fdce203eab2807c7e495eff4f9 AS build-env
 
 # Setup environment variables
 ENV FLUTTER_HOME=/opt/flutter
@@ -29,7 +29,7 @@ RUN if [ -n "$PREBUILT_PATH" ] && [ -d "$PREBUILT_PATH" ]; then \
     fi
 
 # Stage 2: Serve with Nginx (Alpine) - Optimized Runtime
-FROM nginx:1.27-alpine3.20-slim
+FROM nginx:1.27-alpine3.20-slim@sha256:5a56ae385906c5b43ccc99379bce883aa93dc0556d7f705ba501d819925e8fa1
 
 # Copy the Flutter web build output
 COPY --from=build-env /app/build/web /usr/share/nginx/html
