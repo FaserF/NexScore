@@ -318,7 +318,7 @@ class _FactQuestGame extends ConsumerWidget {
 
             // Fact headline
             Text(
-              currentCard.text,
+              l10n.get(currentCard.text),
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w900,
                 height: 1.3,
@@ -338,7 +338,7 @@ class _FactQuestGame extends ConsumerWidget {
                 border: Border.all(color: categoryColor.withValues(alpha: 0.2)),
               ),
               child: Text(
-                currentCard.explanation,
+                l10n.get(currentCard.explanation),
                 style: theme.textTheme.bodyLarge?.copyWith(
                   height: 1.6,
                   color: theme.colorScheme.onSurfaceVariant,

@@ -98,11 +98,9 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.1),
+                      color: Colors.orange.withAlpha(25),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Colors.orange.withValues(alpha: 0.3),
-                      ),
+                      border: Border.all(color: Colors.orange.withAlpha(75)),
                     ),
                     child: const Text(
                       'BETA',
@@ -130,13 +128,13 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
                     decoration: BoxDecoration(
                       color: Theme.of(
                         context,
-                      ).colorScheme.primary.withValues(alpha: 0.1),
+                      ).colorScheme.primary.withAlpha(25),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
                           color: Theme.of(
                             context,
-                          ).colorScheme.primary.withValues(alpha: 0.2),
+                          ).colorScheme.primary.withAlpha(50),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -161,7 +159,7 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
+                          color: Colors.black.withAlpha(12),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -185,7 +183,7 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
+                          color: Colors.black.withAlpha(12),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -229,10 +227,9 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
                             hintText: l10n.get('home_search_games'),
                             prefixIcon: const Icon(Icons.search),
                             filled: true,
-                            fillColor: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerHighest
-                                .withValues(alpha: 0.3),
+                            fillColor: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest.withAlpha(75),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: BorderSide.none,
@@ -437,8 +434,8 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
         route: '/games/volleyball',
         icon: Icons.sports_volleyball,
         color: Colors.orange.shade800,
-        playerCount: '2–12',
-        tag: l10n.get('home_tag_volleyball'),
+        playerCount: '4–12',
+        tag: l10n.get('home_tag_sport'),
       ),
       _GameEntry(
         id: 'generic',

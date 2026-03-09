@@ -10,7 +10,7 @@ class VolleyballStateNotifier extends Notifier<VolleyballGameState> {
   final List<VolleyballGameState> _history = [];
 
   @override
-  VolleyballGameState build() => const VolleyballGameState();
+  VolleyballGameState build() => VolleyballGameState();
 
   void _pushState() {
     _history.add(state);
@@ -31,19 +31,39 @@ class VolleyballStateNotifier extends Notifier<VolleyballGameState> {
     required String teamB,
     required List<String> pA,
     required List<String> pB,
+    int setsToWin = 3,
   }) {
+    _pushState();
+    final rules = type == VolleyballType.indoor
+        ? VolleyballRules.indoor(setsToWin: setsToWin)
+        : VolleyballRules.beach(setsToWin: setsToWin);
+
     state = VolleyballGameState(
       type: type,
+      rules: rules,
       teamAName: teamA,
       teamBName: teamB,
       teamAPlayers: pA,
       teamBPlayers: pB,
-      rules: type == VolleyballType.indoor
-          ? VolleyballRules.indoor()
-          : VolleyballRules.beach(),
-      sets: const [VolleyballSet()],
+      setupDone: true,
     );
-    _history.clear();
+  }
+
+  void finishMatchEarly() {
+    if (state.matchFinished) return;
+    _pushState();
+    state = state.copyWith(matchFinished: true, earlyFinished: true);
+    // TODO: Trigger confetti and sound from UI via a listener or specific event
+  }
+
+  void toggleSides() {
+    _pushState();
+    state = state.copyWith(sidesSwapped: !state.sidesSwapped);
+  }
+
+  void updateTeams(String teamA, String teamB) {
+    _pushState();
+    state = state.copyWith(teamAName: teamA, teamBName: teamB);
   }
 
   void addPoint(String team) {
@@ -175,7 +195,7 @@ class VolleyballStateNotifier extends Notifier<VolleyballGameState> {
 
   void resetGame() {
     _pushState();
-    state = const VolleyballGameState();
+    state = VolleyballGameState();
   }
 
   void updateFromSync(VolleyballGameState newState) {

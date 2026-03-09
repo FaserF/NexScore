@@ -87,7 +87,13 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
   }) async {
     debugPrint('Multiplayer: [Lobby] hostLobby called for $hostName');
 
-    // Diagnostic log of environment
+    // Integrity test requirement: Running connectivity check...
+    debugPrint('Multiplayer: Running connectivity check...');
+    await _firestore
+        .collection('lobbies')
+        .limit(1)
+        .get(const GetOptions(source: Source.serverAndCache))
+        .timeout(const Duration(seconds: 15));
     debugPrint(
       'Multiplayer: [System] Firestore persistence: ${_firestore.settings.persistenceEnabled}',
     );
@@ -182,6 +188,14 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     debugPrint(
       'Multiplayer: [Join] joinLobby called for $roomCode by $playerName',
     );
+
+    // Integrity test requirement: Running connectivity check...
+    debugPrint('Multiplayer: Running connectivity check...');
+    await _firestore
+        .collection('lobbies')
+        .limit(1)
+        .get(const GetOptions(source: Source.serverAndCache))
+        .timeout(const Duration(seconds: 15));
     await _ensureAuth();
     final uid = _uid!;
     roomCode = roomCode.toUpperCase();

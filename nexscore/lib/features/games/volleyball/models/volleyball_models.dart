@@ -18,16 +18,16 @@ class VolleyballRules {
     this.timeoutsPerSet = 2,
   });
 
-  factory VolleyballRules.indoor() => const VolleyballRules(
-    setsToWin: 1,
-    pointsPerSet: 15,
+  factory VolleyballRules.indoor({int setsToWin = 3}) => VolleyballRules(
+    setsToWin: setsToWin,
+    pointsPerSet: 25,
     decidingSetPoints: 15,
     switchSidesEvery: 0,
     timeoutsPerSet: 2,
   );
 
-  factory VolleyballRules.beach() => const VolleyballRules(
-    setsToWin: 2,
+  factory VolleyballRules.beach({int setsToWin = 2}) => VolleyballRules(
+    setsToWin: setsToWin,
     pointsPerSet: 21,
     decidingSetPoints: 15,
     switchSidesEvery: 7,
@@ -155,26 +155,30 @@ class VolleyballGameState {
   final List<String> teamBPlayers;
   final int timeoutsA;
   final int timeoutsB;
+  final bool setupDone;
+  final bool sidesSwapped;
+  final bool earlyFinished;
 
-  const VolleyballGameState({
+  VolleyballGameState({
+    this.type = VolleyballType.indoor,
+    VolleyballRules? rules,
     this.teamAName = 'Team A',
     this.teamBName = 'Team B',
-    this.sets = const [VolleyballSet()],
-    this.type = VolleyballType.indoor,
-    this.rules = const VolleyballRules(
-      setsToWin: 3,
-      pointsPerSet: 25,
-      decidingSetPoints: 15,
-      switchSidesEvery: 0,
-    ),
+    List<String>? teamAPlayers,
+    List<String>? teamBPlayers,
+    List<VolleyballSet>? sets,
     this.currentSetIndex = 0,
     this.matchFinished = false,
     this.server,
-    this.teamAPlayers = const [],
-    this.teamBPlayers = const [],
     this.timeoutsA = 0,
     this.timeoutsB = 0,
-  });
+    this.setupDone = false,
+    this.sidesSwapped = false,
+    this.earlyFinished = false,
+  }) : rules = rules ?? VolleyballRules.indoor(),
+       teamAPlayers = teamAPlayers ?? [],
+       teamBPlayers = teamBPlayers ?? [],
+       sets = sets ?? [VolleyballSet()];
 
   VolleyballSet get currentSet => sets[currentSetIndex];
 
@@ -182,6 +186,36 @@ class VolleyballGameState {
       sets.where((s) => s.isFinished && s.scoreA > s.scoreB).length;
   int get setsWonB =>
       sets.where((s) => s.isFinished && s.scoreB > s.scoreA).length;
+
+  /// Calculates league points based on DVV/FIVB (3-2-1) system.
+  /// 3 points: Win 3-0 or 3-1
+  /// 2 points: Win 3-2
+  /// 1 point: Lose 2-3
+  /// 0 points: Lose 0-3 or 1-3
+  /// For other configurations (e.g. Best of 3):
+  /// Win: 3 points, Lose: 0 points (simplified)
+  (int, int) get leaguePoints {
+    if (!matchFinished && !earlyFinished) return (0, 0);
+
+    final sA = setsWonA;
+    final sB = setsWonB;
+
+    if (rules.setsToWin == 3) {
+      if (sA == 3) {
+        if (sB <= 1) return (3, 0);
+        if (sB == 2) return (2, 1);
+      }
+      if (sB == 3) {
+        if (sA <= 1) return (0, 3);
+        if (sA == 2) return (1, 2);
+      }
+    }
+
+    // Default win/loss points for non-standard or early finish
+    if (sA > sB) return (3, 0);
+    if (sB > sA) return (0, 3);
+    return (0, 0);
+  }
 
   Map<String, dynamic> toJson() => {
     'teamAName': teamAName,
@@ -196,6 +230,9 @@ class VolleyballGameState {
     'teamBPlayers': teamBPlayers,
     'timeoutsA': timeoutsA,
     'timeoutsB': timeoutsB,
+    'setupDone': setupDone,
+    'sidesSwapped': sidesSwapped,
+    'earlyFinished': earlyFinished,
   };
 
   factory VolleyballGameState.fromJson(Map<String, dynamic> json) {
@@ -216,6 +253,9 @@ class VolleyballGameState {
       teamBPlayers: List<String>.from(json['teamBPlayers'] ?? []),
       timeoutsA: json['timeoutsA'] as int? ?? 0,
       timeoutsB: json['timeoutsB'] as int? ?? 0,
+      setupDone: json['setupDone'] as bool? ?? false,
+      sidesSwapped: json['sidesSwapped'] as bool? ?? false,
+      earlyFinished: json['earlyFinished'] as bool? ?? false,
     );
   }
 
@@ -232,6 +272,9 @@ class VolleyballGameState {
     List<String>? teamBPlayers,
     int? timeoutsA,
     int? timeoutsB,
+    bool? setupDone,
+    bool? sidesSwapped,
+    bool? earlyFinished,
   }) {
     return VolleyballGameState(
       teamAName: teamAName ?? this.teamAName,
@@ -246,6 +289,9 @@ class VolleyballGameState {
       teamBPlayers: teamBPlayers ?? this.teamBPlayers,
       timeoutsA: timeoutsA ?? this.timeoutsA,
       timeoutsB: timeoutsB ?? this.timeoutsB,
+      setupDone: setupDone ?? this.setupDone,
+      sidesSwapped: sidesSwapped ?? this.sidesSwapped,
+      earlyFinished: earlyFinished ?? this.earlyFinished,
     );
   }
 
@@ -264,6 +310,8 @@ class VolleyballGameState {
     'server': server,
     'timeoutsA': timeoutsA,
     'timeoutsB': timeoutsB,
+    'setupDone': setupDone,
+    'sidesSwapped': sidesSwapped,
   };
 
   factory VolleyballGameState.fromMap(Map<String, dynamic> map) =>
@@ -282,5 +330,7 @@ class VolleyballGameState {
         server: map['server'],
         timeoutsA: map['timeoutsA'] ?? 0,
         timeoutsB: map['timeoutsB'] ?? 0,
+        setupDone: map['setupDone'] ?? false,
+        sidesSwapped: map['sidesSwapped'] ?? false,
       );
 }
