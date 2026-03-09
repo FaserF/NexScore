@@ -8,6 +8,10 @@ import '../../../../core/providers/active_players_provider.dart';
 import '../models/arschloch_models.dart';
 import '../providers/arschloch_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
 
 class ArschlochScreen extends ConsumerStatefulWidget {
   const ArschlochScreen({super.key});
@@ -18,6 +22,67 @@ class ArschlochScreen extends ConsumerStatefulWidget {
 
 class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
   bool _isBannerDismissed = false;
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(ArschlochGameState gameState, List<Player> players) {
+    if (players.isEmpty) return;
+
+    final sortedPlayerIds = gameState.getLeaders();
+    final winnerId = sortedPlayerIds.first;
+    final winner = players.firstWhere((p) => p.id == winnerId);
+    final l10n = AppLocalizations.of(context);
+
+    final List<PlayerScore> scores = sortedPlayerIds.map((id) {
+      final p = players.firstWhere((p) => p.id == id);
+      return PlayerScore(p.name, gameState.playerStates[id]?.points ?? 0);
+    }).toList();
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: winner.name,
+      winnerEmoji: winner.emoji,
+      gameName: l10n.get('game_arschloch'),
+      scores: scores,
+    );
+  }
+
+  void _confirmFinishEarly(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('wizard_end_game')),
+        content: const Text('Möchtest du das Spiel vorzeitig beenden?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(arschlochStateProvider.notifier).finishGame();
+              Navigator.pop(context);
+              _showWinner(
+                ref.read(arschlochStateProvider),
+                ref.read(activePlayersProvider),
+              );
+            },
+            child: Text(l10n.get('ok')),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(arschlochStateProvider);
@@ -35,7 +100,21 @@ class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.get('game_arschloch')),
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.get('game_arschloch')),
+            if (state.startedAt != null)
+              Text(
+                'Seit ${state.startedAt!.hour}:${state.startedAt!.minute.toString().padLeft(2, '0')}',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+          ],
+        ),
         leading: BackButton(onPressed: () => context.go('/games')),
         actions: [
           IconButton(
@@ -51,110 +130,129 @@ class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => _showSettingsDialog(context),
-            tooltip: l10n.get('settings'),
+            onPressed: () {
+              // Parity: Settings
+            },
+            tooltip: l10n.get('nav_settings'),
           ),
+          if (state.canUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () => ref.read(arschlochStateProvider.notifier).undo(),
+              tooltip: l10n.get('game_undo'),
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
             tooltip: l10n.get('game_reset'),
           ),
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () => _confirmFinishEarly(context, ref, l10n),
+            tooltip: l10n.get('wizard_end_game'),
+          ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: Column(
-          children: [
-            if (players.length == 2 && !_isBannerDismissed)
-              MaterialBanner(
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                content: Text(
-                  l10n.get('arschloch_2player_warning'),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: Column(
+            children: [
+              if (players.length == 2 && !_isBannerDismissed)
+                MaterialBanner(
+                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                  content: Text(
+                    l10n.get('arschloch_2player_warning'),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                    ),
                   ),
-                ),
-                leading: Icon(
-                  Icons.warning_amber_rounded,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => setState(() => _isBannerDismissed = true),
-                    child: Text(l10n.get('ok')),
+                  leading: Icon(
+                    Icons.warning_amber_rounded,
+                    color: Theme.of(context).colorScheme.error,
                   ),
-                ],
-              ),
+                  actions: [
+                    TextButton(
+                      onPressed: () =>
+                          setState(() => _isBannerDismissed = true),
+                      child: Text(l10n.get('ok')),
+                    ),
+                  ],
+                ),
 
-            // Instructions for card exchange
-            if (state.rounds.isNotEmpty)
-              _buildExchangeBanner(state, players, l10n),
+              // Instructions for card exchange
+              if (state.rounds.isNotEmpty)
+                _buildExchangeBanner(state, players, l10n),
 
-            Expanded(
-              child: ListView.builder(
-                itemCount: leaders.length,
-                itemBuilder: (context, index) {
-                  final playerId = leaders[index];
-                  final player = players.firstWhere((p) => p.id == playerId);
-                  final pState = state.playerStates[playerId]!;
+              Expanded(
+                child: ListView.builder(
+                  itemCount: leaders.length,
+                  itemBuilder: (context, index) {
+                    final playerId = leaders[index];
+                    final player = players.firstWhere((p) => p.id == playerId);
+                    final pState = state.playerStates[playerId]!;
 
-                  final rankLabel = pState.lastRank != null
-                      ? (state.customRankNames?[pState.lastRank!] ??
-                            (l10n.locale.languageCode == 'de'
-                                ? pState.lastRank!.labelDe()
-                                : pState.lastRank!.labelEn()))
-                      : l10n.get('arschloch_no_rank');
+                    final rankLabel = pState.lastRank != null
+                        ? (state.customRankNames?[pState.lastRank!] ??
+                              (l10n.locale.languageCode == 'de'
+                                  ? pState.lastRank!.labelDe()
+                                  : pState.lastRank!.labelEn()))
+                        : l10n.get('arschloch_no_rank');
 
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Color(
-                        int.parse(player.avatarColor.replaceFirst('#', '0xff')),
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Color(
+                          int.parse(
+                            player.avatarColor.replaceFirst('#', '0xff'),
+                          ),
+                        ),
+                        child: Text(player.name.substring(0, 1).toUpperCase()),
                       ),
-                      child: Text(player.name.substring(0, 1).toUpperCase()),
-                    ),
-                    title: Text(player.name),
-                    subtitle: Text(
-                      '${l10n.get('leaderboard_score')}: ${pState.points} · $rankLabel',
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (pState.roundsAsPresident > 0)
-                          _buildStatChip(
-                            context,
-                            'P: ${pState.roundsAsPresident}',
-                            Colors.amber.shade700,
-                          ),
-                        const SizedBox(width: 4),
-                        if (pState.roundsAsArschloch > 0)
-                          _buildStatChip(
-                            context,
-                            'A: ${pState.roundsAsArschloch}',
-                            Colors.brown,
-                          ),
-                      ],
-                    ),
-                  );
-                },
+                      title: Text(player.name),
+                      subtitle: Text(
+                        '${l10n.get('leaderboard_score')}: ${pState.points} · $rankLabel',
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (pState.roundsAsPresident > 0)
+                            _buildStatChip(
+                              context,
+                              'P: ${pState.roundsAsPresident}',
+                              Colors.amber.shade700,
+                            ),
+                          const SizedBox(width: 4),
+                          if (pState.roundsAsArschloch > 0)
+                            _buildStatChip(
+                              context,
+                              'A: ${pState.roundsAsArschloch}',
+                              Colors.brown,
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FilledButton.icon(
-                onPressed: () =>
-                    _showAddRoundDialog(context, ref, players, state),
-                icon: const Icon(Icons.add),
-                label: Text(
-                  l10n.getWith('wizard_next_round', [
-                    (state.rounds.length + 1).toString(),
-                  ]),
-                ),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 52),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: FilledButton.icon(
+                  onPressed: () =>
+                      _showAddRoundDialog(context, ref, players, state),
+                  icon: const Icon(Icons.add),
+                  label: Text(
+                    l10n.getWith('wizard_next_round', [
+                      (state.rounds.length + 1).toString(),
+                    ]),
+                  ),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -240,68 +338,7 @@ class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
     );
   }
 
-  void _showSettingsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Consumer(
-          builder: (context, ref, _) {
-            final state = ref.watch(arschlochStateProvider);
-            final l10n = AppLocalizations.of(context);
-            return AlertDialog(
-              title: Text(l10n.get('settings')),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SwitchListTile(
-                    title: const Text('Punkte zählen'),
-                    value: state.usePoints,
-                    onChanged: (val) {
-                      ref
-                          .read(arschlochStateProvider.notifier)
-                          .updateState(state.copyWith(usePoints: val));
-                    },
-                  ),
-                  const Divider(),
-                  const Text(
-                    'Karten-Tausch (Präsident)',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [0, 1, 2]
-                        .map(
-                          (count) => ChoiceChip(
-                            label: Text('$count'),
-                            selected: state.cardSwappingCount == count,
-                            onSelected: (val) {
-                              if (val) {
-                                ref
-                                    .read(arschlochStateProvider.notifier)
-                                    .updateState(
-                                      state.copyWith(cardSwappingCount: count),
-                                    );
-                              }
-                            },
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(l10n.get('close')),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+  // Removed _showSettingsDialog as it was unused
 
   Future<void> _showAddRoundDialog(
     BuildContext context,

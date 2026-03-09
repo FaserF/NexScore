@@ -12,11 +12,10 @@ class KniffelStateNotifier extends Notifier<KniffelGameState> {
     if (_history.length > 20) _history.removeAt(0);
   }
 
-  bool get canUndo => _history.isNotEmpty;
-
   void undo() {
     if (_history.isNotEmpty) {
       state = _history.removeLast();
+      state = state.copyWith(canUndo: _history.isNotEmpty);
     }
   }
 
@@ -26,6 +25,7 @@ class KniffelStateNotifier extends Notifier<KniffelGameState> {
       playerSheets: {
         for (final id in playerIds) id: const YahtzeePlayerSheet(),
       },
+      canUndo: _history.isNotEmpty,
     );
   }
 
@@ -36,7 +36,10 @@ class KniffelStateNotifier extends Notifier<KniffelGameState> {
     final newScores = Map<YahtzeeCategory, int>.from(sheet.scores);
     newScores[category] = value;
     updatedMap[playerId] = sheet.copyWith(scores: newScores);
-    state = state.copyWith(playerSheets: updatedMap);
+    state = state.copyWith(
+      playerSheets: updatedMap,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void updateBonus(String playerId, int value) {
@@ -44,11 +47,14 @@ class KniffelStateNotifier extends Notifier<KniffelGameState> {
     final updatedMap = Map<String, YahtzeePlayerSheet>.from(state.playerSheets);
     final sheet = updatedMap[playerId] ?? const YahtzeePlayerSheet();
     updatedMap[playerId] = sheet.copyWith(bonusYahtzees: value);
-    state = state.copyWith(playerSheets: updatedMap);
+    state = state.copyWith(
+      playerSheets: updatedMap,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void resetGame() {
-    _pushState();
+    _history.clear();
     state = const KniffelGameState();
   }
 }

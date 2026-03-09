@@ -95,6 +95,12 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
           title: Text(l10n.get('qwixx_title')),
           leading: BackButton(onPressed: () => context.go('/games')),
           actions: [
+            if (gameState.canUndo)
+              IconButton(
+                icon: const Icon(Icons.undo),
+                onPressed: () => ref.read(qwixxStateProvider.notifier).undo(),
+                tooltip: l10n.get('game_undo'),
+              ),
             IconButton(
               icon: const Icon(Icons.emoji_events, color: Colors.amber),
               onPressed: () => _showWinner(gameState.sheets, players),
@@ -121,16 +127,15 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
                   _showVariantDialog(context, ref, gameState.variant, l10n),
               tooltip: l10n.get('game_settings'),
             ),
-            if (ref.watch(qwixxStateProvider.notifier).canUndo)
-              IconButton(
-                icon: const Icon(Icons.undo),
-                onPressed: () => ref.read(qwixxStateProvider.notifier).undo(),
-                tooltip: l10n.get('game_undo'),
-              ),
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => _confirmReset(context, ref, l10n),
               tooltip: l10n.get('game_reset'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () => context.go('/games'),
+              tooltip: l10n.get('finishGame'),
             ),
           ],
           bottom: TabBar(

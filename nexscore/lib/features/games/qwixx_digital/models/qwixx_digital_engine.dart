@@ -147,6 +147,9 @@ class QwixxDigitalState {
   final List<int> colorDice; // 4 color dice values (red, yellow, green, blue)
   final int roundNumber;
   final Set<QwixxColor> globalLockedRows; // Rows locked by any player
+  final DateTime? startedAt;
+  final DateTime? endedAt;
+  final bool canUndo;
 
   const QwixxDigitalState({
     this.phase = QwixxDigitalPhase.setup,
@@ -158,6 +161,9 @@ class QwixxDigitalState {
     this.colorDice = const [1, 1, 1, 1],
     this.roundNumber = 1,
     this.globalLockedRows = const {},
+    this.startedAt,
+    this.endedAt,
+    this.canUndo = false,
   });
 
   QwixxDigitalState copyWith({
@@ -170,6 +176,9 @@ class QwixxDigitalState {
     List<int>? colorDice,
     int? roundNumber,
     Set<QwixxColor>? globalLockedRows,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    bool? canUndo,
   }) {
     return QwixxDigitalState(
       phase: phase ?? this.phase,
@@ -181,6 +190,9 @@ class QwixxDigitalState {
       colorDice: colorDice ?? this.colorDice,
       roundNumber: roundNumber ?? this.roundNumber,
       globalLockedRows: globalLockedRows ?? this.globalLockedRows,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -194,6 +206,9 @@ class QwixxDigitalState {
     'colorDice': colorDice,
     'roundNumber': roundNumber,
     'globalLockedRows': globalLockedRows.map((e) => e.name).toList(),
+    'startedAt': startedAt?.toIso8601String(),
+    'endedAt': endedAt?.toIso8601String(),
+    'canUndo': canUndo,
   };
 
   factory QwixxDigitalState.fromMap(Map<String, dynamic> map) =>
@@ -217,6 +232,11 @@ class QwixxDigitalState {
         globalLockedRows: (map['globalLockedRows'] as List? ?? [])
             .map((e) => QwixxColor.values.firstWhere((c) => c.name == e))
             .toSet(),
+        startedAt: map['startedAt'] != null
+            ? DateTime.parse(map['startedAt'])
+            : null,
+        endedAt: map['endedAt'] != null ? DateTime.parse(map['endedAt']) : null,
+        canUndo: map['canUndo'] as bool? ?? false,
       );
 
   /// White dice sum.

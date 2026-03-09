@@ -16,11 +16,10 @@ class WayQuestStateNotifier extends Notifier<WayQuestGameState> {
     if (_history.length > 20) _history.removeAt(0);
   }
 
-  bool get canUndo => _history.isNotEmpty;
-
   void undo() {
     if (_history.isNotEmpty) {
       state = _history.removeLast();
+      state = state.copyWith(canUndo: _history.isNotEmpty);
     }
   }
 
@@ -32,7 +31,10 @@ class WayQuestStateNotifier extends Notifier<WayQuestGameState> {
     } else {
       cats.add(cat);
     }
-    state = state.copyWith(selectedCategories: cats);
+    state = state.copyWith(
+      selectedCategories: cats,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
@@ -86,17 +88,32 @@ class WayQuestStateNotifier extends Notifier<WayQuestGameState> {
       minPlayers: card.minPlayers,
     );
 
-    state = state.copyWith(playedCards: [...state.playedCards, hydratedCard]);
+    state = state.copyWith(
+      playedCards: [...state.playedCards, hydratedCard],
+      canUndo: _history.isNotEmpty,
+      startedAt: state.startedAt ?? DateTime.now(),
+    );
   }
 
   void resetGame() {
+    _history.clear();
+    state = const WayQuestGameState();
+  }
+
+  void finishGame() {
     _pushState();
-    state = state.copyWith(playedCards: []);
+    state = state.copyWith(
+      endedAt: DateTime.now(),
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void initPlayers(List<String> playerIds) {
     _pushState();
-    state = state.copyWith(activePlayerIds: playerIds);
+    state = state.copyWith(
+      activePlayerIds: playerIds,
+      canUndo: _history.isNotEmpty,
+    );
   }
 }
 

@@ -88,15 +88,23 @@ class YahtzeePlayerSheet {
 
 class KniffelGameState {
   final Map<String, YahtzeePlayerSheet> playerSheets;
+  final bool canUndo;
 
-  const KniffelGameState({this.playerSheets = const {}});
+  const KniffelGameState({this.playerSheets = const {}, this.canUndo = false});
 
-  KniffelGameState copyWith({Map<String, YahtzeePlayerSheet>? playerSheets}) {
-    return KniffelGameState(playerSheets: playerSheets ?? this.playerSheets);
+  KniffelGameState copyWith({
+    Map<String, YahtzeePlayerSheet>? playerSheets,
+    bool? canUndo,
+  }) {
+    return KniffelGameState(
+      playerSheets: playerSheets ?? this.playerSheets,
+      canUndo: canUndo ?? this.canUndo,
+    );
   }
 
   Map<String, dynamic> toJson() => {
     'playerSheets': playerSheets.map((k, v) => MapEntry(k, v.toJson())),
+    'canUndo': canUndo,
   };
 
   factory KniffelGameState.fromJson(Map<String, dynamic> json) {
@@ -104,6 +112,7 @@ class KniffelGameState {
       playerSheets: (json['playerSheets'] as Map<String, dynamic>).map(
         (k, v) => MapEntry(k, YahtzeePlayerSheet.fromJson(v)),
       ),
+      canUndo: json['canUndo'] as bool? ?? false,
     );
   }
 }

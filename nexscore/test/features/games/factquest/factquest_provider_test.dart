@@ -227,9 +227,9 @@ void main() {
         notifier.toggleCategory(FactQuestCategory.randomFacts);
       }
       // No crash, and we can still undo
-      expect(notifier.canUndo, isTrue);
+      expect(container.read(factQuestStateProvider).canUndo, isTrue);
       notifier.undo();
-      expect(notifier.canUndo, isTrue);
+      expect(container.read(factQuestStateProvider).canUndo, isTrue);
     });
   });
 }

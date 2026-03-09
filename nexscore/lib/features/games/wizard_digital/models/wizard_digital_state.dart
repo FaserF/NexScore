@@ -54,6 +54,9 @@ class WizardDigitalState {
   final List<Trick> completedTricks;
 
   final WizardPhase phase;
+  final bool canUndo;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
 
   const WizardDigitalState({
     this.currentRound = 1,
@@ -70,6 +73,9 @@ class WizardDigitalState {
     this.currentTrick = const Trick(),
     this.completedTricks = const [],
     this.phase = WizardPhase.setup,
+    this.canUndo = false,
+    this.startedAt,
+    this.endedAt,
   });
 
   WizardDigitalState copyWith({
@@ -87,6 +93,9 @@ class WizardDigitalState {
     Trick? currentTrick,
     List<Trick>? completedTricks,
     WizardPhase? phase,
+    bool? canUndo,
+    DateTime? startedAt,
+    DateTime? endedAt,
   }) {
     return WizardDigitalState(
       currentRound: currentRound ?? this.currentRound,
@@ -103,6 +112,9 @@ class WizardDigitalState {
       currentTrick: currentTrick ?? this.currentTrick,
       completedTricks: completedTricks ?? this.completedTricks,
       phase: phase ?? this.phase,
+      canUndo: canUndo ?? this.canUndo,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
     );
   }
 
@@ -124,6 +136,9 @@ class WizardDigitalState {
       'currentTrick': currentTrick.toMap(),
       'completedTricks': completedTricks.map((t) => t.toMap()).toList(),
       'phase': phase.name,
+      'canUndo': canUndo,
+      'startedAt': startedAt?.toIso8601String(),
+      'endedAt': endedAt?.toIso8601String(),
     };
   }
 
@@ -161,6 +176,13 @@ class WizardDigitalState {
         (e) => e.name == map['phase'],
         orElse: () => WizardPhase.setup,
       ),
+      canUndo: map['canUndo'] as bool? ?? false,
+      startedAt: map['startedAt'] != null
+          ? DateTime.parse(map['startedAt'] as String)
+          : null,
+      endedAt: map['endedAt'] != null
+          ? DateTime.parse(map['endedAt'] as String)
+          : null,
     );
   }
 }

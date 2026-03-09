@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/providers/active_players_provider.dart';
+import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../models/phase10_digital_engine.dart';
 import '../providers/phase10_digital_provider.dart';
@@ -21,11 +22,30 @@ class _Phase10DigitalScreenState extends ConsumerState<Phase10DigitalScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(phase10DigitalProvider);
     final players = ref.watch(activePlayersProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Digital Phase 10'),
         leading: BackButton(onPressed: () => context.go('/games')),
+        actions: [
+          if (state.canUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () => ref.read(phase10DigitalProvider.notifier).undo(),
+              tooltip: l10n.get('game_undo'),
+            ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () => context.go('/games'),
+            tooltip: l10n.get('finishGame'),
+          ),
+        ],
       ),
       body: MultiplayerClientOverlay(
         child: _buildContent(context, state, players),
@@ -539,11 +559,38 @@ class _Phase10DigitalScreenState extends ConsumerState<Phase10DigitalScreen> {
   Color _cardColor(Phase10Card card) {
     if (card.isWild) return Colors.purple;
     if (card.isSkip) return Colors.grey;
-    return [
-      Colors.red,
-      Colors.blue,
-      Colors.green,
-      Colors.amber.shade700,
-    ][card.colorIndex];
+    return [Colors.red, Colors.blue, Colors.green, Colors.amber.shade700][card
+        .colorIndex
+        .clamp(0, 3)];
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(phase10DigitalProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

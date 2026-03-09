@@ -114,22 +114,38 @@ class SchafkopfGameState {
   final List<SchafkopfRound> rounds;
   final double stock; // Pot in Euro
   final int bockRoundsRemaining;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
+  final bool setupDone;
+  final bool canUndo;
 
   const SchafkopfGameState({
     this.rounds = const [],
     this.stock = 0.0,
     this.bockRoundsRemaining = 0,
+    this.startedAt,
+    this.endedAt,
+    this.setupDone = false,
+    this.canUndo = false,
   });
 
   SchafkopfGameState copyWith({
     List<SchafkopfRound>? rounds,
     double? stock,
     int? bockRoundsRemaining,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    bool? setupDone,
+    bool? canUndo,
   }) {
     return SchafkopfGameState(
       rounds: rounds ?? this.rounds,
       stock: stock ?? this.stock,
       bockRoundsRemaining: bockRoundsRemaining ?? this.bockRoundsRemaining,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      setupDone: setupDone ?? this.setupDone,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -146,6 +162,7 @@ class SchafkopfGameState {
     'rounds': rounds.map((e) => e.toJson()).toList(),
     'stock': stock,
     'bockRoundsRemaining': bockRoundsRemaining,
+    'canUndo': canUndo,
   };
 
   factory SchafkopfGameState.fromJson(Map<String, dynamic> json) {
@@ -155,6 +172,7 @@ class SchafkopfGameState {
           .toList(),
       stock: (json['stock'] as num?)?.toDouble() ?? 0.0,
       bockRoundsRemaining: json['bockRoundsRemaining'] as int? ?? 0,
+      canUndo: json['canUndo'] as bool? ?? false,
     );
   }
 }

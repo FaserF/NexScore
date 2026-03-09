@@ -15,6 +15,7 @@ import '../../../core/pwa/pwa_prompt.dart' as pwa;
 import '../../../core/pwa/pwa_install_dialog.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../../core/utils/app_logger.dart';
+import '../../../core/sync/local_backup_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -317,6 +318,133 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   const SizedBox(height: 24),
                 ],
+                _SectionHeader(title: l10n.get('backup_local_section')),
+                GlassContainer(
+                  borderRadius: 24,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.upload_file,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        title: Text(
+                          l10n.get('backup_local_export'),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle:
+                            settings.lastBackupTime != null &&
+                                settings.lastBackupProvider == 'local'
+                            ? Text(
+                                '${l10n.get('last_backup')}: ${settings.lastBackupTime!.day}.${settings.lastBackupTime!.month}.${settings.lastBackupTime!.year}',
+                                style: const TextStyle(fontSize: 11),
+                              )
+                            : null,
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () async {
+                          final messenger = ScaffoldMessenger.of(context);
+                          try {
+                            await ref
+                                .read(localBackupServiceProvider)
+                                .exportBackup();
+                            if (context.mounted) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.get('backup_local_export_success'),
+                                  ),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.getWith('backup_local_import_error', [
+                                      e.toString(),
+                                    ]),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.tertiary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.download_for_offline,
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ),
+                        ),
+                        title: Text(
+                          l10n.get('backup_local_import'),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () async {
+                          final messenger = ScaffoldMessenger.of(context);
+                          try {
+                            final success = await ref
+                                .read(localBackupServiceProvider)
+                                .importBackup();
+                            if (success && context.mounted) {
+                              // Invalidate players and sessions to refresh UI
+                              ref.invalidate(playersProvider);
+                              ref.invalidate(sessionsProvider);
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.get('backup_local_import_success'),
+                                  ),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.getWith('backup_local_import_error', [
+                                      e.toString(),
+                                    ]),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
                 _SectionHeader(title: l10n.get('settings_debug_mode')),
                 GlassContainer(
                   borderRadius: 24,

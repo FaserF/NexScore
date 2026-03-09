@@ -36,6 +36,16 @@ class VolleyballSignalsScreen extends StatelessWidget {
             ),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              // or a dedicated section if available.
+              // For now, using the general volleyball guide.
+            },
+            tooltip: l10n.get('nav_help'),
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(

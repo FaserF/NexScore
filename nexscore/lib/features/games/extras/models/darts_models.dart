@@ -180,12 +180,14 @@ class DartsGameState {
   final int targetScore; // usually 301 or 501
   final DartsFinishType finishType;
   final DartsStartType startType;
+  final bool canUndo;
 
   const DartsGameState({
     this.playerStates = const {},
     this.targetScore = 301,
     this.finishType = DartsFinishType.double,
     this.startType = DartsStartType.straight,
+    this.canUndo = false,
   });
 
   DartsGameState copyWith({
@@ -193,12 +195,14 @@ class DartsGameState {
     int? targetScore,
     DartsFinishType? finishType,
     DartsStartType? startType,
+    bool? canUndo,
   }) {
     return DartsGameState(
       playerStates: playerStates ?? this.playerStates,
       targetScore: targetScore ?? this.targetScore,
       finishType: finishType ?? this.finishType,
       startType: startType ?? this.startType,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -207,6 +211,7 @@ class DartsGameState {
     'targetScore': targetScore,
     'finishType': finishType.name,
     'startType': startType.name,
+    'canUndo': canUndo,
   };
 
   factory DartsGameState.fromJson(Map<String, dynamic> json) {
@@ -228,6 +233,7 @@ class DartsGameState {
         (e) => e.name == json['startType'],
         orElse: () => DartsStartType.straight,
       ),
+      canUndo: json['canUndo'] ?? false,
     );
   }
 }

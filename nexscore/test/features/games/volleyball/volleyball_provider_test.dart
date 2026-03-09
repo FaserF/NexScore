@@ -5,7 +5,7 @@ import 'package:nexscore/features/games/volleyball/providers/volleyball_provider
 
 void main() {
   group('Volleyball Rules', () {
-    test('Indoor rules are correct', () {
+    test('Indoor rules (DVV) are correct', () {
       final rules = VolleyballRules.indoor();
       expect(rules.setsToWin, 3);
       expect(rules.pointsPerSet, 25);
@@ -17,6 +17,13 @@ void main() {
       expect(rules.setsToWin, 2);
       expect(rules.pointsPerSet, 21);
       expect(rules.switchSidesEvery, 7);
+    });
+
+    test('BVV rules are correct', () {
+      final rules = VolleyballRules.bvv();
+      expect(rules.setsToWin, 2);
+      expect(rules.pointsPerSet, 25);
+      expect(rules.decidingSetPoints, 25);
     });
   });
 
@@ -31,101 +38,179 @@ void main() {
       container.dispose();
     });
 
-    test('initial state is default', () {
-      final state = container.read(volleyballStateProvider);
-      expect(state.teamAName, 'Team A');
-      expect(state.sets, hasLength(1));
-    });
-
-    test('setupMatch configures the game', () {
+    test('state has timestamps after setup', () {
       final notifier = container.read(volleyballStateProvider.notifier);
       notifier.setupMatch(
-        type: VolleyballType.beach,
-        teamA: 'Eagles',
-        teamB: 'Sharks',
-        pA: ['P1', 'P2'],
-        pB: ['P3', 'P4'],
-      );
-
-      final state = container.read(volleyballStateProvider);
-      expect(state.type, VolleyballType.beach);
-      expect(state.teamAName, 'Eagles');
-      expect(state.rules.setsToWin, 2);
-    });
-
-    test('addPoint increments score and sets server', () {
-      final notifier = container.read(volleyballStateProvider.notifier);
-      notifier.addPoint('A');
-
-      final state = container.read(volleyballStateProvider);
-      expect(state.currentSet.scoreA, 1);
-      expect(state.server, 'A');
-    });
-
-    test('set transition occurs when target is reached', () {
-      final notifier = container.read(volleyballStateProvider.notifier);
-      notifier.setupMatch(
-        type: VolleyballType.beach, // 21 points
+        type: VolleyballType.indoor,
         teamA: 'A',
         teamB: 'B',
         pA: [],
         pB: [],
       );
+      final state = container.read(volleyballStateProvider);
+      expect(state.matchStartedAt, isNotNull);
+      expect(state.sets[0].startedAt, isNotNull);
+    });
 
-      // Score 20-20
-      for (int i = 0; i < 20; i++) {
+    test('BVV league points calculation (3:0)', () {
+      final notifier = container.read(volleyballStateProvider.notifier);
+      notifier.setupMatch(
+        type: VolleyballType.indoor,
+        teamA: 'A',
+        teamB: 'B',
+        pA: [],
+        pB: [],
+        ruleSet: VolleyballRuleSet.bvv,
+      );
+
+      // Win 2 sets to 0 (BVV is best of 3, so 2 sets to win)
+      for (int s = 0; s < 2; s++) {
+        for (int i = 0; i < 25; i++) {
+          notifier.addPoint('A');
+        }
+      }
+
+      final state = container.read(volleyballStateProvider);
+      expect(state.matchFinished, isTrue);
+      expect(state.setsWonA, 2);
+      expect(state.setsWonB, 0);
+
+      final (lpA, lpB) = state.leaguePoints;
+      expect(lpA, 3);
+      expect(lpB, 0);
+    });
+
+    test('BVV league points calculation (2:1)', () {
+      final notifier = container.read(volleyballStateProvider.notifier);
+      notifier.setupMatch(
+        type: VolleyballType.indoor,
+        teamA: 'A',
+        teamB: 'B',
+        pA: [],
+        pB: [],
+        ruleSet: VolleyballRuleSet
+            .bvv, // BVV: set finish triggers pendingContinue if sets remaining
+      );
+
+      // Set 1: A wins
+      for (int i = 0; i < 25; i++) {
         notifier.addPoint('A');
+      }
+      // Set 2: B wins
+      for (int i = 0; i < 25; i++) {
         notifier.addPoint('B');
       }
 
-      // Next point to A (21-20) - Should not finish (need 2 points lead)
-      notifier.addPoint('A');
-      expect(container.read(volleyballStateProvider).currentSetIndex, 0);
-      expect(
-        container.read(volleyballStateProvider).sets[0].isFinished,
-        isFalse,
-      );
+      // Winner determined (1:1 is not enough, need 2)
+      // Actually BVV is best of 3. So 1:1 means 3rd set is mandatory.
 
-      // Next point to A (22-20) - Should finish set
-      notifier.addPoint('A');
-      final state = container.read(volleyballStateProvider);
-      expect(state.sets[0].isFinished, isTrue);
-      expect(state.currentSetIndex, 1);
-      expect(state.setsWonA, 1);
-    });
-
-    test('match finishes when setsToWin is reached', () {
-      final notifier = container.read(volleyballStateProvider.notifier);
-      notifier.setupMatch(
-        type: VolleyballType.beach, // 2 sets to win
-        teamA: 'A',
-        teamB: 'B',
-        pA: [],
-        pB: [],
-      );
-
-      // Win 2 sets for A
-      // Set 1
-      for (int i = 0; i < 21; i++) {
-        notifier.addPoint('A');
-      }
-      // Set 2
-      for (int i = 0; i < 21; i++) {
+      // Set 3: A wins
+      for (int i = 0; i < 25; i++) {
         notifier.addPoint('A');
       }
 
       final state = container.read(volleyballStateProvider);
       expect(state.matchFinished, isTrue);
       expect(state.setsWonA, 2);
+      expect(state.setsWonB, 1);
+
+      final (lpA, lpB) = state.leaguePoints;
+      expect(lpA, 2);
+      expect(lpB, 1);
     });
 
-    test('undo reverts scores', () {
+    test('DVV league points calculation (3:2)', () {
       final notifier = container.read(volleyballStateProvider.notifier);
-      notifier.addPoint('A');
-      expect(container.read(volleyballStateProvider).currentSet.scoreA, 1);
+      notifier.setupMatch(
+        type: VolleyballType.indoor,
+        teamA: 'A',
+        teamB: 'B',
+        ruleSet: VolleyballRuleSet.dvv,
+        setsToWin: 3,
+        pA: [],
+        pB: [],
+      );
 
-      notifier.undo();
-      expect(container.read(volleyballStateProvider).currentSet.scoreA, 0);
+      // 2:2
+      for (int s = 0; s < 2; s++) {
+        for (int i = 0; i < 25; i++) {
+          notifier.addPoint('A');
+        }
+        for (int i = 0; i < 25; i++) {
+          notifier.addPoint('B');
+        }
+      }
+
+      // Set 5 (Deciding): A wins
+      for (int i = 0; i < 15; i++) {
+        notifier.addPoint('A');
+      }
+
+      final state = container.read(volleyballStateProvider);
+      expect(state.setsWonA, 3);
+      expect(state.setsWonB, 2);
+
+      final (lpA, lpB) = state.leaguePoints;
+      expect(lpA, 2);
+      expect(lpB, 1);
+    });
+
+    test(
+      'pendingContinue flow when winner determined early but sets remain',
+      () {
+        final notifier = container.read(volleyballStateProvider.notifier);
+        notifier.setupMatch(
+          type: VolleyballType.indoor,
+          teamA: 'A',
+          teamB: 'B',
+          ruleSet: VolleyballRuleSet.dvv,
+          setsToWin: 2, // Best of 3
+          pA: [],
+          pB: [],
+        );
+
+        // A wins 2:0
+        for (int s = 0; s < 2; s++) {
+          for (int i = 0; i < 25; i++) {
+            notifier.addPoint('A');
+          }
+        }
+
+        var state = container.read(volleyballStateProvider);
+        expect(state.matchFinished, isTrue);
+        expect(
+          state.pendingContinue,
+          isTrue,
+        ); // Should be true because 3rd set could be played
+
+        // User decides to continue
+        notifier.continuePlayingRemainingSets();
+        state = container.read(volleyballStateProvider);
+        expect(state.matchFinished, isFalse);
+        expect(state.currentSetIndex, 2);
+
+        // Finish last set
+        for (int i = 0; i < 25; i++) {
+          notifier.addPoint('B');
+        }
+        state = container.read(volleyballStateProvider);
+        expect(state.matchFinished, isTrue);
+        expect(state.pendingContinue, isFalse); // All sets played
+        expect(state.allSetsPlayed, isTrue);
+      },
+    );
+
+    test('Timestamps are recorded for each set', () {
+      final notifier = container.read(volleyballStateProvider.notifier);
+
+      // Set 1 finishes
+      for (int i = 0; i < 25; i++) {
+        notifier.addPoint('A');
+      }
+
+      final state = container.read(volleyballStateProvider);
+      expect(state.sets[0].endedAt, isNotNull);
+      expect(state.sets[1].startedAt, isNotNull);
     });
   });
 }

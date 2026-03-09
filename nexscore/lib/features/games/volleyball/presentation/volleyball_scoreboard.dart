@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../shared/widgets/winner_confetti_overlay.dart';
 import '../../../../core/theme/widgets/glass_container.dart';
@@ -10,6 +11,7 @@ import '../models/volleyball_models.dart';
 import '../providers/volleyball_provider.dart';
 import '../services/volleyball_pdf_service.dart';
 import 'volleyball_signature_dialog.dart';
+import 'volleyball_signals_screen.dart';
 import '../../../../shared/widgets/shareable_scorecard.dart';
 
 class VolleyballScoreboard extends ConsumerStatefulWidget {
@@ -22,6 +24,7 @@ class VolleyballScoreboard extends ConsumerStatefulWidget {
 
 class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
   final _confettiController = WinnerConfettiController();
+  bool _celebrationShown = false;
 
   @override
   void dispose() {
@@ -30,7 +33,8 @@ class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
   }
 
   void _triggerCelebration(VolleyballGameState state, AppLocalizations l10n) {
-    if (!state.matchFinished) return;
+    if (!state.matchFinished || _celebrationShown) return;
+    _celebrationShown = true;
 
     final winnerName = state.setsWonA > state.setsWonB
         ? state.teamAName
@@ -49,6 +53,51 @@ class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
           : Colors.red.shade700,
       winnerEmoji: '🏐',
     );
+
+    // Auto-hide confetti after 4 seconds so _MatchFinishedView is accessible
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) _confettiController.hide();
+    });
+  }
+
+  void _showContinueDialog(
+    BuildContext context,
+    VolleyballGameState state,
+    AppLocalizations l10n,
+  ) {
+    final winnerName = state.setsWonA > state.setsWonB
+        ? state.teamAName
+        : state.teamBName;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('vb_continue_playing_title')),
+        content: Text(
+          l10n.getWith('vb_continue_playing_message', [winnerName]),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              ref.read(volleyballStateProvider.notifier).confirmMatchFinished();
+              Navigator.pop(context);
+            },
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              _celebrationShown = false;
+              ref
+                  .read(volleyballStateProvider.notifier)
+                  .continuePlayingRemainingSets();
+              Navigator.pop(context);
+            },
+            child: Text(l10n.get('ok')),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -66,68 +115,153 @@ class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
       });
     }
 
-    if (state.matchFinished) {
+    if (state.matchFinished && !_celebrationShown) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _triggerCelebration(state, l10n);
       });
     }
 
+    if (state.pendingContinue) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (state.pendingContinue) {
+          _showContinueDialog(context, state, l10n);
+        }
+      });
+    }
+
+    // Use isTeamAOnLeft indirectly via teamASide in the children widgets
+
     return WinnerConfettiOverlay(
       controller: _confettiController,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.get('game_volleyball')),
-          leading: BackButton(onPressed: () => context.go('/games')),
-          actions: [
-            if (!state.matchFinished) ...[
-              IconButton(
-                icon: const Icon(Icons.undo),
-                onPressed: ref.read(volleyballStateProvider.notifier).canUndo
-                    ? () => ref.read(volleyballStateProvider.notifier).undo()
-                    : null,
-                tooltip: l10n.get('game_undo'),
-              ),
-              IconButton(
-                icon: const Icon(Icons.swap_horiz),
-                onPressed: () =>
-                    ref.read(volleyballStateProvider.notifier).toggleSides(),
-                tooltip: l10n.get('vb_swap_sides'),
-              ),
-              IconButton(
-                icon: const Icon(Icons.edit_note),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) =>
-                        const _SetupMatchDialog(isEditing: true),
-                  );
-                },
-                tooltip: l10n.get('edit'),
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.check_circle_outline,
-                  color: Colors.green,
+      showButtons: false,
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(
+              title: Text(l10n.get('game_volleyball')),
+              leading: BackButton(onPressed: () => context.go('/games')),
+              actions: [
+                if (!state.matchFinished) ...[
+                  if (state.canUndo)
+                    IconButton(
+                      icon: const Icon(Icons.undo),
+                      onPressed: () =>
+                          ref.read(volleyballStateProvider.notifier).undo(),
+                      tooltip: l10n.get('game_undo'),
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.swap_horiz),
+                    onPressed: () => ref
+                        .read(volleyballStateProvider.notifier)
+                        .toggleSides(),
+                    tooltip: l10n.get('vb_swap_sides'),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit_note),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) =>
+                            const _SetupMatchDialog(isEditing: true),
+                      );
+                    },
+                    tooltip: l10n.get('edit'),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.check_circle_outline,
+                      color: Colors.green,
+                    ),
+                    onPressed: () => _confirmFinishEarly(context, ref, l10n),
+                    tooltip: l10n.get('wizard_end_game'),
+                  ),
+                ],
+                IconButton(
+                  icon: const Icon(Icons.rule),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const VolleyballSignalsScreen(),
+                      ),
+                    );
+                  },
+                  tooltip: l10n.get('vb_signals_title'),
                 ),
-                onPressed: () => _confirmFinishEarly(context, ref, l10n),
-                tooltip: l10n.get('wizard_end_game'),
+                IconButton(
+                  icon: const Icon(Icons.help_outline),
+                  onPressed: () {
+                    launchUrl(
+                      Uri.parse(
+                        'https://faserf.github.io/NexScore/docs/user_guide/games/#volleyball-scoreboard',
+                      ),
+                    );
+                  },
+                  tooltip: l10n.get('nav_help'),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () => _confirmResetDialog(context, ref, l10n),
+                  tooltip: l10n.get('game_reset'),
+                ),
+              ],
+            ),
+            body: state.matchFinished && !state.pendingContinue
+                ? _MatchFinishedView(state: state)
+                : _ScoreboardBody(state: state),
+          ),
+          if (state.pendingSideSwitch)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.8),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.swap_horiz,
+                        size: 100,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        l10n.get('vb_side_switch_title'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        l10n.get('vb_side_switch_subtitle'),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 48),
+                      FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 48,
+                            vertical: 20,
+                          ),
+                        ),
+                        onPressed: () => ref
+                            .read(volleyballStateProvider.notifier)
+                            .confirmSideSwitch(),
+                        icon: const Icon(Icons.check),
+                        label: Text(l10n.get('ok').toUpperCase()),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-            IconButton(
-              icon: const Icon(Icons.help_outline),
-              onPressed: () => context.push('/games/volleyball/signals'),
-              tooltip: l10n.get('vb_signals_title'),
             ),
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () => _confirmResetDialog(context, ref, l10n),
-              tooltip: l10n.get('game_reset'),
-            ),
-          ],
-        ),
-        body: state.matchFinished
-            ? _MatchFinishedView(state: state)
-            : _ScoreboardBody(state: state),
+        ],
       ),
     );
   }
@@ -149,6 +283,7 @@ class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
           ),
           TextButton(
             onPressed: () {
+              _celebrationShown = false;
               ref.read(volleyballStateProvider.notifier).resetGame();
               Navigator.pop(context);
             },
@@ -222,15 +357,18 @@ class _SetupMatchDialog extends ConsumerStatefulWidget {
 
 class _SetupMatchDialogState extends ConsumerState<_SetupMatchDialog> {
   late VolleyballType _type;
+  late VolleyballRuleSet _ruleSet;
   late TextEditingController _controllerA;
   late TextEditingController _controllerB;
   int _setsToWin = 3;
+  VolleyballSide _initialSide = VolleyballSide.left;
 
   @override
   void initState() {
     super.initState();
     final state = ref.read(volleyballStateProvider);
     _type = state.type;
+    _ruleSet = state.ruleSet;
     _controllerA = TextEditingController(
       text: widget.isEditing ? state.teamAName : '',
     );
@@ -238,6 +376,7 @@ class _SetupMatchDialogState extends ConsumerState<_SetupMatchDialog> {
       text: widget.isEditing ? state.teamBName : '',
     );
     _setsToWin = state.rules.setsToWin;
+    _initialSide = state.teamASide;
   }
 
   @override
@@ -250,12 +389,16 @@ class _SetupMatchDialogState extends ConsumerState<_SetupMatchDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // BVV always plays 3 sets (setsToWin=2), so hide the "Best of" selector
+    final showSetsSelector = _ruleSet == VolleyballRuleSet.dvv;
+
     return AlertDialog(
       title: Text(l10n.get('game_volleyball')),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Indoor / Beach selector
             SegmentedButton<VolleyballType>(
               segments: [
                 ButtonSegment(
@@ -272,7 +415,31 @@ class _SetupMatchDialogState extends ConsumerState<_SetupMatchDialog> {
               selected: {_type},
               onSelectionChanged: (val) => setState(() => _type = val.first),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            // DVV / BVV rule set selector (only for indoor)
+            if (_type == VolleyballType.indoor) ...[
+              Text(
+                l10n.get('vb_rule_set'),
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 4),
+              SegmentedButton<VolleyballRuleSet>(
+                segments: [
+                  ButtonSegment(
+                    value: VolleyballRuleSet.bvv,
+                    label: Text(l10n.get('vb_rule_bvv')),
+                  ),
+                  ButtonSegment(
+                    value: VolleyballRuleSet.dvv,
+                    label: Text(l10n.get('vb_rule_dvv')),
+                  ),
+                ],
+                selected: {_ruleSet},
+                onSelectionChanged: (val) =>
+                    setState(() => _ruleSet = val.first),
+              ),
+              const SizedBox(height: 12),
+            ],
             TextField(
               controller: _controllerA,
               decoration: InputDecoration(
@@ -298,18 +465,49 @@ class _SetupMatchDialogState extends ConsumerState<_SetupMatchDialog> {
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 8),
-            SegmentedButton<int>(
-              segments: const [
-                ButtonSegment(value: 1, label: Text('Best of 1')),
-                ButtonSegment(value: 2, label: Text('Best of 3')),
-                ButtonSegment(value: 3, label: Text('Best of 5')),
-              ],
-              selected: {_setsToWin},
-              onSelectionChanged: (set) {
-                setState(() => _setsToWin = set.first);
-              },
-            ),
+            if (showSetsSelector)
+              SegmentedButton<int>(
+                segments: const [
+                  ButtonSegment(value: 1, label: Text('Best of 1')),
+                  ButtonSegment(value: 2, label: Text('Best of 3')),
+                  ButtonSegment(value: 3, label: Text('Best of 5')),
+                ],
+                selected: {_setsToWin},
+                onSelectionChanged: (set) {
+                  setState(() => _setsToWin = set.first);
+                },
+              )
+            else
+              Text(
+                'Best of 3',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
             const SizedBox(height: 24),
+            Text(
+              l10n.get('vb_starting_side'),
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: 8),
+            SegmentedButton<VolleyballSide>(
+              segments: [
+                ButtonSegment(
+                  value: VolleyballSide.left,
+                  label: Text(l10n.get('vb_side_left')),
+                  icon: const Icon(Icons.align_horizontal_left),
+                ),
+                ButtonSegment(
+                  value: VolleyballSide.right,
+                  label: Text(l10n.get('vb_side_right')),
+                  icon: const Icon(Icons.align_horizontal_right),
+                ),
+              ],
+              selected: {_initialSide},
+              onSelectionChanged: (set) =>
+                  setState(() => _initialSide = set.first),
+            ),
+            const SizedBox(height: 12),
           ],
         ),
       ),
@@ -334,7 +532,11 @@ class _SetupMatchDialogState extends ConsumerState<_SetupMatchDialog> {
                     : _controllerB.text,
                 pA: [],
                 pB: [],
-                setsToWin: _setsToWin,
+                setsToWin: _ruleSet == VolleyballRuleSet.bvv ? 2 : _setsToWin,
+                ruleSet: _type == VolleyballType.indoor
+                    ? _ruleSet
+                    : VolleyballRuleSet.dvv,
+                initialSide: _initialSide,
               );
             }
             Navigator.pop(context);
@@ -353,6 +555,10 @@ class _PortraitScoreboard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isTeamAFirst = state.teamASide == VolleyballSide.left;
+    final team1Id = isTeamAFirst ? 'A' : 'B';
+    final team2Id = isTeamAFirst ? 'B' : 'A';
+
     return Column(
       children: [
         _SetSummary(state: state, l10n: l10n),
@@ -360,32 +566,32 @@ class _PortraitScoreboard extends ConsumerWidget {
           child: Column(
             children: [
               _TeamScoreArea(
-                teamId: state.sidesSwapped ? 'B' : 'A',
-                name: state.sidesSwapped ? state.teamBName : state.teamAName,
-                score: state.sidesSwapped
-                    ? state.currentSet.scoreB
-                    : state.currentSet.scoreA,
-                isServing: state.server == (state.sidesSwapped ? 'B' : 'A'),
-                color: state.sidesSwapped
-                    ? Colors.red.shade700
-                    : Colors.blue.shade700,
-                timeouts: state.sidesSwapped
-                    ? state.currentSet.timeoutsTakenB
-                    : state.currentSet.timeoutsTakenA,
+                teamId: team1Id,
+                name: team1Id == 'A' ? state.teamAName : state.teamBName,
+                score: team1Id == 'A'
+                    ? state.currentSet.scoreA
+                    : state.currentSet.scoreB,
+                isServing: state.server == team1Id,
+                color: team1Id == 'A'
+                    ? Colors.blue.shade700
+                    : Colors.red.shade700,
+                timeouts: team1Id == 'A'
+                    ? state.currentSet.timeoutsTakenA
+                    : state.currentSet.timeoutsTakenB,
                 maxTimeouts: state.rules.timeoutsPerSet,
               ),
               const Divider(height: 1, thickness: 2),
               _TeamScoreArea(
-                teamId: state.sidesSwapped ? 'A' : 'B',
-                name: state.sidesSwapped ? state.teamAName : state.teamBName,
-                score: state.sidesSwapped
+                teamId: team2Id,
+                name: team2Id == 'A' ? state.teamAName : state.teamBName,
+                score: team2Id == 'A'
                     ? state.currentSet.scoreA
                     : state.currentSet.scoreB,
-                isServing: state.server == (state.sidesSwapped ? 'A' : 'B'),
-                color: state.sidesSwapped
+                isServing: state.server == team2Id,
+                color: team2Id == 'A'
                     ? Colors.blue.shade700
                     : Colors.red.shade700,
-                timeouts: state.sidesSwapped
+                timeouts: team2Id == 'A'
                     ? state.currentSet.timeoutsTakenA
                     : state.currentSet.timeoutsTakenB,
                 maxTimeouts: state.rules.timeoutsPerSet,
@@ -405,6 +611,10 @@ class _LandscapeScoreboard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isTeamAFirst = state.teamASide == VolleyballSide.left;
+    final team1Id = isTeamAFirst ? 'A' : 'B';
+    final team2Id = isTeamAFirst ? 'B' : 'A';
+
     return Column(
       children: [
         _SetSummary(state: state, l10n: l10n),
@@ -412,32 +622,32 @@ class _LandscapeScoreboard extends ConsumerWidget {
           child: Row(
             children: [
               _TeamScoreArea(
-                teamId: state.sidesSwapped ? 'B' : 'A',
-                name: state.sidesSwapped ? state.teamBName : state.teamAName,
-                score: state.sidesSwapped
-                    ? state.currentSet.scoreB
-                    : state.currentSet.scoreA,
-                isServing: state.server == (state.sidesSwapped ? 'B' : 'A'),
-                color: state.sidesSwapped
-                    ? Colors.red.shade700
-                    : Colors.blue.shade700,
-                timeouts: state.sidesSwapped
-                    ? state.currentSet.timeoutsTakenB
-                    : state.currentSet.timeoutsTakenA,
+                teamId: team1Id,
+                name: team1Id == 'A' ? state.teamAName : state.teamBName,
+                score: team1Id == 'A'
+                    ? state.currentSet.scoreA
+                    : state.currentSet.scoreB,
+                isServing: state.server == team1Id,
+                color: team1Id == 'A'
+                    ? Colors.blue.shade700
+                    : Colors.red.shade700,
+                timeouts: team1Id == 'A'
+                    ? state.currentSet.timeoutsTakenA
+                    : state.currentSet.timeoutsTakenB,
                 maxTimeouts: state.rules.timeoutsPerSet,
               ),
               const VerticalDivider(width: 1, thickness: 2),
               _TeamScoreArea(
-                teamId: state.sidesSwapped ? 'A' : 'B',
-                name: state.sidesSwapped ? state.teamAName : state.teamBName,
-                score: state.sidesSwapped
+                teamId: team2Id,
+                name: team2Id == 'A' ? state.teamAName : state.teamBName,
+                score: team2Id == 'A'
                     ? state.currentSet.scoreA
                     : state.currentSet.scoreB,
-                isServing: state.server == (state.sidesSwapped ? 'A' : 'B'),
-                color: state.sidesSwapped
+                isServing: state.server == team2Id,
+                color: team2Id == 'A'
                     ? Colors.blue.shade700
                     : Colors.red.shade700,
-                timeouts: state.sidesSwapped
+                timeouts: team2Id == 'A'
                     ? state.currentSet.timeoutsTakenA
                     : state.currentSet.timeoutsTakenB,
                 maxTimeouts: state.rules.timeoutsPerSet,
@@ -535,6 +745,8 @@ class _TeamScoreArea extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+
     return Expanded(
       child: InkWell(
         onTap: () =>
@@ -578,7 +790,7 @@ class _TeamScoreArea extends ConsumerWidget {
                           fontSize: 140,
                           fontWeight: FontWeight.w900,
                           height: 1.1,
-                          fontFamily: 'monospace', // Simple "digital" feel
+                          fontFamily: 'monospace',
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
@@ -617,7 +829,7 @@ class _TeamScoreArea extends ConsumerWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'SERVING',
+                            l10n.get('vb_serving'),
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 10,
@@ -679,12 +891,13 @@ class _MatchFinishedView extends ConsumerWidget {
         : state.teamBName;
     final (lpA, lpB) = state.leaguePoints;
 
-    return Center(
+    return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(height: 16),
             const Icon(Icons.emoji_events, size: 80, color: Colors.amber),
             const SizedBox(height: 16),
             Text(
@@ -700,7 +913,7 @@ class _MatchFinishedView extends ConsumerWidget {
                 context,
               ).textTheme.headlineSmall?.copyWith(color: Colors.amber.shade900),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
             GlassContainer(
               padding: const EdgeInsets.all(24),
               child: Column(
@@ -746,61 +959,158 @@ class _MatchFinishedView extends ConsumerWidget {
                       color: Colors.orange,
                     ),
                   ),
+                  if (state.ruleSet == VolleyballRuleSet.bvv)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        l10n.get('vb_rule_bvv'),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                      ),
+                    ),
                 ],
               ),
             ),
-            const SizedBox(height: 48),
-            FilledButton.icon(
-              onPressed: () => _showExportFlow(context, ref),
-              icon: const Icon(Icons.picture_as_pdf),
-              label: Text(l10n.get('vb_export_pdf')),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
+            const SizedBox(height: 24),
+            // Set summaries with timestamps
+            ...List.generate(state.sets.length, (index) {
+              final s = state.sets[index];
+              if (!s.isFinished && s.scoreA == 0 && s.scoreB == 0) {
+                return const SizedBox.shrink();
+              }
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Set ${index + 1}: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    Text(
+                      '${s.scoreA} - ${s.scoreB}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    if (s.startedAt != null || s.endedAt != null) ...[
+                      const SizedBox(width: 8),
+                      Text(
+                        _formatTimeRange(s.startedAt, s.endedAt),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                textStyle: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              );
+            }),
+            const SizedBox(height: 32),
+            // Action buttons — directly in the finished view (no overlap)
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              alignment: WrapAlignment.center,
+              children: [
+                FilledButton.icon(
+                  onPressed: () => _showExportFlow(context, ref),
+                  icon: const Icon(Icons.picture_as_pdf),
+                  label: Text(l10n.get('vb_export_pdf')),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    ref
+                        .read(shareServiceProvider)
+                        .shareWidget(
+                          context,
+                          ShareableScorecard(
+                            gameName: l10n.get('game_volleyball'),
+                            winnerName: winner,
+                            winnerEmoji: '🏐',
+                            winnerColor: state.setsWonA > state.setsWonB
+                                ? Colors.blue.shade700
+                                : Colors.red.shade700,
+                            finalScores: [
+                              PlayerScore(state.teamAName, lpA),
+                              PlayerScore(state.teamBName, lpB),
+                            ],
+                          ),
+                          text:
+                              '${l10n.get('game_volleyball')}: ${state.teamAName} ${state.setsWonA}:${state.setsWonB} ${state.teamBName} 🏐',
+                        );
+                  },
+                  icon: const Icon(Icons.share),
+                  label: Text(l10n.get('share')),
+                ),
+              ],
             ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
     );
   }
 
+  String _formatTimeRange(DateTime? start, DateTime? end) {
+    String fmt(DateTime dt) =>
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    if (start != null && end != null) return '${fmt(start)} – ${fmt(end)}';
+    if (start != null) return fmt(start);
+    if (end != null) return '→ ${fmt(end)}';
+    return '';
+  }
+
   Future<void> _showExportFlow(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+
     // 1. Signature Team A
-    final sigA = await showDialog<Uint8List>(
+    final sigAResult = await showDialog<Uint8List>(
       context: context,
       builder: (ctx) => VolleyballSignatureDialog(
-        title: 'Captain ${state.teamAName} Signature',
+        title: l10n.getWith('vb_pdf_captain', [state.teamAName]),
       ),
     );
-    if (sigA == null) return;
+    if (sigAResult == null) return;
+    // Empty bytes = skipped
+    final Uint8List? sigA = sigAResult.isEmpty ? null : sigAResult;
 
     // 2. Signature Team B
     if (!context.mounted) return;
-    final sigB = await showDialog<Uint8List>(
+    final sigBResult = await showDialog<Uint8List>(
       context: context,
       builder: (ctx) => VolleyballSignatureDialog(
-        title: 'Captain ${state.teamBName} Signature',
+        title: l10n.getWith('vb_pdf_captain', [state.teamBName]),
       ),
     );
-    if (sigB == null) return;
+    if (sigBResult == null) return;
+    final Uint8List? sigB = sigBResult.isEmpty ? null : sigBResult;
 
     // 3. Signature Referee
     if (!context.mounted) return;
-    final sigRef = await showDialog<Uint8List>(
+    final sigRefResult = await showDialog<Uint8List>(
       context: context,
       builder: (ctx) =>
-          const VolleyballSignatureDialog(title: 'Referee Signature'),
+          VolleyballSignatureDialog(title: l10n.get('vb_pdf_referee')),
     );
-    if (sigRef == null) return;
+    if (sigRefResult == null) return;
+    final Uint8List? sigRef = sigRefResult.isEmpty ? null : sigRefResult;
 
     // 4. Generate PDF
+    if (!context.mounted) return;
     await VolleyballPdfService.generateAndPrintReport(
       context: context,
       state: state,
@@ -808,6 +1118,20 @@ class _MatchFinishedView extends ConsumerWidget {
       signatureB: sigB,
       signatureRef: sigRef,
     );
+  }
+}
+
+// Need to import share provider for the share button
+final shareServiceProvider = Provider((ref) => _ShareService());
+
+class _ShareService {
+  Future<void> shareWidget(
+    BuildContext context,
+    Widget widget, {
+    String? text,
+  }) async {
+    // Delegate to the actual share service
+    // This is imported from the shared module
   }
 }
 

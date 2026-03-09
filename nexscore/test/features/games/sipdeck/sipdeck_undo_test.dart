@@ -46,7 +46,7 @@ void main() {
 
       notifier.drawNextCard(players, l10n);
       expect(container.read(sipDeckStateProvider).playedCards, isNotEmpty);
-      expect(notifier.canUndo, isTrue);
+      expect(container.read(sipDeckStateProvider).canUndo, isTrue);
 
       notifier.undo();
       expect(container.read(sipDeckStateProvider).playedCards, isEmpty);

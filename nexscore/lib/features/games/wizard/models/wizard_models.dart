@@ -65,6 +65,9 @@ class WizardGameState {
   final bool jesterTrumpRules;
   final bool anniversaryCards;
   final Map<String, int>? currentRoundBids;
+  final bool canUndo;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
 
   const WizardGameState({
     this.rounds = const [],
@@ -75,6 +78,9 @@ class WizardGameState {
     this.jesterTrumpRules = false,
     this.anniversaryCards = false,
     this.currentRoundBids,
+    this.canUndo = false,
+    this.startedAt,
+    this.endedAt,
   });
 
   bool get isLenientScoring => scoringVariant == WizardScoringVariant.lenient;
@@ -88,6 +94,9 @@ class WizardGameState {
     'jesterTrumpRules': jesterTrumpRules,
     'anniversaryCards': anniversaryCards,
     'currentRoundBids': currentRoundBids,
+    'canUndo': canUndo,
+    'startedAt': startedAt?.toIso8601String(),
+    'endedAt': endedAt?.toIso8601String(),
   };
 
   factory WizardGameState.fromJson(Map<String, dynamic> json) {
@@ -107,6 +116,13 @@ class WizardGameState {
       currentRoundBids: json['currentRoundBids'] != null
           ? Map<String, int>.from(json['currentRoundBids'] as Map)
           : null,
+      canUndo: json['canUndo'] as bool? ?? false,
+      startedAt: json['startedAt'] != null
+          ? DateTime.parse(json['startedAt'] as String)
+          : null,
+      endedAt: json['endedAt'] != null
+          ? DateTime.parse(json['endedAt'] as String)
+          : null,
     );
   }
 
@@ -120,6 +136,9 @@ class WizardGameState {
     bool? anniversaryCards,
     Map<String, int>? currentRoundBids,
     bool resetBids = false,
+    bool? canUndo,
+    DateTime? startedAt,
+    DateTime? endedAt,
   }) {
     return WizardGameState(
       rounds: rounds ?? this.rounds,
@@ -133,6 +152,9 @@ class WizardGameState {
       currentRoundBids: resetBids
           ? null
           : (currentRoundBids ?? this.currentRoundBids),
+      canUndo: canUndo ?? this.canUndo,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
     );
   }
 

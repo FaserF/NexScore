@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/i18n/app_localizations.dart';
+import '../../../../core/models/player_model.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/wayquest_models.dart';
 import '../providers/wayquest_provider.dart';
@@ -10,6 +12,7 @@ import '../../../../core/providers/tts_provider.dart';
 import '../../../../core/providers/audio_provider.dart';
 import '../../../../core/services/audio_service.dart';
 import '../../../settings/provider/settings_provider.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
 
 class WayQuestScreen extends ConsumerStatefulWidget {
   const WayQuestScreen({super.key});
@@ -19,6 +22,14 @@ class WayQuestScreen extends ConsumerStatefulWidget {
 }
 
 class _WayQuestScreenState extends ConsumerState<WayQuestScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -73,25 +84,45 @@ class _WayQuestScreenState extends ConsumerState<WayQuestScreen> {
             },
             tooltip: l10n.get('tts_toggle'),
           ),
-          if (state.playedCards.isNotEmpty) ...[
+          if (state.canUndo)
             IconButton(
               icon: const Icon(Icons.undo),
               tooltip: l10n.get('game_undo'),
-              onPressed: ref.read(wayQuestStateProvider.notifier).canUndo
-                  ? () => ref.read(wayQuestStateProvider.notifier).undo()
-                  : null,
+              onPressed: () => ref.read(wayQuestStateProvider.notifier).undo(),
             ),
+          if (state.playedCards.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () => _confirmReset(context, ref, l10n),
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () => _confirmFinish(context, ref, l10n),
+              tooltip: l10n.get('wizard_end_game'),
             ),
-          ],
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              launchUrl(
+                Uri.parse(
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#wayquest-road-trip',
+                ),
+              );
+            },
+            tooltip: l10n.get('nav_help'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
+          ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: state.playedCards.isEmpty
-            ? _WayQuestSetup(l10n: l10n)
-            : _WayQuestGame(l10n: l10n, state: state),
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: Center(
+            child: state.playedCards.isEmpty
+                ? _WayQuestSetup(l10n: l10n)
+                : _WayQuestGame(l10n: l10n, state: state),
+          ),
+        ),
       ),
     );
   }
@@ -123,6 +154,56 @@ class _WayQuestScreenState extends ConsumerState<WayQuestScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _confirmFinish(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('wizard_end_game')),
+        content: Text(l10n.get('game_finish_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(wayQuestStateProvider.notifier).finishGame();
+              Navigator.pop(context);
+              _showWinner(
+                ref.read(wayQuestStateProvider),
+                ref.read(activePlayersProvider),
+              );
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.green),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showWinner(WayQuestGameState state, List<Player> players) {
+    if (players.isEmpty) return;
+
+    // In WayQuest, there might not be a clear winner by score,
+    // but we can celebrate the end of the trip.
+    final l10n = AppLocalizations.of(context);
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: 'WayQuest',
+      winnerEmoji: '🚗',
+      gameName: l10n.get('game_wayquest'),
+      scores: [], // No competitive scores usually
     );
   }
 }

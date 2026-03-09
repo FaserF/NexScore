@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../models/kniffel_models.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
@@ -90,7 +91,7 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
         appBar: AppBar(
           title: Text(l10n.get('game_kniffel')),
           actions: [
-            if (ref.read(kniffelStateProvider.notifier).canUndo)
+            if (state.canUndo)
               IconButton(
                 icon: const Icon(Icons.undo),
                 onPressed: () => ref.read(kniffelStateProvider.notifier).undo(),
@@ -105,6 +106,11 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
               icon: const Icon(Icons.refresh),
               onPressed: () => _confirmReset(context, ref, l10n),
               tooltip: l10n.get('game_reset'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () => context.go('/games'),
+              tooltip: l10n.get('finishGame'),
             ),
           ],
           bottom: TabBar(

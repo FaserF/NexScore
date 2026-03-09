@@ -16,11 +16,10 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     if (_history.length > 20) _history.removeAt(0);
   }
 
-  bool get canUndo => _history.isNotEmpty;
-
   void undo() {
     if (_history.isNotEmpty) {
       state = _history.removeLast();
+      state = state.copyWith(canUndo: _history.isNotEmpty);
     }
   }
 
@@ -32,7 +31,10 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     } else {
       cats.add(cat);
     }
-    state = state.copyWith(selectedCategories: cats);
+    state = state.copyWith(
+      selectedCategories: cats,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void toggleTag(SipDeckTaskTag tag) {
@@ -43,27 +45,36 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     } else {
       tags.add(tag);
     }
-    state = state.copyWith(disabledTags: tags);
+    state = state.copyWith(disabledTags: tags, canUndo: _history.isNotEmpty);
   }
 
   void toggleFilterMultiplayerOnly(bool value) {
     _pushState();
-    state = state.copyWith(filterMultiplayerOnly: value);
+    state = state.copyWith(
+      filterMultiplayerOnly: value,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void toggleIntensity(DrinkIntensity intensity) {
     _pushState();
-    state = state.copyWith(intensity: intensity);
+    state = state.copyWith(intensity: intensity, canUndo: _history.isNotEmpty);
   }
 
   void setCustomIntensity(double multiplier) {
     _pushState();
-    state = state.copyWith(customIntensityMultiplier: multiplier);
+    state = state.copyWith(
+      customIntensityMultiplier: multiplier,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void toggleHydrationCards(bool value) {
     _pushState();
-    state = state.copyWith(enableHydrationCards: value);
+    state = state.copyWith(
+      enableHydrationCards: value,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
@@ -232,6 +243,8 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     state = state.copyWith(
       playedCards: [...state.playedCards, hydratedCard],
       activeViruses: activeViruses,
+      canUndo: _history.isNotEmpty,
+      startedAt: state.startedAt ?? DateTime.now(),
     );
   }
 
@@ -239,7 +252,7 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     _pushState();
     final sips = Map<String, int>.from(state.playerSips);
     sips[playerId] = (sips[playerId] ?? 0) + amount;
-    state = state.copyWith(playerSips: sips);
+    state = state.copyWith(playerSips: sips, canUndo: _history.isNotEmpty);
   }
 
   void decrementSips(String playerId, int amount) {
@@ -251,7 +264,7 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     } else {
       sips[playerId] = 0;
     }
-    state = state.copyWith(playerSips: sips);
+    state = state.copyWith(playerSips: sips, canUndo: _history.isNotEmpty);
   }
 
   void completeCard(bool skipped) {
@@ -264,7 +277,7 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
       for (final pid in card.targetIds) {
         sips[pid] = (sips[pid] ?? 0) + card.sips;
       }
-      state = state.copyWith(playerSips: sips);
+      state = state.copyWith(playerSips: sips, canUndo: _history.isNotEmpty);
     }
     // We don't advance the card automatically here as the UI handles the "Tap to continue" or "Next"
     // But we might want to flag it as "resolved" if sips are handled.
@@ -272,8 +285,16 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
   }
 
   void resetGame() {
+    _history.clear();
+    state = const SipDeckGameState();
+  }
+
+  void finishGame() {
     _pushState();
-    state = state.copyWith(playedCards: [], playerSips: {});
+    state = state.copyWith(
+      endedAt: DateTime.now(),
+      canUndo: _history.isNotEmpty,
+    );
   }
 }
 

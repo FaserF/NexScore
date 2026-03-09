@@ -8,6 +8,8 @@ final genericScoreProvider =
     });
 
 class GenericScoreNotifier extends Notifier<GenericScoreState> {
+  final List<GenericScoreState> _history = [];
+
   @override
   GenericScoreState build() {
     final activePlayers = ref.watch(activePlayersProvider);
@@ -23,26 +25,44 @@ class GenericScoreNotifier extends Notifier<GenericScoreState> {
     );
   }
 
+  void _pushState() {
+    _history.add(state);
+    if (_history.length > 20) _history.removeAt(0);
+  }
+
   void addRound() {
+    _pushState();
     final newRound = List<int>.filled(state.playerIds.length, 0);
-    state = state.copyWith(rounds: [...state.rounds, newRound]);
+    state = state.copyWith(
+      rounds: [...state.rounds, newRound],
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void removeRound(int index) {
     if (state.rounds.length <= 1) return;
+    _pushState();
     final newRounds = List<List<int>>.from(state.rounds)..removeAt(index);
-    state = state.copyWith(rounds: newRounds);
+    state = state.copyWith(rounds: newRounds, canUndo: _history.isNotEmpty);
     _updateTotals();
   }
 
   void updateScore(int roundIndex, int playerIndex, int score) {
+    _pushState();
     final newRounds = List<List<int>>.from(state.rounds);
     final newRound = List<int>.from(newRounds[roundIndex]);
     newRound[playerIndex] = score;
     newRounds[roundIndex] = newRound;
 
-    state = state.copyWith(rounds: newRounds);
+    state = state.copyWith(rounds: newRounds, canUndo: _history.isNotEmpty);
     _updateTotals();
+  }
+
+  void undo() {
+    if (_history.isNotEmpty) {
+      state = _history.removeLast();
+      state = state.copyWith(canUndo: _history.isNotEmpty);
+    }
   }
 
   void _updateTotals() {
@@ -58,6 +78,7 @@ class GenericScoreNotifier extends Notifier<GenericScoreState> {
   }
 
   void reset() {
+    _history.clear();
     final playerIds = state.playerIds;
     state = GenericScoreState(
       playerIds: playerIds,
@@ -65,6 +86,7 @@ class GenericScoreNotifier extends Notifier<GenericScoreState> {
           ? [List<int>.filled(playerIds.length, 0)]
           : [],
       playerTotals: {for (var id in playerIds) id: 0},
+      canUndo: false,
     );
   }
 }

@@ -10,6 +10,8 @@ import '../providers/wizard_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../../../../shared/widgets/winner_confetti_overlay.dart';
 import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
 
 class WizardScreen extends ConsumerStatefulWidget {
   const WizardScreen({super.key});
@@ -63,6 +65,7 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
       // Sort scores descending
       scores.sort((a, b) => b.score.compareTo(a.score));
 
+      ref.read(audioServiceProvider).play(SfxType.fanfare);
       _confettiController.show(
         winnerName: winner.name,
         winnerEmoji: winner.emoji,
@@ -130,7 +133,7 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
             onPressed: () => _showEndGameDialog(context),
             tooltip: l10n.get('wizard_end_game'),
           ),
-          if (ref.watch(wizardStateProvider.notifier).canUndo)
+          if (state.canUndo)
             IconButton(
               icon: const Icon(Icons.undo),
               onPressed: () => ref.read(wizardStateProvider.notifier).undo(),
@@ -557,6 +560,7 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
           ),
           FilledButton(
             onPressed: () {
+              ref.read(wizardStateProvider.notifier).finishGame();
               Navigator.pop(context);
               context.go('/games');
             },

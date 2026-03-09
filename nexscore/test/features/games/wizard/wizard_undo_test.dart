@@ -26,7 +26,7 @@ void main() {
 
       notifier.addRound(round);
       expect(container.read(wizardStateProvider).rounds, isNotEmpty);
-      expect(notifier.canUndo, isTrue);
+      expect(container.read(wizardStateProvider).canUndo, isTrue);
 
       notifier.undo();
       expect(container.read(wizardStateProvider).rounds, isEmpty);

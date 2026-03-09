@@ -2,6 +2,10 @@ import 'package:flutter/foundation.dart';
 
 enum VolleyballType { indoor, beach }
 
+enum VolleyballRuleSet { dvv, bvv }
+
+enum VolleyballSide { left, right }
+
 @immutable
 class VolleyballRules {
   final int setsToWin;
@@ -18,6 +22,11 @@ class VolleyballRules {
     this.timeoutsPerSet = 2,
   });
 
+  int get midSetSideSwitchPoints {
+    if (decidingSetPoints <= 15) return 8;
+    return 13; // For 21 or 25 point sets
+  }
+
   factory VolleyballRules.indoor({int setsToWin = 3}) => VolleyballRules(
     setsToWin: setsToWin,
     pointsPerSet: 25,
@@ -33,6 +42,18 @@ class VolleyballRules {
     switchSidesEvery: 7,
     timeoutsPerSet: 1,
   );
+
+  /// BVV Freizeitliga: always 3 sets, all to 25 pts (no 15-pt deciding set).
+  factory VolleyballRules.bvv() => const VolleyballRules(
+    setsToWin: 2,
+    pointsPerSet: 25,
+    decidingSetPoints: 25, // No special deciding set in BVV
+    switchSidesEvery: 0,
+    timeoutsPerSet: 2,
+  );
+
+  /// Total number of sets that can be played (e.g. 5 for Best-of-5, 3 for Best-of-3).
+  int get maxSets => setsToWin * 2 - 1;
 
   Map<String, dynamic> toJson() => {
     'setsToWin': setsToWin,
@@ -76,6 +97,9 @@ class VolleyballSet {
   final int timeoutsTakenB;
   final bool isFinished;
   final int sideSwitches;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
+  final bool midSetSideSwitchDone;
 
   const VolleyballSet({
     this.scoreA = 0,
@@ -84,6 +108,9 @@ class VolleyballSet {
     this.timeoutsTakenB = 0,
     this.isFinished = false,
     this.sideSwitches = 0,
+    this.startedAt,
+    this.endedAt,
+    this.midSetSideSwitchDone = false,
   });
 
   Map<String, dynamic> toJson() => {
@@ -93,6 +120,9 @@ class VolleyballSet {
     'timeoutsTakenB': timeoutsTakenB,
     'isFinished': isFinished,
     'sideSwitches': sideSwitches,
+    'startedAt': startedAt?.toIso8601String(),
+    'endedAt': endedAt?.toIso8601String(),
+    'midSetSideSwitchDone': midSetSideSwitchDone,
   };
 
   factory VolleyballSet.fromJson(Map<String, dynamic> json) => VolleyballSet(
@@ -102,6 +132,13 @@ class VolleyballSet {
     timeoutsTakenB: json['timeoutsTakenB'] as int? ?? 0,
     isFinished: json['isFinished'] as bool? ?? false,
     sideSwitches: json['sideSwitches'] as int? ?? 0,
+    startedAt: json['startedAt'] != null
+        ? DateTime.parse(json['startedAt'] as String)
+        : null,
+    endedAt: json['endedAt'] != null
+        ? DateTime.parse(json['endedAt'] as String)
+        : null,
+    midSetSideSwitchDone: json['midSetSideSwitchDone'] as bool? ?? false,
   );
 
   VolleyballSet copyWith({
@@ -111,6 +148,9 @@ class VolleyballSet {
     int? timeoutsTakenB,
     bool? isFinished,
     int? sideSwitches,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    bool? midSetSideSwitchDone,
   }) {
     return VolleyballSet(
       scoreA: scoreA ?? this.scoreA,
@@ -119,6 +159,9 @@ class VolleyballSet {
       timeoutsTakenB: timeoutsTakenB ?? this.timeoutsTakenB,
       isFinished: isFinished ?? this.isFinished,
       sideSwitches: sideSwitches ?? this.sideSwitches,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      midSetSideSwitchDone: midSetSideSwitchDone ?? this.midSetSideSwitchDone,
     );
   }
 
@@ -129,6 +172,9 @@ class VolleyballSet {
     'sideSwitches': sideSwitches,
     'timeoutsTakenA': timeoutsTakenA,
     'timeoutsTakenB': timeoutsTakenB,
+    'startedAt': startedAt?.toIso8601String(),
+    'endedAt': endedAt?.toIso8601String(),
+    'midSetSideSwitchDone': midSetSideSwitchDone,
   };
 
   factory VolleyballSet.fromMap(Map<String, dynamic> map) => VolleyballSet(
@@ -138,6 +184,13 @@ class VolleyballSet {
     sideSwitches: map['sideSwitches'] as int? ?? 0,
     timeoutsTakenA: map['timeoutsTakenA'] as int? ?? 0,
     timeoutsTakenB: map['timeoutsTakenB'] as int? ?? 0,
+    startedAt: map['startedAt'] != null
+        ? DateTime.parse(map['startedAt'] as String)
+        : null,
+    endedAt: map['endedAt'] != null
+        ? DateTime.parse(map['endedAt'] as String)
+        : null,
+    midSetSideSwitchDone: map['midSetSideSwitchDone'] as bool? ?? false,
   );
 }
 
@@ -148,8 +201,10 @@ class VolleyballGameState {
   final List<VolleyballSet> sets;
   final VolleyballType type;
   final VolleyballRules rules;
+  final VolleyballRuleSet ruleSet;
   final int currentSetIndex;
   final bool matchFinished;
+  final bool pendingContinue;
   final String? server; // 'A' or 'B'
   final List<String> teamAPlayers;
   final List<String> teamBPlayers;
@@ -158,10 +213,16 @@ class VolleyballGameState {
   final bool setupDone;
   final bool sidesSwapped;
   final bool earlyFinished;
+  final DateTime? matchStartedAt;
+  final DateTime? matchEndedAt;
+  final VolleyballSide teamASide;
+  final bool pendingSideSwitch;
+  final bool canUndo;
 
   VolleyballGameState({
     this.type = VolleyballType.indoor,
     VolleyballRules? rules,
+    this.ruleSet = VolleyballRuleSet.bvv,
     this.teamAName = 'Team A',
     this.teamBName = 'Team B',
     List<String>? teamAPlayers,
@@ -169,16 +230,22 @@ class VolleyballGameState {
     List<VolleyballSet>? sets,
     this.currentSetIndex = 0,
     this.matchFinished = false,
+    this.pendingContinue = false,
     this.server,
     this.timeoutsA = 0,
     this.timeoutsB = 0,
     this.setupDone = false,
     this.sidesSwapped = false,
     this.earlyFinished = false,
+    this.matchStartedAt,
+    this.matchEndedAt,
+    this.teamASide = VolleyballSide.left,
+    this.pendingSideSwitch = false,
+    this.canUndo = false,
   }) : rules = rules ?? VolleyballRules.indoor(),
        teamAPlayers = teamAPlayers ?? [],
        teamBPlayers = teamBPlayers ?? [],
-       sets = sets ?? [VolleyballSet()];
+       sets = sets ?? [const VolleyballSet()];
 
   VolleyballSet get currentSet => sets[currentSetIndex];
 
@@ -187,18 +254,28 @@ class VolleyballGameState {
   int get setsWonB =>
       sets.where((s) => s.isFinished && s.scoreB > s.scoreA).length;
 
-  /// Calculates league points based on DVV/FIVB (3-2-1) system.
-  /// 3 points: Win 3-0 or 3-1
-  /// 2 points: Win 3-2
-  /// 1 point: Lose 2-3
-  /// 0 points: Lose 0-3 or 1-3
-  /// For other configurations (e.g. Best of 3):
-  /// Win: 3 points, Lose: 0 points (simplified)
+  /// Whether all possible sets have been played.
+  bool get allSetsPlayed =>
+      sets.where((s) => s.isFinished).length >= rules.maxSets;
+
+  /// Calculates league points based on the selected rule set.
   (int, int) get leaguePoints {
     if (!matchFinished && !earlyFinished) return (0, 0);
 
     final sA = setsWonA;
     final sB = setsWonB;
+
+    if (ruleSet == VolleyballRuleSet.bvv) {
+      if (sA > sB) {
+        if (sB == 0) return (3, 0);
+        return (2, 1);
+      }
+      if (sB > sA) {
+        if (sA == 0) return (0, 3);
+        return (1, 2);
+      }
+      return (0, 0);
+    }
 
     if (rules.setsToWin == 3) {
       if (sA == 3) {
@@ -211,7 +288,6 @@ class VolleyballGameState {
       }
     }
 
-    // Default win/loss points for non-standard or early finish
     if (sA > sB) return (3, 0);
     if (sB > sA) return (0, 3);
     return (0, 0);
@@ -223,8 +299,10 @@ class VolleyballGameState {
     'sets': sets.map((s) => s.toJson()).toList(),
     'type': type.name,
     'rules': rules.toJson(),
+    'ruleSet': ruleSet.name,
     'currentSetIndex': currentSetIndex,
     'matchFinished': matchFinished,
+    'pendingContinue': pendingContinue,
     'server': server,
     'teamAPlayers': teamAPlayers,
     'teamBPlayers': teamBPlayers,
@@ -233,6 +311,10 @@ class VolleyballGameState {
     'setupDone': setupDone,
     'sidesSwapped': sidesSwapped,
     'earlyFinished': earlyFinished,
+    'matchStartedAt': matchStartedAt?.toIso8601String(),
+    'matchEndedAt': matchEndedAt?.toIso8601String(),
+    'teamASide': teamASide.name,
+    'pendingSideSwitch': pendingSideSwitch,
   };
 
   factory VolleyballGameState.fromJson(Map<String, dynamic> json) {
@@ -246,8 +328,12 @@ class VolleyballGameState {
           const [VolleyballSet()],
       type: VolleyballType.values.byName(json['type'] as String? ?? 'indoor'),
       rules: VolleyballRules.fromJson(json['rules'] as Map<String, dynamic>),
+      ruleSet: VolleyballRuleSet.values.byName(
+        json['ruleSet'] as String? ?? 'bvv',
+      ),
       currentSetIndex: json['currentSetIndex'] as int? ?? 0,
       matchFinished: json['matchFinished'] as bool? ?? false,
+      pendingContinue: json['pendingContinue'] as bool? ?? false,
       server: json['server'] as String?,
       teamAPlayers: List<String>.from(json['teamAPlayers'] ?? []),
       teamBPlayers: List<String>.from(json['teamBPlayers'] ?? []),
@@ -256,6 +342,17 @@ class VolleyballGameState {
       setupDone: json['setupDone'] as bool? ?? false,
       sidesSwapped: json['sidesSwapped'] as bool? ?? false,
       earlyFinished: json['earlyFinished'] as bool? ?? false,
+      matchStartedAt: json['matchStartedAt'] != null
+          ? DateTime.parse(json['matchStartedAt'] as String)
+          : null,
+      matchEndedAt: json['matchEndedAt'] != null
+          ? DateTime.parse(json['matchEndedAt'] as String)
+          : null,
+      teamASide: VolleyballSide.values.byName(
+        json['teamASide'] as String? ?? 'left',
+      ),
+      pendingSideSwitch: json['pendingSideSwitch'] as bool? ?? false,
+      canUndo: json['canUndo'] as bool? ?? false,
     );
   }
 
@@ -265,8 +362,10 @@ class VolleyballGameState {
     List<VolleyballSet>? sets,
     VolleyballType? type,
     VolleyballRules? rules,
+    VolleyballRuleSet? ruleSet,
     int? currentSetIndex,
     bool? matchFinished,
+    bool? pendingContinue,
     String? server,
     List<String>? teamAPlayers,
     List<String>? teamBPlayers,
@@ -275,6 +374,11 @@ class VolleyballGameState {
     bool? setupDone,
     bool? sidesSwapped,
     bool? earlyFinished,
+    DateTime? matchStartedAt,
+    DateTime? matchEndedAt,
+    VolleyballSide? teamASide,
+    bool? pendingSideSwitch,
+    bool? canUndo,
   }) {
     return VolleyballGameState(
       teamAName: teamAName ?? this.teamAName,
@@ -282,8 +386,10 @@ class VolleyballGameState {
       sets: sets ?? this.sets,
       type: type ?? this.type,
       rules: rules ?? this.rules,
+      ruleSet: ruleSet ?? this.ruleSet,
       currentSetIndex: currentSetIndex ?? this.currentSetIndex,
       matchFinished: matchFinished ?? this.matchFinished,
+      pendingContinue: pendingContinue ?? this.pendingContinue,
       server: server ?? this.server,
       teamAPlayers: teamAPlayers ?? this.teamAPlayers,
       teamBPlayers: teamBPlayers ?? this.teamBPlayers,
@@ -292,12 +398,18 @@ class VolleyballGameState {
       setupDone: setupDone ?? this.setupDone,
       sidesSwapped: sidesSwapped ?? this.sidesSwapped,
       earlyFinished: earlyFinished ?? this.earlyFinished,
+      matchStartedAt: matchStartedAt ?? this.matchStartedAt,
+      matchEndedAt: matchEndedAt ?? this.matchEndedAt,
+      teamASide: teamASide ?? this.teamASide,
+      pendingSideSwitch: pendingSideSwitch ?? this.pendingSideSwitch,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
   Map<String, dynamic> toMap() => {
     'type': type.name,
     'rules': rules.toMap(),
+    'ruleSet': ruleSet.name,
     'teamAName': teamAName,
     'teamBName': teamBName,
     'teamAPlayers': teamAPlayers,
@@ -307,17 +419,23 @@ class VolleyballGameState {
     'setsWonA': setsWonA,
     'setsWonB': setsWonB,
     'matchFinished': matchFinished,
+    'pendingContinue': pendingContinue,
     'server': server,
     'timeoutsA': timeoutsA,
     'timeoutsB': timeoutsB,
     'setupDone': setupDone,
     'sidesSwapped': sidesSwapped,
+    'matchStartedAt': matchStartedAt?.toIso8601String(),
+    'matchEndedAt': matchEndedAt?.toIso8601String(),
+    'teamASide': teamASide.name,
+    'pendingSideSwitch': pendingSideSwitch,
   };
 
   factory VolleyballGameState.fromMap(Map<String, dynamic> map) =>
       VolleyballGameState(
         type: VolleyballType.values.byName(map['type'] ?? 'indoor'),
         rules: VolleyballRules.fromMap(map['rules']),
+        ruleSet: VolleyballRuleSet.values.byName(map['ruleSet'] ?? 'bvv'),
         teamAName: map['teamAName'] ?? 'Team A',
         teamBName: map['teamBName'] ?? 'Team B',
         teamAPlayers: List<String>.from(map['teamAPlayers'] ?? []),
@@ -327,10 +445,20 @@ class VolleyballGameState {
             .toList(),
         currentSetIndex: map['currentSetIndex'] ?? 0,
         matchFinished: map['matchFinished'] ?? false,
+        pendingContinue: map['pendingContinue'] ?? false,
         server: map['server'],
         timeoutsA: map['timeoutsA'] ?? 0,
         timeoutsB: map['timeoutsB'] ?? 0,
         setupDone: map['setupDone'] ?? false,
         sidesSwapped: map['sidesSwapped'] ?? false,
+        matchStartedAt: map['matchStartedAt'] != null
+            ? DateTime.parse(map['matchStartedAt'] as String)
+            : null,
+        matchEndedAt: map['matchEndedAt'] != null
+            ? DateTime.parse(map['matchEndedAt'] as String)
+            : null,
+        teamASide: VolleyballSide.values.byName(map['teamASide'] ?? 'left'),
+        pendingSideSwitch: map['pendingSideSwitch'] ?? false,
+        canUndo: map['canUndo'] ?? false,
       );
 }

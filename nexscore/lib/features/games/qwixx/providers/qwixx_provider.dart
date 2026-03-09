@@ -12,11 +12,10 @@ class QwixxStateNotifier extends Notifier<QwixxGameState> {
     if (_history.length > 20) _history.removeAt(0);
   }
 
-  bool get canUndo => _history.isNotEmpty;
-
   void undo() {
     if (_history.isNotEmpty) {
       state = _history.removeLast();
+      state = state.copyWith(canUndo: _history.isNotEmpty);
     }
   }
 
@@ -24,7 +23,7 @@ class QwixxStateNotifier extends Notifier<QwixxGameState> {
     if (state.sheets.isNotEmpty) return;
     _pushState();
     final sheets = {for (var id in playerIds) id: const QwixxPlayerSheet()};
-    state = QwixxGameState(sheets: sheets);
+    state = QwixxGameState(sheets: sheets, canUndo: _history.isNotEmpty);
   }
 
   void setVariant(QwixxVariant variant) {
@@ -32,6 +31,7 @@ class QwixxStateNotifier extends Notifier<QwixxGameState> {
     state = state.copyWith(
       variant: variant,
       sheets: {},
+      canUndo: _history.isNotEmpty,
     ); // Reset on variant change
   }
 
@@ -39,12 +39,12 @@ class QwixxStateNotifier extends Notifier<QwixxGameState> {
     _pushState();
     final updated = Map<String, QwixxPlayerSheet>.from(state.sheets);
     updated[playerId] = newSheet;
-    state = state.copyWith(sheets: updated);
+    state = state.copyWith(sheets: updated, canUndo: _history.isNotEmpty);
   }
 
   void resetGame() {
-    _pushState();
-    state = state.copyWith(sheets: {});
+    _history.clear();
+    state = state.copyWith(sheets: {}, canUndo: false);
   }
 }
 

@@ -176,6 +176,7 @@ class RommeDigitalState {
   final int currentPlayerIndex;
   final int roundNumber;
   final Map<String, int> totalScores;
+  final bool canUndo;
 
   const RommeDigitalState({
     this.phase = RommeDigitalPhase.setup,
@@ -187,6 +188,7 @@ class RommeDigitalState {
     this.currentPlayerIndex = 0,
     this.roundNumber = 1,
     this.totalScores = const {},
+    this.canUndo = false,
   });
 
   RommeDigitalState copyWith({
@@ -199,6 +201,7 @@ class RommeDigitalState {
     int? currentPlayerIndex,
     int? roundNumber,
     Map<String, int>? totalScores,
+    bool? canUndo,
   }) {
     return RommeDigitalState(
       phase: phase ?? this.phase,
@@ -210,6 +213,7 @@ class RommeDigitalState {
       currentPlayerIndex: currentPlayerIndex ?? this.currentPlayerIndex,
       roundNumber: roundNumber ?? this.roundNumber,
       totalScores: totalScores ?? this.totalScores,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -223,6 +227,7 @@ class RommeDigitalState {
     'currentPlayerIndex': currentPlayerIndex,
     'roundNumber': roundNumber,
     'totalScores': totalScores,
+    'canUndo': canUndo,
   };
 
   factory RommeDigitalState.fromMap(Map<String, dynamic> map) =>
@@ -248,6 +253,7 @@ class RommeDigitalState {
         currentPlayerIndex: map['currentPlayerIndex'] ?? 0,
         roundNumber: map['roundNumber'] ?? 1,
         totalScores: Map<String, int>.from(map['totalScores'] ?? {}),
+        canUndo: map['canUndo'] ?? false,
       );
 }
 

@@ -17,17 +17,19 @@ class FactQuestStateNotifier extends Notifier<FactQuestGameState> {
     if (_history.length > 20) _history.removeAt(0);
   }
 
-  bool get canUndo => _history.isNotEmpty;
-
   void undo() {
     if (_history.isNotEmpty) {
       state = _history.removeLast();
+      state = state.copyWith(canUndo: _history.isNotEmpty);
     }
   }
 
   void initPlayers(List<String> playerIds) {
     _pushState();
-    state = state.copyWith(activePlayerIds: playerIds);
+    state = state.copyWith(
+      activePlayerIds: playerIds,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void toggleCategory(FactQuestCategory category) {
@@ -42,7 +44,10 @@ class FactQuestStateNotifier extends Notifier<FactQuestGameState> {
     } else {
       newCategories.add(category);
     }
-    state = state.copyWith(selectedCategories: newCategories);
+    state = state.copyWith(
+      selectedCategories: newCategories,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void drawNextCard() {
@@ -56,11 +61,14 @@ class FactQuestStateNotifier extends Notifier<FactQuestGameState> {
     final random = Random();
     final card = available[random.nextInt(available.length)];
 
-    state = state.copyWith(playedCards: [...state.playedCards, card]);
+    state = state.copyWith(
+      playedCards: [...state.playedCards, card],
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void resetGame() {
-    _pushState();
+    _history.clear();
     state = const FactQuestGameState();
   }
 

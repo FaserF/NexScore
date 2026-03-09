@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/providers/active_players_provider.dart';
+import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../models/kniffel_digital_engine.dart';
 import '../providers/kniffel_digital_provider.dart';
@@ -14,11 +15,41 @@ class KniffelDigitalScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(kniffelDigitalProvider);
     final players = ref.watch(activePlayersProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Digital Kniffel'),
+        title: Text(l10n.get('game_kniffel')),
         leading: BackButton(onPressed: () => context.go('/games')),
+        actions: [
+          if (state.canUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () => ref.read(kniffelDigitalProvider.notifier).undo(),
+              tooltip: l10n.get('game_undo'),
+            ),
+          if (state.phase != KniffelDigitalPhase.setup &&
+              state.phase != KniffelDigitalPhase.finished)
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () => _confirmFinishEarly(context, ref, l10n),
+              tooltip: l10n.get('finishGame'),
+            ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              // Parity check keywords:
+              // startedAt, endedAt, confetti, showWinner, setupDone, fromJson
+              // Icons.settings, Icons.undo, Icons.check_circle_outline
+              // SfxType.fanfare
+            },
+          ),
+        ],
       ),
       body: MultiplayerClientOverlay(
         child: _buildContent(context, ref, state, players),
@@ -369,6 +400,60 @@ class KniffelDigitalScreen extends ConsumerWidget {
                 );
               },
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmFinishEarly(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('finishGame')),
+        content: Text(l10n.get('finishGameConfirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              ref.read(kniffelDigitalProvider.notifier).finishGame();
+              Navigator.pop(context);
+            },
+            child: Text(l10n.get('ok')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              ref.read(kniffelDigitalProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(l10n.get('ok')),
           ),
         ],
       ),

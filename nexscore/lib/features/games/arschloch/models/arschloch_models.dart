@@ -1,6 +1,5 @@
 // Arschloch card game – rank tracking module.
 // Also known as "President" (EN) / "Asshole" (EN colloquial).
-// Based on the rules at: https://de.wikipedia.org/wiki/Arschloch_(Kartenspiel)
 //
 // Rank after each round:
 //   1st to shed all cards = President (Präsident)
@@ -131,6 +130,9 @@ class ArschlochGameState {
   final bool usePoints;
   final int cardSwappingCount; // 1 or 2 (default 2)
   final Map<ArschlochRank, String>? customRankNames;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
+  final bool setupDone;
 
   const ArschlochGameState({
     this.playerStates = const {},
@@ -138,7 +140,12 @@ class ArschlochGameState {
     this.usePoints = true,
     this.cardSwappingCount = 2,
     this.customRankNames,
+    this.startedAt,
+    this.endedAt,
+    this.setupDone = false,
   });
+
+  bool get canUndo => rounds.isNotEmpty;
 
   ArschlochGameState copyWith({
     Map<String, ArschlochPlayerState>? playerStates,
@@ -146,6 +153,9 @@ class ArschlochGameState {
     bool? usePoints,
     int? cardSwappingCount,
     Map<ArschlochRank, String>? customRankNames,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    bool? setupDone,
   }) {
     return ArschlochGameState(
       playerStates: playerStates ?? this.playerStates,
@@ -153,6 +163,9 @@ class ArschlochGameState {
       usePoints: usePoints ?? this.usePoints,
       cardSwappingCount: cardSwappingCount ?? this.cardSwappingCount,
       customRankNames: customRankNames ?? this.customRankNames,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      setupDone: setupDone ?? this.setupDone,
     );
   }
 

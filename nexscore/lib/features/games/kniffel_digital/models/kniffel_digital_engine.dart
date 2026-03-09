@@ -123,6 +123,8 @@ class KniffelDigitalState {
   final int rollsLeft; // 3 rolls per turn
   final int currentPlayerIndex;
   final int roundNumber; // 1-13 (13 categories)
+  final DateTime? startedAt;
+  final DateTime? endedAt;
 
   const KniffelDigitalState({
     this.phase = KniffelDigitalPhase.setup,
@@ -134,7 +136,12 @@ class KniffelDigitalState {
     this.rollsLeft = 3,
     this.currentPlayerIndex = 0,
     this.roundNumber = 1,
+    this.startedAt,
+    this.endedAt,
+    this.canUndo = false,
   });
+
+  final bool canUndo;
 
   KniffelDigitalState copyWith({
     KniffelDigitalPhase? phase,
@@ -146,6 +153,9 @@ class KniffelDigitalState {
     int? rollsLeft,
     int? currentPlayerIndex,
     int? roundNumber,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    bool? canUndo,
   }) {
     return KniffelDigitalState(
       phase: phase ?? this.phase,
@@ -157,6 +167,9 @@ class KniffelDigitalState {
       rollsLeft: rollsLeft ?? this.rollsLeft,
       currentPlayerIndex: currentPlayerIndex ?? this.currentPlayerIndex,
       roundNumber: roundNumber ?? this.roundNumber,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -171,6 +184,9 @@ class KniffelDigitalState {
       'rollsLeft': rollsLeft,
       'currentPlayerIndex': currentPlayerIndex,
       'roundNumber': roundNumber,
+      'startedAt': startedAt?.toIso8601String(),
+      'endedAt': endedAt?.toIso8601String(),
+      'canUndo': canUndo,
     };
   }
 
@@ -193,6 +209,11 @@ class KniffelDigitalState {
       rollsLeft: map['rollsLeft'] ?? 3,
       currentPlayerIndex: map['currentPlayerIndex'] ?? 0,
       roundNumber: map['roundNumber'] ?? 1,
+      startedAt: map['startedAt'] != null
+          ? DateTime.parse(map['startedAt'])
+          : null,
+      endedAt: map['endedAt'] != null ? DateTime.parse(map['endedAt']) : null,
+      canUndo: map['canUndo'] as bool? ?? false,
     );
   }
 }

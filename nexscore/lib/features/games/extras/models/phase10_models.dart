@@ -119,11 +119,13 @@ class Phase10GameState {
   final Map<String, Phase10PlayerState> playerStates;
   final Phase10Variant variant;
   final List<Phase10Phase> customPhases;
+  final bool canUndo;
 
   const Phase10GameState({
     this.playerStates = const {},
     this.variant = Phase10Variant.original,
     this.customPhases = const [],
+    this.canUndo = false,
   });
 
   List<Phase10Phase> get activePhases {
@@ -143,11 +145,13 @@ class Phase10GameState {
     Map<String, Phase10PlayerState>? playerStates,
     Phase10Variant? variant,
     List<Phase10Phase>? customPhases,
+    bool? canUndo,
   }) {
     return Phase10GameState(
       playerStates: playerStates ?? this.playerStates,
       variant: variant ?? this.variant,
       customPhases: customPhases ?? this.customPhases,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -155,6 +159,7 @@ class Phase10GameState {
     'playerStates': playerStates.map((k, v) => MapEntry(k, v.toJson())),
     'variant': variant.name,
     'customPhases': customPhases.map((e) => e.toJson()).toList(),
+    'canUndo': canUndo,
   };
 
   factory Phase10GameState.fromJson(Map<String, dynamic> json) {
@@ -172,6 +177,7 @@ class Phase10GameState {
               ?.map((e) => Phase10Phase.fromJson(e))
               .toList() ??
           [],
+      canUndo: json['canUndo'] ?? false,
     );
   }
 
@@ -179,7 +185,6 @@ class Phase10GameState {
     if (playerStates.isEmpty) return [];
     final entries = playerStates.entries.toList();
     entries.sort((a, b) {
-      // Logic for standing: most phases completed first, then lowest score.
       // In original/levelup, currentPhase is the indicator.
       // In masters, it might be different, but typically it's still about who finishes phase 10.
       final aPhases = a.value.completedPhases.length;

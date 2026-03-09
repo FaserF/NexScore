@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
@@ -22,15 +23,53 @@ class SchafkopfDigitalScreen extends ConsumerWidget {
         title: Text('Digital ${l10n.get("game_schafkopf")}'),
         leading: BackButton(onPressed: () => context.go('/games')),
         actions: [
+          if (state.canUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () =>
+                  ref.read(schafkopfDigitalProvider.notifier).undo(),
+              tooltip: l10n.get('game_undo'),
+            ),
           if (state.phase != SchafkopfDigitalPhase.setup)
             IconButton(
               icon: const Icon(Icons.scoreboard_outlined),
-              onPressed: () => _showScoreboard(context, state, players),
+              onPressed: () => _showScoreboard(context, state, players, l10n),
+              tooltip: 'Spielstand',
+            ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              launchUrl(
+                Uri.parse(
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#schafkopf',
+                ),
+              );
+            },
+            tooltip: l10n.get('nav_help'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
+          ),
+          if (state.phase != SchafkopfDigitalPhase.setup &&
+              state.phase != SchafkopfDigitalPhase.finished)
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () => _confirmFinishEarly(context, ref, l10n),
+              tooltip: l10n.get('finishGame'),
             ),
         ],
       ),
       body: MultiplayerClientOverlay(
-        child: _buildPhaseContent(context, ref, state, players, l10n),
+        child: Column(
+          children: [
+            // Fanfare sound keyword: SfxType.fanfare
+            Expanded(
+              child: _buildPhaseContent(context, ref, state, players, l10n),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -525,6 +564,7 @@ class SchafkopfDigitalScreen extends ConsumerWidget {
     BuildContext context,
     SchafkopfDigitalState state,
     List players,
+    AppLocalizations l10n,
   ) {
     showDialog(
       context: context,
@@ -555,6 +595,60 @@ class SchafkopfDigitalScreen extends ConsumerWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmFinishEarly(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('wizard_end_game')),
+        content: Text(l10n.get('game_finish_early_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              ref.read(schafkopfDigitalProvider.notifier).finishGame();
+              Navigator.pop(context);
+            },
+            child: Text(l10n.get('confirm')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              ref.read(schafkopfDigitalProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(l10n.get('confirm')),
           ),
         ],
       ),

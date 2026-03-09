@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/factquest_provider.dart';
 import '../../../../core/i18n/app_localizations.dart';
@@ -53,13 +54,13 @@ class _FactQuestScreenState extends ConsumerState<FactQuestScreen>
         title: Text(l10n.get('game_factquest')),
         actions: [
           if (state.playedCards.isNotEmpty) ...[
-            IconButton(
-              icon: const Icon(Icons.undo),
-              tooltip: l10n.get('game_undo'),
-              onPressed: ref.read(factQuestStateProvider.notifier).canUndo
-                  ? () => ref.read(factQuestStateProvider.notifier).undo()
-                  : null,
-            ),
+            if (state.canUndo)
+              IconButton(
+                icon: const Icon(Icons.undo),
+                tooltip: l10n.get('game_undo'),
+                onPressed: () =>
+                    ref.read(factQuestStateProvider.notifier).undo(),
+              ),
             IconButton(
               icon: const Icon(Icons.settings),
               tooltip: l10n.get('factquest_categories'),
@@ -92,6 +93,11 @@ class _FactQuestScreenState extends ConsumerState<FactQuestScreen>
               },
             ),
           ],
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () => context.go('/games'),
+            tooltip: l10n.get('finishGame'),
+          ),
         ],
       ),
       body: state.playedCards.isEmpty

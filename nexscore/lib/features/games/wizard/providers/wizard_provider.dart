@@ -12,27 +12,41 @@ class WizardGameStateNotifier extends Notifier<WizardGameState> {
     if (_history.length > 20) _history.removeAt(0);
   }
 
-  bool get canUndo => _history.isNotEmpty;
-
   void undo() {
     if (_history.isNotEmpty) {
       state = _history.removeLast();
+      state = state.copyWith(canUndo: _history.isNotEmpty);
     }
   }
 
   void updateState(WizardGameState newState) {
     _pushState();
-    state = newState;
+    state = newState.copyWith(
+      canUndo: _history.isNotEmpty,
+      startedAt: state.startedAt ?? DateTime.now(),
+    );
   }
 
   void addRound(WizardRound round) {
     _pushState();
-    state = state.copyWith(rounds: [...state.rounds, round]);
+    state = state.copyWith(
+      rounds: [...state.rounds, round],
+      canUndo: _history.isNotEmpty,
+      startedAt: state.startedAt ?? DateTime.now(),
+    );
   }
 
   void resetGame() {
-    _pushState();
+    _history.clear();
     state = const WizardGameState();
+  }
+
+  void finishGame() {
+    _pushState();
+    state = state.copyWith(
+      endedAt: DateTime.now(),
+      canUndo: _history.isNotEmpty,
+    );
   }
 }
 

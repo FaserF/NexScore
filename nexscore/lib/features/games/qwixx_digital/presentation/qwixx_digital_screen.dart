@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/providers/active_players_provider.dart';
+import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../models/qwixx_digital_engine.dart';
 import '../providers/qwixx_digital_provider.dart';
@@ -13,11 +14,32 @@ class QwixxDigitalScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(qwixxDigitalProvider);
     final players = ref.watch(activePlayersProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Digital Qwixx'),
+        title: Text(l10n.get('game_qwixx')),
         leading: BackButton(onPressed: () => context.go('/games')),
+        actions: [
+          if (state.canUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () => ref.read(qwixxDigitalProvider.notifier).undo(),
+              tooltip: l10n.get('game_undo'),
+            ),
+          if (state.phase != QwixxDigitalPhase.setup &&
+              state.phase != QwixxDigitalPhase.finished)
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () => _confirmFinishEarly(context, ref, l10n),
+              tooltip: l10n.get('finishGame'),
+            ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
+          ),
+        ],
       ),
       body: MultiplayerClientOverlay(
         child: _buildContent(context, ref, state, players),
@@ -461,6 +483,61 @@ class QwixxDigitalScreen extends ConsumerWidget {
       QwixxColor.green => Colors.green,
       QwixxColor.blue => Colors.blue,
     };
+  }
+
+  void _confirmReset(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              ref.read(qwixxDigitalProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(l10n.get('ok')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmFinishEarly(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('finishGame')),
+        content: Text(l10n.get('finishGameConfirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              ref.read(qwixxDigitalProvider.notifier).finishGame();
+              Navigator.pop(context); // Close dialog
+              context.go('/games'); // Navigate away
+            },
+            child: Text(l10n.get('ok')),
+          ),
+        ],
+      ),
+    );
   }
 }
 

@@ -100,6 +100,9 @@ class SipDeckGameState {
   final DrinkIntensity intensity;
   final double customIntensityMultiplier;
   final bool enableHydrationCards;
+  final bool canUndo;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
 
   const SipDeckGameState({
     this.activePlayerIds = const [],
@@ -112,6 +115,9 @@ class SipDeckGameState {
     this.intensity = DrinkIntensity.normal,
     this.customIntensityMultiplier = 1.0,
     this.enableHydrationCards = true,
+    this.canUndo = false,
+    this.startedAt,
+    this.endedAt,
   });
 
   SipDeckGameState copyWith({
@@ -125,6 +131,9 @@ class SipDeckGameState {
     DrinkIntensity? intensity,
     double? customIntensityMultiplier,
     bool? enableHydrationCards,
+    bool? canUndo,
+    DateTime? startedAt,
+    DateTime? endedAt,
   }) {
     return SipDeckGameState(
       activePlayerIds: activePlayerIds ?? this.activePlayerIds,
@@ -139,6 +148,9 @@ class SipDeckGameState {
       customIntensityMultiplier:
           customIntensityMultiplier ?? this.customIntensityMultiplier,
       enableHydrationCards: enableHydrationCards ?? this.enableHydrationCards,
+      canUndo: canUndo ?? this.canUndo,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
     );
   }
 
@@ -154,6 +166,9 @@ class SipDeckGameState {
       'intensity': intensity.name,
       'customIntensityMultiplier': customIntensityMultiplier,
       'enableHydrationCards': enableHydrationCards,
+      'canUndo': canUndo,
+      'startedAt': startedAt?.toIso8601String(),
+      'endedAt': endedAt?.toIso8601String(),
     };
   }
 
@@ -181,6 +196,11 @@ class SipDeckGameState {
       customIntensityMultiplier:
           (map['customIntensityMultiplier'] as num? ?? 1.0).toDouble(),
       enableHydrationCards: map['enableHydrationCards'] ?? true,
+      canUndo: map['canUndo'] as bool? ?? false,
+      startedAt: map['startedAt'] != null
+          ? DateTime.parse(map['startedAt'])
+          : null,
+      endedAt: map['endedAt'] != null ? DateTime.parse(map['endedAt']) : null,
     );
   }
 

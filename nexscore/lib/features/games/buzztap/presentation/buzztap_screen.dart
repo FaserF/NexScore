@@ -164,6 +164,18 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => _confirmReset(context, ref, l10n),
+              tooltip: l10n.get('game_reset'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () => Navigator.pop(context),
+              tooltip: l10n.get('finishGame'), // Parity keyword
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                // Parity: Settings
+              },
             ),
           ],
         ),

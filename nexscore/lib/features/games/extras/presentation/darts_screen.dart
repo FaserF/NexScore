@@ -9,8 +9,15 @@ import '../models/darts_models.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class DartsStateNotifier extends Notifier<DartsGameState> {
+  final List<DartsGameState> _history = [];
+
   @override
   DartsGameState build() => const DartsGameState();
+
+  void _pushState() {
+    _history.add(state);
+    if (_history.length > 20) _history.removeAt(0);
+  }
 
   void addRound(String playerId, DartRound round) {
     final currentState =
@@ -20,13 +27,17 @@ class DartsStateNotifier extends Notifier<DartsGameState> {
           finishType: state.finishType,
           startType: state.startType,
         );
+    _pushState();
     final updatedStates = Map<String, DartPlayerState>.from(state.playerStates);
 
     updatedStates[playerId] = currentState.copyWith(
       rounds: [...currentState.rounds, round],
     );
 
-    state = state.copyWith(playerStates: updatedStates);
+    state = state.copyWith(
+      playerStates: updatedStates,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void updateSettings({
@@ -34,16 +45,26 @@ class DartsStateNotifier extends Notifier<DartsGameState> {
     DartsFinishType? finishType,
     DartsStartType? startType,
   }) {
+    _pushState();
     state = state.copyWith(
       targetScore: targetScore,
       finishType: finishType,
       startType: startType,
       playerStates: {}, // Reset on major setting change
+      canUndo: _history.isNotEmpty,
     );
   }
 
+  void undo() {
+    if (_history.isNotEmpty) {
+      state = _history.removeLast();
+      state = state.copyWith(canUndo: _history.isNotEmpty);
+    }
+  }
+
   void resetGame() {
-    state = state.copyWith(playerStates: {});
+    _history.clear();
+    state = state.copyWith(playerStates: {}, canUndo: false);
   }
 }
 
@@ -101,10 +122,21 @@ class DartsScreen extends ConsumerWidget {
             onPressed: () => _showSettingsDialog(context, ref, gameState, l10n),
             tooltip: l10n.get('darts_settings'),
           ),
+          if (gameState.canUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () => ref.read(dartsStateProvider.notifier).undo(),
+              tooltip: l10n.get('game_undo'),
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
             tooltip: l10n.get('game_reset'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () => context.go('/games'),
+            tooltip: l10n.get('finishGame'),
           ),
         ],
       ),

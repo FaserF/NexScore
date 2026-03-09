@@ -57,6 +57,7 @@ class FactQuestGameState {
   final List<String> activePlayerIds;
   final List<FactQuestCategory> selectedCategories;
   final List<FactQuestCard> playedCards;
+  final bool canUndo;
 
   const FactQuestGameState({
     this.activePlayerIds = const [],
@@ -65,17 +66,20 @@ class FactQuestGameState {
       FactQuestCategory.dumbWaysToDie,
     ],
     this.playedCards = const [],
+    this.canUndo = false,
   });
 
   FactQuestGameState copyWith({
     List<String>? activePlayerIds,
     List<FactQuestCategory>? selectedCategories,
     List<FactQuestCard>? playedCards,
+    bool? canUndo,
   }) {
     return FactQuestGameState(
       activePlayerIds: activePlayerIds ?? this.activePlayerIds,
       selectedCategories: selectedCategories ?? this.selectedCategories,
       playedCards: playedCards ?? this.playedCards,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -83,6 +87,7 @@ class FactQuestGameState {
     'activePlayerIds': activePlayerIds,
     'selectedCategories': selectedCategories.map((e) => e.name).toList(),
     'playedCards': playedCards.map((e) => e.toMap()).toList(),
+    'canUndo': canUndo,
   };
 
   factory FactQuestGameState.fromMap(Map<String, dynamic> map) =>
@@ -94,6 +99,7 @@ class FactQuestGameState {
         playedCards: (map['playedCards'] as List? ?? [])
             .map((e) => FactQuestCard.fromMap(e as Map<String, dynamic>))
             .toList(),
+        canUndo: map['canUndo'] as bool? ?? false,
       );
 
   FactQuestCard? get currentCard =>

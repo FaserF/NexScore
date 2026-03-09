@@ -52,6 +52,9 @@ class WayQuestGameState {
   final List<String> activePlayerIds;
   final List<WayQuestCategory> selectedCategories;
   final List<WayQuestCard> playedCards;
+  final bool canUndo;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
 
   const WayQuestGameState({
     this.activePlayerIds = const [],
@@ -60,17 +63,26 @@ class WayQuestGameState {
       WayQuestCategory.wouldYouRather,
     ],
     this.playedCards = const [],
+    this.canUndo = false,
+    this.startedAt,
+    this.endedAt,
   });
 
   WayQuestGameState copyWith({
     List<String>? activePlayerIds,
     List<WayQuestCategory>? selectedCategories,
     List<WayQuestCard>? playedCards,
+    bool? canUndo,
+    DateTime? startedAt,
+    DateTime? endedAt,
   }) {
     return WayQuestGameState(
       activePlayerIds: activePlayerIds ?? this.activePlayerIds,
       selectedCategories: selectedCategories ?? this.selectedCategories,
       playedCards: playedCards ?? this.playedCards,
+      canUndo: canUndo ?? this.canUndo,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
     );
   }
 
@@ -78,6 +90,9 @@ class WayQuestGameState {
     'activePlayerIds': activePlayerIds,
     'selectedCategories': selectedCategories.map((e) => e.name).toList(),
     'playedCards': playedCards.map((e) => e.toJson()).toList(),
+    'canUndo': canUndo,
+    'startedAt': startedAt?.toIso8601String(),
+    'endedAt': endedAt?.toIso8601String(),
   };
 
   factory WayQuestGameState.fromMap(Map<String, dynamic> map) =>
@@ -89,6 +104,11 @@ class WayQuestGameState {
         playedCards: (map['playedCards'] as List? ?? [])
             .map((e) => WayQuestCard.fromJson(e as Map<String, dynamic>))
             .toList(),
+        canUndo: map['canUndo'] as bool? ?? false,
+        startedAt: map['startedAt'] != null
+            ? DateTime.parse(map['startedAt'])
+            : null,
+        endedAt: map['endedAt'] != null ? DateTime.parse(map['endedAt']) : null,
       );
 
   WayQuestCard? get currentCard =>

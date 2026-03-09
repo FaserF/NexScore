@@ -9,27 +9,39 @@ import '../models/phase10_models.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class Phase10StateNotifier extends Notifier<Phase10GameState> {
+  final List<Phase10GameState> _history = [];
+
   @override
   Phase10GameState build() => const Phase10GameState();
 
+  void _pushState() {
+    _history.add(state);
+    if (_history.length > 20) _history.removeAt(0);
+  }
+
   void setVariant(Phase10Variant variant) {
+    _pushState();
     state = state.copyWith(
       variant: variant,
       playerStates: {}, // Reset on major variant change
+      canUndo: _history.isNotEmpty,
     );
   }
 
   void setFullState(Phase10GameState newState) {
-    state = newState;
+    _pushState();
+    state = newState.copyWith(canUndo: _history.isNotEmpty);
   }
 
   void resetGame() {
-    state = state.copyWith(playerStates: {});
+    _history.clear();
+    state = state.copyWith(playerStates: {}, canUndo: false);
   }
 
   void advancePhase(String playerId) {
     final currentState =
         state.playerStates[playerId] ?? const Phase10PlayerState();
+    _pushState();
     final updatedStates = Map<String, Phase10PlayerState>.from(
       state.playerStates,
     );
@@ -51,29 +63,47 @@ class Phase10StateNotifier extends Notifier<Phase10GameState> {
       currentPhase: nextPhase,
     );
 
-    state = state.copyWith(playerStates: updatedStates);
+    state = state.copyWith(
+      playerStates: updatedStates,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void selectPhase(String playerId, int phase) {
     final currentState =
         state.playerStates[playerId] ?? const Phase10PlayerState();
+    _pushState();
     final updatedStates = Map<String, Phase10PlayerState>.from(
       state.playerStates,
     );
     updatedStates[playerId] = currentState.copyWith(currentPhase: phase);
-    state = state.copyWith(playerStates: updatedStates);
+    state = state.copyWith(
+      playerStates: updatedStates,
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void addPenaltyPoints(String playerId, int points) {
     final currentState =
         state.playerStates[playerId] ?? const Phase10PlayerState();
+    _pushState();
     final updatedStates = Map<String, Phase10PlayerState>.from(
       state.playerStates,
     );
     updatedStates[playerId] = currentState.copyWith(
       totalScore: currentState.totalScore + points,
     );
-    state = state.copyWith(playerStates: updatedStates);
+    state = state.copyWith(
+      playerStates: updatedStates,
+      canUndo: _history.isNotEmpty,
+    );
+  }
+
+  void undo() {
+    if (_history.isNotEmpty) {
+      state = _history.removeLast();
+      state = state.copyWith(canUndo: _history.isNotEmpty);
+    }
   }
 }
 
@@ -135,10 +165,21 @@ class Phase10Screen extends ConsumerWidget {
             onPressed: () => _showVariantDialog(context, ref, gameState, l10n),
             tooltip: l10n.get('phase10_variant'),
           ),
+          if (gameState.canUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () => ref.read(phase10StateProvider.notifier).undo(),
+              tooltip: l10n.get('game_undo'),
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
             tooltip: l10n.get('game_reset'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () => context.go('/games'),
+            tooltip: l10n.get('finishGame'),
           ),
         ],
       ),

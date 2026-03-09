@@ -8,32 +8,47 @@ import '../models/romme_models.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
 class RommeStateNotifier extends Notifier<RommeGameState> {
+  final List<RommeGameState> _history = [];
+
   @override
   RommeGameState build() => const RommeGameState();
 
+  void _pushState() {
+    _history.add(state);
+    if (_history.length > 20) _history.removeAt(0);
+  }
+
   void addRound(RommeRound round) {
-    state = state.copyWith(rounds: [...state.rounds, round]);
+    _pushState();
+    state = state.copyWith(
+      rounds: [...state.rounds, round],
+      canUndo: _history.isNotEmpty,
+    );
   }
 
   void resetGame() {
-    state = state.copyWith(rounds: []);
+    _history.clear();
+    state = state.copyWith(rounds: [], canUndo: false);
   }
 
   void updateSettings({int? firstMeldPoints, bool? doubleOnHandRomme}) {
+    _pushState();
     state = state.copyWith(
       firstMeldPoints: firstMeldPoints,
       doubleOnHandRomme: doubleOnHandRomme,
       rounds: [], // Reset on setting change
+      canUndo: _history.isNotEmpty,
     );
   }
 
-  void removeLastRound() {
-    if (state.rounds.isNotEmpty) {
-      state = state.copyWith(
-        rounds: state.rounds.sublist(0, state.rounds.length - 1),
-      );
+  void undo() {
+    if (_history.isNotEmpty) {
+      state = _history.removeLast();
+      state = state.copyWith(canUndo: _history.isNotEmpty);
     }
   }
+
+  void removeLastRound() => undo();
 }
 
 final rommeStateProvider = NotifierProvider<RommeStateNotifier, RommeGameState>(
@@ -66,12 +81,11 @@ class RommeScreen extends ConsumerWidget {
         title: Text(l10n.get('romme_title')),
         leading: BackButton(onPressed: () => context.go('/games')),
         actions: [
-          if (gameState.rounds.isNotEmpty)
+          if (gameState.canUndo)
             IconButton(
               icon: const Icon(Icons.undo),
-              onPressed: () =>
-                  ref.read(rommeStateProvider.notifier).removeLastRound(),
-              tooltip: l10n.get('schafkopf_undo'),
+              onPressed: () => ref.read(rommeStateProvider.notifier).undo(),
+              tooltip: l10n.get('game_undo'),
             ),
           IconButton(
             icon: const Icon(Icons.settings),
@@ -82,6 +96,11 @@ class RommeScreen extends ConsumerWidget {
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
             tooltip: l10n.get('game_reset'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () => context.go('/games'),
+            tooltip: l10n.get('finishGame'),
           ),
         ],
       ),

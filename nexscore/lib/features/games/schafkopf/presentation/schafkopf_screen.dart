@@ -11,6 +11,8 @@ import '../providers/schafkopf_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../../../../shared/widgets/winner_confetti_overlay.dart';
 import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
 
 class SchafkopfScreen extends ConsumerStatefulWidget {
   const SchafkopfScreen({super.key});
@@ -26,6 +28,37 @@ class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
   void dispose() {
     _confettiController.dispose();
     super.dispose();
+  }
+
+  void _confirmFinishEarly(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('wizard_end_game')),
+        content: const Text('Möchtest du das Spiel vorzeitig beenden?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(schafkopfStateProvider.notifier).finishGame();
+              Navigator.pop(context);
+              _showWinner(
+                ref.read(schafkopfStateProvider),
+                ref.read(activePlayersProvider),
+              );
+            },
+            child: Text(l10n.get('ok')),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showWinner(SchafkopfGameState gameState, List<Player> players) {
@@ -53,6 +86,7 @@ class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
       // Sort scores descending
       scores.sort((a, b) => b.score.compareTo(a.score));
 
+      ref.read(audioServiceProvider).play(SfxType.fanfare);
       _confettiController.show(
         winnerName: winner.name,
         winnerEmoji: winner.emoji,
@@ -73,6 +107,12 @@ class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
         title: Text(l10n.get('game_schafkopf')),
         leading: BackButton(onPressed: () => context.go('/games')),
         actions: [
+          if (gameState.canUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              tooltip: l10n.get('game_undo'),
+              onPressed: () => ref.read(schafkopfStateProvider.notifier).undo(),
+            ),
           IconButton(
             icon: const Icon(Icons.emoji_events, color: Colors.amber),
             onPressed: () => _showWinner(gameState, players),
@@ -89,16 +129,48 @@ class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
             },
             tooltip: l10n.get('nav_help'),
           ),
-          if (ref.watch(schafkopfStateProvider.notifier).canUndo)
-            IconButton(
-              icon: const Icon(Icons.undo),
-              tooltip: l10n.get('game_undo'),
-              onPressed: () => ref.read(schafkopfStateProvider.notifier).undo(),
-            ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              // Open settings or setup dialog
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(l10n.get('settings')),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('Schafkopf-Optionen (Tarif, Bock, etc.)'),
+                      if (gameState.startedAt != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Spielstart: ${gameState.startedAt!.hour}:${gameState.startedAt!.minute}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(l10n.get('close')),
+                    ),
+                  ],
+                ),
+              );
+            },
+            tooltip: l10n.get('settings'),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
             tooltip: l10n.get('game_reset'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () => _confirmFinishEarly(context, ref, l10n),
+            tooltip: l10n.get('finishGame'),
           ),
         ],
       ),

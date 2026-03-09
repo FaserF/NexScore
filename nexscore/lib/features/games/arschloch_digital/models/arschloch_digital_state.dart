@@ -82,6 +82,9 @@ class ArschlochDigitalState {
   final int roundNumber;
   final int finishedCount; // How many players have gone out
   final List<String> finishOrder; // Order in which players finished
+  final bool canUndo;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
 
   const ArschlochDigitalState({
     this.phase = ArschlochDigitalPhase.setup,
@@ -95,6 +98,9 @@ class ArschlochDigitalState {
     this.roundNumber = 0,
     this.finishedCount = 0,
     this.finishOrder = const [],
+    this.canUndo = false,
+    this.startedAt,
+    this.endedAt,
   });
 
   ArschlochDigitalState copyWith({
@@ -109,6 +115,9 @@ class ArschlochDigitalState {
     int? roundNumber,
     int? finishedCount,
     List<String>? finishOrder,
+    bool? canUndo,
+    DateTime? startedAt,
+    DateTime? endedAt,
   }) {
     return ArschlochDigitalState(
       phase: phase ?? this.phase,
@@ -122,6 +131,9 @@ class ArschlochDigitalState {
       roundNumber: roundNumber ?? this.roundNumber,
       finishedCount: finishedCount ?? this.finishedCount,
       finishOrder: finishOrder ?? this.finishOrder,
+      canUndo: canUndo ?? this.canUndo,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
     );
   }
 
@@ -138,6 +150,9 @@ class ArschlochDigitalState {
       'roundNumber': roundNumber,
       'finishedCount': finishedCount,
       'finishOrder': finishOrder,
+      'canUndo': canUndo,
+      'startedAt': startedAt?.toIso8601String(),
+      'endedAt': endedAt?.toIso8601String(),
     };
   }
 
@@ -164,6 +179,13 @@ class ArschlochDigitalState {
       roundNumber: map['roundNumber'] ?? 0,
       finishedCount: map['finishedCount'] ?? 0,
       finishOrder: List<String>.from(map['finishOrder'] ?? []),
+      canUndo: map['canUndo'] ?? false,
+      startedAt: map['startedAt'] != null
+          ? DateTime.parse(map['startedAt'] as String)
+          : null,
+      endedAt: map['endedAt'] != null
+          ? DateTime.parse(map['endedAt'] as String)
+          : null,
     );
   }
 }

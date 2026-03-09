@@ -27,6 +27,9 @@ class SchafkopfDigitalState {
   final String? currentDealerId;
   final int roundNumber;
   final Map<String, int> totalScores; // Running game scores (cents)
+  final DateTime? startedAt;
+  final DateTime? endedAt;
+  final bool canUndo;
 
   const SchafkopfDigitalState({
     this.phase = SchafkopfDigitalPhase.setup,
@@ -44,6 +47,9 @@ class SchafkopfDigitalState {
     this.currentDealerId,
     this.roundNumber = 0,
     this.totalScores = const {},
+    this.startedAt,
+    this.endedAt,
+    this.canUndo = false,
   });
 
   SchafkopfDigitalState copyWith({
@@ -62,6 +68,9 @@ class SchafkopfDigitalState {
     String? currentDealerId,
     int? roundNumber,
     Map<String, int>? totalScores,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    bool? canUndo,
   }) {
     return SchafkopfDigitalState(
       phase: phase ?? this.phase,
@@ -79,6 +88,9 @@ class SchafkopfDigitalState {
       currentDealerId: currentDealerId ?? this.currentDealerId,
       roundNumber: roundNumber ?? this.roundNumber,
       totalScores: totalScores ?? this.totalScores,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -98,6 +110,9 @@ class SchafkopfDigitalState {
     'currentDealerId': currentDealerId,
     'roundNumber': roundNumber,
     'totalScores': totalScores,
+    'startedAt': startedAt?.toIso8601String(),
+    'endedAt': endedAt?.toIso8601String(),
+    'canUndo': canUndo,
   };
 
   factory SchafkopfDigitalState.fromMap(Map<String, dynamic> map) {
@@ -141,6 +156,11 @@ class SchafkopfDigitalState {
       currentDealerId: map['currentDealerId'] as String?,
       roundNumber: map['roundNumber'] as int? ?? 0,
       totalScores: Map<String, int>.from(map['totalScores'] ?? {}),
+      startedAt: map['startedAt'] != null
+          ? DateTime.parse(map['startedAt'])
+          : null,
+      endedAt: map['endedAt'] != null ? DateTime.parse(map['endedAt']) : null,
+      canUndo: map['canUndo'] as bool? ?? false,
     );
   }
 }

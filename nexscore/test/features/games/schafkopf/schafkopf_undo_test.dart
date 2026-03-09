@@ -28,7 +28,7 @@ void main() {
 
       notifier.addRound(round);
       expect(container.read(schafkopfStateProvider).rounds, isNotEmpty);
-      expect(notifier.canUndo, isTrue);
+      expect(container.read(schafkopfStateProvider).canUndo, isTrue);
 
       notifier.undo();
       expect(container.read(schafkopfStateProvider).rounds, isEmpty);

@@ -32,22 +32,26 @@ class RommeGameState {
   final List<RommeRound> rounds;
   final int firstMeldPoints; // e.g. 0, 30, 40
   final bool doubleOnHandRomme;
+  final bool canUndo;
 
   const RommeGameState({
     this.rounds = const [],
     this.firstMeldPoints = 40,
     this.doubleOnHandRomme = true,
+    this.canUndo = false,
   });
 
   RommeGameState copyWith({
     List<RommeRound>? rounds,
     int? firstMeldPoints,
     bool? doubleOnHandRomme,
+    bool? canUndo,
   }) {
     return RommeGameState(
       rounds: rounds ?? this.rounds,
       firstMeldPoints: firstMeldPoints ?? this.firstMeldPoints,
       doubleOnHandRomme: doubleOnHandRomme ?? this.doubleOnHandRomme,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -74,6 +78,7 @@ class RommeGameState {
     'rounds': rounds.map((r) => r.toJson()).toList(),
     'firstMeldPoints': firstMeldPoints,
     'doubleOnHandRomme': doubleOnHandRomme,
+    'canUndo': canUndo,
   };
 
   factory RommeGameState.fromJson(Map<String, dynamic> json) {
@@ -85,6 +90,7 @@ class RommeGameState {
           [],
       firstMeldPoints: json['firstMeldPoints'] as int? ?? 40,
       doubleOnHandRomme: json['doubleOnHandRomme'] as bool? ?? true,
+      canUndo: json['canUndo'] as bool? ?? false,
     );
   }
 }

@@ -1,36 +1,167 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
 import '../models/standard_card_models.dart';
 import '../models/arschloch_digital_state.dart';
 import '../providers/arschloch_digital_provider.dart';
 
-class ArschlochDigitalScreen extends ConsumerWidget {
+class ArschlochDigitalScreen extends ConsumerStatefulWidget {
   const ArschlochDigitalScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ArschlochDigitalScreen> createState() =>
+      _ArschlochDigitalScreenState();
+}
+
+class _ArschlochDigitalScreenState
+    extends ConsumerState<ArschlochDigitalScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(arschlochDigitalProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Digital ${l10n.get("game_arschloch")}'),
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Digital ${l10n.get("game_arschloch")}'),
+            if (state.startedAt != null)
+              Text(
+                'Seit ${state.startedAt!.hour}:${state.startedAt!.minute.toString().padLeft(2, "0")}',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+          ],
+        ),
         leading: BackButton(onPressed: () => context.go('/games')),
         actions: [
-          if (state.phase != ArschlochDigitalPhase.setup)
-            IconButton(
-              icon: const Icon(Icons.scoreboard_outlined),
-              onPressed: () => _showScoreboard(context, state, players),
-            ),
+          IconButton(
+            icon: const Icon(Icons.scoreboard_outlined),
+            onPressed: () => _showScoreboard(context, state, players),
+          ),
+          IconButton(
+            icon: const Icon(Icons.undo),
+            onPressed: () => ref.read(arschlochDigitalProvider.notifier).undo(),
+            tooltip: l10n.get('game_undo'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => ref
+                .read(arschlochDigitalProvider.notifier)
+                .resetGame(), // Parity: reset
+            tooltip: l10n.get('game_reset'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () => _confirmFinish(context, ref, l10n),
+            tooltip: l10n.get('wizard_end_game'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              launchUrl(
+                Uri.parse(
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#arschloch',
+                ),
+              );
+            },
+            tooltip: l10n.get('nav_help'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {},
+            tooltip: l10n.get('nav_settings'),
+          ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: _buildPhaseContent(context, ref, state, players, l10n),
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: _buildPhaseContent(context, ref, state, players, l10n),
+        ),
+      ),
+    );
+  }
+
+  void _showWinner(ArschlochDigitalState state, List players) {
+    if (players.isEmpty) return;
+
+    final sortedPlayerIds = [...state.playerOrder]
+      ..sort(
+        (a, b) => (state.playerStates[b]?.totalPoints ?? 0).compareTo(
+          state.playerStates[a]?.totalPoints ?? 0,
+        ),
+      );
+
+    final winnerId = sortedPlayerIds.first;
+    final winner = players.firstWhere((p) => p.id == winnerId);
+    final l10n = AppLocalizations.of(context);
+
+    final List<PlayerScore> scores = sortedPlayerIds.map((id) {
+      final p = players.firstWhere((p) => p.id == id);
+      return PlayerScore(p.name, state.playerStates[id]?.totalPoints ?? 0);
+    }).toList();
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: winner.name,
+      winnerEmoji: winner.emoji,
+      gameName: l10n.get('game_arschloch'),
+      scores: scores,
+    );
+  }
+
+  void _confirmFinish(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('wizard_end_game')),
+        content: Text(l10n.get('game_finish_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(arschlochDigitalProvider.notifier).finishGame();
+              Navigator.pop(context);
+              _showWinner(
+                ref.read(arschlochDigitalProvider),
+                ref.read(activePlayersProvider),
+              );
+            },
+            child: Text(
+              l10n.get('ok'),
+              style: const TextStyle(color: Colors.green),
+            ),
+          ),
+        ],
       ),
     );
   }

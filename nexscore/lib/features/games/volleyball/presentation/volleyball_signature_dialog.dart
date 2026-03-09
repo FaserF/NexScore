@@ -70,6 +70,13 @@ class _VolleyballSignatureDialogState extends State<VolleyballSignatureDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(l10n.get('cancel')),
         ),
+        OutlinedButton(
+          onPressed: () {
+            // Return empty bytes to indicate "skipped" (distinct from null = cancelled)
+            Navigator.pop(context, Uint8List(0));
+          },
+          child: Text(l10n.get('vb_signature_skip')),
+        ),
         FilledButton(
           onPressed: () async {
             if (_controller.isEmpty) return;

@@ -68,10 +68,13 @@ class WinnerConfettiOverlay extends ConsumerStatefulWidget {
   final Widget child;
   final WinnerConfettiController controller;
 
+  final bool showButtons;
+
   const WinnerConfettiOverlay({
     super.key,
     required this.child,
     required this.controller,
+    this.showButtons = true,
   });
 
   @override
@@ -214,7 +217,7 @@ class _WinnerConfettiOverlayState extends ConsumerState<WinnerConfettiOverlay> {
             ),
           ),
         // Action buttons
-        if (widget.controller.isShowing)
+        if (widget.controller.isShowing && widget.showButtons)
           Positioned(
             bottom: 48,
             left: 0,

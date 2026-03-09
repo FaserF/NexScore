@@ -90,20 +90,19 @@ void main() {
         await tester.tap(find.text('OK'));
         await tester.pumpAndSettle();
 
-        // Initially disabled (tested by opacity or presence of button)
-        final undoButton = find.byIcon(Icons.undo);
-        expect(tester.widget<IconButton>(undoButton).onPressed, isNull);
+        // Initially disabled
+        final undoFinder = find.ancestor(
+          of: find.byIcon(Icons.undo),
+          matching: find.byType(IconButton),
+        );
+        expect(tester.widget<IconButton>(undoFinder).onPressed, isNull);
 
         // Add a point
         await tester.tap(find.text('0').at(0));
         await tester.pumpAndSettle();
 
         // Now enabled
-        final undoButtonEnabled = find.byIcon(Icons.undo);
-        expect(
-          tester.widget<IconButton>(undoButtonEnabled).onPressed,
-          isNotNull,
-        );
+        expect(tester.widget<IconButton>(undoFinder).onPressed, isNotNull);
       },
     );
 

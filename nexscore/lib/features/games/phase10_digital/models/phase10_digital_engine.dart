@@ -210,6 +210,7 @@ class Phase10DigitalState {
   final String? currentPlayerId;
   final int currentPlayerIndex;
   final int roundNumber;
+  final bool canUndo;
 
   const Phase10DigitalState({
     this.phase = Phase10DigitalPhase.setup,
@@ -220,6 +221,7 @@ class Phase10DigitalState {
     this.currentPlayerId,
     this.currentPlayerIndex = 0,
     this.roundNumber = 1,
+    this.canUndo = false,
   });
 
   Phase10DigitalState copyWith({
@@ -231,6 +233,7 @@ class Phase10DigitalState {
     String? currentPlayerId,
     int? currentPlayerIndex,
     int? roundNumber,
+    bool? canUndo,
   }) {
     return Phase10DigitalState(
       phase: phase ?? this.phase,
@@ -241,6 +244,7 @@ class Phase10DigitalState {
       currentPlayerId: currentPlayerId ?? this.currentPlayerId,
       currentPlayerIndex: currentPlayerIndex ?? this.currentPlayerIndex,
       roundNumber: roundNumber ?? this.roundNumber,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -253,6 +257,7 @@ class Phase10DigitalState {
     'currentPlayerId': currentPlayerId,
     'currentPlayerIndex': currentPlayerIndex,
     'roundNumber': roundNumber,
+    'canUndo': canUndo,
   };
 
   factory Phase10DigitalState.fromMap(Map<String, dynamic> map) =>
@@ -277,6 +282,7 @@ class Phase10DigitalState {
         currentPlayerId: map['currentPlayerId'],
         currentPlayerIndex: map['currentPlayerIndex'] ?? 0,
         roundNumber: map['roundNumber'] ?? 1,
+        canUndo: map['canUndo'] ?? false,
       );
 }
 

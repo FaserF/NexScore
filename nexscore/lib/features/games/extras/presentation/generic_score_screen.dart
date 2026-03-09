@@ -25,13 +25,26 @@ class GenericScoreScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.get('game_generic')),
         actions: [
+          if (state.canUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () => ref.read(genericScoreProvider.notifier).undo(),
+              tooltip: l10n.get('game_undo'),
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
+            tooltip: l10n.get('game_reset'),
           ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => ref.read(genericScoreProvider.notifier).addRound(),
+            tooltip: l10n.get('add'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () => Navigator.pop(context),
+            tooltip: l10n.get('finishGame'),
           ),
         ],
       ),

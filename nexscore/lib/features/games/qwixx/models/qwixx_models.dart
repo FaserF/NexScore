@@ -3,6 +3,7 @@ enum QwixxVariant { original, mixedColors, mixedNumbers }
 class QwixxGameState {
   final Map<String, QwixxPlayerSheet> sheets; // PlayerId -> Sheet
   final QwixxVariant variant;
+  final bool canUndo;
 
   static List<int> getRowNumbers(int rowIndex, QwixxVariant variant) {
     if (variant == QwixxVariant.original) {
@@ -26,11 +27,13 @@ class QwixxGameState {
   const QwixxGameState({
     this.sheets = const {},
     this.variant = QwixxVariant.original,
+    this.canUndo = false,
   });
 
   Map<String, dynamic> toJson() => {
     'sheets': sheets.map((k, v) => MapEntry(k, v.toJson())),
     'variant': variant.name,
+    'canUndo': canUndo,
   };
 
   factory QwixxGameState.fromJson(Map<String, dynamic> json) {
@@ -43,16 +46,19 @@ class QwixxGameState {
         (v) => v.name == (json['variant'] as String? ?? 'original'),
         orElse: () => QwixxVariant.original,
       ),
+      canUndo: json['canUndo'] as bool? ?? false,
     );
   }
 
   QwixxGameState copyWith({
     Map<String, QwixxPlayerSheet>? sheets,
     QwixxVariant? variant,
+    bool? canUndo,
   }) {
     return QwixxGameState(
       sheets: sheets ?? this.sheets,
       variant: variant ?? this.variant,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 }

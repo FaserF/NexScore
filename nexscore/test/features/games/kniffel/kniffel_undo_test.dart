@@ -16,19 +16,18 @@ void main() {
     });
 
     test('Initial state canUndo is false', () {
-      final notifier = container.read(kniffelStateProvider.notifier);
-      expect(notifier.canUndo, isFalse);
+      expect(container.read(kniffelStateProvider).canUndo, isFalse);
     });
 
     test('Undo after initPlayers', () {
       final notifier = container.read(kniffelStateProvider.notifier);
 
       notifier.initPlayers(['p1', 'p2']);
-      expect(notifier.canUndo, isTrue);
+      expect(container.read(kniffelStateProvider).canUndo, isTrue);
       expect(container.read(kniffelStateProvider).playerSheets.length, 2);
 
       notifier.undo();
-      expect(notifier.canUndo, isFalse);
+      expect(container.read(kniffelStateProvider).canUndo, isFalse);
       expect(container.read(kniffelStateProvider).playerSheets, isEmpty);
     });
 

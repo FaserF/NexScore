@@ -118,7 +118,7 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
             icon: const Icon(Icons.settings),
             onPressed: () => _showCategoriesModal(context, ref, state, l10n),
           ),
-          if (ref.watch(sipDeckStateProvider.notifier).canUndo)
+          if (state.canUndo)
             IconButton(
               icon: const Icon(Icons.undo),
               onPressed: () => ref.read(sipDeckStateProvider.notifier).undo(),
