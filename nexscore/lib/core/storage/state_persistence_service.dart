@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class StatePersistenceService {
   static const String _lastGameKey = 'last_game_id';
   static const String _statePrefix = 'game_state_';
+  static const String _activePlayerIdsKey = 'active_player_ids';
 
   /// Save the current state of a game.
   Future<void> saveGameState(String gameId, Map<String, dynamic> state) async {
@@ -35,6 +36,18 @@ class StatePersistenceService {
     return decoded['data'] as Map<String, dynamic>?;
   }
 
+  /// Save the active player IDs for game resumption.
+  Future<void> saveActivePlayerIds(List<String> playerIds) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_activePlayerIdsKey, playerIds);
+  }
+
+  /// Load the active player IDs for game resumption.
+  Future<List<String>> loadActivePlayerIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_activePlayerIdsKey) ?? [];
+  }
+
   /// Clear the state for a specific game (e.g. when finished).
   Future<void> clearGameState(String gameId) async {
     final prefs = await SharedPreferences.getInstance();
@@ -43,6 +56,7 @@ class StatePersistenceService {
     final lastId = prefs.getString(_lastGameKey);
     if (lastId == gameId) {
       await prefs.remove(_lastGameKey);
+      await prefs.remove(_activePlayerIdsKey);
     }
   }
 
@@ -50,7 +64,7 @@ class StatePersistenceService {
   Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();
     final keys = prefs.getKeys().where(
-      (k) => k.startsWith(_statePrefix) || k == _lastGameKey,
+      (k) => k.startsWith(_statePrefix) || k == _lastGameKey || k == _activePlayerIdsKey,
     );
     for (final key in keys) {
       await prefs.remove(key);

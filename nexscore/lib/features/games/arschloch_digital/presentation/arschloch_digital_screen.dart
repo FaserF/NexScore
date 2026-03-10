@@ -12,9 +12,13 @@ import '../../../../core/services/audio_service.dart';
 import '../models/standard_card_models.dart';
 import '../models/arschloch_digital_state.dart';
 import '../providers/arschloch_digital_provider.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class ArschlochDigitalScreen extends ConsumerStatefulWidget {
   const ArschlochDigitalScreen({super.key});
+
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
 
   @override
   ConsumerState<ArschlochDigitalScreen> createState() =>
@@ -75,7 +79,7 @@ class _ArschlochDigitalScreenState
           IconButton(
             icon: const Icon(Icons.check_circle_outline, color: Colors.green),
             onPressed: () => _confirmFinish(context, ref, l10n),
-            tooltip: l10n.get('wizard_end_game'),
+            tooltip: l10n.get('finishGame'),
           ),
           IconButton(
             icon: const Icon(Icons.help_outline),
@@ -84,6 +88,7 @@ class _ArschlochDigitalScreenState
                 Uri.parse(
                   'https://faserf.github.io/NexScore/docs/user_guide/games/#arschloch',
                 ),
+                mode: LaunchMode.externalApplication,
               );
             },
             tooltip: l10n.get('nav_help'),
@@ -130,6 +135,22 @@ class _ArschlochDigitalScreenState
       gameName: l10n.get('game_arschloch'),
       scores: scores,
     );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: state.startedAt ?? DateTime.now(),
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'arschloch_digital',
+      players: players.map<String>((p) => p.name as String).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'round': state.roundNumber,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
   }
 
   void _confirmFinish(

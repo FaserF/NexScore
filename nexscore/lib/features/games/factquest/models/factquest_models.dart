@@ -23,10 +23,10 @@ class FactQuestCard {
   });
 
   /// Localization key for the fact text.
-  String get textKey => 'fq_card_\${id}_text';
+  String get textKey => 'fq_card_${id}_text';
 
   /// Localization key for the detailed explanation.
-  String get explanationKey => 'fq_card_\${id}_expl';
+  String get explanationKey => 'fq_card_${id}_expl';
 
   Map<String, dynamic> toMap() => {
     'id': id,

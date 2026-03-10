@@ -15,17 +15,19 @@ class ShareService {
   ScreenshotController get controller => _screenshotController;
 
   /// Captures a [Widget] by wrapping it in a [Screenshot] widget and shares it.
-  /// Note: On Web, the behavioral fallback might differ based on browser support.
   Future<void> shareWidget(
     BuildContext context,
     Widget widget, {
     String? text,
   }) async {
     try {
+      final locale = Localizations.maybeLocaleOf(context) ?? const Locale('en');
+      final theme = Theme.of(context);
+
       final imageBytes = await _screenshotController.captureFromWidget(
         MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: Theme.of(context),
+          theme: theme,
           localizationsDelegates: const [
             AppLocalizationsDelegate(),
             GlobalMaterialLocalizations.delegate,
@@ -33,7 +35,7 @@ class ShareService {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en'), Locale('de')],
-          locale: Localizations.localeOf(context),
+          locale: locale,
           home: Material(color: Colors.transparent, child: widget),
         ),
         context: context,
@@ -43,17 +45,15 @@ class ShareService {
       );
 
       if (kIsWeb) {
-        await SharePlus.instance.share(
-          ShareParams(
-            files: [
-              XFile.fromData(
-                imageBytes,
-                mimeType: 'image/png',
-                name: 'nexscore_share_${const Uuid().v4().substring(0, 8)}.png',
-              ),
-            ],
-            subject: text,
-          ),
+        await Share.shareXFiles(
+          [
+            XFile.fromData(
+              imageBytes,
+              mimeType: 'image/png',
+              name: 'nexscore_share_${const Uuid().v4().substring(0, 8)}.png',
+            ),
+          ],
+          subject: text,
         );
       } else {
         final tempDir = await getTemporaryDirectory();
@@ -62,8 +62,9 @@ class ShareService {
         ).create();
         await file.writeAsBytes(imageBytes);
 
-        await SharePlus.instance.share(
-          ShareParams(files: [XFile(file.path)], subject: text),
+        await Share.shareXFiles(
+          [XFile(file.path)],
+          subject: text,
         );
       }
     } catch (e) {
@@ -78,8 +79,9 @@ class ShareService {
 
   /// Shares a captured file path directly.
   Future<void> shareFile(String filePath, {String? text}) async {
-    await SharePlus.instance.share(
-      ShareParams(files: [XFile(filePath)], subject: text),
+    await Share.shareXFiles(
+      [XFile(filePath)],
+      subject: text,
     );
   }
 }

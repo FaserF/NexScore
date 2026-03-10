@@ -6,6 +6,12 @@ import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/romme_models.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class RommeStateNotifier extends Notifier<RommeGameState> {
   final List<RommeGameState> _history = [];
@@ -57,11 +63,61 @@ final rommeStateProvider = NotifierProvider<RommeStateNotifier, RommeGameState>(
 
 final rommePlayersProvider = activePlayersProvider;
 
-class RommeScreen extends ConsumerWidget {
+class RommeScreen extends ConsumerStatefulWidget {
+  // Duration: startedAt, endedAt, DateTime, duration
   const RommeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RommeScreen> createState() => _RommeScreenState();
+}
+
+class _RommeScreenState extends ConsumerState<RommeScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(RommeGameState state, List<Player> players, AppLocalizations l10n) {
+    if (players.isEmpty) return;
+
+    final List<PlayerScore> scores = players.map((p) {
+      return PlayerScore(p.name, state.getPlayerScore(p.id));
+    }).toList();
+
+    // In Romme, lower score is better
+    scores.sort((a, b) => a.score.compareTo(b.score));
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: scores.first.name,
+      winnerEmoji: '🏆',
+      gameName: l10n.get('romme_title'),
+      scores: scores,
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'romme',
+      players: players.map<String>((p) => p.name).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'rounds': state.rounds.length,
+        'firstMeldPoints': state.firstMeldPoints,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(rommeStateProvider);
     final players = ref.watch(rommePlayersProvider);
     final l10n = AppLocalizations.of(context);
@@ -72,9 +128,6 @@ class RommeScreen extends ConsumerWidget {
         body: Center(child: Text(l10n.get('game_no_players'))),
       );
     }
-
-    final playerIds = players.map((p) => p.id).toList();
-    final leaders = gameState.getLeaders(playerIds);
 
     return Scaffold(
       appBar: AppBar(
@@ -93,102 +146,93 @@ class RommeScreen extends ConsumerWidget {
             tooltip: l10n.get('romme_settings'),
           ),
           IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {}, // Help
+            tooltip: l10n.get('nav_help'),
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
             tooltip: l10n.get('game_reset'),
           ),
           IconButton(
             icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-            onPressed: () => context.go('/games'),
+            onPressed: () => _showWinner(gameState, players, l10n),
             tooltip: l10n.get('finishGame'),
           ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: Column(
-          children: [
-            _RommeScoreHeader(players: players, gameState: gameState),
-            const Divider(height: 1, thickness: 2),
-            Expanded(
-              child: gameState.rounds.isEmpty
-                  ? Center(child: Text(l10n.get('romme_no_rounds')))
-                  : ListView.separated(
-                      itemCount: gameState.rounds.length,
-                      separatorBuilder: (_, _) => const Divider(height: 1),
-                      itemBuilder: (context, i) {
-                        final round = gameState.rounds[i];
-                        return ListTile(
-                          title: Text(
-                            '${l10n.get('romme_round')} ${round.roundIndex}',
-                          ),
-                          subtitle: round.isHandRomme
-                              ? Text(
-                                  l10n.get('romme_hand_romme'),
-                                  style: const TextStyle(
-                                    color: Colors.orange,
-                                    fontSize: 12,
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: Column(
+            children: [
+              _RommeScoreHeader(players: players, gameState: gameState),
+              const Divider(height: 1, thickness: 2),
+              Expanded(
+                child: gameState.rounds.isEmpty
+                    ? Center(child: Text(l10n.get('romme_no_rounds')))
+                    : ListView.separated(
+                        itemCount: gameState.rounds.length,
+                        separatorBuilder: (_, _) => const Divider(height: 1),
+                        itemBuilder: (context, i) {
+                          final round = gameState.rounds[i];
+                          return ListTile(
+                            title: Text(
+                              '${l10n.get('romme_round')} ${round.roundIndex}',
+                            ),
+                            subtitle: round.isHandRomme
+                                ? Text(
+                                    l10n.get('romme_hand_romme'),
+                                    style: const TextStyle(
+                                      color: Colors.orange,
+                                      fontSize: 12,
+                                    ),
+                                  )
+                                : null,
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: players.map((p) {
+                                final pts = round.penaltyPoints[p.id] ?? 0;
+                                return SizedBox(
+                                  width: 56,
+                                  child: Text(
+                                    '$pts',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: pts > 0 ? Colors.red : Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                )
-                              : null,
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: players.map((p) {
-                              final pts = round.penaltyPoints[p.id] ?? 0;
-                              return SizedBox(
-                                width: 56,
-                                child: Text(
-                                  '$pts',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: pts > 0 ? Colors.red : Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FilledButton.icon(
-                onPressed: () => _showAddRoundDialog(
-                  context,
-                  ref,
-                  players,
-                  gameState.rounds.length + 1,
-                  gameState,
-                  l10n,
-                ),
-                icon: const Icon(Icons.add),
-                label: Text(l10n.get('add_round')),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 52),
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: FilledButton.icon(
+                  onPressed: () => _showAddRoundDialog(
+                    context,
+                    ref,
+                    players,
+                    gameState.rounds.length + 1,
+                    gameState,
+                    l10n,
+                  ),
+                  icon: const Icon(Icons.add),
+                  label: Text(l10n.get('add_round')),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-      floatingActionButton: leaders.isNotEmpty
-          ? FloatingActionButton.extended(
-              onPressed: () =>
-                  _showScoreBreakdown(context, players, gameState, l10n),
-              label: Text(
-                l10n.getWith('romme_leader', [
-                  players
-                      .firstWhere(
-                        (p) => p.id == leaders.first,
-                        orElse: () => players.first,
-                      )
-                      .name,
-                ]),
-              ),
-              icon: const Icon(Icons.emoji_events, color: Colors.amber),
-            )
-          : null,
     );
   }
 
@@ -323,76 +367,7 @@ class RommeScreen extends ConsumerWidget {
     }
   }
 
-  void _showScoreBreakdown(
-    BuildContext context,
-    List<Player> players,
-    RommeGameState gameState,
-    AppLocalizations l10n,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final sortedPlayers = List<Player>.from(players)
-          ..sort(
-            (a, b) => gameState
-                .getPlayerScore(a.id)
-                .compareTo(gameState.getPlayerScore(b.id)),
-          );
 
-        return AlertDialog(
-          title: Text(l10n.get('romme_breakdown')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ...sortedPlayers.map((p) {
-                final score = gameState.getPlayerScore(p.id);
-                final isLeader =
-                    score == gameState.getPlayerScore(sortedPlayers.first.id);
-
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Color(
-                      int.parse(p.avatarColor.replaceFirst('#', '0xff')),
-                    ),
-                    child: Text(
-                      p.name.substring(0, 1).toUpperCase(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  title: Text(p.name),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (isLeader)
-                        const Icon(
-                          Icons.emoji_events,
-                          color: Colors.amber,
-                          size: 20,
-                        ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '$score',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.get('close')),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   void _showSettingsDialog(
     BuildContext context,

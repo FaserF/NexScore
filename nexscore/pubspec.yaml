@@ -44,6 +44,7 @@ dependencies:
   printing: ^5.13.2
   signature: 6.3.0
   file_picker: 10.3.10
+  flutter_local_notifications: ^21.0.0
 
 dependency_overrides:
   _fe_analyzer_shared: 97.0.0
@@ -53,6 +54,7 @@ dependency_overrides:
   meta: 1.18.1
 
 dev_dependencies:
+  sqflite_common_ffi: ^2.3.3
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0

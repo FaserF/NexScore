@@ -18,9 +18,15 @@ import '../../../../core/services/audio_service.dart';
 import '../../../settings/provider/settings_provider.dart';
 import '../../../../core/providers/share_provider.dart';
 import '../../../../shared/widgets/shareable_card.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class BuzzTapScreen extends ConsumerStatefulWidget {
   const BuzzTapScreen({super.key});
+
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
 
   @override
   ConsumerState<BuzzTapScreen> createState() => _BuzzTapScreenState();
@@ -31,6 +37,7 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
   bool _isBannerDismissed = false;
+  final _confettiController = WinnerConfettiController();
 
   @override
   void initState() {
@@ -50,16 +57,13 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
       ref
           .read(buzzTapStateProvider.notifier)
           .toggle2PlayerOptimization(players.length == 2);
-
-      // Initialize TTS toggle from global settings
-      final settings = ref.read(settingsProvider);
-      ref.read(ttsActiveProvider.notifier).setEnabled(settings.ttsEnabled);
     });
   }
 
   @override
   void dispose() {
     _pulseController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -146,6 +150,7 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                   Uri.parse(
                     'https://faserf.github.io/NexScore/docs/user_guide/games/#buzztap-18',
                   ),
+                  mode: LaunchMode.externalApplication,
                 );
               },
               tooltip: l10n.get('nav_help'),
@@ -168,7 +173,7 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
             ),
             IconButton(
               icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => _finishGame(context, ref, state, players, l10n),
               tooltip: l10n.get('finishGame'), // Parity keyword
             ),
             IconButton(
@@ -179,12 +184,15 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
             ),
           ],
         ),
-        body: MultiplayerClientOverlay(
-          child: players.isEmpty
-              ? Center(child: Text(l10n.get('sipdeck_no_players')))
-              : state.playedCards.isEmpty
-              ? _buildStartScreen(context, ref, state, players, l10n)
-              : _buildCardScreen(context, ref, state, players, l10n),
+        body: WinnerConfettiOverlay(
+          controller: _confettiController,
+          child: MultiplayerClientOverlay(
+            child: players.isEmpty
+                ? Center(child: Text(l10n.get('sipdeck_no_players')))
+                : state.playedCards.isEmpty
+                ? _buildStartScreen(context, ref, state, players, l10n)
+                : _buildCardScreen(context, ref, state, players, l10n),
+          ),
         ),
       ),
     );
@@ -1138,5 +1146,51 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
         ],
       ),
     );
+  }
+
+  void _finishGame(
+    BuildContext context,
+    WidgetRef ref,
+    BuzzTapGameState state,
+    List<Player> players,
+    AppLocalizations l10n,
+  ) {
+    if (players.isEmpty) {
+      Navigator.pop(context);
+      return;
+    }
+
+    final scores = players.map((p) {
+      return PlayerScore(p.name, state.playerSips[p.id] ?? 0);
+    }).toList();
+
+    // In Buzztap, higher sips is "better" (or just the score)
+    scores.sort((a, b) => b.score.compareTo(a.score));
+
+    final winner = players.firstWhere((p) => p.name == scores.first.name);
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: winner.name,
+      winnerEmoji: '🍺',
+      gameName: 'BuzzTap',
+      scores: scores,
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'buzztap',
+      players: players.map((p) => p.name).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'totalSips': state.playerSips.values.fold(0, (a, b) => a + b),
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../providers/persistence_provider.dart';
+import '../providers/active_players_provider.dart';
 
 // Game Providers
 import '../../features/games/wizard_digital/providers/wizard_digital_provider.dart';
@@ -53,6 +54,12 @@ class GameSaveManager {
 
       if (stateMap != null) {
         await service.saveGameState(gameId, stateMap);
+
+        // Also save active player IDs for resume
+        final players = ref.read(activePlayersProvider) as List;
+        final playerIds = players.map<String>((p) => p.id as String).toList();
+        await service.saveActivePlayerIds(playerIds);
+
         debugPrint('Saved game state for $gameId');
       }
     } catch (e) {

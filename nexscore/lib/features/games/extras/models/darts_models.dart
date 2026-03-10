@@ -180,6 +180,8 @@ class DartsGameState {
   final int targetScore; // usually 301 or 501
   final DartsFinishType finishType;
   final DartsStartType startType;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
   final bool canUndo;
 
   const DartsGameState({
@@ -187,6 +189,8 @@ class DartsGameState {
     this.targetScore = 301,
     this.finishType = DartsFinishType.double,
     this.startType = DartsStartType.straight,
+    this.startedAt,
+    this.endedAt,
     this.canUndo = false,
   });
 
@@ -195,6 +199,8 @@ class DartsGameState {
     int? targetScore,
     DartsFinishType? finishType,
     DartsStartType? startType,
+    DateTime? startedAt,
+    DateTime? endedAt,
     bool? canUndo,
   }) {
     return DartsGameState(
@@ -202,6 +208,8 @@ class DartsGameState {
       targetScore: targetScore ?? this.targetScore,
       finishType: finishType ?? this.finishType,
       startType: startType ?? this.startType,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
       canUndo: canUndo ?? this.canUndo,
     );
   }
@@ -211,6 +219,8 @@ class DartsGameState {
     'targetScore': targetScore,
     'finishType': finishType.name,
     'startType': startType.name,
+    'startedAt': startedAt?.toIso8601String(),
+    'endedAt': endedAt?.toIso8601String(),
     'canUndo': canUndo,
   };
 
@@ -233,6 +243,14 @@ class DartsGameState {
         (e) => e.name == json['startType'],
         orElse: () => DartsStartType.straight,
       ),
+      startedAt:
+          json['startedAt'] != null
+              ? DateTime.tryParse(json['startedAt'] as String)
+              : null,
+      endedAt:
+          json['endedAt'] != null
+              ? DateTime.tryParse(json['endedAt'] as String)
+              : null,
       canUndo: json['canUndo'] ?? false,
     );
   }

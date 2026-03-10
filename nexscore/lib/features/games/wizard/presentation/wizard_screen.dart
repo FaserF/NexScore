@@ -12,9 +12,14 @@ import '../../../../shared/widgets/winner_confetti_overlay.dart';
 import '../../../../shared/widgets/shareable_scorecard.dart';
 import '../../../../core/providers/audio_provider.dart';
 import '../../../../core/services/audio_service.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class WizardScreen extends ConsumerStatefulWidget {
+  // Duration: startedAt, endedAt, DateTime, duration
   const WizardScreen({super.key});
+
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
 
   @override
   ConsumerState<WizardScreen> createState() => _WizardScreenState();
@@ -32,47 +37,58 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
 
   void _showWinner(WizardGameState state, List<Player> players) {
     if (players.isEmpty) return;
-    String? winnerId;
-    int maxScore = -99999;
-    for (final p in players) {
-      final score = WizardGameState.calculatePlayerScore(
-        p.id,
-        state.rounds,
-        lenient: state.scoringVariant == WizardScoringVariant.lenient,
-        extreme: state.scoringVariant == WizardScoringVariant.extreme,
+    
+    final winners = state.getLeaders(players.map((p) => p.id).toList());
+    if (winners.isEmpty) return;
+
+    final l10n = AppLocalizations.of(context);
+    final List<PlayerScore> scores = players.map((p) {
+      return PlayerScore(
+        p.name,
+        WizardGameState.calculatePlayerScore(
+          p.id,
+          state.rounds,
+          lenient: state.scoringVariant == WizardScoringVariant.lenient,
+          extreme: state.scoringVariant == WizardScoringVariant.extreme,
+        ),
       );
-      if (score > maxScore) {
-        maxScore = score;
-        winnerId = p.id;
-      }
-    }
-    if (winnerId != null) {
-      final winner = players.firstWhere((p) => p.id == winnerId);
-      final l10n = AppLocalizations.of(context);
+    }).toList();
 
-      final List<PlayerScore> scores = players.map((p) {
-        return PlayerScore(
-          p.name,
-          WizardGameState.calculatePlayerScore(
-            p.id,
-            state.rounds,
-            lenient: state.scoringVariant == WizardScoringVariant.lenient,
-            extreme: state.scoringVariant == WizardScoringVariant.extreme,
-          ),
-        );
-      }).toList();
+    // Sort scores descending
+    scores.sort((a, b) => b.score.compareTo(a.score));
 
-      // Sort scores descending
-      scores.sort((a, b) => b.score.compareTo(a.score));
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    
+    // Use the first winner for the main display (or could handle multiple)
+    final winner = players.firstWhere((p) => p.id == winners.first);
+    
+    _confettiController.show(
+      winnerName: winners.length > 1
+          ? winners
+              .map((id) => players.firstWhere((p) => p.id == id).name)
+              .join(', ')
+          : winner.name,
+      winnerEmoji: winners.length > 1 ? '🏆' : winner.emoji,
+      gameName: l10n.get('game_wizard'),
+      scores: scores,
+    );
 
-      ref.read(audioServiceProvider).play(SfxType.fanfare);
-      _confettiController.show(
-        winnerName: winner.name,
-        winnerEmoji: winner.emoji,
-        gameName: l10n.get('game_wizard'),
-        scores: scores,
-      );
-    }
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'wizard',
+      players: players.map<String>((p) => p.name).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'rounds': state.rounds.length,
+        'variant': state.scoringVariant.name,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
   }
 
   @override
@@ -108,17 +124,13 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
           ),
           const SizedBox(width: 4),
           IconButton(
-            icon: const Icon(Icons.emoji_events, color: Colors.amber),
-            onPressed: () => _showWinner(state, players),
-            tooltip: l10n.get('game_show_winner'),
-          ),
-          IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: () {
               launchUrl(
                 Uri.parse(
                   'https://faserf.github.io/NexScore/docs/user_guide/games/#wizard',
                 ),
+                mode: LaunchMode.externalApplication,
               );
             },
             tooltip: l10n.get('nav_help'),
@@ -129,9 +141,12 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
             tooltip: l10n.get('settings'),
           ),
           IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            onPressed: () => _showEndGameDialog(context),
-            tooltip: l10n.get('wizard_end_game'),
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () {
+              ref.read(wizardStateProvider.notifier).finishGame();
+              _showWinner(state, players);
+            },
+            tooltip: l10n.get('finishGame'),
           ),
           if (state.canUndo)
             IconButton(
@@ -546,30 +561,6 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
     );
   }
 
-  void _showEndGameDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.get('wizard_end_game')),
-        content: Text(l10n.get('wizard_end_game_confirm')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.get('cancel')),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref.read(wizardStateProvider.notifier).finishGame();
-              Navigator.pop(context);
-              context.go('/games');
-            },
-            child: Text(l10n.get('ok')),
-          ),
-        ],
-      ),
-    );
-  }
 
   Future<void> _showPredictionDialog(
     BuildContext context,

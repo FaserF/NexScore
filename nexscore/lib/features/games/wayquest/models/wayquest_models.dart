@@ -53,6 +53,8 @@ class WayQuestGameState {
   final List<WayQuestCategory> selectedCategories;
   final List<WayQuestCard> playedCards;
   final bool canUndo;
+  final Map<String, int> scores; // Points per player (playerId -> score)
+  final String? lastWinnerId; // ID of the player who won the most recent card
   final DateTime? startedAt;
   final DateTime? endedAt;
 
@@ -64,6 +66,8 @@ class WayQuestGameState {
     ],
     this.playedCards = const [],
     this.canUndo = false,
+    this.scores = const {},
+    this.lastWinnerId,
     this.startedAt,
     this.endedAt,
   });
@@ -73,6 +77,8 @@ class WayQuestGameState {
     List<WayQuestCategory>? selectedCategories,
     List<WayQuestCard>? playedCards,
     bool? canUndo,
+    Map<String, int>? scores,
+    String? lastWinnerId,
     DateTime? startedAt,
     DateTime? endedAt,
   }) {
@@ -81,6 +87,8 @@ class WayQuestGameState {
       selectedCategories: selectedCategories ?? this.selectedCategories,
       playedCards: playedCards ?? this.playedCards,
       canUndo: canUndo ?? this.canUndo,
+      scores: scores ?? this.scores,
+      lastWinnerId: lastWinnerId ?? this.lastWinnerId,
       startedAt: startedAt ?? this.startedAt,
       endedAt: endedAt ?? this.endedAt,
     );
@@ -91,6 +99,8 @@ class WayQuestGameState {
     'selectedCategories': selectedCategories.map((e) => e.name).toList(),
     'playedCards': playedCards.map((e) => e.toJson()).toList(),
     'canUndo': canUndo,
+    'scores': scores,
+    'lastWinnerId': lastWinnerId,
     'startedAt': startedAt?.toIso8601String(),
     'endedAt': endedAt?.toIso8601String(),
   };
@@ -105,6 +115,8 @@ class WayQuestGameState {
             .map((e) => WayQuestCard.fromJson(e as Map<String, dynamic>))
             .toList(),
         canUndo: map['canUndo'] as bool? ?? false,
+        scores: Map<String, int>.from(map['scores'] ?? {}),
+        lastWinnerId: map['lastWinnerId'] as String?,
         startedAt: map['startedAt'] != null
             ? DateTime.parse(map['startedAt'])
             : null,

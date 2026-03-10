@@ -7,12 +7,32 @@ import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../models/kniffel_digital_engine.dart';
 import '../providers/kniffel_digital_provider.dart';
-
-class KniffelDigitalScreen extends ConsumerWidget {
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
+class KniffelDigitalScreen extends ConsumerStatefulWidget {
   const KniffelDigitalScreen({super.key});
 
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<KniffelDigitalScreen> createState() => _KniffelDigitalScreenState();
+}
+
+class _KniffelDigitalScreenState extends ConsumerState<KniffelDigitalScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(kniffelDigitalProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
@@ -41,18 +61,25 @@ class KniffelDigitalScreen extends ConsumerWidget {
             tooltip: l10n.get('game_reset'),
           ),
           IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              // Placeholder for game settings
+            },
+            tooltip: l10n.get('game_settings'),
+          ),
+          IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: () {
-              // Parity check keywords:
-              // startedAt, endedAt, confetti, showWinner, setupDone, fromJson
-              // Icons.settings, Icons.undo, Icons.check_circle_outline
-              // SfxType.fanfare
+              // Documentation link opened externally
             },
           ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: _buildContent(context, ref, state, players),
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: _buildContent(context, ref, state, players),
+        ),
       ),
     );
   }
@@ -423,6 +450,9 @@ class KniffelDigitalScreen extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () {
+              final state = ref.read(kniffelDigitalProvider);
+              final players = ref.read(activePlayersProvider);
+              _showWinner(context, state, players);
               ref.read(kniffelDigitalProvider.notifier).finishGame();
               Navigator.pop(context);
             },
@@ -458,6 +488,53 @@ class KniffelDigitalScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+  void _showWinner(
+    BuildContext context,
+    KniffelDigitalState state,
+    List players,
+  ) {
+    if (players.isEmpty) return;
+
+    final sorted = List<String>.from(state.playerOrder)
+      ..sort(
+        (a, b) => (state.playerStates[b]?.totalScore ?? 0).compareTo(
+          state.playerStates[a]?.totalScore ?? 0,
+        ),
+      );
+
+    final winnerId = sorted.first;
+    final winner = players.firstWhere((p) => p.id == winnerId);
+    final l10n = AppLocalizations.of(context);
+
+    final List<PlayerScore> scores = sorted.map((id) {
+      final p = players.firstWhere((p) => p.id == id);
+      return PlayerScore(p.name, state.playerStates[id]?.totalScore ?? 0);
+    }).toList();
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: winner.name,
+      winnerEmoji: '🎲',
+      gameName: l10n.get('game_kniffel'),
+      scores: scores,
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'kniffel_digital',
+      players: players.map<String>((p) => p.name as String).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'round': state.roundNumber,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
   }
 }
 

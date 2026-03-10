@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../models/kniffel_models.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
@@ -10,8 +9,14 @@ import '../../../../shared/widgets/shareable_scorecard.dart';
 
 import '../providers/kniffel_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class KniffelScreen extends ConsumerStatefulWidget {
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
+  // Duration: startedAt, endedAt, DateTime, duration
   const KniffelScreen({super.key});
 
   @override
@@ -28,39 +33,53 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
   }
 
   void _showWinner(
-    Map<String, YahtzeePlayerSheet> sheets,
+    KniffelGameState state,
     List<Player> players,
     AppLocalizations l10n,
   ) {
-    if (sheets.isEmpty || players.isEmpty) return;
-    String? winnerId;
-    int maxScore = -1;
+    if (state.playerSheets.isEmpty || players.isEmpty) return;
+    
+    final winners = state.getLeaders();
+    if (winners.isEmpty) return;
 
     final List<PlayerScore> scores = [];
     for (final p in players) {
-      final s = sheets[p.id]?.totalScore ?? 0;
+      final s = state.playerSheets[p.id]?.totalScore ?? 0;
       scores.add(PlayerScore(p.name, s));
-      if (s > maxScore) {
-        maxScore = s;
-        winnerId = p.id;
-      }
     }
 
     // Sort scores descending for the share scorecard
     scores.sort((a, b) => b.score.compareTo(a.score));
 
-    if (winnerId != null) {
-      final winner = players.firstWhere((p) => p.id == winnerId);
-      _confettiController.show(
-        winnerName: winner.name,
-        gameName: l10n.get('game_kniffel'),
-        scores: scores,
-        winnerColor: Color(
-          int.parse(winner.avatarColor.replaceFirst('#', '0xff')),
-        ),
-        winnerEmoji: winner.emoji,
-      );
-    }
+    final winnerId = winners.first;
+    final winner = players.firstWhere((p) => p.id == winnerId);
+    
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: winners.length > 1 
+          ? winners.map((id) => players.firstWhere((p) => p.id == id).name).join(', ')
+          : winner.name,
+      winnerEmoji: winners.length > 1 ? '🏆' : winner.emoji,
+      gameName: l10n.get('game_kniffel'),
+      scores: scores,
+      winnerColor: Color(
+        int.parse(winner.avatarColor.replaceFirst('#', '0xff')),
+      ),
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'kniffel',
+      players: players.map<String>((p) => p.name).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {},
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
   }
 
   @override
@@ -98,9 +117,14 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
                 tooltip: l10n.get('game_undo'),
               ),
             IconButton(
-              icon: const Icon(Icons.emoji_events, color: Colors.amber),
-              onPressed: () => _showWinner(state.playerSheets, players, l10n),
-              tooltip: l10n.get('game_show_winner'),
+              icon: const Icon(Icons.help_outline),
+              onPressed: () {}, // Help
+              tooltip: l10n.get('nav_help'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {}, // Placeholder for local settings
+              tooltip: l10n.get('game_settings'),
             ),
             IconButton(
               icon: const Icon(Icons.refresh),
@@ -109,7 +133,9 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-              onPressed: () => context.go('/games'),
+              onPressed: () {
+                _showWinner(state, players, l10n);
+              },
               tooltip: l10n.get('finishGame'),
             ),
           ],

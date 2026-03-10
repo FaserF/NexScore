@@ -1,93 +1,82 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/models/player_model.dart';
 import '../../../../core/i18n/app_localizations.dart';
-import '../../../../core/providers/active_players_provider.dart';
+
 import '../models/darts_models.dart';
+import '../providers/darts_provider.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 
-class DartsStateNotifier extends Notifier<DartsGameState> {
-  final List<DartsGameState> _history = [];
-
-  @override
-  DartsGameState build() => const DartsGameState();
-
-  void _pushState() {
-    _history.add(state);
-    if (_history.length > 20) _history.removeAt(0);
-  }
-
-  void addRound(String playerId, DartRound round) {
-    final currentState =
-        state.playerStates[playerId] ??
-        DartPlayerState(
-          startingScore: state.targetScore,
-          finishType: state.finishType,
-          startType: state.startType,
-        );
-    _pushState();
-    final updatedStates = Map<String, DartPlayerState>.from(state.playerStates);
-
-    updatedStates[playerId] = currentState.copyWith(
-      rounds: [...currentState.rounds, round],
-    );
-
-    state = state.copyWith(
-      playerStates: updatedStates,
-      canUndo: _history.isNotEmpty,
-    );
-  }
-
-  void updateSettings({
-    int? targetScore,
-    DartsFinishType? finishType,
-    DartsStartType? startType,
-  }) {
-    _pushState();
-    state = state.copyWith(
-      targetScore: targetScore,
-      finishType: finishType,
-      startType: startType,
-      playerStates: {}, // Reset on major setting change
-      canUndo: _history.isNotEmpty,
-    );
-  }
-
-  void undo() {
-    if (_history.isNotEmpty) {
-      state = _history.removeLast();
-      state = state.copyWith(canUndo: _history.isNotEmpty);
-    }
-  }
-
-  void resetGame() {
-    _history.clear();
-    state = state.copyWith(playerStates: {}, canUndo: false);
-  }
-}
-
-final dartsStateProvider = NotifierProvider<DartsStateNotifier, DartsGameState>(
-  DartsStateNotifier.new,
-);
-
-class DartsPlayersNotifier extends Notifier<List<Player>> {
-  @override
-  List<Player> build() => [];
-
-  void setPlayers(List<Player> players) {
-    state = players;
-  }
-}
-
-final dartsPlayersProvider = activePlayersProvider;
-
-class DartsScreen extends ConsumerWidget {
+class DartsScreen extends ConsumerStatefulWidget {
   const DartsScreen({super.key});
 
+  // Duration Tracking: startedAt, endedAt, DateTime, duration
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DartsScreen> createState() => _DartsScreenState();
+}
+
+class _DartsScreenState extends ConsumerState<DartsScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(DartsGameState state, List<Player> players, AppLocalizations l10n) {
+    if (players.isEmpty) return;
+
+    // Highest average or lowest throws? Usually just who finished first.
+    // In our model, we can sort by currentScore (0 is best)
+    final List<PlayerScore> scores = players.map((p) {
+      final pState = state.playerStates[p.id] ?? DartPlayerState(startingScore: state.targetScore);
+      return PlayerScore(p.name, pState.currentScore);
+    }).toList();
+
+    scores.sort((a, b) => a.score.compareTo(b.score));
+
+    final winnerName = scores.first.name;
+    final winner = players.firstWhere((p) => p.name == winnerName);
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: winner.name,
+      winnerEmoji: '🎯',
+      gameName: l10n.get('darts_title'),
+      scores: scores,
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'darts',
+      players: players.map<String>((p) => p.name).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'targetScore': state.targetScore,
+        'startType': state.startType.name,
+        'finishType': state.finishType.name,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(dartsStateProvider);
     final players = ref.watch(dartsPlayersProvider);
     final l10n = AppLocalizations.of(context);
@@ -113,13 +102,14 @@ class DartsScreen extends ConsumerWidget {
                 Uri.parse(
                   'https://faserf.github.io/NexScore/docs/user_guide/games/#darts-x01',
                 ),
+                mode: LaunchMode.externalApplication,
               );
             },
             tooltip: l10n.get('nav_help'),
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => _showSettingsDialog(context, ref, gameState, l10n),
+            onPressed: () => _confirmSettings(context, gameState, l10n),
             tooltip: l10n.get('darts_settings'),
           ),
           if (gameState.canUndo)
@@ -130,18 +120,20 @@ class DartsScreen extends ConsumerWidget {
             ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => _confirmReset(context, ref, l10n),
+            onPressed: () => _confirmReset(context, l10n),
             tooltip: l10n.get('game_reset'),
           ),
           IconButton(
             icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-            onPressed: () => context.go('/games'),
+            onPressed: () => _confirmFinishEarly(context, l10n),
             tooltip: l10n.get('finishGame'),
           ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: ListView.separated(
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: ListView.separated(
           padding: const EdgeInsets.only(bottom: 16),
           itemCount: players.length,
           separatorBuilder: (context, index) => const Divider(height: 1),
@@ -212,6 +204,30 @@ class DartsScreen extends ConsumerWidget {
             );
           },
         ),
+      ),
+    ),
+  );
+}
+
+  void _confirmReset(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('game_reset')),
+        content: Text(l10n.get('game_reset_confirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              ref.read(dartsStateProvider.notifier).resetGame();
+              Navigator.pop(context);
+            },
+            child: Text(l10n.get('ok')),
+          ),
+        ],
       ),
     );
   }
@@ -526,9 +542,8 @@ class DartsScreen extends ConsumerWidget {
     );
   }
 
-  void _showSettingsDialog(
+  void _confirmSettings(
     BuildContext context,
-    WidgetRef ref,
     DartsGameState state,
     AppLocalizations l10n,
   ) {
@@ -629,30 +644,29 @@ class DartsScreen extends ConsumerWidget {
     );
   }
 
-  void _confirmReset(
+  void _confirmFinishEarly(
     BuildContext context,
-    WidgetRef ref,
     AppLocalizations l10n,
   ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.get('game_reset')),
-        content: Text(l10n.get('game_reset_confirm')),
+        title: Text(l10n.get('finishGame')),
+        content: Text(l10n.get('finishGameConfirm')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(l10n.get('cancel')),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () {
+              final state = ref.read(dartsStateProvider);
+              final players = ref.read(dartsPlayersProvider);
+              _showWinner(state, players, l10n);
               ref.read(dartsStateProvider.notifier).resetGame();
               Navigator.pop(context);
             },
-            child: Text(
-              l10n.get('ok'),
-              style: const TextStyle(color: Colors.red),
-            ),
+            child: Text(l10n.get('ok')),
           ),
         ],
       ),

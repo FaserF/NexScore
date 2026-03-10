@@ -13,9 +13,13 @@ import '../../../../core/services/audio_service.dart';
 import '../models/card_models.dart';
 import '../models/wizard_digital_state.dart';
 import '../providers/wizard_digital_provider.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class WizardDigitalScreen extends ConsumerStatefulWidget {
   const WizardDigitalScreen({super.key});
+
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
 
   @override
   ConsumerState<WizardDigitalScreen> createState() =>
@@ -50,22 +54,15 @@ class _WizardDigitalScreenState extends ConsumerState<WizardDigitalScreen> {
               onPressed: () => ref.read(wizardDigitalProvider.notifier).undo(),
               tooltip: l10n.get('game_undo'),
             ),
-          if (state.phase != WizardPhase.setup) ...[
+          if (state.phase != WizardPhase.finished)
             IconButton(
-              icon: const Icon(Icons.scoreboard_outlined),
-              onPressed: () => _showScoreboard(context, state, players, l10n),
-              tooltip: l10n.get('wizard_total'),
-            ),
-            if (state.phase != WizardPhase.finished)
-              IconButton(
-                icon: const Icon(
-                  Icons.check_circle_outline,
-                  color: Colors.green,
-                ),
-                onPressed: () => _confirmFinish(context, ref, l10n),
-                tooltip: l10n.get('wizard_end_game'),
+              icon: const Icon(
+                Icons.check_circle_outline,
+                color: Colors.green,
               ),
-          ],
+              onPressed: () => _confirmFinish(context, ref, l10n),
+              tooltip: l10n.get('finishGame'),
+            ),
           IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: () {
@@ -73,6 +70,7 @@ class _WizardDigitalScreenState extends ConsumerState<WizardDigitalScreen> {
                 Uri.parse(
                   'https://faserf.github.io/NexScore/docs/user_guide/games/#wizard',
                 ),
+                mode: LaunchMode.externalApplication,
               );
             },
             tooltip: l10n.get('nav_help'),
@@ -81,6 +79,11 @@ class _WizardDigitalScreenState extends ConsumerState<WizardDigitalScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
             tooltip: l10n.get('game_reset'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {},
+            tooltip: l10n.get('game_settings'),
           ),
         ],
       ),
@@ -118,6 +121,23 @@ class _WizardDigitalScreenState extends ConsumerState<WizardDigitalScreen> {
       gameName: l10n.get('game_wizard'),
       scores: scores,
     );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'wizard_digital',
+      players: players.map((p) => p.name).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'round': state.currentRound,
+        'totalRounds': state.totalRounds,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
   }
 
   void _confirmReset(
@@ -688,44 +708,7 @@ class _WizardDigitalScreenState extends ConsumerState<WizardDigitalScreen> {
     );
   }
 
-  void _showScoreboard(
-    BuildContext context,
-    WizardDigitalState state,
-    List players,
-    AppLocalizations l10n,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.get('wizard_total')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: state.playerOrder.map((pid) {
-            final player = players.firstWhere(
-              (p) => p.id == pid,
-              orElse: () => players.first,
-            );
-            return ListTile(
-              title: Text(player.name),
-              trailing: Text(
-                '${state.totalScores[pid] ?? 0}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.get('ok')),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   String _suitLabel(CardSuit suit) {
     switch (suit) {

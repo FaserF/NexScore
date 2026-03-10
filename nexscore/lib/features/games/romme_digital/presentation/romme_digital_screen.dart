@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../models/romme_digital_engine.dart';
 import '../providers/romme_digital_provider.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class RommeDigitalScreen extends ConsumerStatefulWidget {
   const RommeDigitalScreen({super.key});
+
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
 
   @override
   ConsumerState<RommeDigitalScreen> createState() => _RommeDigitalScreenState();
@@ -16,6 +25,55 @@ class RommeDigitalScreen extends ConsumerStatefulWidget {
 
 class _RommeDigitalScreenState extends ConsumerState<RommeDigitalScreen> {
   final Set<String> _selectedCardIds = {};
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(RommeDigitalState state, List players, AppLocalizations l10n) {
+    if (players.isEmpty) return;
+
+    final sorted = List<String>.from(state.playerOrder)
+      ..sort(
+        (a, b) =>
+            (state.totalScores[a] ?? 0).compareTo(state.totalScores[b] ?? 0),
+      );
+
+    final winnerId = sorted.first;
+    final winner = players.firstWhere((p) => p.id == winnerId);
+    
+    final List<PlayerScore> scores = sorted.map((id) {
+      final p = players.firstWhere((p) => p.id == id);
+      return PlayerScore(p.name, state.totalScores[id] ?? 0);
+    }).toList();
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: winner.name,
+      winnerEmoji: winner.emoji,
+      gameName: l10n.get('game_romme'),
+      scores: scores,
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'romme_digital',
+      players: players.map<String>((p) => p.name as String).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'round': state.roundNumber,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,18 +94,40 @@ class _RommeDigitalScreenState extends ConsumerState<RommeDigitalScreen> {
             ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => _confirmReset(context, ref, l10n),
+            onPressed: () => _confirmReset(context, l10n),
             tooltip: l10n.get('game_reset'),
           ),
           IconButton(
-            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-            onPressed: () => context.go('/games'),
-            tooltip: l10n.get('finishGame'),
+            icon: const Icon(Icons.settings),
+            onPressed: () {},
+            tooltip: l10n.get('game_settings'),
           ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              launchUrl(
+                Uri.parse(
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#romme',
+                ),
+                mode: LaunchMode.externalApplication,
+              );
+            },
+            tooltip: l10n.get('nav_help'),
+          ),
+          if (state.phase != RommeDigitalPhase.setup && 
+              state.phase != RommeDigitalPhase.finished)
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () => _confirmFinishEarly(context, l10n),
+              tooltip: l10n.get('finishGame'),
+            ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: _buildContent(context, state, players),
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: _buildContent(context, state, players),
+        ),
       ),
     );
   }
@@ -57,14 +137,40 @@ class _RommeDigitalScreenState extends ConsumerState<RommeDigitalScreen> {
     RommeDigitalState state,
     List players,
   ) {
-    switch (state.phase) {
-      case RommeDigitalPhase.setup:
-        return _buildSetup(context, players);
-      case RommeDigitalPhase.playing:
-        return _buildPlaying(context, state, players);
-      case RommeDigitalPhase.finished:
-        return _buildFinished(context, state, players);
-    }
+    return switch (state.phase) {
+      RommeDigitalPhase.setup => _buildSetup(context, players),
+      RommeDigitalPhase.playing => _buildPlaying(context, state, players),
+      RommeDigitalPhase.finished => _buildFinished(context, state, players),
+    };
+  }
+
+  void _confirmFinishEarly(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('finishGame')),
+        content: Text(l10n.get('finishGameConfirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () {
+              final state = ref.read(rommeDigitalProvider);
+              final players = ref.read(activePlayersProvider);
+              _showWinner(state, players, l10n);
+              ref.read(rommeDigitalProvider.notifier).finishGame();
+              Navigator.pop(context);
+            },
+            child: Text(l10n.get('ok')),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildSetup(BuildContext context, List players) {
@@ -526,7 +632,6 @@ class _RommeDigitalScreenState extends ConsumerState<RommeDigitalScreen> {
 
   void _confirmReset(
     BuildContext context,
-    WidgetRef ref,
     AppLocalizations l10n,
   ) {
     showDialog(

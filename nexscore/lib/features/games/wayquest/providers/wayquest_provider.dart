@@ -100,6 +100,19 @@ class WayQuestStateNotifier extends Notifier<WayQuestGameState> {
     state = const WayQuestGameState();
   }
 
+  void recordWinner(String? playerId, int points) {
+    _pushState();
+    final newScores = Map<String, int>.from(state.scores);
+    if (playerId != null) {
+      newScores[playerId] = (newScores[playerId] ?? 0) + points;
+    }
+    state = state.copyWith(
+      scores: newScores,
+      lastWinnerId: playerId,
+      canUndo: _history.isNotEmpty,
+    );
+  }
+
   void finishGame() {
     _pushState();
     state = state.copyWith(

@@ -4,16 +4,71 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../models/bavarian_card_models.dart';
 import '../models/schafkopf_digital_state.dart';
 import '../providers/schafkopf_digital_provider.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
-class SchafkopfDigitalScreen extends ConsumerWidget {
+class SchafkopfDigitalScreen extends ConsumerStatefulWidget {
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
   const SchafkopfDigitalScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SchafkopfDigitalScreen> createState() => _SchafkopfDigitalScreenState();
+}
+
+class _SchafkopfDigitalScreenState extends ConsumerState<SchafkopfDigitalScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(SchafkopfDigitalState state, List players, AppLocalizations l10n) {
+    if (players.isEmpty) return;
+
+    final List<PlayerScore> scores = players.map((p) {
+      return PlayerScore(p.name, state.totalScores[p.id] ?? 0);
+    }).toList();
+
+    // Sort descending
+    scores.sort((a, b) => b.score.compareTo(a.score));
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: scores.first.name,
+      winnerEmoji: '🍺',
+      gameName: l10n.get('game_schafkopf'),
+      scores: scores,
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'schafkopf_digital',
+      players: players.map<String>((p) => p.name as String).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'rounds': state.completedTricks.length, // Or rounds? Schafkopf digital seems to track tricks
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(schafkopfDigitalProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
@@ -43,6 +98,7 @@ class SchafkopfDigitalScreen extends ConsumerWidget {
                 Uri.parse(
                   'https://faserf.github.io/NexScore/docs/user_guide/games/#schafkopf',
                 ),
+                mode: LaunchMode.externalApplication,
               );
             },
             tooltip: l10n.get('nav_help'),
@@ -52,23 +108,30 @@ class SchafkopfDigitalScreen extends ConsumerWidget {
             onPressed: () => _confirmReset(context, ref, l10n),
             tooltip: l10n.get('game_reset'),
           ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {}, // Settings
+            tooltip: l10n.get('game_settings'),
+          ),
           if (state.phase != SchafkopfDigitalPhase.setup &&
               state.phase != SchafkopfDigitalPhase.finished)
             IconButton(
               icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-              onPressed: () => _confirmFinishEarly(context, ref, l10n),
+              onPressed: () => _showWinner(state, players, l10n),
               tooltip: l10n.get('finishGame'),
             ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: Column(
-          children: [
-            // Fanfare sound keyword: SfxType.fanfare
-            Expanded(
-              child: _buildPhaseContent(context, ref, state, players, l10n),
-            ),
-          ],
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: Column(
+            children: [
+              Expanded(
+                child: _buildPhaseContent(context, ref, state, players, l10n),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -601,32 +664,6 @@ class SchafkopfDigitalScreen extends ConsumerWidget {
     );
   }
 
-  void _confirmFinishEarly(
-    BuildContext context,
-    WidgetRef ref,
-    AppLocalizations l10n,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.get('wizard_end_game')),
-        content: Text(l10n.get('game_finish_early_confirm')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.get('cancel')),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref.read(schafkopfDigitalProvider.notifier).finishGame();
-              Navigator.pop(context);
-            },
-            child: Text(l10n.get('confirm')),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _confirmReset(
     BuildContext context,

@@ -209,4 +209,22 @@ class WizardGameState {
     }
     return totalScore;
   }
+
+  /// Returns the IDs of the players with the highest score.
+  List<String> getLeaders(List<String> playerIds) {
+    if (playerIds.isEmpty) return [];
+    int maxScore = -999999;
+    final Map<String, int> scores = {};
+    for (final pid in playerIds) {
+      final score = calculatePlayerScore(
+        pid,
+        rounds,
+        lenient: scoringVariant == WizardScoringVariant.lenient,
+        extreme: scoringVariant == WizardScoringVariant.extreme,
+      );
+      scores[pid] = score;
+      if (score > maxScore) maxScore = score;
+    }
+    return playerIds.where((pid) => scores[pid] == maxScore).toList();
+  }
 }

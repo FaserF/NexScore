@@ -1,6 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 
-enum SfxType { click, swipe, fanfare }
+enum SfxType { swipe, fanfare }
 
 class AudioService {
   final AudioPlayer _player;
@@ -17,9 +17,6 @@ class AudioService {
 
     String path;
     switch (type) {
-      case SfxType.click:
-        path = 'audio/click1.mp3';
-        break;
       case SfxType.swipe:
         path = 'audio/beep1.mp3';
         break;

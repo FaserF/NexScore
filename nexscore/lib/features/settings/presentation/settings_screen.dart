@@ -187,45 +187,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _SectionHeader(title: l10n.get('settings_tts')),
-                GlassContainer(
-                  borderRadius: 24,
-                  child: SwitchListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
-                    ),
-                    secondary: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.record_voice_over,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    title: Text(
-                      l10n.get('settings_tts'),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Text(
-                      l10n.get('settings_tts_desc'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    value: settings.ttsEnabled,
-                    onChanged: (val) {
-                      ref.read(settingsProvider.notifier).setTtsEnabled(val);
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
                 _SectionHeader(title: l10n.get('settings_sfx')),
                 GlassContainer(
                   borderRadius: 24,

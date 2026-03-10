@@ -21,17 +21,17 @@ class VolleyballPdfService {
     final now = DateTime.now();
 
     // Resolve Dynamic URL
-    String generatedByUrl = 'https://github.com/FaserF/NexScore';
+    String generatedByUrl = 'https://faserf.github.io/NexScore/';
     if (kIsWeb) {
       try {
-        // In a real web environment, we can get the origin
-        // Since we can't easily import dart:html without conditional imports usually,
-        // and we want to keep it simple, we'll use a safe approach or just hardcode if it fails.
-        // But the requirement said: "use the URL it is currently used"
-        // For simplicity in this environment, I'll use a common pattern.
-        generatedByUrl = Uri.base.origin;
+        final origin = Uri.base.origin;
+        if (origin.contains('github.io')) {
+          generatedByUrl = 'https://faserf.github.io/NexScore/';
+        } else {
+          generatedByUrl = origin;
+        }
       } catch (_) {
-        generatedByUrl = 'nexscore.app';
+        generatedByUrl = 'https://faserf.github.io/NexScore/';
       }
     }
 
@@ -219,10 +219,10 @@ class VolleyballPdfService {
                 pw.TableRow(
                   decoration: const pw.BoxDecoration(color: PdfColors.grey200),
                   children: [
-                    _tableHeader('#'),
+                    _tableHeader(l10n.get('vb_pdf_nr_symbol')),
                     _tableHeader(state.teamAName),
                     _tableHeader(state.teamBName),
-                    _tableHeader('TIME'), // Using literal but we could use a key if needed
+                    _tableHeader(l10n.get('vb_pdf_time')),
                     _tableHeader(l10n.get('vb_pdf_winner')),
                   ],
                 ),
@@ -287,12 +287,32 @@ class VolleyballPdfService {
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Text(
-                  l10n.getWith('vb_pdf_generated_by', [generatedByUrl]),
-                  style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey400),
+                pw.Row(
+                  children: [
+                    pw.Container(
+                      width: 10,
+                      height: 10,
+                      decoration: const pw.BoxDecoration(
+                        color: PdfColors.blue900,
+                        shape: pw.BoxShape.circle,
+                      ),
+                    ),
+                    pw.SizedBox(width: 4),
+                    pw.Text(
+                      l10n.getWith('vb_pdf_generated_by', [generatedByUrl]),
+                      style: pw.TextStyle(
+                        fontSize: 8,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.grey700,
+                      ),
+                    ),
+                  ],
                 ),
                 pw.Text(
-                  l10n.getWith('vb_pdf_page', ['1', '1']),
+                  l10n.getWith(
+                    'vb_pdf_page',
+                    [context.pageNumber.toString(), context.pagesCount.toString()],
+                  ),
                   style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey400),
                 ),
               ],

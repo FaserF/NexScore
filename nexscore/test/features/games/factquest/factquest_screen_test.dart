@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:nexscore/core/i18n/app_localizations.dart';
 import 'package:nexscore/features/games/factquest/presentation/factquest_screen.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 void main() {
   Widget buildTestWidget() {
@@ -114,11 +115,51 @@ void main() {
       await tester.pumpAndSettle();
 
       // Modal should show "Select Categories" (from EN mock or real l10n)
-      // The mock in buildTestWidget uses AppLocalizationsDelegate, which loads English.
       expect(find.text('Select Categories'), findsWidgets);
 
       // Should show category chips in the modal
       expect(find.text('Random Facts'), findsWidgets);
     });
+
+    testWidgets('Volume button toggles TTS state', (tester) async {
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
+
+      // Find the volume off icon (default state)
+      expect(find.byIcon(Icons.volume_off), findsOneWidget);
+      expect(find.byIcon(Icons.volume_up), findsNothing);
+
+      // Tap the volume button
+      await tester.tap(find.byIcon(Icons.volume_off));
+      await tester.pumpAndSettle();
+
+      // Now should show volume up icon
+      expect(find.byIcon(Icons.volume_up), findsOneWidget);
+      expect(find.byIcon(Icons.volume_off), findsNothing);
+    });
   });
+}
+
+class FakeFlutterTts extends Fake implements FlutterTts {
+  String? lastSpokenText;
+  bool isStopped = false;
+
+  @override
+  void setStartHandler(Function callback) {}
+  @override
+  void setCompletionHandler(Function callback) {}
+  @override
+  void setErrorHandler(Function(dynamic message) callback) {}
+  @override
+  Future<dynamic> setLanguage(String language) async => true;
+  @override
+  Future<dynamic> speak(String text, {bool? focus}) async {
+    lastSpokenText = text;
+    return true;
+  }
+  @override
+  Future<dynamic> stop() async {
+    isStopped = true;
+    return true;
+  }
 }

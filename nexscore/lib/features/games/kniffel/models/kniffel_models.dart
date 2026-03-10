@@ -115,4 +115,17 @@ class KniffelGameState {
       canUndo: json['canUndo'] as bool? ?? false,
     );
   }
+
+  /// Returns the IDs of the players with the highest score.
+  List<String> getLeaders() {
+    if (playerSheets.isEmpty) return [];
+    int maxScore = -1;
+    for (final s in playerSheets.values) {
+      if (s.totalScore > maxScore) maxScore = s.totalScore;
+    }
+    return playerSheets.entries
+        .where((e) => e.value.totalScore == maxScore)
+        .map((e) => e.key)
+        .toList();
+  }
 }

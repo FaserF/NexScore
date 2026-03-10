@@ -1,17 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../models/qwixx_digital_engine.dart';
 import '../providers/qwixx_digital_provider.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
-class QwixxDigitalScreen extends ConsumerWidget {
+class QwixxDigitalScreen extends ConsumerStatefulWidget {
+  // Duration: startedAt, endedAt, DateTime, duration
   const QwixxDigitalScreen({super.key});
 
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<QwixxDigitalScreen> createState() => _QwixxDigitalScreenState();
+}
+
+class _QwixxDigitalScreenState extends ConsumerState<QwixxDigitalScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(QwixxDigitalState state, List players, AppLocalizations l10n) {
+    if (players.isEmpty) return;
+
+    final sorted = List<String>.from(state.playerOrder)
+      ..sort(
+        (a, b) => (state.playerStates[b]?.totalScore ?? 0).compareTo(
+          state.playerStates[a]?.totalScore ?? 0,
+        ),
+      );
+
+    final winnerId = sorted.first;
+    final winner = players.firstWhere((p) => p.id == winnerId);
+    
+    final List<PlayerScore> scores = sorted.map((id) {
+      final p = players.firstWhere((p) => p.id == id);
+      return PlayerScore(p.name, state.playerStates[id]?.totalScore ?? 0);
+    }).toList();
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: winner.name,
+      winnerEmoji: winner.emoji,
+      gameName: l10n.get('game_qwixx'),
+      scores: scores,
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'qwixx_digital',
+      players: players.map<String>((p) => p.name as String).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'round': state.roundNumber,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(qwixxDigitalProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
@@ -27,45 +93,60 @@ class QwixxDigitalScreen extends ConsumerWidget {
               onPressed: () => ref.read(qwixxDigitalProvider.notifier).undo(),
               tooltip: l10n.get('game_undo'),
             ),
-          if (state.phase != QwixxDigitalPhase.setup &&
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _confirmReset(context, l10n),
+            tooltip: l10n.get('game_reset'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {},
+            tooltip: l10n.get('game_settings'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              launchUrl(
+                Uri.parse(
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#qwixx',
+                ),
+                mode: LaunchMode.externalApplication,
+              );
+            },
+            tooltip: l10n.get('nav_help'),
+          ),
+          if (state.phase != QwixxDigitalPhase.setup && 
               state.phase != QwixxDigitalPhase.finished)
             IconButton(
               icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-              onPressed: () => _confirmFinishEarly(context, ref, l10n),
+              onPressed: () => _confirmFinishEarly(context, l10n),
               tooltip: l10n.get('finishGame'),
             ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => _confirmReset(context, ref, l10n),
-            tooltip: l10n.get('game_reset'),
-          ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: _buildContent(context, ref, state, players),
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: _buildContent(context, state, players),
+        ),
       ),
     );
   }
 
   Widget _buildContent(
     BuildContext context,
-    WidgetRef ref,
     QwixxDigitalState state,
     List players,
   ) {
-    switch (state.phase) {
-      case QwixxDigitalPhase.setup:
-        return _buildSetup(context, ref, players);
-      case QwixxDigitalPhase.rolling:
-        return _buildRolling(context, ref, state, players);
-      case QwixxDigitalPhase.whiteChoice:
-      case QwixxDigitalPhase.colorChoice:
-      case QwixxDigitalPhase.otherPlayers:
-      case QwixxDigitalPhase.roundEnd:
-        return _buildPlaying(context, ref, state, players);
-      case QwixxDigitalPhase.finished:
-        return _buildFinished(context, state, players);
-    }
+    return switch (state.phase) {
+      QwixxDigitalPhase.setup => _buildSetup(context, ref, players),
+      QwixxDigitalPhase.rolling => _buildRolling(context, ref, state, players),
+      QwixxDigitalPhase.whiteChoice ||
+      QwixxDigitalPhase.colorChoice ||
+      QwixxDigitalPhase.otherPlayers ||
+      QwixxDigitalPhase.roundEnd => _buildPlaying(context, ref, state, players),
+      QwixxDigitalPhase.finished => _buildFinished(context, state, players),
+    };
   }
 
   Widget _buildSetup(BuildContext context, WidgetRef ref, List players) {
@@ -487,7 +568,6 @@ class QwixxDigitalScreen extends ConsumerWidget {
 
   void _confirmReset(
     BuildContext context,
-    WidgetRef ref,
     AppLocalizations l10n,
   ) {
     showDialog(
@@ -514,7 +594,6 @@ class QwixxDigitalScreen extends ConsumerWidget {
 
   void _confirmFinishEarly(
     BuildContext context,
-    WidgetRef ref,
     AppLocalizations l10n,
   ) {
     showDialog(
@@ -529,9 +608,11 @@ class QwixxDigitalScreen extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () {
+              final state = ref.read(qwixxDigitalProvider);
+              final players = ref.read(activePlayersProvider);
+              _showWinner(state, players, l10n);
               ref.read(qwixxDigitalProvider.notifier).finishGame();
-              Navigator.pop(context); // Close dialog
-              context.go('/games'); // Navigate away
+              Navigator.pop(context);
             },
             child: Text(l10n.get('ok')),
           ),

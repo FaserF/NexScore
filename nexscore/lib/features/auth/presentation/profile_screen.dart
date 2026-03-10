@@ -349,7 +349,11 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
             ListTile(
               leading: const Icon(Icons.info_outline, color: Colors.orange),
               title: Text(l10n.get('account_guest_status')),
-              subtitle: Text(l10n.get('account_signed_out_body')),
+              subtitle: Text(
+                '${l10n.get('account_signed_out_body')}\n\n'
+                'Tip: Signing in will replace this guest session with your cloud account. '
+                'Make sure to export local data if you need it.',
+              ),
             ),
             const SizedBox(height: 32),
             _AuthButton(
@@ -662,10 +666,21 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
     String message,
     ScaffoldMessengerState messenger,
   ) {
+    final isAlreadyLinked = message.contains('already linked to another user');
+
     messenger.showSnackBar(
       SnackBar(
         content: Text(l10n.getWith('account_sign_in_error', [message])),
         backgroundColor: Colors.red,
+        action: isAlreadyLinked
+            ? SnackBarAction(
+                label: 'Sign Out & Switch',
+                textColor: Colors.white,
+                onPressed: () {
+                  ref.read(authServiceProvider).signOut();
+                },
+              )
+            : null,
       ),
     );
 
@@ -678,6 +693,13 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(l10n.getWith('account_sign_in_error', [message])),
+            if (isAlreadyLinked) ...[
+              const SizedBox(height: 16),
+              const Text(
+                'If you want to use this cloud account, you must sign out of the current (guest) account first.',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
             const SizedBox(height: 16),
             const Text(
               'Please check the browser console for more details.',
@@ -686,6 +708,14 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
           ],
         ),
         actions: [
+          if (isAlreadyLinked)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                ref.read(authServiceProvider).signOut();
+              },
+              child: const Text('Sign Out & Switch'),
+            ),
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(l10n.get('ok')),

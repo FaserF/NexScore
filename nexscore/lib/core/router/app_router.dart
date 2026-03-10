@@ -24,6 +24,7 @@ import '../../features/help/presentation/help_screen.dart';
 import '../../features/help/presentation/privacy_docs_screen.dart';
 import '../../features/games/extras/presentation/generic_score_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/settings/presentation/notification_permission_screen.dart';
 import '../../features/games/presentation/game_setup_screen.dart';
 import '../../features/games/arschloch/presentation/arschloch_screen.dart';
 import '../../features/multiplayer/presentation/multiplayer_hub_screen.dart';
@@ -205,6 +206,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'settings',
                     builder: (context, state) => const SettingsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'notification-permission',
+                    builder: (context, state) => const NotificationPermissionScreen(),
                   ),
                   GoRoute(
                     path: 'docs',

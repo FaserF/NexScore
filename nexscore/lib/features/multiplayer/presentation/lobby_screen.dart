@@ -62,7 +62,24 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             ),
           );
         } else if (message.contains('unavailable') ||
-            message.contains('firestore_timeout')) {
+            message.contains('client is offline')) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.get('multiplayer_error_offline_title')),
+              content: Text(l10n.get('multiplayer_error_offline_desc')),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.pop();
+                  },
+                  child: Text(l10n.get('ok')),
+                ),
+              ],
+            ),
+          );
+        } else if (message.contains('firestore_timeout')) {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(

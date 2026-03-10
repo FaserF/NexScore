@@ -15,7 +15,8 @@ void main() {
           // Exclude non-game screens
           if (!entity.path.contains('games_list_screen.dart') &&
               !entity.path.contains('game_setup_screen.dart') &&
-              !entity.path.contains('generic_scoreboard_setup.dart')) {
+              !entity.path.contains('generic_scoreboard_setup.dart') &&
+              !entity.path.contains('volleyball_signals_screen.dart')) {
             // ignoring any generic non-main screens if present
             screenFiles.add(entity);
           }
@@ -140,5 +141,33 @@ void _checkFileForParity(File file, String gameName) {
         content.contains('timestamp'),
     isTrue,
     reason: 'Game $gameName is missing duration tracking (startedAt, endedAt).',
+  );
+
+  // 10. PWA Compatibility (External Links)
+  if (content.contains('launchUrl')) {
+    expect(
+      content.contains('LaunchMode.externalApplication'),
+      isTrue,
+      reason:
+          'Game $gameName uses launchUrl but might not be opening in an external application (required for PWA).',
+    );
+  }
+
+  // 11. UI Standardization (No redundant "Show Winner" button)
+  expect(
+    !content.contains('Icon(Icons.emoji_events)'),
+    isTrue,
+    reason:
+        'Game $gameName still contains an Icons.emoji_events button. Redundant "Show Winner" buttons should be removed in favor of the standardized Finish button.',
+  );
+
+  // 12. Share Results / Share Task
+  expect(
+    content.contains('Icons.share') ||
+        content.contains('shareWidget') ||
+        content.contains('share_provider') ||
+        content.contains('WinnerConfettiOverlay'), // Standardized winner screen includes share
+    isTrue,
+    reason: 'Game $gameName is missing a Share button or sharing logic.',
   );
 }

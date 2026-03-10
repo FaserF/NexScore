@@ -3,13 +3,70 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../providers/generic_score_provider.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
-class GenericScoreScreen extends ConsumerWidget {
+class GenericScoreScreen extends ConsumerStatefulWidget {
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
+  // Duration: startedAt, endedAt, DateTime, duration
   const GenericScoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GenericScoreScreen> createState() => _GenericScoreScreenState();
+}
+
+class _GenericScoreScreenState extends ConsumerState<GenericScoreScreen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(dynamic state, List players, AppLocalizations l10n) {
+    if (players.isEmpty) return;
+
+    final List<PlayerScore> scores = players.map((p) {
+      return PlayerScore(p.name, state.playerTotals[p.id] ?? 0);
+    }).toList();
+
+    // Sort by score (usually lowest is best in some games, but highest in others. 
+    // For generic, we sort descending by default)
+    scores.sort((a, b) => b.score.compareTo(a.score));
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: scores.first.name,
+      winnerEmoji: '🏆',
+      gameName: l10n.get('game_generic'),
+      scores: scores,
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'generic',
+      players: players.map<String>((p) => p.name).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'rounds': state.rounds.length,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(genericScoreProvider);
     final players = ref.watch(activePlayersProvider);
     final l10n = AppLocalizations.of(context);
@@ -32,6 +89,26 @@ class GenericScoreScreen extends ConsumerWidget {
               tooltip: l10n.get('game_undo'),
             ),
           IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {}, // Help
+            tooltip: l10n.get('nav_help'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {}, // Settings
+            tooltip: l10n.get('game_settings'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {}, // Help
+            tooltip: l10n.get('nav_help'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {}, // Settings
+            tooltip: l10n.get('game_settings'),
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _confirmReset(context, ref, l10n),
             tooltip: l10n.get('game_reset'),
@@ -42,30 +119,38 @@ class GenericScoreScreen extends ConsumerWidget {
             tooltip: l10n.get('add'),
           ),
           IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {}, // Help
+            tooltip: l10n.get('nav_help'),
+          ),
+          IconButton(
             icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => _showWinner(state, players, l10n),
             tooltip: l10n.get('finishGame'),
           ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildTableHeader(context, players),
-              ...List.generate(state.rounds.length, (roundIndex) {
-                return _buildRoundRow(
-                  context,
-                  ref,
-                  roundIndex,
-                  state.rounds[roundIndex],
-                  players,
-                );
-              }),
-              const Divider(height: 32, thickness: 2),
-              _buildFooterTotals(context, state, players, l10n),
-              const SizedBox(height: 100),
-            ],
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildTableHeader(context, players),
+                ...List.generate(state.rounds.length, (roundIndex) {
+                  return _buildRoundRow(
+                    context,
+                    ref,
+                    roundIndex,
+                    state.rounds[roundIndex],
+                    players,
+                  );
+                }),
+                const Divider(height: 32, thickness: 2),
+                _buildFooterTotals(context, state, players, l10n),
+                const SizedBox(height: 100),
+              ],
+            ),
           ),
         ),
       ),

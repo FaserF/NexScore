@@ -7,8 +7,14 @@ class AppLocalizations {
 
   AppLocalizations(this.locale);
 
+  static AppLocalizations? maybeOf(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  }
+
   static AppLocalizations of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+    final AppLocalizations? result = maybeOf(context);
+    assert(result != null, 'No AppLocalizations found in context');
+    return result!;
   }
 
   static const Map<String, Map<String, String>>
@@ -154,6 +160,7 @@ class AppLocalizations {
       'game_skip': 'Skip',
       'game_show_winner': 'Show Winner',
       'game_undo': 'Undo',
+      'finishGame': 'Finish Game',
       'back': 'Back',
 
       // ── Game Descriptions
@@ -270,6 +277,9 @@ class AppLocalizations {
       'multiplayer_host': 'Host a Room',
       'multiplayer_join': 'Join a Room',
       'multiplayer_room_code': 'Room Code',
+      'multiplayer_error_offline_title': 'Connection Blocked or Offline',
+      'multiplayer_error_offline_desc':
+          'NexScore could not reach the multiplayer servers. This is often caused by an AdBlocker, a VPN, or a restrictive network (e.g. corporate WiFi) blocking the connection. If you are connected to the internet, please disable your AdBlocker/VPN and try again.',
       'multiplayer_diagnostics': 'Multiplayer Diagnostics',
       'settings_presets': 'Player Groups',
       'presets_save': 'Save as Group',
@@ -344,6 +354,18 @@ class AppLocalizations {
       'add_round': 'Add Round',
       'clear': 'Clear',
 
+      // Notifications
+      'notifications_title': 'Notifications',
+      'notifications_enabled': 'Notifications Enabled',
+      'notifications_denied': 'Notifications Denied',
+      'notifications_why_title': 'Stay in the Loop!',
+      'notifications_why_desc': 'NexScore needs notification permissions to let you know when it\'s your turn, when a local server is found, and when a new game starts while the app is in the background.',
+      'notifications_feature_server': 'Local Server Discovery',
+      'notifications_feature_start': 'Game Start Alerts',
+      'notifications_feature_turn': 'Your Turn Reminders',
+      'notifications_allow_btn': 'Allow Notifications',
+      'not_now': 'Not Now',
+
       // ── Qwixx
       'qwixx_title': 'Qwixx',
       'qwixx_score_label': 'Total Score: {0}',
@@ -364,6 +386,12 @@ class AppLocalizations {
       'wayquest_cat_storyStarters': 'Story Starters',
       'wayquest_start': 'START VOYAGE',
       'wayquest_tap_continue': 'Tap for next quest',
+      'wayquest_who_won': 'Who won this quest?',
+      'wayquest_nobody_won': 'Nobody',
+      'wayquest_scoreboard': 'Scoreboard',
+      'wayquest_winner_title': '{0} wins!',
+      'wayquest_winner_subtitle': 'Great job on the road!',
+      'wayquest_points': '{0} pts',
       'desc_wayquest':
           'Entertaining questions and challenges for long car rides.',
 
@@ -684,6 +712,7 @@ class AppLocalizations {
       'buzztap_cat_hot': 'Hot',
       'buzztap_cat_extreme': 'Extreme',
       'buzztap_start': 'Let\'s Buzz!',
+      'sipdeck_sip_tracker': 'Sips Tracker',
       'sip_tracker': 'Sips Tracker',
       'sipdeck_18_warning': 'Must be 18+ to play.',
       'sipdeck_2player_warning':
@@ -2531,9 +2560,9 @@ class AppLocalizations {
       'fq_card_dw131_expl':
           'This tragedy led to fire codes requiring outward-opening exit doors in public buildings.',
       'fq_card_dw132_text':
-          'A man dies after being struck by a falling scaffold.',
+          'A writer dies of exhaustion while investigating a volcanic eruption. He sailed close to the danger to rescue others. Who was he?',
       'fq_card_dw132_expl':
-          'Improperly secured scaffolding can collapse entirely, causing multiple fatalities.',
+          'Solution: Pliny the Elder died in 79 CE during the eruption of Mount Vesuvius. He sailed close to Pompeii to rescue friends and died on the shore, likely of cardiovascular collapse or toxic fumes.',
       'fq_card_dw133_text':
           'A man dies after accidentally eating a poisonous mushroom.',
       'fq_card_dw133_expl':
@@ -2623,6 +2652,28 @@ class AppLocalizations {
       'resume_game_desc': 'Would you like to resume your unfinished {0} game?',
       'resume': 'Resume',
       'discard': 'Discard',
+      'nav_settings': 'Settings',
+      'game_finish_confirm':
+          'Are you sure you want to finish the game now? The current state will be saved as the final score.',
+      'finishGameConfirm': 'Finish Game',
+      'factquest_cards_played': 'Cards played: {0}',
+      'vb_set_with_number': 'Set {0}: ',
+      'vb_pdf_time': 'TIME',
+      'vb_pdf_nr_symbol': '#',
+      'vb_signal_serve_desc': 'The referee blows the whistle to authorize the service.',
+      'vb_signal_team_to_serve_desc': 'Indicates which team will serve next.',
+      'vb_signal_change_sides_desc': 'Teams must switch sides of the court.',
+      'vb_signal_timeout_desc': 'A 30-second break requested by a team.',
+      'vb_signal_substitution_desc': 'One player replaces another on the court.',
+      'vb_signal_ball_in_desc': 'The ball touched the floor inside the court boundaries.',
+      'vb_signal_ball_out_desc': 'The ball touched the floor outside the court or hit an antenna.',
+      'vb_signal_touch_desc': 'The ball touched a player before going out.',
+      'vb_signal_net_touch_desc': 'A player touched the net or its antennas during an action.',
+      'vb_signal_over_net_desc': 'Reaching over the net into the opponent\'s space.',
+      'vb_signal_four_hits_desc': 'A team touched the ball four times before returning it.',
+      'vb_signal_double_hit_desc': 'A player touched the ball twice in succession.',
+      'vb_signal_rotation_fault_desc': 'Players were not in their correct positions during service.',
+      'vb_signal_held_ball_desc': 'The ball was caught or thrown rather than hit.',
     },
     'de': {
       // ── Navigation
@@ -2671,6 +2722,7 @@ class AppLocalizations {
       'game_skip': 'Überspringen',
       'game_show_winner': 'Gewinner anzeigen',
       'game_undo': 'Rückgängig',
+      'finishGame': 'Spiel beenden',
       'settings_language': 'Sprache',
       'settings_language_en': 'Englisch',
       'settings_language_de': 'Deutsch',
@@ -2789,6 +2841,7 @@ class AppLocalizations {
       'buzztap_cat_hot': 'Heiß',
       'buzztap_cat_extreme': 'Extrem',
       'buzztap_start': 'Los geht\'s!',
+      'sipdeck_sip_tracker': 'Schluckzähler',
       'sip_tracker': 'Schluckzähler',
       'category_help_title': 'Kategoriebeschreibungen',
       'buzztap_help_warmup':
@@ -2894,6 +2947,9 @@ class AppLocalizations {
       'multiplayer_host': 'Raum erstellen',
       'multiplayer_join': 'Raum beitreten',
       'multiplayer_room_code': 'Raum-Code',
+      'multiplayer_error_offline_title': 'Verbindung blockiert oder offline',
+      'multiplayer_error_offline_desc':
+          'NexScore konnte die Multiplayer-Server nicht erreichen. Dies wird oft durch einen AdBlocker, ein VPN oder ein eingeschränktes Netzwerk (z.B. Firmen-WLAN) verursacht. Wenn du mit dem Internet verbunden bist, deaktiviere bitte deinen AdBlocker/VPN und versuche es erneut.',
       'multiplayer_diagnostics': 'Multiplayer Diagnose',
       'settings_presets': 'Spieler-Gruppen',
       'presets_save': 'Als Gruppe speichern',
@@ -2966,6 +3022,18 @@ class AppLocalizations {
       'wizard_2player_warning':
           'Hinweis: Amigo unterstützt Wizard mit nur 2 Spielern offiziell nicht.',
 
+      // Notifications
+      'notifications_title': 'Benachrichtigungen',
+      'notifications_enabled': 'Benachrichtigungen aktiviert',
+      'notifications_denied': 'Benachrichtigungen abgelehnt',
+      'notifications_why_title': 'Bleib auf dem Laufenden!',
+      'notifications_why_desc': 'NexScore benötigt die Berechtigung für Benachrichtigungen, um dir mitzuteilen, wenn du an der Reihe bist, wenn ein lokaler Server gefunden wird und wenn ein neues Spiel beginnt, während die App im Hintergrund ist.',
+      'notifications_feature_server': 'Lokale Server-Erkennung',
+      'notifications_feature_start': 'Spielstart-Benachrichtigungen',
+      'notifications_feature_turn': 'Erinnerungen für deinen Zug',
+      'notifications_allow_btn': 'Benachrichtigungen erlauben',
+      'not_now': 'Später',
+
       // ── Qwixx
       'qwixx_title': 'Qwixx',
       'qwixx_score_label': 'Gesamtpunktzahl: {0}',
@@ -2986,6 +3054,12 @@ class AppLocalizations {
       'wayquest_cat_storyStarters': 'Geschichten-Starter',
       'wayquest_start': 'REISE STARTEN',
       'wayquest_tap_continue': 'Tippen für die nächste Quest',
+      'wayquest_who_won': 'Wer hat diese Quest gewonnen?',
+      'wayquest_nobody_won': 'Niemand',
+      'wayquest_scoreboard': 'Punktestand',
+      'wayquest_winner_title': '{0} gewinnt!',
+      'wayquest_winner_subtitle': 'Gute Arbeit auf der Straße!',
+      'wayquest_points': '{0} Pkt',
       'desc_wayquest':
           'Unterhaltsame Fragen und Challenges für lange Autofahrten.',
 
@@ -3917,6 +3991,28 @@ class AppLocalizations {
       'backup_local_export_success': 'Backup erfolgreich exportiert.',
       'backup_local_import_success': 'Backup erfolgreich importiert.',
       'backup_local_import_error': 'Fehler beim Importieren: {0}',
+      'nav_settings': 'Einstellungen',
+      'game_finish_confirm':
+          'Möchtest du das Spiel wirklich beenden? Der aktuelle Stand wird als Endergebnis gespeichert.',
+      'finishGameConfirm': 'Spiel beenden',
+      'factquest_cards_played': 'Gespielte Karten: {0}',
+      'vb_set_with_number': 'Satz {0}: ',
+      'vb_pdf_time': 'ZEIT',
+      'vb_pdf_nr_symbol': 'Nr.',
+      'vb_signal_serve_desc': 'Der Schiedsrichter gibt den Aufschlag mit einem Pfiff frei.',
+      'vb_signal_team_to_serve_desc': 'Zeigt an, welche Mannschaft als nächstes aufschlägt.',
+      'vb_signal_change_sides_desc': 'Die Mannschaften müssen die Spielfeldseite wechseln.',
+      'vb_signal_timeout_desc': 'Eine von einer Mannschaft beantragte 30-sekündige Pause.',
+      'vb_signal_substitution_desc': 'Ein Spieler wird durch einen anderen Spieler ersetzt.',
+      'vb_signal_ball_in_desc': 'Der Ball hat den Boden innerhalb des Spielfelds berührt.',
+      'vb_signal_ball_out_desc': 'Der Ball hat den Boden außerhalb berührt oder die Antenne getroffen.',
+      'vb_signal_touch_desc': 'Ein Spieler hat den Ball berührt, bevor er ins Aus ging.',
+      'vb_signal_net_touch_desc': 'Ein Spieler hat während einer Aktion das Netz oder die Antenne berührt.',
+      'vb_signal_over_net_desc': 'Ein Spieler hat über das Netz in den gegnerischen Raum gegriffen.',
+      'vb_signal_four_hits_desc': 'Eine Mannschaft hat den Ball viermal berührt.',
+      'vb_signal_double_hit_desc': 'Ein Spieler hat den Ball zweimal hintereinander berührt.',
+      'vb_signal_rotation_fault_desc': 'Die Spieler standen beim Aufschlag nicht auf ihren korrekten Positionen.',
+      'vb_signal_held_ball_desc': 'Der Ball wurde gefangen oder geworfen, statt geschlagen.',
       'backup_local_section': 'Lokales Backup',
 
       // ── FactQuest
@@ -5181,9 +5277,9 @@ class AppLocalizations {
       'fq_card_dw131_expl':
           'Balkonstürze aufgrund von Schwindel oder mangelhaften Geländern waren in historischen Gebäuden keine Seltenheit.',
       'fq_card_dw132_text':
-          'Ein Mann stirbt, weil er versucht, einen Hai mit bloßen Händen zu füttern. Die Gier des Meeres kannte keine Grenzen. Wo geschah das?',
+          'Ein berühmter römischer Schriftsteller stirbt bei der Untersuchung eines Vulkanausbruchs. Er segelte nah an die Gefahr heran, um andere zu retten. Wer war er?',
       'fq_card_dw132_expl':
-          'Das Füttern von Raubtieren von Hand führt oft zu schweren Verletzungen oder zum Verlust von Gliedmaßen und Leben.',
+          'Lösung: Plinius der Ältere starb 79 n. Chr. beim Ausbruch des Vesuvs. Er segelte in die Nähe von Pompeji, um Freunde zu retten, und starb am Strand, wahrscheinlich an Herz-Kreislauf-Versagen oder giftigen Dämpfen.',
       'fq_card_dw133_text':
           'Ein Wissenschaftler stirbt, weil er radioaktives Material für seine Experimente im Kühlschrank neben seinem Essen lagerte. Was war die Folge?',
       'fq_card_dw133_expl':

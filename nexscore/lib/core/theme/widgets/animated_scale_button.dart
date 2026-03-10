@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/audio_provider.dart';
-import '../../services/audio_service.dart';
 
 class AnimatedScaleButton extends ConsumerStatefulWidget {
   final Widget child;
@@ -46,8 +44,6 @@ class _AnimatedScaleButtonState extends ConsumerState<AnimatedScaleButton>
 
   void _onTapDown(TapDownDetails details) {
     _controller.reverse();
-    // Play click sound
-    ref.read(audioServiceProvider).play(SfxType.click);
   }
 
   void _onTapUp(TapUpDetails details) {

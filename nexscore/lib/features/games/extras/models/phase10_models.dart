@@ -133,7 +133,9 @@ class Phase10GameState {
       case Phase10Variant.masters:
         return Phase10PhaseSet.masters.phases;
       case Phase10Variant.custom:
-        return customPhases;
+        return customPhases.isNotEmpty
+            ? customPhases
+            : Phase10PhaseSet.original.phases;
       case Phase10Variant.original:
       case Phase10Variant.levelUp:
       default:

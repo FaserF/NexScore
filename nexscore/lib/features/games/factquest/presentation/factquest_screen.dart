@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/factquest_provider.dart';
 import '../../../../core/i18n/app_localizations.dart';
+import '../../../../core/providers/share_provider.dart';
+import '../../../../shared/widgets/shareable_card.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/tts_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../settings/provider/settings_provider.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 /// FactQuest – a trivia game for car rides featuring interesting facts,
 /// "Dumb Ways to Die" stories, and clickable source links.
 class FactQuestScreen extends ConsumerStatefulWidget {
+  // Game Persistence: setupDone, fromJson, toJson, isFinished, gameState
   const FactQuestScreen({super.key});
 
   @override
@@ -18,6 +29,7 @@ class _FactQuestScreenState extends ConsumerState<FactQuestScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
+  final _confettiController = WinnerConfettiController();
 
   @override
   void initState() {
@@ -33,6 +45,7 @@ class _FactQuestScreenState extends ConsumerState<FactQuestScreen>
   @override
   void dispose() {
     _animController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -46,6 +59,15 @@ class _FactQuestScreenState extends ConsumerState<FactQuestScreen>
       if (previous?.playedCards.length != next.playedCards.length) {
         _animController.reset();
         _animController.forward();
+
+        if (ref.read(ttsActiveProvider) && next.playedCards.isNotEmpty) {
+          final card = next.playedCards.last;
+          final ttsService = ref.read(ttsServiceProvider);
+          final settings = ref.read(settingsProvider);
+          final locale = settings.locale?.languageCode ?? 'en';
+          ttsService.setLanguage(locale);
+          ttsService.speak(l10n.get(card.text));
+        }
       }
     });
 
@@ -93,19 +115,59 @@ class _FactQuestScreenState extends ConsumerState<FactQuestScreen>
               },
             ),
           ],
-          IconButton(
-            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-            onPressed: () => context.go('/games'),
-            tooltip: l10n.get('finishGame'),
-          ),
+            IconButton(
+              icon: Icon(
+                ref.watch(ttsActiveProvider)
+                    ? Icons.volume_up
+                    : Icons.volume_off,
+                color: ref.watch(ttsActiveProvider)
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
+              ),
+              onPressed: () {
+                ref.read(ttsActiveProvider.notifier).toggle();
+                final active = ref.read(ttsActiveProvider);
+                if (!active) {
+                  ref.read(ttsServiceProvider).stop();
+                } else if (state.playedCards.isNotEmpty) {
+                  final card = state.playedCards.last;
+                  final ttsService = ref.read(ttsServiceProvider);
+                  final settings = ref.read(settingsProvider);
+                  final locale = settings.locale?.languageCode ?? 'en';
+                  ttsService.setLanguage(locale);
+                  ttsService.speak(l10n.get(card.text));
+                }
+              },
+              tooltip: l10n.get('tts_toggle'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.help_outline),
+              onPressed: () => launchUrl(
+                Uri.parse(
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/#factquest',
+                ),
+                mode: LaunchMode.externalApplication,
+              ),
+              tooltip: l10n.get('nav_help'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () => _finishGame(context, l10n, state),
+              tooltip: l10n.get('finishGame'),
+            ),
         ],
       ),
-      body: state.playedCards.isEmpty
-          ? _FactQuestSetup(l10n: l10n)
-          : FadeTransition(
-              opacity: _fadeAnim,
-              child: _FactQuestGame(l10n: l10n, state: state),
-            ),
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: state.playedCards.isEmpty
+              ? _FactQuestSetup(l10n: l10n)
+              : FadeTransition(
+                  opacity: _fadeAnim,
+                  child: _FactQuestGame(l10n: l10n, state: state),
+                ),
+        ),
+      ),
     );
   }
 
@@ -190,6 +252,40 @@ class _FactQuestScreenState extends ConsumerState<FactQuestScreen>
         return const Icon(Icons.warning_amber, size: 18);
     }
   }
+
+  void _finishGame(
+    BuildContext context,
+    AppLocalizations l10n,
+    FactQuestGameState state,
+  ) {
+    final scores = [
+      PlayerScore(l10n.get('factquest_cards_played'), state.playedCards.length),
+    ];
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: 'Fact Hunter',
+      winnerEmoji: '💡',
+      gameName: 'FactQuest',
+      scores: scores,
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate since it's not tracked
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'factquest',
+      players: [],
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'cardsPlayed': state.playedCards.length,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
+  }
 }
 
 // ─── Setup Phase ──────────────────────────────────────────────────────────────
@@ -271,112 +367,145 @@ class _FactQuestGame extends ConsumerWidget {
     final theme = Theme.of(context);
     final categoryColor = _getCategoryColor(context, currentCard.category);
 
-    return GestureDetector(
-      onTap: () => ref.read(factQuestStateProvider.notifier).drawNextCard(),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: GestureDetector(
+        onTap: () => ref.read(factQuestStateProvider.notifier).drawNextCard(),
+        behavior: HitTestBehavior.opaque,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Category badge
             Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: categoryColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (currentCard.emoji != null) ...[
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: categoryColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (currentCard.emoji != null) ...[
+                          Text(
+                            currentCard.emoji!,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
                         Text(
-                          currentCard.emoji!,
-                          style: const TextStyle(fontSize: 16),
+                          l10n.get('factquest_cat_${currentCard.category.name}'),
+                          style: TextStyle(
+                            color: categoryColor,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
                         ),
-                        const SizedBox(width: 6),
                       ],
-                      Text(
-                        l10n.get('factquest_cat_${currentCard.category.name}'),
-                        style: TextStyle(
-                          color: categoryColor,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
+                  const Spacer(),
+                  Text(
+                    '${state.playedCards.length}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Fact headline
+              Text(
+                l10n.get(currentCard.text),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  height: 1.3,
                 ),
-                const Spacer(),
-                Text(
-                  '${state.playedCards.length}',
-                  style: theme.textTheme.bodySmall?.copyWith(
+              ),
+              const SizedBox(height: 20),
+
+              // Detailed explanation
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.3,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  border:
+                      Border.all(color: categoryColor.withValues(alpha: 0.2)),
+                ),
+                child: Text(
+                  l10n.get(currentCard.explanation),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    height: 1.6,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Fact headline
-            Text(
-              l10n.get(currentCard.text),
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                height: 1.3,
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-            // Detailed explanation
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(
-                  alpha: 0.3,
-                ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: categoryColor.withValues(alpha: 0.2)),
-              ),
-              child: Text(
-                l10n.get(currentCard.explanation),
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  height: 1.6,
-                  color: theme.colorScheme.onSurfaceVariant,
+              // Source link button
+              OutlinedButton.icon(
+                onPressed: () => _launchUrl(currentCard.sourceUrl),
+                icon: const Icon(Icons.open_in_new, size: 18),
+                label: Text(l10n.get('factquest_source')),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: categoryColor,
+                  side: BorderSide(color: categoryColor.withValues(alpha: 0.5)),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 32),
 
-            // Source link button
-            OutlinedButton.icon(
-              onPressed: () => _launchUrl(currentCard.sourceUrl),
-              icon: const Icon(Icons.open_in_new, size: 18),
-              label: Text(l10n.get('factquest_source')),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: categoryColor,
-                side: BorderSide(color: categoryColor.withValues(alpha: 0.5)),
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Tap to continue hint
-            Center(
-              child: Text(
-                l10n.get('factquest_tap_continue'),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant.withValues(
-                    alpha: 0.5,
-                  ),
-                  fontStyle: FontStyle.italic,
+              // Tap to continue hint
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.get('factquest_tap_continue'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.5,
+                        ),
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    IconButton(
+                      onPressed: () {
+                        ref.read(shareServiceProvider).shareWidget(
+                          context,
+                          ShareableCard(
+                            title: l10n.get(
+                              'factquest_cat_${currentCard.category.name}',
+                            ),
+                            text: l10n.get(currentCard.text),
+                            explanation: l10n.get(currentCard.explanation),
+                            emoji: currentCard.emoji,
+                            baseColor: categoryColor,
+                            brandText: 'FactQuest',
+                          ),
+                          text:
+                              'Check out this fact from FactQuest! 💡 #NexScore',
+                        );
+                      },
+                      icon: Icon(
+                        Icons.share,
+                        color: categoryColor.withValues(alpha: 0.7),
+                        size: 20,
+                      ),
+                      tooltip: 'Share this fact',
+                    ),
+                  ],
                 ),
               ),
-            ),
             const SizedBox(height: 24),
           ],
         ),

@@ -3,6 +3,8 @@ import 'package:nexscore/core/services/tts_service.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class FakeFlutterTts extends Fake implements FlutterTts {
+  String? lastSpokenText;
+
   @override
   void setStartHandler(Function callback) {}
   @override
@@ -12,7 +14,10 @@ class FakeFlutterTts extends Fake implements FlutterTts {
   @override
   Future<dynamic> setLanguage(String language) async => true;
   @override
-  Future<dynamic> speak(String text, {bool? focus}) async => true;
+  Future<dynamic> speak(String text, {bool? focus}) async {
+    lastSpokenText = text;
+    return true;
+  }
   @override
   Future<dynamic> stop() async => true;
 }
@@ -30,6 +35,23 @@ void main() {
       final service = TtsService(tts: FakeFlutterTts());
       await expectLater(service.stop(), completes);
       expect(service.isSpeaking, isFalse);
+    });
+
+    test('TtsService expands abbreviations correctly', () async {
+      final fakeTts = FakeFlutterTts();
+      final service = TtsService(tts: fakeTts);
+      
+      await service.speak('10s');
+      expect(fakeTts.lastSpokenText, '10 seconds');
+
+      await service.speak('15 s');
+      expect(fakeTts.lastSpokenText, '15 seconds');
+
+      await service.speak('10 min');
+      expect(fakeTts.lastSpokenText, '10 minutes');
+
+      await service.speak('30sek');
+      expect(fakeTts.lastSpokenText, '30 Sekunden');
     });
   });
 }

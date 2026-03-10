@@ -29,7 +29,7 @@ void main() {
     test('AudioService.setEnabled toggle works', () {
       final service = AudioService(player: FakeAudioPlayer());
       service.setEnabled(false);
-      expect(() => service.play(SfxType.click), returnsNormally);
+      expect(() => service.play(SfxType.swipe), returnsNormally);
     });
 
     test('AudioService.play() executes without error', () async {

@@ -70,6 +70,14 @@ class Phase10DigitalNotifier extends Notifier<Phase10DigitalState> {
     _history.clear();
     state = const Phase10DigitalState();
   }
+
+  void finishGame() {
+    _pushState();
+    state = state.copyWith(
+      phase: Phase10DigitalPhase.finished,
+      canUndo: _history.isNotEmpty,
+    );
+  }
 }
 
 final phase10DigitalProvider =

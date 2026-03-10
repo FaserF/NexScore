@@ -70,6 +70,14 @@ class RommeDigitalNotifier extends Notifier<RommeDigitalState> {
     _history.clear();
     state = const RommeDigitalState();
   }
+
+  void finishGame() {
+    _pushState();
+    state = state.copyWith(
+      phase: RommeDigitalPhase.finished,
+      canUndo: _history.isNotEmpty,
+    );
+  }
 }
 
 final rommeDigitalProvider =

@@ -152,5 +152,33 @@ void main() {
             'These keys are used in code but missing from DE localization: $missingInDe',
       );
     });
+    test('check for hardcoded strings in volleyball feature', () {
+      final volleyballDir = Directory('lib/features/games/volleyball');
+      if (!volleyballDir.existsSync()) return;
+
+      final files = volleyballDir.listSync(recursive: true).whereType<File>();
+      final hardcodedRegex = RegExp(r"['"
+          '"'
+          r"](?:Set |Winner: )['"
+          '"'
+          r"]", caseSensitive: false);
+
+      final failures = <String>[];
+      for (final file in files) {
+        if (file.path.endsWith('.dart')) {
+          final content = file.readAsStringSync();
+          if (hardcodedRegex.hasMatch(content)) {
+            failures.add(file.path);
+          }
+        }
+      }
+
+      expect(
+        failures,
+        isEmpty,
+        reason:
+            'These files might contain hardcoded "Set" or "Winner" strings: $failures. Use localization keys instead.',
+      );
+    });
   });
 }

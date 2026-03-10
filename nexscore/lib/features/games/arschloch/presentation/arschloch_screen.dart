@@ -12,6 +12,8 @@ import '../../../../shared/widgets/winner_confetti_overlay.dart';
 import '../../../../shared/widgets/shareable_scorecard.dart';
 import '../../../../core/providers/audio_provider.dart';
 import '../../../../core/services/audio_service.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class ArschlochScreen extends ConsumerStatefulWidget {
   const ArschlochScreen({super.key});
@@ -50,6 +52,24 @@ class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
       gameName: l10n.get('game_arschloch'),
       scores: scores,
     );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: gameState.startedAt ?? DateTime.now(),
+      endTime: DateTime.now(),
+      durationSeconds: gameState.startedAt != null
+          ? DateTime.now().difference(gameState.startedAt!).inSeconds
+          : 0,
+      gameType: 'arschloch',
+      players: players.map<String>((p) => p.name).toList(),
+      scores: {for (var s in scores) s.name: s.score},
+      gameData: {
+        'rounds': gameState.rounds.length,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
   }
 
   void _confirmFinishEarly(
@@ -124,6 +144,7 @@ class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
                 Uri.parse(
                   'https://faserf.github.io/NexScore/docs/user_guide/games/#arschloch',
                 ),
+                mode: LaunchMode.externalApplication,
               );
             },
             tooltip: l10n.get('nav_help'),
@@ -149,7 +170,7 @@ class _ArschlochScreenState extends ConsumerState<ArschlochScreen> {
           IconButton(
             icon: const Icon(Icons.check_circle_outline, color: Colors.green),
             onPressed: () => _confirmFinishEarly(context, ref, l10n),
-            tooltip: l10n.get('wizard_end_game'),
+            tooltip: l10n.get('finishGame'),
           ),
         ],
       ),

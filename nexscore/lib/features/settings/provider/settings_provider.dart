@@ -10,7 +10,6 @@ class Settings {
   final Locale? locale;
   final String hostName;
   final String hostColor;
-  final bool ttsEnabled;
   final bool sfxEnabled;
   final bool debugMode;
   final bool autoBackupEnabled;
@@ -23,7 +22,6 @@ class Settings {
     this.locale,
     this.hostName = 'Player',
     this.hostColor = '#4287f5',
-    this.ttsEnabled = false,
     this.sfxEnabled = true,
     this.debugMode = false,
     this.autoBackupEnabled = true,
@@ -38,7 +36,6 @@ class Settings {
     bool clearLocale = false,
     String? hostName,
     String? hostColor,
-    bool? ttsEnabled,
     bool? sfxEnabled,
     bool? debugMode,
     bool? autoBackupEnabled,
@@ -51,7 +48,6 @@ class Settings {
       locale: clearLocale ? null : (locale ?? this.locale),
       hostName: hostName ?? this.hostName,
       hostColor: hostColor ?? this.hostColor,
-      ttsEnabled: ttsEnabled ?? this.ttsEnabled,
       sfxEnabled: sfxEnabled ?? this.sfxEnabled,
       debugMode: debugMode ?? this.debugMode,
       autoBackupEnabled: autoBackupEnabled ?? this.autoBackupEnabled,
@@ -72,7 +68,6 @@ class SettingsNotifier extends Notifier<Settings> {
   static const _localeKey = 'settings_locale';
   static const _hostNameKey = 'settings_host_name';
   static const _hostColorKey = 'settings_host_color';
-  static const _ttsEnabledKey = 'settings_tts_enabled';
   static const _sfxEnabledKey = 'settings_sfx_enabled';
   static const _debugModeKey = 'settings_debug_mode';
   static const _autoBackupEnabledKey = 'settings_auto_backup_enabled';
@@ -88,7 +83,6 @@ class SettingsNotifier extends Notifier<Settings> {
     return Settings(
       themeMode: ThemeMode.system,
       hostName: _generateDefaultName(),
-      ttsEnabled: false,
       sfxEnabled: true,
     );
   }
@@ -106,7 +100,6 @@ class SettingsNotifier extends Notifier<Settings> {
 
     final hostName = prefs.getString(_hostNameKey) ?? _generateDefaultName();
     final hostColor = prefs.getString(_hostColorKey) ?? '#4287f5';
-    final ttsEnabled = prefs.getBool(_ttsEnabledKey) ?? false;
     final sfxEnabled = prefs.getBool(_sfxEnabledKey) ?? true;
     final debugMode = prefs.getBool(_debugModeKey) ?? false;
     AppLogger.debugMode = debugMode;
@@ -123,7 +116,6 @@ class SettingsNotifier extends Notifier<Settings> {
       locale: locale,
       hostName: hostName,
       hostColor: hostColor,
-      ttsEnabled: ttsEnabled,
       sfxEnabled: sfxEnabled,
       debugMode: debugMode,
       autoBackupEnabled: autoBackupEnabled,
@@ -167,11 +159,6 @@ class SettingsNotifier extends Notifier<Settings> {
     state = state.copyWith(hostColor: color);
   }
 
-  Future<void> setTtsEnabled(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_ttsEnabledKey, enabled);
-    state = state.copyWith(ttsEnabled: enabled);
-  }
 
   Future<void> setSfxEnabled(bool enabled) async {
     final prefs = await SharedPreferences.getInstance();

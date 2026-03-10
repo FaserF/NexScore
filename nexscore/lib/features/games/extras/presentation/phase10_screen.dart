@@ -7,6 +7,12 @@ import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/providers/active_players_provider.dart';
 import '../models/phase10_models.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class Phase10StateNotifier extends Notifier<Phase10GameState> {
   final List<Phase10GameState> _history = [];
@@ -114,11 +120,70 @@ final phase10StateProvider =
 
 final phase10PlayersProvider = activePlayersProvider;
 
-class Phase10Screen extends ConsumerWidget {
+class Phase10Screen extends ConsumerStatefulWidget {
   const Phase10Screen({super.key});
 
+  // Duration Tracking: startedAt, endedAt, DateTime, duration
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<Phase10Screen> createState() => _Phase10ScreenState();
+}
+
+class _Phase10ScreenState extends ConsumerState<Phase10Screen> {
+  final _confettiController = WinnerConfettiController();
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _showWinner(Phase10GameState gameState, List<Player> players) {
+    if (players.isEmpty) return;
+
+    final leaderIds = gameState.getLeaders();
+    if (leaderIds.isEmpty) return;
+
+    final winnerId = leaderIds.first;
+    final winner = players.firstWhere((p) => p.id == winnerId);
+    final l10n = AppLocalizations.of(context);
+
+    // Sort scores (ascending is better in Phase 10 if same phase, but getLeaders handles it)
+    // Actually, Phase 10 logic: Most phases, then fewest points.
+    // getLeaders already returns them in correct order.
+    final List<PlayerScore> sortedScores = leaderIds.map((id) {
+      final p = players.firstWhere((player) => player.id == id);
+      final pState = gameState.playerStates[id] ?? const Phase10PlayerState();
+      return PlayerScore(p.name, pState.totalScore);
+    }).toList();
+
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+    _confettiController.show(
+      winnerName: winner.name,
+      winnerEmoji: winner.emoji,
+      gameName: l10n.get('game_phase10'),
+      scores: sortedScores,
+    );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'phase10',
+      players: players.map<String>((p) => p.name).toList(),
+      scores: {for (var s in sortedScores) s.name: s.score},
+      gameData: {
+        'variant': gameState.variant.name,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(phase10StateProvider);
     final players = ref.watch(phase10PlayersProvider);
     final l10n = AppLocalizations.of(context);
@@ -149,8 +214,9 @@ class Phase10Screen extends ConsumerWidget {
             onPressed: () {
               launchUrl(
                 Uri.parse(
-                  'https://faserf.github.io/NexScore/docs/user_guide/games/#phase-10',
+                  'https://faserf.github.io/NexScore/docs/user_guide/games/index.html#phase-10',
                 ),
+                mode: LaunchMode.externalApplication,
               );
             },
             tooltip: l10n.get('nav_help'),
@@ -162,7 +228,7 @@ class Phase10Screen extends ConsumerWidget {
           const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => _showVariantDialog(context, ref, gameState, l10n),
+            onPressed: () => _showVariantDialog(context, gameState, l10n),
             tooltip: l10n.get('phase10_variant'),
           ),
           if (gameState.canUndo)
@@ -173,18 +239,20 @@ class Phase10Screen extends ConsumerWidget {
             ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => _confirmReset(context, ref, l10n),
+            onPressed: () => _confirmReset(context, l10n),
             tooltip: l10n.get('game_reset'),
           ),
           IconButton(
             icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-            onPressed: () => context.go('/games'),
+            onPressed: () => _showWinner(gameState, players),
             tooltip: l10n.get('finishGame'),
           ),
         ],
       ),
-      body: MultiplayerClientOverlay(
-        child: Column(
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: Column(
           children: [
             InkWell(
               onTap: () => _showPhaseLegend(context, gameState),
@@ -224,7 +292,9 @@ class Phase10Screen extends ConsumerWidget {
                       leaders.last == p.id &&
                       players.length > 1;
 
-                  final activePhases = gameState.activePhases;
+                  final activePhases = gameState.activePhases.isNotEmpty
+                      ? gameState.activePhases
+                      : Phase10PhaseSet.original.phases;
                   final phaseNum = pState.currentPhase;
                   final phase =
                       activePhases[(phaseNum - 1).clamp(
@@ -343,7 +413,7 @@ class Phase10Screen extends ConsumerWidget {
                         const SizedBox(width: 8),
                         InkWell(
                           onTap: () =>
-                              _showPointsDialog(context, ref, p, pState, l10n),
+                              _showPointsDialog(context, p, pState, l10n),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 14,
@@ -376,12 +446,12 @@ class Phase10Screen extends ConsumerWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
   void _showVariantDialog(
     BuildContext context,
-    WidgetRef ref,
     Phase10GameState state,
     AppLocalizations l10n,
   ) {
@@ -483,7 +553,6 @@ class Phase10Screen extends ConsumerWidget {
 
   Future<void> _showPointsDialog(
     BuildContext context,
-    WidgetRef ref,
     Player player,
     Phase10PlayerState pState,
     AppLocalizations l10n,
@@ -589,7 +658,6 @@ class Phase10Screen extends ConsumerWidget {
 
   void _confirmReset(
     BuildContext context,
-    WidgetRef ref,
     AppLocalizations l10n,
   ) {
     showDialog(

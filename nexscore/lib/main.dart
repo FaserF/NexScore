@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -30,6 +31,18 @@ void main() async {
         originalDebugPrint(message, wrapWidth: wrapWidth);
       }
     }
+  };
+
+  // Catch Flutter-specific errors
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    AppLogger.addLog('FLUTTER ERROR: ${details.exceptionAsString()}\n${details.stack}');
+  };
+
+  // Catch errors not caught by the Flutter framework
+  PlatformDispatcher.instance.onError = (error, stack) {
+    AppLogger.addLog('PLATFORM ERROR: $error\n$stack');
+    return false; // Let the platform handle it too
   };
 
   if (kIsWeb) {

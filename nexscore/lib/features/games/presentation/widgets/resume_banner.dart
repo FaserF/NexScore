@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/providers/persistence_provider.dart';
+import '../../../../core/providers/active_players_provider.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/theme/widgets/glass_container.dart';
+import '../../../players/repository/player_repository.dart';
 
 class ResumeBanner extends ConsumerWidget {
   const ResumeBanner({super.key});
@@ -73,8 +75,26 @@ class ResumeBanner extends ConsumerWidget {
     );
   }
 
-  void _resumeGame(BuildContext context, WidgetRef ref, String gameId) {
-    // Navigate to the game screen. The game provider itself should handle loading.
+  Future<void> _resumeGame(BuildContext context, WidgetRef ref, String gameId) async {
+    // Restore active players from saved IDs
+    final service = ref.read(persistenceServiceProvider);
+    final savedPlayerIds = await service.loadActivePlayerIds();
+
+    if (savedPlayerIds.isNotEmpty) {
+      final playersAsync = ref.read(playersProvider);
+      final allPlayers = playersAsync.value ?? [];
+      final activePlayers = allPlayers
+          .where((p) => savedPlayerIds.contains(p.id))
+          .toList();
+      ref.read(activePlayersProvider.notifier).setPlayers(activePlayers);
+    }
+
+    // Set the active game ID
+    ref.read(activeGameIdProvider.notifier).state = gameId;
+
+    if (!context.mounted) return;
+
+    // Navigate to the game screen
     if (gameId == 'wizard_digital') {
       context.push('/games/wizard-digital');
     } else if (gameId == 'kniffel_digital') {
@@ -93,6 +113,8 @@ class ResumeBanner extends ConsumerWidget {
       context.push('/games/buzztap');
     } else if (gameId == 'wayquest') {
       context.push('/games/wayquest');
+    } else if (gameId == 'volleyball') {
+      context.push('/games/volleyball');
     }
   }
 }

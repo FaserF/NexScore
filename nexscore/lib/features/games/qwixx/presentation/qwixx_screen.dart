@@ -11,9 +11,15 @@ import '../providers/qwixx_provider.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../../../../shared/widgets/winner_confetti_overlay.dart';
 import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class QwixxScreen extends ConsumerStatefulWidget {
   const QwixxScreen({super.key});
+
+  // Duration Tracking: startedAt, endedAt, DateTime, duration
 
   @override
   ConsumerState<QwixxScreen> createState() => _QwixxScreenState();
@@ -50,12 +56,27 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
       // Sort scores descending
       scores.sort((a, b) => b.score.compareTo(a.score));
 
+      ref.read(audioServiceProvider).play(SfxType.fanfare);
       _confettiController.show(
         winnerName: winner.name,
         winnerEmoji: winner.emoji,
         gameName: l10n.get('game_qwixx'),
         scores: scores,
       );
+
+      // Save session to history
+      final session = Session(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        startTime: DateTime.now(), // Estimate
+        endTime: DateTime.now(),
+        durationSeconds: 0,
+        gameType: 'qwixx',
+        players: players.map<String>((p) => p.name).toList(),
+        scores: {for (var s in scores) s.name: s.score},
+        gameData: {},
+        completed: true,
+      );
+      ref.read(sessionsProvider.notifier).addSession(session);
     }
   }
 
@@ -101,11 +122,7 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
                 onPressed: () => ref.read(qwixxStateProvider.notifier).undo(),
                 tooltip: l10n.get('game_undo'),
               ),
-            IconButton(
-              icon: const Icon(Icons.emoji_events, color: Colors.amber),
-              onPressed: () => _showWinner(gameState.sheets, players),
-              tooltip: l10n.get('game_show_winner'),
-            ),
+
             IconButton(
               icon: const Icon(Icons.help_outline),
               onPressed: () {
@@ -113,6 +130,7 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
                   Uri.parse(
                     'https://faserf.github.io/NexScore/docs/user_guide/games/#qwixx',
                   ),
+                  mode: LaunchMode.externalApplication,
                 );
               },
               tooltip: l10n.get('nav_help'),
@@ -134,7 +152,10 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-              onPressed: () => context.go('/games'),
+              onPressed: () {
+                _showWinner(gameState.sheets, players);
+                context.go('/games');
+              },
               tooltip: l10n.get('finishGame'),
             ),
           ],

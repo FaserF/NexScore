@@ -52,8 +52,22 @@ class _JoinLobbyScreenState extends ConsumerState<JoinLobbyScreen> {
       if (mounted) {
         final l10n = AppLocalizations.of(context);
         String message = e.toString();
-        if (message.contains('firestore_timeout') ||
-            message.contains('unavailable')) {
+        if (message.contains('unavailable') ||
+            message.contains('client is offline')) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.get('multiplayer_error_offline_title')),
+              content: Text(l10n.get('multiplayer_error_offline_desc')),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.get('ok')),
+                ),
+              ],
+            ),
+          );
+        } else if (message.contains('firestore_timeout')) {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(

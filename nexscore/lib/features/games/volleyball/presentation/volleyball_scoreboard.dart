@@ -13,6 +13,11 @@ import '../services/volleyball_pdf_service.dart';
 import 'volleyball_signature_dialog.dart';
 import 'volleyball_signals_screen.dart';
 import '../../../../shared/widgets/shareable_scorecard.dart';
+import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/services/audio_service.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class VolleyballScoreboard extends ConsumerStatefulWidget {
   const VolleyballScoreboard({super.key});
@@ -41,6 +46,8 @@ class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
         : state.teamBName;
     final (lpA, lpB) = state.leaguePoints;
 
+    ref.read(audioServiceProvider).play(SfxType.fanfare);
+
     _confettiController.show(
       winnerName: winnerName,
       gameName: l10n.get('game_volleyball'),
@@ -53,6 +60,27 @@ class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
           : Colors.red.shade700,
       winnerEmoji: '🏐',
     );
+
+    // Save session to history
+    final session = Session(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startTime: DateTime.now(), // Estimate
+      endTime: DateTime.now(),
+      durationSeconds: 0,
+      gameType: 'volleyball',
+      players: [state.teamAName, state.teamBName],
+      scores: {
+        state.teamAName: lpA,
+        state.teamBName: lpB,
+      },
+      gameData: {
+        'setsWonA': state.setsWonA,
+        'setsWonB': state.setsWonB,
+        'type': state.type.name,
+      },
+      completed: true,
+    );
+    ref.read(sessionsProvider.notifier).addSession(session);
 
     // Auto-hide confetti after 4 seconds so _MatchFinishedView is accessible
     Future.delayed(const Duration(seconds: 4), () {
@@ -134,21 +162,22 @@ class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
     return WinnerConfettiOverlay(
       controller: _confettiController,
       showButtons: false,
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(
-              title: Text(l10n.get('game_volleyball')),
-              leading: BackButton(onPressed: () => context.go('/games')),
-              actions: [
+      child: MultiplayerClientOverlay(
+        child: Stack(
+          children: [
+            Scaffold(
+              appBar: AppBar(
+                title: Text(l10n.get('game_volleyball')),
+                leading: BackButton(onPressed: () => context.go('/games')),
+                actions: [
                 if (!state.matchFinished) ...[
-                  if (state.canUndo)
-                    IconButton(
-                      icon: const Icon(Icons.undo),
-                      onPressed: () =>
-                          ref.read(volleyballStateProvider.notifier).undo(),
-                      tooltip: l10n.get('game_undo'),
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.undo),
+                    onPressed: state.canUndo
+                        ? () => ref.read(volleyballStateProvider.notifier).undo()
+                        : null,
+                    tooltip: l10n.get('game_undo'),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.swap_horiz),
                     onPressed: () => ref
@@ -173,7 +202,7 @@ class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
                       color: Colors.green,
                     ),
                     onPressed: () => _confirmFinishEarly(context, ref, l10n),
-                    tooltip: l10n.get('wizard_end_game'),
+                    tooltip: l10n.get('finishGame'),
                   ),
                 ],
                 IconButton(
@@ -195,6 +224,7 @@ class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
                       Uri.parse(
                         'https://faserf.github.io/NexScore/docs/user_guide/games/#volleyball-scoreboard',
                       ),
+                      mode: LaunchMode.externalApplication,
                     );
                   },
                   tooltip: l10n.get('nav_help'),
@@ -263,8 +293,9 @@ class _VolleyballScoreboardState extends ConsumerState<VolleyballScoreboard> {
             ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _confirmResetDialog(
     BuildContext context,
@@ -985,7 +1016,7 @@ class _MatchFinishedView extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Set ${index + 1}: ',
+                      l10n.getWith('vb_set_with_number', [(index + 1).toString()]),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.grey.shade600,
@@ -1012,8 +1043,8 @@ class _MatchFinishedView extends ConsumerWidget {
             const SizedBox(height: 32),
             // Action buttons — directly in the finished view (no overlap)
             Wrap(
-              spacing: 12,
-              runSpacing: 12,
+              spacing: 16,
+              runSpacing: 16,
               alignment: WrapAlignment.center,
               children: [
                 FilledButton.icon(
@@ -1021,6 +1052,23 @@ class _MatchFinishedView extends ConsumerWidget {
                   icon: const Icon(Icons.picture_as_pdf),
                   label: Text(l10n.get('vb_export_pdf')),
                   style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                FilledButton.icon(
+                  onPressed: () => context.go('/games'),
+                  icon: const Icon(Icons.check_circle_outline),
+                  label: Text(l10n.get('nav_games')), // Using 'nav_games' or similar to go back to overview
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
                       vertical: 14,

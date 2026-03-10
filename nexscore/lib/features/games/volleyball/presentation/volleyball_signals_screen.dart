@@ -45,6 +45,11 @@ class VolleyballSignalsScreen extends StatelessWidget {
             },
             tooltip: l10n.get('nav_help'),
           ),
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+            onPressed: () => Navigator.of(context).pop(),
+            tooltip: l10n.get('finishGame'),
+          ),
         ],
       ),
       body: Container(
@@ -58,57 +63,91 @@ class VolleyballSignalsScreen extends StatelessWidget {
             ],
           ),
         ),
-        child: GridView.builder(
-          padding: const EdgeInsets.all(20),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 20,
-            mainAxisSpacing: 20,
-            childAspectRatio: 0.85,
-          ),
-          itemCount: signals.length,
-          itemBuilder: (context, index) {
-            final signal = signals[index];
-            return Card(
-              elevation: 4,
-              shadowColor: theme.colorScheme.primary.withValues(alpha: 0.2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+            return GridView.builder(
+              padding: const EdgeInsets.all(20),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+                childAspectRatio: 0.85,
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      theme.colorScheme.surface,
-                      theme.colorScheme.surfaceContainerHighest.withValues(
-                        alpha: 0.3,
+              itemCount: signals.length,
+              itemBuilder: (context, index) {
+                final signal = signals[index];
+                return InkWell(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Row(
+                          children: [
+                            Text(signal.emoji, style: const TextStyle(fontSize: 32)),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(l10n.get('vb_signal_${signal.id}'))),
+                          ],
+                        ),
+                        content: Text(l10n.get('vb_signal_${signal.id}_desc')),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(l10n.get('ok')),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(signal.emoji, style: const TextStyle(fontSize: 56)),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n.get('vb_signal_${signal.id}'),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: theme.colorScheme.onSurface,
-                        letterSpacing: -0.5,
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(24),
+                  child: Card(
+                    elevation: 4,
+                    shadowColor: theme.colorScheme.primary.withValues(alpha: 0.2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            theme.colorScheme.surface,
+                            theme.colorScheme.surfaceContainerHighest.withValues(
+                              alpha: 0.3,
+                            ),
+                          ],
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: Text(signal.emoji, style: const TextStyle(fontSize: 100)),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            l10n.get('vb_signal_${signal.id}'),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: theme.colorScheme.onSurface,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             );
           },
         ),

@@ -13,6 +13,8 @@ import '../../../../shared/widgets/winner_confetti_overlay.dart';
 import '../../../../shared/widgets/shareable_scorecard.dart';
 import '../../../../core/providers/audio_provider.dart';
 import '../../../../core/services/audio_service.dart';
+import '../../../../core/models/session_model.dart';
+import '../../../history/repository/session_repository.dart';
 
 class SchafkopfScreen extends ConsumerStatefulWidget {
   const SchafkopfScreen({super.key});
@@ -93,6 +95,25 @@ class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
         gameName: l10n.get('game_schafkopf'),
         scores: scores,
       );
+
+      // Save session to history
+      final session = Session(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        startTime: gameState.startedAt ?? DateTime.now(),
+        endTime: DateTime.now(),
+        durationSeconds: gameState.startedAt != null
+            ? DateTime.now().difference(gameState.startedAt!).inSeconds
+            : 0,
+        gameType: 'schafkopf',
+        players: players.map<String>((p) => p.name).toList(),
+        scores: {for (var s in scores) s.name: s.score},
+        gameData: {
+          'rounds': gameState.rounds.length,
+          'stock': gameState.stock,
+        },
+        completed: true,
+      );
+      ref.read(sessionsProvider.notifier).addSession(session);
     }
   }
 
@@ -114,17 +135,13 @@ class _SchafkopfScreenState extends ConsumerState<SchafkopfScreen> {
               onPressed: () => ref.read(schafkopfStateProvider.notifier).undo(),
             ),
           IconButton(
-            icon: const Icon(Icons.emoji_events, color: Colors.amber),
-            onPressed: () => _showWinner(gameState, players),
-            tooltip: l10n.get('game_show_winner'),
-          ),
-          IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: () {
               launchUrl(
                 Uri.parse(
                   'https://faserf.github.io/NexScore/docs/user_guide/games/#schafkopf',
                 ),
+                mode: LaunchMode.externalApplication,
               );
             },
             tooltip: l10n.get('nav_help'),
