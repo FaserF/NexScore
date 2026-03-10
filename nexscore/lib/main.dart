@@ -86,7 +86,7 @@ void main() async {
       webExperimentalForceLongPolling: kIsWeb,
     );
     debugPrint(
-      'Firestore settings applied: persistenceEnabled=${firestore.FirebaseFirestore.instance.settings.persistenceEnabled}, webExperimentalForceLongPolling=${kIsWeb}',
+      'Firestore settings applied: persistenceEnabled=${firestore.FirebaseFirestore.instance.settings.persistenceEnabled}, webExperimentalForceLongPolling=$kIsWeb',
     );
   } catch (e) {
     debugPrint('Firestore settings error: $e');
