@@ -89,11 +89,20 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
 
     // Integrity test requirement: Running connectivity check...
     debugPrint('Multiplayer: Running connectivity check...');
-    await _firestore
-        .collection('lobbies')
-        .limit(1)
-        .get(const GetOptions(source: Source.serverAndCache))
-        .timeout(const Duration(seconds: 15));
+    try {
+      await _firestore
+          .collection('lobbies')
+          .limit(1)
+          .get(const GetOptions(source: Source.serverAndCache))
+          .timeout(const Duration(seconds: 15));
+      debugPrint('Multiplayer: Connectivity check successful');
+    } on TimeoutException {
+      debugPrint('Multiplayer: Connectivity check TIMEOUT');
+      throw Exception('firestore_timeout');
+    } catch (e) {
+      debugPrint('Multiplayer: Connectivity check FAILED ($e)');
+      // Don't throw here, maybe it's just an empty collection
+    }
     debugPrint(
       'Multiplayer: [System] Firestore persistence: ${_firestore.settings.persistenceEnabled}',
     );
@@ -135,12 +144,12 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
           throw Exception('firestore_timeout');
         }
       } catch (e) {
-        debugPrint('Multiplayer: [Lobby] Error checking uniqueness: $e');
+        debugPrint('Multiplayer: [Lobby] Error checking uniqueness ($e)');
         if (e is FirebaseException) {
           debugPrint(
             'Multiplayer: [Lobby] Code: ${e.code}, Message: ${e.message}',
           );
-          if (e.code == 'unavailable') {
+          if (e.code == 'unavailable' || e.message?.contains('offline') == true) {
             throw Exception('firestore_unavailable: ${e.message}');
           }
         }

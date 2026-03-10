@@ -79,11 +79,14 @@ void main() async {
   // Configure Firestore specifically to prevent Web timeouts
   try {
     debugPrint('Firestore: Applying settings...');
-    firestore.FirebaseFirestore.instance.settings = const firestore.Settings(
+    firestore.FirebaseFirestore.instance.settings = firestore.Settings(
       persistenceEnabled: false,
+      // experimentalForceLongPolling is often required on GitHub Pages 
+      // where gRPC-web connections can be unstable or blocked.
+      webExperimentalForceLongPolling: kIsWeb,
     );
     debugPrint(
-      'Firestore settings applied: persistenceEnabled=${firestore.FirebaseFirestore.instance.settings.persistenceEnabled}',
+      'Firestore settings applied: persistenceEnabled=${firestore.FirebaseFirestore.instance.settings.persistenceEnabled}, webExperimentalForceLongPolling=${kIsWeb}',
     );
   } catch (e) {
     debugPrint('Firestore settings error: $e');

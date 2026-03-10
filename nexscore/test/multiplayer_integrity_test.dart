@@ -93,6 +93,8 @@ void main() {
         final content = file.readAsStringSync();
         expect(content, isNot(contains('\n  usePathUrlStrategy();')));
         expect(content, contains('//   usePathUrlStrategy();'));
+        // Verify long polling for web
+        expect(content, contains('webExperimentalForceLongPolling: kIsWeb'));
       },
     );
   });
