@@ -330,7 +330,7 @@ class VolleyballPdfService {
                         ],
                       ),
                   ];
-                }).whereType<List<pw.TableRow>>().expand((i) => i).toList(),
+                }).whereType<List<pw.TableRow>>().expand((i) => i),
               ],
             ),
 
