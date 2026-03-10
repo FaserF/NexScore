@@ -11,6 +11,9 @@ class Settings {
   final String hostName;
   final String hostColor;
   final bool sfxEnabled;
+  final bool sfxBeepEnabled;
+  final bool sfxFanfareEnabled;
+  final bool sfxOtherEnabled;
   final bool debugMode;
   final bool autoBackupEnabled;
   final String autoBackupFrequency; // 'daily', 'weekly', 'manual'
@@ -23,6 +26,9 @@ class Settings {
     this.hostName = 'Player',
     this.hostColor = '#4287f5',
     this.sfxEnabled = true,
+    this.sfxBeepEnabled = true,
+    this.sfxFanfareEnabled = true,
+    this.sfxOtherEnabled = true,
     this.debugMode = false,
     this.autoBackupEnabled = true,
     this.autoBackupFrequency = 'daily',
@@ -37,6 +43,9 @@ class Settings {
     String? hostName,
     String? hostColor,
     bool? sfxEnabled,
+    bool? sfxBeepEnabled,
+    bool? sfxFanfareEnabled,
+    bool? sfxOtherEnabled,
     bool? debugMode,
     bool? autoBackupEnabled,
     String? autoBackupFrequency,
@@ -49,6 +58,9 @@ class Settings {
       hostName: hostName ?? this.hostName,
       hostColor: hostColor ?? this.hostColor,
       sfxEnabled: sfxEnabled ?? this.sfxEnabled,
+      sfxBeepEnabled: sfxBeepEnabled ?? this.sfxBeepEnabled,
+      sfxFanfareEnabled: sfxFanfareEnabled ?? this.sfxFanfareEnabled,
+      sfxOtherEnabled: sfxOtherEnabled ?? this.sfxOtherEnabled,
       debugMode: debugMode ?? this.debugMode,
       autoBackupEnabled: autoBackupEnabled ?? this.autoBackupEnabled,
       autoBackupFrequency: autoBackupFrequency ?? this.autoBackupFrequency,
@@ -69,6 +81,9 @@ class SettingsNotifier extends Notifier<Settings> {
   static const _hostNameKey = 'settings_host_name';
   static const _hostColorKey = 'settings_host_color';
   static const _sfxEnabledKey = 'settings_sfx_enabled';
+  static const _sfxBeepKey = 'settings_sfx_beep_enabled';
+  static const _sfxFanfareKey = 'settings_sfx_fanfare_enabled';
+  static const _sfxOtherKey = 'settings_sfx_other_enabled';
   static const _debugModeKey = 'settings_debug_mode';
   static const _autoBackupEnabledKey = 'settings_auto_backup_enabled';
   static const _autoBackupFreqKey = 'settings_auto_backup_freq';
@@ -84,6 +99,9 @@ class SettingsNotifier extends Notifier<Settings> {
       themeMode: ThemeMode.system,
       hostName: _generateDefaultName(),
       sfxEnabled: true,
+      sfxBeepEnabled: true,
+      sfxFanfareEnabled: true,
+      sfxOtherEnabled: true,
     );
   }
 
@@ -101,6 +119,9 @@ class SettingsNotifier extends Notifier<Settings> {
     final hostName = prefs.getString(_hostNameKey) ?? _generateDefaultName();
     final hostColor = prefs.getString(_hostColorKey) ?? '#4287f5';
     final sfxEnabled = prefs.getBool(_sfxEnabledKey) ?? true;
+    final sfxBeepEnabled = prefs.getBool(_sfxBeepKey) ?? true;
+    final sfxFanfareEnabled = prefs.getBool(_sfxFanfareKey) ?? true;
+    final sfxOtherEnabled = prefs.getBool(_sfxOtherKey) ?? true;
     final debugMode = prefs.getBool(_debugModeKey) ?? false;
     AppLogger.debugMode = debugMode;
     final autoBackupEnabled = prefs.getBool(_autoBackupEnabledKey) ?? true;
@@ -117,6 +138,9 @@ class SettingsNotifier extends Notifier<Settings> {
       hostName: hostName,
       hostColor: hostColor,
       sfxEnabled: sfxEnabled,
+      sfxBeepEnabled: sfxBeepEnabled,
+      sfxFanfareEnabled: sfxFanfareEnabled,
+      sfxOtherEnabled: sfxOtherEnabled,
       debugMode: debugMode,
       autoBackupEnabled: autoBackupEnabled,
       autoBackupFrequency: autoBackupFreq,
@@ -164,6 +188,24 @@ class SettingsNotifier extends Notifier<Settings> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_sfxEnabledKey, enabled);
     state = state.copyWith(sfxEnabled: enabled);
+  }
+
+  Future<void> setSfxBeepEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_sfxBeepKey, enabled);
+    state = state.copyWith(sfxBeepEnabled: enabled);
+  }
+
+  Future<void> setSfxFanfareEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_sfxFanfareKey, enabled);
+    state = state.copyWith(sfxFanfareEnabled: enabled);
+  }
+
+  Future<void> setSfxOtherEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_sfxOtherKey, enabled);
+    state = state.copyWith(sfxOtherEnabled: enabled);
   }
 
   Future<void> setDebugMode(bool enabled) async {

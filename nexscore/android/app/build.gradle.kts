@@ -46,6 +46,6 @@ flutter {
     source = "../.."
 }
 
-kotlin {
-    jvmToolchain(17)
-}
+
+// Redundant kotlin { jvmToolchain(17) } removed to avoid conflicts
+

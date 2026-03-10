@@ -25,6 +25,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
   Future<void> _initLobby() async {
     if (!widget.isHostingStart) return;
+    if (_isHosting) return; // Prevent concurrent calls
+
     setState(() => _isHosting = true);
     try {
       final settings = ref.read(settingsProvider);
@@ -38,10 +40,36 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           _isHosting = false;
         });
       }
-    } catch (e) {
+    } catch (e, stack) {
       if (mounted) {
+        setState(() => _isHosting = false);
         final l10n = AppLocalizations.of(context);
         String message = e.toString();
+        
+        // Handle minified exceptions on web
+        String displayMessage = message;
+        if (message.contains('minified')) {
+          displayMessage = 'A connection error occurred. Please check your internet and AdBlocker.';
+        }
+
+        void showDetails() {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.get('multiplayer_error_details')),
+              content: SingleChildScrollView(
+                child: SelectableText('Error: $e\n\nStack: $stack'),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.get('ok')),
+                ),
+              ],
+            ),
+          );
+        }
+
         if (message.contains('FIREBASE_NOT_CONFIGURED')) {
           showDialog(
             context: context,
@@ -49,7 +77,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             builder: (context) => AlertDialog(
               title: Text(l10n.get('multiplayer_firebase_missing')),
               content: Text(l10n.get('multiplayer_firebase_missing_desc')),
-
               actions: [
                 TextButton(
                   onPressed: () {
@@ -69,6 +96,17 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               title: Text(l10n.get('multiplayer_error_offline_title')),
               content: Text(l10n.get('multiplayer_error_offline_desc')),
               actions: [
+                TextButton(
+                  onPressed: showDetails,
+                  child: Text(l10n.get('multiplayer_error_details')),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _initLobby(); // Retry
+                  },
+                  child: Text(l10n.get('multiplayer_error_retry')),
+                ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -100,6 +138,17 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ),
               actions: [
                 TextButton(
+                  onPressed: showDetails,
+                  child: Text(l10n.get('multiplayer_error_details')),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _initLobby(); // Retry
+                  },
+                  child: Text(l10n.get('multiplayer_error_retry')),
+                ),
+                TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                     context.pop();
@@ -113,7 +162,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                l10n.getWith('multiplayer_error_host', [e.toString()]),
+                l10n.getWith('multiplayer_error_host', [displayMessage]),
+              ),
+              action: SnackBarAction(
+                label: l10n.get('multiplayer_error_details'),
+                onPressed: showDetails,
               ),
             ),
           );

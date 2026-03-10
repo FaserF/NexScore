@@ -190,39 +190,67 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 _SectionHeader(title: l10n.get('settings_sfx')),
                 GlassContainer(
                   borderRadius: 24,
-                  child: SwitchListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
-                    ),
-                    secondary: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.secondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                  child: Column(
+                    children: [
+                      SwitchListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        secondary: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.secondary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.volume_up,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        ),
+                        title: Text(
+                          l10n.get('settings_sfx'),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          l10n.get('settings_sfx_desc'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        value: settings.sfxEnabled,
+                        onChanged: (val) {
+                          ref.read(settingsProvider.notifier).setSfxEnabled(val);
+                        },
                       ),
-                      child: Icon(
-                        Icons.volume_up,
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
-                    ),
-                    title: Text(
-                      l10n.get('settings_sfx'),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Text(
-                      l10n.get('settings_sfx_desc'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    value: settings.sfxEnabled,
-                    onChanged: (val) {
-                      ref.read(settingsProvider.notifier).setSfxEnabled(val);
-                    },
+                      if (settings.sfxEnabled) ...[
+                        const Divider(height: 1),
+                        _SubSettingSwitch(
+                          title: l10n.get('settings_sfx_beep'),
+                          value: settings.sfxBeepEnabled,
+                          onChanged: (val) => ref
+                              .read(settingsProvider.notifier)
+                              .setSfxBeepEnabled(val),
+                        ),
+                        _SubSettingSwitch(
+                          title: l10n.get('settings_sfx_fanfare'),
+                          value: settings.sfxFanfareEnabled,
+                          onChanged: (val) => ref
+                              .read(settingsProvider.notifier)
+                              .setSfxFanfareEnabled(val),
+                        ),
+                        _SubSettingSwitch(
+                          title: l10n.get('settings_sfx_other'),
+                          value: settings.sfxOtherEnabled,
+                          onChanged: (val) => ref
+                              .read(settingsProvider.notifier)
+                              .setSfxOtherEnabled(val),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -756,6 +784,32 @@ class _SectionHeader extends StatelessWidget {
           letterSpacing: 1.5,
         ),
       ),
+    );
+  }
+}
+
+class _SubSettingSwitch extends StatelessWidget {
+  final String title;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _SubSettingSwitch({
+    required this.title,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      contentPadding: const EdgeInsets.only(left: 72, right: 16),
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      ),
+      value: value,
+      onChanged: onChanged,
+      dense: true,
     );
   }
 }

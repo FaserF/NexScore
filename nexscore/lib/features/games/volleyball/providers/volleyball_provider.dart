@@ -99,13 +99,26 @@ class VolleyballStateNotifier extends Notifier<VolleyballGameState> {
 
     if (team == 'A') {
       scoreA++;
-      state = state.copyWith(server: 'A');
     } else {
       scoreB++;
-      state = state.copyWith(server: 'B');
     }
 
-    final updatedSet = currentSet.copyWith(scoreA: scoreA, scoreB: scoreB);
+    final updatedHistory = List<VolleyballPoint>.from(currentSet.pointHistory);
+    // Record who served this point and who scored it.
+    // If server isn't set yet (first point), we'll have to handle it in UI 
+    // or just use the winner as server for now.
+    updatedHistory.add(VolleyballPoint(
+      scorer: team,
+      server: state.server ?? team,
+    ));
+
+    state = state.copyWith(server: team);
+
+    final updatedSet = currentSet.copyWith(
+      scoreA: scoreA,
+      scoreB: scoreB,
+      pointHistory: updatedHistory,
+    );
 
     // Mid-set side switch check (deciding set only)
     final isDeciding = state.currentSetIndex == state.rules.maxSets - 1;
@@ -130,18 +143,38 @@ class VolleyballStateNotifier extends Notifier<VolleyballGameState> {
     if (team == 'B' && currentSet.scoreB == 0) return;
 
     _pushState();
+    final updatedHistory = List<VolleyballPoint>.from(currentSet.pointHistory);
+    String? prevServer = state.server;
+    if (updatedHistory.isNotEmpty) {
+      updatedHistory.removeLast();
+      // Restore server from previous point if history is not empty
+      if (updatedHistory.isNotEmpty) {
+        prevServer = updatedHistory.last.scorer; // Winner of previous point serves
+      } else {
+        prevServer = null; // First point was removed, reset server
+      }
+    }
+
     if (team == 'A') {
       state = state.copyWith(
+        server: prevServer,
         sets: _updateSetsAt(
           state.currentSetIndex,
-          currentSet.copyWith(scoreA: currentSet.scoreA - 1),
+          currentSet.copyWith(
+            scoreA: currentSet.scoreA - 1,
+            pointHistory: updatedHistory,
+          ),
         ),
       );
     } else {
       state = state.copyWith(
+        server: prevServer,
         sets: _updateSetsAt(
           state.currentSetIndex,
-          currentSet.copyWith(scoreB: currentSet.scoreB - 1),
+          currentSet.copyWith(
+            scoreB: currentSet.scoreB - 1,
+            pointHistory: updatedHistory,
+          ),
         ),
       );
     }

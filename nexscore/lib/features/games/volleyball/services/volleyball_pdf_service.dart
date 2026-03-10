@@ -236,25 +236,62 @@ class VolleyballPdfService {
                     return null;
                   }
 
-                  return pw.TableRow(
-                    children: [
-                      _tableCell('${index + 1}'),
-                      _tableCell('${s.scoreA}', bold: s.scoreA > s.scoreB),
-                      _tableCell('${s.scoreB}', bold: s.scoreB > s.scoreA),
-                      _tableCell(
-                        _formatTimeRange(s.startedAt, s.endedAt),
-                        fontSize: 8,
+                  return [
+                    pw.TableRow(
+                      children: [
+                        _tableCell('${index + 1}'),
+                        _tableCell('${s.scoreA}', bold: s.scoreA > s.scoreB),
+                        _tableCell('${s.scoreB}', bold: s.scoreB > s.scoreA),
+                        _tableCell(
+                          _formatTimeRange(s.startedAt, s.endedAt),
+                          fontSize: 8,
+                        ),
+                        _tableCell(
+                          s.scoreA > s.scoreB ? state.teamAName : state.teamBName,
+                          bold: true,
+                          color: s.scoreA > s.scoreB
+                              ? PdfColors.blue
+                              : PdfColors.red,
+                        ),
+                      ],
+                    ),
+                    if (s.pointHistory.isNotEmpty)
+                      pw.TableRow(
+                        children: [
+                          _tableCell(''), // No number
+                          pw.Container(
+                            padding: const pw.EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            alignment: pw.Alignment.centerLeft,
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  l10n.get('vb_serve_history').toUpperCase(),
+                                  style: pw.TextStyle(
+                                    fontSize: 6,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColors.grey600,
+                                  ),
+                                ),
+                                pw.Text(
+                                  s.pointHistory
+                                      .map((p) => p.server)
+                                      .join(', '),
+                                  style: const pw.TextStyle(fontSize: 7),
+                                ),
+                              ],
+                            ),
+                          ),
+                          _tableCell(''),
+                          _tableCell(''),
+                          _tableCell(''),
+                        ],
                       ),
-                      _tableCell(
-                        s.scoreA > s.scoreB ? state.teamAName : state.teamBName,
-                        bold: true,
-                        color: s.scoreA > s.scoreB
-                            ? PdfColors.blue
-                            : PdfColors.red,
-                      ),
-                    ],
-                  );
-                }).whereType<pw.TableRow>(),
+                  ];
+                }).whereType<List<pw.TableRow>>().expand((i) => i).toList(),
               ],
             ),
 

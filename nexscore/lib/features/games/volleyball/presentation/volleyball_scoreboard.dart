@@ -774,14 +774,53 @@ class _TeamScoreArea extends ConsumerWidget {
     required this.maxTimeouts,
   });
 
+  Future<void> _showInitialServerDialog(
+    BuildContext context,
+    WidgetRef ref,
+    VolleyballGameState state,
+    AppLocalizations l10n,
+    String scorerTeamId,
+  ) async {
+    final result = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.get('vb_select_initial_server')),
+        content: Text(l10n.get('vb_select_initial_server_desc')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'A'),
+            child: Text(state.teamAName),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'B'),
+            child: Text(state.teamBName),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null) {
+      ref.read(volleyballStateProvider.notifier).setServer(result);
+      // After setting the initial server, add the point
+      ref.read(volleyballStateProvider.notifier).addPoint(scorerTeamId);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final state = ref.watch(volleyballStateProvider);
 
     return Expanded(
       child: InkWell(
-        onTap: () =>
-            ref.read(volleyballStateProvider.notifier).addPoint(teamId),
+        onTap: () {
+          if (state.server == null) {
+            _showInitialServerDialog(context, ref, state, l10n, teamId);
+          } else {
+            ref.read(volleyballStateProvider.notifier).addPoint(teamId);
+          }
+        },
         onLongPress: () =>
             ref.read(volleyballStateProvider.notifier).removePoint(teamId),
         child: Container(

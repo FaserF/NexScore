@@ -6,6 +6,11 @@ final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
   final settings = ref.watch(settingsProvider);
   service.setEnabled(settings.sfxEnabled);
+  service.setGranularEnabled(
+    beep: settings.sfxBeepEnabled,
+    fanfare: settings.sfxFanfareEnabled,
+    other: settings.sfxOtherEnabled,
+  );
   ref.onDispose(() => service.dispose());
   return service;
 });

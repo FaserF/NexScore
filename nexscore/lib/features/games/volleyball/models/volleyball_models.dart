@@ -90,6 +90,22 @@ class VolleyballRules {
 }
 
 @immutable
+class VolleyballPoint {
+  final String scorer; // 'A' or 'B'
+  final String server; // 'A' or 'B'
+
+  const VolleyballPoint({required this.scorer, required this.server});
+
+  Map<String, dynamic> toJson() => {'scorer': scorer, 'server': server};
+
+  factory VolleyballPoint.fromJson(Map<String, dynamic> json) =>
+      VolleyballPoint(
+        scorer: json['scorer'] as String,
+        server: json['server'] as String,
+      );
+}
+
+@immutable
 class VolleyballSet {
   final int scoreA;
   final int scoreB;
@@ -100,6 +116,7 @@ class VolleyballSet {
   final DateTime? startedAt;
   final DateTime? endedAt;
   final bool midSetSideSwitchDone;
+  final List<VolleyballPoint> pointHistory;
 
   const VolleyballSet({
     this.scoreA = 0,
@@ -111,6 +128,7 @@ class VolleyballSet {
     this.startedAt,
     this.endedAt,
     this.midSetSideSwitchDone = false,
+    this.pointHistory = const [],
   });
 
   Map<String, dynamic> toJson() => {
@@ -123,6 +141,7 @@ class VolleyballSet {
     'startedAt': startedAt?.toIso8601String(),
     'endedAt': endedAt?.toIso8601String(),
     'midSetSideSwitchDone': midSetSideSwitchDone,
+    'pointHistory': pointHistory.map((p) => p.toJson()).toList(),
   };
 
   factory VolleyballSet.fromJson(Map<String, dynamic> json) => VolleyballSet(
@@ -139,6 +158,11 @@ class VolleyballSet {
         ? DateTime.parse(json['endedAt'] as String)
         : null,
     midSetSideSwitchDone: json['midSetSideSwitchDone'] as bool? ?? false,
+    pointHistory:
+        (json['pointHistory'] as List?)
+            ?.map((p) => VolleyballPoint.fromJson(p as Map<String, dynamic>))
+            .toList() ??
+        const [],
   );
 
   VolleyballSet copyWith({
@@ -151,6 +175,7 @@ class VolleyballSet {
     DateTime? startedAt,
     DateTime? endedAt,
     bool? midSetSideSwitchDone,
+    List<VolleyballPoint>? pointHistory,
   }) {
     return VolleyballSet(
       scoreA: scoreA ?? this.scoreA,
@@ -162,6 +187,7 @@ class VolleyballSet {
       startedAt: startedAt ?? this.startedAt,
       endedAt: endedAt ?? this.endedAt,
       midSetSideSwitchDone: midSetSideSwitchDone ?? this.midSetSideSwitchDone,
+      pointHistory: pointHistory ?? this.pointHistory,
     );
   }
 
@@ -191,6 +217,11 @@ class VolleyballSet {
         ? DateTime.parse(map['endedAt'] as String)
         : null,
     midSetSideSwitchDone: map['midSetSideSwitchDone'] as bool? ?? false,
+    pointHistory:
+        (map['pointHistory'] as List?)
+            ?.map((p) => VolleyballPoint.fromJson(p as Map<String, dynamic>))
+            .toList() ??
+        const [],
   );
 }
 

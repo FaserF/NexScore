@@ -20,7 +20,11 @@ class TtsService {
 
     _flutterTts.setErrorHandler((msg) {
       _isSpeaking = false;
-      debugPrint("TTS Error: $msg");
+      // "interrupted" is common on Web when stop() is called or a new speaker starts.
+      // We don't want to spam the console with this as it's often expected.
+      if (msg != "interrupted") {
+        debugPrint("TTS Error: $msg");
+      }
     });
   }
 

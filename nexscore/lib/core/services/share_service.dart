@@ -44,6 +44,10 @@ class ShareService {
         ), // Increased delay for rendering
       );
 
+      // Note: captureFromWidget in screenshot 3.0.0 returns Uint8List,
+      // not Uint8List?, so a null check is redundant. If it fails,
+      // it should throw an exception which will be caught below.
+
       if (kIsWeb) {
         await SharePlus.instance.share(
           ShareParams(
@@ -71,12 +75,45 @@ class ShareService {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('Share error type: ${e.runtimeType}');
       debugPrint('Share error: $e');
+      if (kDebugMode) {
+        debugPrint('Stack trace: $stack');
+      }
+      
+      String displayError = e.toString();
+      // Handle minified exceptions on web by checking for properties if possible
+      if (displayError.contains('minified')) {
+        displayError = 'A platform error occurred during sharing. Please try again.';
+      }
+
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to share: $e')));
+        ).showSnackBar(SnackBar(
+          content: Text('Failed to share: $displayError'),
+          action: SnackBarAction(
+            label: 'Details',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Share Error Details'),
+                  content: SingleChildScrollView(
+                    child: SelectableText('Error: $e\n\nType: ${e.runtimeType}\n\nStack: $stack'),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Close'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ));
       }
     }
   }

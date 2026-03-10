@@ -140,6 +140,9 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
           debugPrint(
             'Multiplayer: [Lobby] Code: ${e.code}, Message: ${e.message}',
           );
+          if (e.code == 'unavailable') {
+            throw Exception('firestore_unavailable: ${e.message}');
+          }
         }
         rethrow;
       }
@@ -214,6 +217,9 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
         debugPrint(
           'Multiplayer: [Join] Code: ${e.code}, Message: ${e.message}',
         );
+        if (e.code == 'unavailable') {
+          throw Exception('firestore_unavailable: ${e.message}');
+        }
       }
       rethrow;
     }
