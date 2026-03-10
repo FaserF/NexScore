@@ -65,6 +65,7 @@ void main() {
 
       // Win 2 sets to 0 (BVV is best of 3, so 2 sets to win)
       for (int s = 0; s < 2; s++) {
+        notifier.setServer('A');
         for (int i = 0; i < 25; i++) {
           notifier.addPoint('A');
         }
@@ -93,6 +94,7 @@ void main() {
       );
 
       // Set 1: A wins
+      notifier.setServer('A');
       for (int i = 0; i < 25; i++) {
         notifier.addPoint('A');
       }
@@ -133,6 +135,7 @@ void main() {
 
       // 2:2
       for (int s = 0; s < 2; s++) {
+        notifier.setServer('A');
         for (int i = 0; i < 25; i++) {
           notifier.addPoint('A');
         }
@@ -171,6 +174,7 @@ void main() {
 
         // A wins 2:0
         for (int s = 0; s < 2; s++) {
+          notifier.setServer('A');
           for (int i = 0; i < 25; i++) {
             notifier.addPoint('A');
           }
@@ -204,6 +208,7 @@ void main() {
       final notifier = container.read(volleyballStateProvider.notifier);
 
       // Set 1 finishes
+      notifier.setServer('A');
       for (int i = 0; i < 25; i++) {
         notifier.addPoint('A');
       }

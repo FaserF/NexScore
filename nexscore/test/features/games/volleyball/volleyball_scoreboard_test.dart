@@ -59,6 +59,10 @@ void main() {
       await tester.tap(teamA0);
       await tester.pumpAndSettle();
 
+      // Should show initial server dialog. Select Team A.
+      await tester.tap(find.text('Team A').last); // Tapping Team A in the dialog
+      await tester.pumpAndSettle();
+
       // Score should be 1
       expect(find.text('1'), findsOneWidget);
     });
@@ -72,6 +76,11 @@ void main() {
       // Add a point
       await tester.tap(find.text('0').at(0));
       await tester.pumpAndSettle();
+      
+      // Select server
+      await tester.tap(find.text('Team A').last);
+      await tester.pumpAndSettle();
+      
       expect(find.text('1'), findsOneWidget);
 
       // Long press same area
@@ -99,6 +108,10 @@ void main() {
 
         // Add a point
         await tester.tap(find.text('0').at(0));
+        await tester.pumpAndSettle();
+
+        // Select server
+        await tester.tap(find.text('Team A').last);
         await tester.pumpAndSettle();
 
         // Now enabled
