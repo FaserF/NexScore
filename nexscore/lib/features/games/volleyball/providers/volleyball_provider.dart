@@ -184,22 +184,46 @@ class VolleyballStateNotifier extends Notifier<VolleyballGameState> {
     if (state.matchFinished || state.currentSet.isFinished) return;
 
     final currentSet = state.currentSet;
+    final now = DateTime.now();
+
     if (team == 'A') {
       if (currentSet.timeoutsTakenA >= state.rules.timeoutsPerSet) return;
       _pushState();
+      
+      final newTimeout = VolleyballTimeout(
+        team: 'A',
+        timestamp: now,
+        scoreA: currentSet.scoreA,
+        scoreB: currentSet.scoreB,
+      );
+
       state = state.copyWith(
         sets: _updateSetsAt(
           state.currentSetIndex,
-          currentSet.copyWith(timeoutsTakenA: currentSet.timeoutsTakenA + 1),
+          currentSet.copyWith(
+            timeoutsTakenA: currentSet.timeoutsTakenA + 1,
+            timeouts: [...currentSet.timeouts, newTimeout],
+          ),
         ),
       );
     } else {
       if (currentSet.timeoutsTakenB >= state.rules.timeoutsPerSet) return;
       _pushState();
+
+      final newTimeout = VolleyballTimeout(
+        team: 'B',
+        timestamp: now,
+        scoreA: currentSet.scoreA,
+        scoreB: currentSet.scoreB,
+      );
+
       state = state.copyWith(
         sets: _updateSetsAt(
           state.currentSetIndex,
-          currentSet.copyWith(timeoutsTakenB: currentSet.timeoutsTakenB + 1),
+          currentSet.copyWith(
+            timeoutsTakenB: currentSet.timeoutsTakenB + 1,
+            timeouts: [...currentSet.timeouts, newTimeout],
+          ),
         ),
       );
     }

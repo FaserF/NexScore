@@ -290,6 +290,45 @@ class VolleyballPdfService {
                           _tableCell(''),
                         ],
                       ),
+                    if (s.timeouts.isNotEmpty)
+                      pw.TableRow(
+                        children: [
+                          _tableCell(''), // No number
+                          pw.Container(
+                            padding: const pw.EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            alignment: pw.Alignment.centerLeft,
+                            child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  l10n.get('vb_timeouts').toUpperCase(),
+                                  style: pw.TextStyle(
+                                    fontSize: 6,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColors.orange800,
+                                  ),
+                                ),
+                                ...s.timeouts.map((t) {
+                                  final teamName =
+                                      t.team == 'A' ? state.teamAName : state.teamBName;
+                                  final timeStr =
+                                      '${t.timestamp.hour.toString().padLeft(2, '0')}:${t.timestamp.minute.toString().padLeft(2, '0')}';
+                                  return pw.Text(
+                                    '$teamName (${t.scoreA}:${t.scoreB}) @ $timeStr',
+                                    style: const pw.TextStyle(fontSize: 7),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                          _tableCell(''),
+                          _tableCell(''),
+                          _tableCell(''),
+                        ],
+                      ),
                   ];
                 }).whereType<List<pw.TableRow>>().expand((i) => i).toList(),
               ],

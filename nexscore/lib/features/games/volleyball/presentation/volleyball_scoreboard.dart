@@ -913,32 +913,50 @@ class _TeamScoreArea extends ConsumerWidget {
                   ),
                 ),
               Positioned(
-                bottom: 16,
+                bottom: 8,
                 left: 0,
                 right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(maxTimeouts, (index) {
-                    final taken = index < timeouts;
-                    return AnimatedScaleButton(
-                      onPressed: taken
-                          ? () {}
-                          : () => ref
-                                .read(volleyballStateProvider.notifier)
-                                .takeTimeout(teamId),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: 40,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: taken
-                              ? Colors.grey.withValues(alpha: 0.3)
-                              : color,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
+                child: Column(
+                  children: [
+                    Text(
+                      '${l10n.get('vb_timeouts')}: $timeouts / $maxTimeouts',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: timeouts >= maxTimeouts 
+                            ? Colors.grey 
+                            : color.withValues(alpha: 0.7),
                       ),
-                    );
-                  }),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(maxTimeouts, (index) {
+                        final taken = index < timeouts;
+                        return AnimatedScaleButton(
+                          onPressed: taken || state.currentSet.isFinished
+                              ? () {}
+                              : () => ref
+                                    .read(volleyballStateProvider.notifier)
+                                    .takeTimeout(teamId),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 50,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: taken
+                                  ? Colors.grey.withValues(alpha: 0.3)
+                                  : color,
+                              borderRadius: BorderRadius.circular(4),
+                              border: taken 
+                                  ? null 
+                                  : Border.all(color: Colors.white24, width: 0.5),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
                 ),
               ),
             ],

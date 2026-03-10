@@ -106,6 +106,36 @@ class VolleyballPoint {
 }
 
 @immutable
+class VolleyballTimeout {
+  final String team; // 'A' or 'B'
+  final DateTime timestamp;
+  final int scoreA;
+  final int scoreB;
+
+  const VolleyballTimeout({
+    required this.team,
+    required this.timestamp,
+    required this.scoreA,
+    required this.scoreB,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'team': team,
+    'timestamp': timestamp.toIso8601String(),
+    'scoreA': scoreA,
+    'scoreB': scoreB,
+  };
+
+  factory VolleyballTimeout.fromJson(Map<String, dynamic> json) =>
+      VolleyballTimeout(
+        team: json['team'] as String,
+        timestamp: DateTime.parse(json['timestamp'] as String),
+        scoreA: json['scoreA'] as int,
+        scoreB: json['scoreB'] as int,
+      );
+}
+
+@immutable
 class VolleyballSet {
   final int scoreA;
   final int scoreB;
@@ -117,6 +147,7 @@ class VolleyballSet {
   final DateTime? endedAt;
   final bool midSetSideSwitchDone;
   final List<VolleyballPoint> pointHistory;
+  final List<VolleyballTimeout> timeouts;
 
   const VolleyballSet({
     this.scoreA = 0,
@@ -129,6 +160,7 @@ class VolleyballSet {
     this.endedAt,
     this.midSetSideSwitchDone = false,
     this.pointHistory = const [],
+    this.timeouts = const [],
   });
 
   Map<String, dynamic> toJson() => {
@@ -142,6 +174,7 @@ class VolleyballSet {
     'endedAt': endedAt?.toIso8601String(),
     'midSetSideSwitchDone': midSetSideSwitchDone,
     'pointHistory': pointHistory.map((p) => p.toJson()).toList(),
+    'timeouts': timeouts.map((t) => t.toJson()).toList(),
   };
 
   factory VolleyballSet.fromJson(Map<String, dynamic> json) => VolleyballSet(
@@ -163,6 +196,11 @@ class VolleyballSet {
             ?.map((p) => VolleyballPoint.fromJson(p as Map<String, dynamic>))
             .toList() ??
         const [],
+    timeouts:
+        (json['timeouts'] as List?)
+            ?.map((t) => VolleyballTimeout.fromJson(t as Map<String, dynamic>))
+            .toList() ??
+        const [],
   );
 
   VolleyballSet copyWith({
@@ -176,6 +214,7 @@ class VolleyballSet {
     DateTime? endedAt,
     bool? midSetSideSwitchDone,
     List<VolleyballPoint>? pointHistory,
+    List<VolleyballTimeout>? timeouts,
   }) {
     return VolleyballSet(
       scoreA: scoreA ?? this.scoreA,
@@ -188,6 +227,7 @@ class VolleyballSet {
       endedAt: endedAt ?? this.endedAt,
       midSetSideSwitchDone: midSetSideSwitchDone ?? this.midSetSideSwitchDone,
       pointHistory: pointHistory ?? this.pointHistory,
+      timeouts: timeouts ?? this.timeouts,
     );
   }
 
@@ -220,6 +260,11 @@ class VolleyballSet {
     pointHistory:
         (map['pointHistory'] as List?)
             ?.map((p) => VolleyballPoint.fromJson(p as Map<String, dynamic>))
+            .toList() ??
+        const [],
+    timeouts:
+        (map['timeouts'] as List?)
+            ?.map((t) => VolleyballTimeout.fromJson(t as Map<String, dynamic>))
             .toList() ??
         const [],
   );
