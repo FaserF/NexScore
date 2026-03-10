@@ -11,9 +11,9 @@ void main() {
         if (entity is File && entity.path.endsWith('.dart')) {
           final content = entity.readAsStringSync();
           
-          // Should NOT use SharePlus.instance (deprecated/non-standard in our project)
-          if (content.contains('SharePlus.instance')) {
-            fail('File ${entity.path} uses the non-standard SharePlus.instance. Use Share.shareXFiles instead.');
+          // Should use SharePlus.instance.share (standard in our project now)
+          if (content.contains('Share.shareXFiles')) {
+            fail('File ${entity.path} uses the deprecated Share.shareXFiles. Use SharePlus.instance.share instead.');
           }
           
           // If it contains Share.share, it should probably be Share.shareXFiles or Share.share

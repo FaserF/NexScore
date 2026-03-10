@@ -1,0 +1,72 @@
+name: Auto Labeler
+
+on:
+  issues:
+    types: [opened, edited]
+  pull_request_target:
+    types: [opened, synchronized]
+
+jobs:
+  label_pr:
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          configuration-path: .github/labeler.yml
+          sync-labels: true
+
+  label_issue:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+            const labels = new Set();
+
+            // Helper to add labels based on keywords/selections in the issue body
+            const checkBody = (text, label) => {
+              if (body.toLowerCase().includes(text.toLowerCase())) {
+                labels.add(label);
+              }
+            };
+
+            // Platform Labels
+            if (body.includes('- Android')) labels.add('android');
+            if (body.includes('- iOS')) labels.add('ios');
+            if (body.includes('- Web (Browser)')) labels.add('web');
+            if (body.includes('- PWA (Installed)')) labels.add('pwa');
+
+            // Game Module Labels
+            if (body.includes('- Wizard')) labels.add('game-wizard');
+            if (body.includes('- Qwixx')) labels.add('game-qwixx');
+            if (body.includes('- Schafkopf')) labels.add('game-schafkopf');
+            if (body.includes('- Volleyball')) labels.add('game-volleyball');
+            if (body.includes('- SipDeck')) labels.add('game-sipdeck');
+            if (body.includes('- Phase 10')) labels.add('game-phase10');
+            if (body.includes('- Arschloch / President')) labels.add('game-arschi');
+            if (body.includes('- Darts X01')) labels.add('game-darts');
+
+            // Feature Categories
+            if (body.includes('- New Game Module')) labels.add('new-feature');
+            if (body.includes('- UI / UX Improvement')) labels.add('ui');
+            if (body.includes('- Internationalization (i18n)')) labels.add('i18n');
+            if (body.includes('- Performance / Stability')) labels.add('performance');
+
+            if (labels.size > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: Array.from(labels)
+              });
+            }

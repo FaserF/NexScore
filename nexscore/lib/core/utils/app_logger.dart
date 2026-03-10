@@ -35,9 +35,11 @@ class AppLogger {
       name: 'nexscore_logs.txt',
     );
 
-    await Share.shareXFiles(
-      [xFile],
-      subject: 'NexScore Debug Logs',
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [xFile],
+        subject: 'NexScore Debug Logs',
+      ),
     );
   }
 }

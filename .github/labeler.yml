@@ -1,0 +1,52 @@
+# Path-based labeling for Pull Requests
+core:
+  - changed-files:
+    - any-glob-to-any-file: 'lib/core/**/*'
+
+ui:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'lib/shared/widgets/**/*'
+      - '**/presentation/**/*'
+
+i18n:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'lib/core/i18n/**/*'
+      - 'assets/lang/**/*'
+
+game-wizard:
+  - changed-files:
+    - any-glob-to-any-file: 'lib/features/games/wizard/**/*'
+
+game-qwixx:
+  - changed-files:
+    - any-glob-to-any-file: 'lib/features/games/qwixx/**/*'
+
+game-schafkopf:
+  - changed-files:
+    - any-glob-to-any-file: 'lib/features/games/schafkopf/**/*'
+
+game-sipdeck:
+  - changed-files:
+    - any-glob-to-any-file: 'lib/features/games/sipdeck/**/*'
+
+game-volleyball:
+  - changed-files:
+    - any-glob-to-any-file: 'lib/features/games/volleyball/**/*'
+
+game-wayquest:
+  - changed-files:
+    - any-glob-to-any-file: 'lib/features/games/wayquest/**/*'
+
+game-multiplayer:
+  - changed-files:
+    - any-glob-to-any-file: 'lib/features/multiplayer/**/*'
+
+ci-cd:
+  - changed-files:
+    - any-glob-to-any-file: '.github/workflows/**/*'
+
+test:
+  - changed-files:
+    - any-glob-to-any-file: 'test/**/*'
