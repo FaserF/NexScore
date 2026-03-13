@@ -51,7 +51,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     try {
       if (_auth.currentUser == null) {
         debugPrint('Multiplayer: [Auth] Signing in anonymously...');
-        await _auth.signInAnonymously().timeout(const Duration(seconds: 15));
+        await _auth.signInAnonymously().timeout(const Duration(seconds: 30));
       }
       _uid = _auth.currentUser?.uid;
       debugPrint('Multiplayer: [Auth] Successful, uid: $_uid');
@@ -87,27 +87,6 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
   }) async {
     debugPrint('Multiplayer: [Lobby] hostLobby called for $hostName');
 
-    // Integrity test requirement: Running connectivity check...
-    debugPrint('Multiplayer: Running connectivity check...');
-    try {
-      await _firestore
-          .collection('lobbies')
-          .limit(1)
-          .get(const GetOptions(source: Source.serverAndCache))
-          .timeout(const Duration(seconds: 15));
-      debugPrint('Multiplayer: Connectivity check successful');
-    } on TimeoutException {
-      debugPrint('Multiplayer: Connectivity check TIMEOUT');
-      throw Exception('firestore_timeout');
-    } catch (e) {
-      debugPrint('Multiplayer: Connectivity check FAILED ($e)');
-      // Don't throw here, maybe it's just an empty collection
-    }
-    debugPrint(
-      'Multiplayer: [System] Firestore persistence: ${_firestore.settings.persistenceEnabled}',
-    );
-    debugPrint('Multiplayer: [System] Firebase Apps: ${Firebase.apps.length}');
-
     await _ensureAuth();
     final uid = _uid!;
 
@@ -128,7 +107,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
             .collection('lobbies')
             .doc(roomCode)
             .get(const GetOptions(source: Source.server))
-            .timeout(const Duration(seconds: 15));
+            .timeout(const Duration(seconds: 30));
 
         if (!doc.exists) {
           isUnique = true;
@@ -180,7 +159,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
           .collection('lobbies')
           .doc(roomCode)
           .set(lobby.toMap())
-          .timeout(const Duration(seconds: 15)); // Increased from 10s
+          .timeout(const Duration(seconds: 45));
       debugPrint('Multiplayer: Lobby document set successfully');
     } on TimeoutException {
       debugPrint('Multiplayer: Timeout while setting lobby document');
@@ -201,13 +180,6 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
       'Multiplayer: [Join] joinLobby called for $roomCode by $playerName',
     );
 
-    // Integrity test requirement: Running connectivity check...
-    debugPrint('Multiplayer: Running connectivity check...');
-    await _firestore
-        .collection('lobbies')
-        .limit(1)
-        .get(const GetOptions(source: Source.serverAndCache))
-        .timeout(const Duration(seconds: 15));
     await _ensureAuth();
     final uid = _uid!;
     roomCode = roomCode.toUpperCase();
@@ -216,7 +188,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     final DocumentSnapshot docSnap;
     try {
       debugPrint('Multiplayer: [Join] Fetching lobby doc $roomCode');
-      docSnap = await docRef.get().timeout(const Duration(seconds: 15));
+      docSnap = await docRef.get().timeout(const Duration(seconds: 30));
     } on TimeoutException {
       debugPrint('Multiplayer: [Join] Timeout fetching lobby doc');
       throw Exception('firestore_timeout');
@@ -260,7 +232,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
       debugPrint('Multiplayer: [Join] Updating users list for $roomCode');
       await docRef
           .update({'users.$uid': joinUser.toMap()})
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 30));
       debugPrint('Multiplayer: [Join] Successfully joined $roomCode');
     } on TimeoutException {
       debugPrint('Multiplayer: [Join] Timeout while updating users');

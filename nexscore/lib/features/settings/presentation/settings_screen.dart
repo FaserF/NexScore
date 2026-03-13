@@ -30,7 +30,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     super.initState();
     // Listen for the install prompt being ready to refresh the UI
     pwa.onInstallPromptReady = () {
-      if (mounted) setState(() {});
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() {});
+        });
+      }
     };
   }
 

@@ -806,6 +806,11 @@ class AppLocalizations {
       'account_gist_restore_desc': 'Download your data from GitHub',
       'account_gist_restore_success': 'Data restored successfully from GitHub',
       'account_sign_in_error': 'Sign-in failed: {0}',
+      'account_error_already_linked':
+          'This {0} account is already in use by another user.',
+      'account_error_already_linked_advice':
+          'If you want to use the data associated with this {0} account, please sign out of the current session and sign in with {0} directly.',
+      'account_action_sign_out_switch': 'Sign Out & Switch',
       'account_data_stay_note':
           'Your local data remains on this device when you sign out.',
       'account_privacy_info':
@@ -3429,6 +3434,11 @@ class AppLocalizations {
       'account_gist_restore_success':
           'Daten erfolgreich von GitHub wiederhergestellt',
       'account_sign_in_error': 'Anmeldung fehlgeschlagen: {0}',
+      'account_error_already_linked':
+          'Dieses {0}-Konto wird bereits von einem anderen Benutzer verwendet.',
+      'account_error_already_linked_advice':
+          'Wenn du die Daten dieses {0}-Kontos verwenden möchtest, melde dich bitte von der aktuellen Sitzung ab und melde dich direkt mit {0} an.',
+      'account_action_sign_out_switch': 'Abmelden & Wechseln',
       'account_data_stay_note':
           'Deine lokalen Daten bleiben beim Abmelden auf diesem Gerät erhalten.',
       'account_privacy_info':

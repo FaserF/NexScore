@@ -820,7 +820,7 @@ class _BuzzTapScreenState extends ConsumerState<BuzzTapScreen>
                                       brandText: 'BuzzTap',
                                     ),
                                     text:
-                                        'Check out this prompt from BuzzTap! ⚡ #NexScore',
+                                        'Check out this BuzzTap prompt: ${currentCard.text} ⚡ #NexScore',
                                   );
                             },
                             icon: const Icon(

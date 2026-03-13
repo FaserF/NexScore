@@ -224,11 +224,18 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
     String message,
     ScaffoldMessengerState messenger,
   ) {
+    final isAlreadyLinked = message == 'credential-already-in-use';
+    final provider = message.contains('Google') ? 'Google' : 'GitHub';
+
+    final errorDisplay = isAlreadyLinked
+        ? l10n.getWith('account_error_already_linked', [provider])
+        : l10n.getWith('account_sign_in_error', [message]);
+
     messenger.showSnackBar(
       SnackBar(
-        content: Text(l10n.getWith('account_sign_in_error', [message])),
-        behavior: SnackBarBehavior.floating,
+        content: Text(errorDisplay),
         backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 10),
       ),
     );
@@ -237,7 +244,25 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.get('error')),
-        content: Text(l10n.getWith('account_sign_in_error', [message])),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(errorDisplay),
+            if (isAlreadyLinked) ...[
+              const SizedBox(height: 16),
+              Text(
+                l10n.getWith('account_error_already_linked_advice', [provider]),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+            const SizedBox(height: 16),
+            const Text(
+              'Please check the browser console for more details.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -247,6 +272,7 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
       ),
     );
   }
+
 }
 
 class _SignedInView extends ConsumerStatefulWidget {
@@ -666,15 +692,22 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
     String message,
     ScaffoldMessengerState messenger,
   ) {
-    final isAlreadyLinked = message.contains('already linked to another user');
+    final isAlreadyLinked = message == 'credential-already-in-use';
+    // Try to guess the provider from the message if it was hardcoded before
+    // or just default to 'GitHub' for now as that's the main issue.
+    final provider = message.contains('Google') ? 'Google' : 'GitHub';
+
+    final errorDisplay = isAlreadyLinked
+        ? l10n.getWith('account_error_already_linked', [provider])
+        : l10n.getWith('account_sign_in_error', [message]);
 
     messenger.showSnackBar(
       SnackBar(
-        content: Text(l10n.getWith('account_sign_in_error', [message])),
+        content: Text(errorDisplay),
         backgroundColor: Colors.red,
         action: isAlreadyLinked
             ? SnackBarAction(
-                label: 'Sign Out & Switch',
+                label: l10n.get('account_action_sign_out_switch'),
                 textColor: Colors.white,
                 onPressed: () {
                   ref.read(authServiceProvider).signOut();
@@ -692,12 +725,12 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.getWith('account_sign_in_error', [message])),
+            Text(errorDisplay),
             if (isAlreadyLinked) ...[
               const SizedBox(height: 16),
-              const Text(
-                'If you want to use this cloud account, you must sign out of the current (guest) account first.',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                l10n.getWith('account_error_already_linked_advice', [provider]),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
             const SizedBox(height: 16),
@@ -714,7 +747,7 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                 Navigator.pop(context);
                 ref.read(authServiceProvider).signOut();
               },
-              child: const Text('Sign Out & Switch'),
+              child: Text(l10n.get('account_action_sign_out_switch')),
             ),
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -724,6 +757,7 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
       ),
     );
   }
+
 }
 
 class _AuthButton extends StatelessWidget {

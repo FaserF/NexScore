@@ -493,7 +493,7 @@ class _FactQuestGame extends ConsumerWidget {
                             brandText: 'FactQuest',
                           ),
                           text:
-                              'Check out this fact from FactQuest! 💡 #NexScore',
+                              'Check out this fact: ${l10n.get(currentCard.text)} 💡 #NexScore',
                         );
                       },
                       icon: Icon(

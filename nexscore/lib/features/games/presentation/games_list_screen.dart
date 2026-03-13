@@ -31,7 +31,11 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
 
   void _initPwaListeners() {
     pwa.onInstallPromptReady = () {
-      if (mounted) setState(() {});
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() {});
+        });
+      }
     };
   }
 

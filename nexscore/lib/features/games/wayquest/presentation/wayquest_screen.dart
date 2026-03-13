@@ -645,7 +645,7 @@ class _WayQuestGame extends ConsumerWidget {
                                               brandText: 'WayQuest',
                                             ),
                                             text:
-                                                'Check out this WayQuest challenge! 🚗 #NexScore',
+                                                'Check out this WayQuest challenge: ${currentCard.text} 🚗 #NexScore',
                                           );
                                     },
                                     icon: const Icon(

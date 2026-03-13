@@ -81,41 +81,56 @@ class ShareService {
       if (kDebugMode) {
         debugPrint('Stack trace: $stack');
       }
-      
+
+      // On Web, if image capture fails (common with CanvasKit/readPixels),
+      // we attempt to share just the text as a fallback.
+      if (kIsWeb && text != null && text.isNotEmpty) {
+        try {
+          await SharePlus.instance.share(ShareParams(subject: text));
+          return; // Successfully fell back to text sharing
+        } catch (fallbackError) {
+          debugPrint('Text fallback share also failed: $fallbackError');
+        }
+      }
+
       String displayError = e.toString();
       // Handle minified exceptions on web by checking for properties if possible
       if (displayError.contains('minified')) {
-        displayError = 'A platform error occurred during sharing. Please try again.';
+        displayError =
+            'A platform error occurred during sharing. Please try again.';
       }
 
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(
-          content: Text('Failed to share: $displayError'),
-          action: SnackBarAction(
-            label: 'Details',
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Share Error Details'),
-                  content: SingleChildScrollView(
-                    child: SelectableText('Error: $e\n\nType: ${e.runtimeType}\n\nStack: $stack'),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Close'),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to share: $displayError'),
+            action: SnackBarAction(
+              label: 'Details',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Share Error Details'),
+                    content: SingleChildScrollView(
+                      child: SelectableText(
+                        'Error: $e\n\nType: ${e.runtimeType}\n\nStack: $stack',
+                      ),
                     ),
-                  ],
-                ),
-              );
-            },
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
-        ));
+        );
       }
     }
+
   }
 
   /// Shares a captured file path directly.

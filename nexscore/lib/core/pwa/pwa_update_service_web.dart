@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 @JS()
 external void flutterReloadApp();
 
-@JS('window.flutterUpdateAvailable')
+@JS('flutterUpdateAvailable')
 external JSBoolean? get _flutterUpdateAvailable;
 
-@JS('window.onFlutterUpdateAvailable')
+@JS('onFlutterUpdateAvailable')
 external set _onFlutterUpdateAvailable(JSFunction value);
 
 final pwaUpdateProvider = NotifierProvider<PwaUpdateNotifier, bool>(() {

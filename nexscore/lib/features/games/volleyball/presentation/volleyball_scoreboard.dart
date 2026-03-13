@@ -1226,19 +1226,6 @@ class _MatchFinishedView extends ConsumerWidget {
   }
 }
 
-// Need to import share provider for the share button
-final shareServiceProvider = Provider((ref) => _ShareService());
-
-class _ShareService {
-  Future<void> shareWidget(
-    BuildContext context,
-    Widget widget, {
-    String? text,
-  }) async {
-    // Delegate to the actual share service
-    // This is imported from the shared module
-  }
-}
 
 class _FinishedTeamScore extends StatelessWidget {
   final String name;

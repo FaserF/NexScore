@@ -1,13 +1,13 @@
 import 'dart:js_interop';
 import 'package:flutter/foundation.dart';
 
-@JS('window.flutterShowInstallPrompt')
+@JS('flutterShowInstallPrompt')
 external JSPromise<JSBoolean> _flutterShowInstallPrompt();
 
-@JS('window.flutterCanShowInstallPrompt')
+@JS('flutterCanShowInstallPrompt')
 external JSBoolean _flutterCanShowInstallPrompt();
 
-@JS('window.onFlutterInstallPromptReady')
+@JS('onFlutterInstallPromptReady')
 external set _onInstallPromptReady(JSFunction? value);
 
 /// Callback for when the install prompt is ready.
@@ -35,11 +35,12 @@ bool isStandalone() {
 }
 
 /// Shows the PWA install prompt. Returns true if accepted or shown.
-Future<bool> showInstallPrompt() {
+Future<bool> showInstallPrompt() async {
   try {
-    return _flutterShowInstallPrompt().toDart.then((result) => result.toDart);
+    final result = await _flutterShowInstallPrompt().toDart;
+    return result.toDart;
   } catch (e) {
     debugPrint('Error showing PWA prompt: $e');
-    return Future.value(false);
+    return false;
   }
 }

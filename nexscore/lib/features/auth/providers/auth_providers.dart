@@ -154,26 +154,8 @@ class AuthService {
 
       String message = 'Linking failed';
       if (e is FirebaseAuthException) {
-        switch (e.code) {
-          case 'credential-already-in-use':
-            message =
-                'This Google account is already linked to another user. Please sign in with Google directly or use a different account.';
-            break;
-          case 'provider-already-linked':
-            message = 'This user already has a Google account linked.';
-            break;
-          case 'invalid-credential':
-            message = 'The Google credential is invalid or has expired.';
-            break;
-          case 'requires-recent-login':
-            message =
-                'For security reasons, this operation requires a recent login. Please sign out and sign in again before linking.';
-            break;
-          default:
-            message = 'Linking failed (${e.code})';
-        }
+        message = e.code;
       }
-
       return Result.failure(AuthFailure(message, error: e, stackTrace: stack));
     }
   }
@@ -214,26 +196,8 @@ class AuthService {
 
       String message = 'GitHub linking failed';
       if (e is FirebaseAuthException) {
-        switch (e.code) {
-          case 'credential-already-in-use':
-            message =
-                'This GitHub account is already linked to another user. Please sign in with GitHub directly or use a different account.';
-            break;
-          case 'provider-already-linked':
-            message = 'This user already has a GitHub account linked.';
-            break;
-          case 'invalid-credential':
-            message = 'The GitHub credential is invalid or has expired.';
-            break;
-          case 'requires-recent-login':
-            message =
-                'For security reasons, this operation requires a recent login. Please sign out and sign in again before linking.';
-            break;
-          default:
-            message = 'GitHub linking failed (${e.code})';
-        }
+        message = e.code;
       }
-
       return Result.failure(AuthFailure(message, error: e, stackTrace: stack));
     }
   }
