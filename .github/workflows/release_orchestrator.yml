@@ -450,14 +450,7 @@ jobs:
 
           # Use Python for safe placeholder replacement (avoids sed issues with markdown pipe chars)
           if grep -qF "| **Android** | _Building..._ | _TBD_ |" release_body.md; then
-            python3 -c "
-import sys
-with open('release_body.md', 'r') as f:
-    content = f.read()
-content = content.replace('| **Android** | _Building..._ | _TBD_ |', sys.argv[1])
-with open('release_body.md', 'w') as f:
-    f.write(content)
-" "$NEW_ROW"
+            python3 -c "import sys; content = open('release_body.md').read(); content = content.replace('| **Android** | _Building..._ | _TBD_ |', sys.argv[1]); open('release_body.md', 'w').write(content)" "$NEW_ROW"
             gh release edit ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --notes-file release_body.md
           fi
 
@@ -511,14 +504,7 @@ with open('release_body.md', 'w') as f:
 
           # Use Python for safe placeholder replacement (avoids sed issues with markdown pipe chars)
           if grep -qF "| **iOS** | _Building..._ | _TBD_ |" release_body.md; then
-            python3 -c "
-import sys
-with open('release_body.md', 'r') as f:
-    content = f.read()
-content = content.replace('| **iOS** | _Building..._ | _TBD_ |', sys.argv[1])
-with open('release_body.md', 'w') as f:
-    f.write(content)
-" "$NEW_ROW"
+            python3 -c "import sys; content = open('release_body.md').read(); content = content.replace('| **iOS** | _Building..._ | _TBD_ |', sys.argv[1]); open('release_body.md', 'w').write(content)" "$NEW_ROW"
             gh release edit ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --notes-file release_body.md
           fi
 
