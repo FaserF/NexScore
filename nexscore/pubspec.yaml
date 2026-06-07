@@ -2,7 +2,7 @@ name: nexscore
 description: "NexScore – Cross-platform score tracker for Wizard, Qwixx, Schafkopf, Kniffel, SipDeck, Phase 10, Darts (X01), Rommé, and Arschloch/President."
 publish_to: 'none'
 
-version: 1.0.0-beta.0
+version: 1.0.0-beta.1
 
 environment:
   sdk: ^3.11.0
