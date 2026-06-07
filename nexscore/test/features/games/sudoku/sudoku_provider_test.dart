@@ -264,7 +264,7 @@ void main() {
 
       final analysis = SudokuAnalyzer.analyze(cells, SudokuVariant.standard);
       expect(analysis, isNotNull);
-      expect(analysis!.explanation, contains('Single'));
+      expect(analysis!.explanationKey, contains('single'));
     });
 
     test('SudokuShareService exports and imports with perfect parity', () {

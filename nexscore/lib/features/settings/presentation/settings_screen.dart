@@ -635,7 +635,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('New Version Available: ${release.tagName}'),
+          title: Text('New Version Available: ${release!.tagName}'),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -650,7 +650,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
-                Text(release.body),
+                Text(release!.body),
               ],
             ),
           ),
@@ -670,7 +670,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     onPressed: () async {
                       Navigator.pop(context);
                       try {
-                        await BuiltInUpdaterService.performUpdate(release);
+                        await BuiltInUpdaterService.performUpdate(release!);
                       } catch (e) {
                         messenger.showSnackBar(
                           SnackBar(content: Text('Failed to trigger update: $e')),

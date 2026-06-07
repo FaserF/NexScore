@@ -13,7 +13,7 @@ import '../services/sudoku_generator.dart';
 import '../services/sudoku_sync_service.dart';
 import '../services/sudoku_stats_service.dart';
 import '../services/sudoku_analyzer.dart';
-import '../../settings/provider/settings_provider.dart';
+import '../../../settings/provider/settings_provider.dart';
 
 
 class SudokuStateNotifier extends Notifier<SudokuGameState> {
