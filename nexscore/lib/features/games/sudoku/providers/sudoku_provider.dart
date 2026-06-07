@@ -310,7 +310,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
       mode: SudokuMode.classic,
       theme: state.theme,
       mistakes: 0,
-      maxMistakes: 3,
+      maxMistakes: level.maxMistakes,
       timeSeconds: 0,
       isFinished: false,
       campaignLevelId: levelId,

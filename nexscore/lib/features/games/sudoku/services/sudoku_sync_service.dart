@@ -213,7 +213,11 @@ class SudokuSyncService {
           .where('mode', isEqualTo: mode)
           .orderBy('timeSeconds', descending: false)
           .limit(50)
-          .get(const GetOptions(source: Source.serverAndCache));
+          .get(const GetOptions(source: Source.serverAndCache))
+          .timeout(
+            const Duration(seconds: 8),
+            onTimeout: () => throw Exception('Leaderboard request timed out'),
+          );
 
       return querySnapshot.docs.map((doc) {
         final data = doc.data();

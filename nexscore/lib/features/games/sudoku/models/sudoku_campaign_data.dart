@@ -8,6 +8,7 @@ class SudokuCampaignLevel {
   final SudokuDifficulty difficulty;
   final int targetTimeSeconds;
   final String seed;
+  final int maxMistakes;
 
   const SudokuCampaignLevel({
     required this.levelId,
@@ -17,10 +18,12 @@ class SudokuCampaignLevel {
     required this.difficulty,
     required this.targetTimeSeconds,
     required this.seed,
+    this.maxMistakes = 3,
   });
 }
 
 const List<SudokuCampaignLevel> sudokuCampaignLevels = [
+  // ── Beginner Zone (Level 1–4): 10 mistakes – learn without frustration ──
   SudokuCampaignLevel(
     levelId: 1,
     title: 'First Steps',
@@ -29,6 +32,7 @@ const List<SudokuCampaignLevel> sudokuCampaignLevels = [
     difficulty: SudokuDifficulty.easy,
     targetTimeSeconds: 180,
     seed: 'academy_level_1_seed_val',
+    maxMistakes: 10,
   ),
   SudokuCampaignLevel(
     levelId: 2,
@@ -38,6 +42,7 @@ const List<SudokuCampaignLevel> sudokuCampaignLevels = [
     difficulty: SudokuDifficulty.easy,
     targetTimeSeconds: 420,
     seed: 'academy_level_2_seed_val',
+    maxMistakes: 10,
   ),
   SudokuCampaignLevel(
     levelId: 3,
@@ -47,6 +52,7 @@ const List<SudokuCampaignLevel> sudokuCampaignLevels = [
     difficulty: SudokuDifficulty.easy,
     targetTimeSeconds: 480,
     seed: 'academy_level_3_seed_val',
+    maxMistakes: 10,
   ),
   SudokuCampaignLevel(
     levelId: 4,
@@ -56,7 +62,9 @@ const List<SudokuCampaignLevel> sudokuCampaignLevels = [
     difficulty: SudokuDifficulty.easy,
     targetTimeSeconds: 540,
     seed: 'academy_level_4_seed_val',
+    maxMistakes: 10,
   ),
+  // ── Intermediate Zone (Level 5–9): 6 mistakes – challenge ramps up ──
   SudokuCampaignLevel(
     levelId: 5,
     title: 'Speedy Six',
@@ -65,6 +73,7 @@ const List<SudokuCampaignLevel> sudokuCampaignLevels = [
     difficulty: SudokuDifficulty.medium,
     targetTimeSeconds: 120,
     seed: 'academy_level_5_seed_val',
+    maxMistakes: 6,
   ),
   SudokuCampaignLevel(
     levelId: 6,
@@ -74,6 +83,7 @@ const List<SudokuCampaignLevel> sudokuCampaignLevels = [
     difficulty: SudokuDifficulty.medium,
     targetTimeSeconds: 480,
     seed: 'academy_level_6_seed_val',
+    maxMistakes: 6,
   ),
   SudokuCampaignLevel(
     levelId: 7,
@@ -83,6 +93,7 @@ const List<SudokuCampaignLevel> sudokuCampaignLevels = [
     difficulty: SudokuDifficulty.medium,
     targetTimeSeconds: 600,
     seed: 'academy_level_7_seed_val',
+    maxMistakes: 6,
   ),
   SudokuCampaignLevel(
     levelId: 8,
@@ -92,6 +103,7 @@ const List<SudokuCampaignLevel> sudokuCampaignLevels = [
     difficulty: SudokuDifficulty.medium,
     targetTimeSeconds: 660,
     seed: 'academy_level_8_seed_val',
+    maxMistakes: 6,
   ),
   SudokuCampaignLevel(
     levelId: 9,
@@ -101,7 +113,9 @@ const List<SudokuCampaignLevel> sudokuCampaignLevels = [
     difficulty: SudokuDifficulty.easy,
     targetTimeSeconds: 240,
     seed: 'academy_level_9_seed_val',
+    maxMistakes: 6,
   ),
+  // ── Advanced Zone (Level 10–20): 3 mistakes – classic challenge ──
   SudokuCampaignLevel(
     levelId: 10,
     title: 'Six Expert',

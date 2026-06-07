@@ -83,6 +83,13 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     super.dispose();
   }
 
+  // Ordered list of fallback ambient music stream URLs
+  static const List<String> _ambientMusicUrls = [
+    'https://coderadio-relay-nyc.freecodecamp.org/radio/8010/radio.mp3',
+    'https://coderadio-relay-sfo.freecodecamp.org/radio/8010/radio.mp3',
+    'https://coderadio-relay-fra.freecodecamp.org/radio/8010/radio.mp3',
+  ];
+
   Future<void> _toggleBackgroundMusic() async {
     final player = _bgMusicPlayer;
     if (player == null) return;
@@ -90,18 +97,30 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     if (_isMusicPlaying) {
       await player.pause();
       setState(() => _isMusicPlaying = false);
-    } else {
+      return;
+    }
+
+    // Try each stream URL in order until one works
+    bool started = false;
+    for (final url in _ambientMusicUrls) {
       try {
-        await player.play(UrlSource('https://coderadio-relay-nyc.freecodecamp.org/radio/8010/radio.mp3'));
+        await player.play(UrlSource(url));
         await player.setVolume(0.25);
-        setState(() => _isMusicPlaying = true);
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to stream ambient music. Check internet.')),
-          );
-        }
+        if (mounted) setState(() => _isMusicPlaying = true);
+        started = true;
+        break;
+      } catch (_) {
+        // Try next URL
       }
+    }
+
+    if (!started && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ambient music unavailable. Check internet connection.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -256,11 +275,28 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   void _handleKeyboardInput(KeyEvent event) {
     if (event is! KeyDownEvent) return;
 
+    final key = event.logicalKey;
+
+    // ESC closes any open overlay first
+    if (key == LogicalKeyboardKey.escape) {
+      if (_showLeaderboard) {
+        setState(() => _showLeaderboard = false);
+        return;
+      }
+      if (_showStats) {
+        setState(() => _showStats = false);
+        return;
+      }
+      return;
+    }
+
     final state = ref.read(sudokuStateProvider);
     if (state.grid.isEmpty || state.isFinished) return;
 
+    // Block game inputs while an overlay is visible
+    if (_showLeaderboard || _showStats) return;
+
     final size = state.variant == SudokuVariant.mini6x6 ? 6 : 9;
-    final key = event.logicalKey;
 
     // Number Inputs
     int? enteredNum;
@@ -1696,67 +1732,73 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   // --- Leaderboards Screen Overlay ---
 
   Widget _buildLeaderboardOverlay(_SudokuThemeColors colors, AppLocalizations l10n) {
-    return Container(
-      color: Colors.black.withAlpha(200),
-      child: Center(
-        child: GlassContainer(
-          margin: const EdgeInsets.all(24),
-          padding: const EdgeInsets.all(24),
-          borderRadius: 24,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GestureDetector(
+      onTap: () => setState(() => _showLeaderboard = false),
+      child: Container(
+        color: Colors.black.withAlpha(200),
+        child: Center(
+          child: GestureDetector(
+            onTap: () {}, // absorb taps inside the card
+            child: GlassContainer(
+              margin: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
+              borderRadius: 24,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    l10n.get('sudoku_leaderboard'),
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colors.primary),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.get('sudoku_leaderboard'),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colors.primary),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => setState(() => _showLeaderboard = false),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => setState(() => _showLeaderboard = false),
-                  ),
+                  const Divider(),
+                  const SizedBox(height: 12),
+                  if (_loadingLeaderboard)
+                    const Center(child: CircularProgressIndicator())
+                  else if (_leaderboardScores.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32.0),
+                      child: Text(
+                        'No scores recorded yet.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )
+                  else
+                    Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _leaderboardScores.length,
+                        itemBuilder: (context, index) {
+                          final item = _leaderboardScores[index];
+                          final name = item['playerName'] ?? 'Anonymous';
+                          final seconds = item['timeSeconds'] as int;
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: colors.primary.withAlpha(50),
+                              child: Text('${index + 1}', style: TextStyle(color: colors.primary, fontWeight: FontWeight.bold)),
+                            ),
+                            title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            trailing: Text(
+                              _formatTime(seconds),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                 ],
               ),
-              const Divider(),
-              const SizedBox(height: 12),
-              if (_loadingLeaderboard)
-                const Center(child: CircularProgressIndicator())
-              else if (_leaderboardScores.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32.0),
-                  child: Text(
-                    'No scores recorded yet.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                )
-              else
-                Flexible(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _leaderboardScores.length,
-                    itemBuilder: (context, index) {
-                      final item = _leaderboardScores[index];
-                      final name = item['playerName'] ?? 'Anonymous';
-                      final seconds = item['timeSeconds'] as int;
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: colors.primary.withAlpha(50),
-                          child: Text('${index + 1}', style: TextStyle(color: colors.primary, fontWeight: FontWeight.bold)),
-                        ),
-                        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        trailing: Text(
-                          _formatTime(seconds),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-            ],
+            ),
           ),
         ),
       ),
@@ -1769,60 +1811,66 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     final stats = _cachedStats ?? SudokuStats();
     final winRate = stats.gamesPlayed > 0 ? (stats.gamesWon / stats.gamesPlayed * 100).toStringAsFixed(0) : '0';
 
-    return Container(
-      color: Colors.black.withAlpha(200),
-      child: Center(
-        child: GlassContainer(
-          margin: const EdgeInsets.all(24),
-          padding: const EdgeInsets.all(24),
-          borderRadius: 24,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GestureDetector(
+      onTap: () => setState(() => _showStats = false),
+      child: Container(
+        color: Colors.black.withAlpha(200),
+        child: Center(
+          child: GestureDetector(
+            onTap: () {}, // absorb taps inside the card
+            child: GlassContainer(
+              margin: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
+              borderRadius: 24,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    '${l10n.get('sudoku_stats')} (${_selectedVariant.name.toUpperCase()})',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.primary),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${l10n.get('sudoku_stats')} (${_selectedVariant.name.toUpperCase()})',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.primary),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => setState(() => _showStats = false),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => setState(() => _showStats = false),
+                  const Divider(),
+                  const SizedBox(height: 12),
+                  
+                  // Stats Grid Layout
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildStatCard(l10n.get('sudoku_stats_played'), '${stats.gamesPlayed}', colors),
+                      _buildStatCard(l10n.get('sudoku_stats_won'), '${stats.gamesWon}', colors),
+                      _buildStatCard(l10n.get('sudoku_stats_win_rate'), '$winRate%', colors),
+                    ],
                   ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildStatCard(l10n.get('sudoku_stats_best_time'), _formatTime(stats.bestTimeSeconds), colors),
+                      _buildStatCard(l10n.get('sudoku_stats_avg_time'), _formatTime(stats.averageTimeSeconds), colors),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildStatCard(l10n.get('sudoku_stats_streak'), '${stats.currentStreak}', colors),
+                      _buildStatCard(l10n.get('sudoku_stats_longest_streak'), '${stats.longestStreak}', colors),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
-              const Divider(),
-              const SizedBox(height: 12),
-              
-              // Stats Grid Layout
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatCard(l10n.get('sudoku_stats_played'), '${stats.gamesPlayed}', colors),
-                  _buildStatCard(l10n.get('sudoku_stats_won'), '${stats.gamesWon}', colors),
-                  _buildStatCard(l10n.get('sudoku_stats_win_rate'), '$winRate%', colors),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatCard(l10n.get('sudoku_stats_best_time'), _formatTime(stats.bestTimeSeconds), colors),
-                  _buildStatCard(l10n.get('sudoku_stats_avg_time'), _formatTime(stats.averageTimeSeconds), colors),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStatCard(l10n.get('sudoku_stats_streak'), '${stats.currentStreak}', colors),
-                  _buildStatCard(l10n.get('sudoku_stats_longest_streak'), '${stats.longestStreak}', colors),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
+            ),
           ),
         ),
       ),

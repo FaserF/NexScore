@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/theme/widgets/glass_container.dart';
 import '../../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../../core/providers/audio_provider.dart';
@@ -46,6 +47,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
   bool _stepCompleted = false;
   final _confettiController = WinnerConfettiController();
   final List<List<int>> _undoHistory = [];
+  List<TutorialStep>? _cachedSteps;
 
   void finishGame() {
     // Parity: finishGame method
@@ -63,7 +65,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
 
   void reset() {
     setState(() {
-      _loadStep(_currentStepIdx);
+      _loadStep(_currentStepIdx, _cachedSteps);
     });
   }
 
@@ -73,11 +75,11 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
     super.dispose();
   }
 
-  final List<TutorialStep> _steps = const [
+  List<TutorialStep> _buildSteps(AppLocalizations l10n) => [
     TutorialStep(
-      title: '1. Rows & Columns',
-      instruction: 'Each row and column must contain digits 1 to 4 without repetition.\n\nLook at the highlighted first row. Only one number is missing to complete the sequence [1, 2, 3, ?].',
-      targetExplanation: 'Select the highlighted empty cell in Row 1 and tap "4".',
+      title: l10n.get('tutorial_step1_title'),
+      instruction: l10n.get('tutorial_step1_instruction'),
+      targetExplanation: l10n.get('tutorial_step1_target'),
       initialGrid: [
         1, 2, 3, 0,
         3, 4, 0, 1,
@@ -95,9 +97,9 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
       targetValue: 4,
     ),
     TutorialStep(
-      title: '2. Box Areas',
-      instruction: 'A 4x4 Sudoku board is divided into four 2x2 box areas. Each box must contain digits 1 to 4.\n\nCheck the bottom-left box. The digits [3, 4, 1] are filled, meaning only one number remains.',
-      targetExplanation: 'Select the highlighted cell in the bottom-left box and tap "2" to complete it.',
+      title: l10n.get('tutorial_step2_title'),
+      instruction: l10n.get('tutorial_step2_instruction'),
+      targetExplanation: l10n.get('tutorial_step2_target'),
       initialGrid: [
         1, 2, 3, 4,
         3, 4, 2, 1,
@@ -115,9 +117,9 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
       targetValue: 2,
     ),
     TutorialStep(
-      title: '3. Diagonal X-Sudoku',
-      instruction: 'In Diagonal (X) Sudoku, the two main diagonals (top-left to bottom-right, and top-right to bottom-left) must also contain digits 1 to 4 without repeats.',
-      targetExplanation: 'Select the bottom-right corner cell on the main diagonal and tap "3" to complete the diagonal.',
+      title: l10n.get('tutorial_step3_title'),
+      instruction: l10n.get('tutorial_step3_instruction'),
+      targetExplanation: l10n.get('tutorial_step3_target'),
       initialGrid: [
         1, 2, 3, 4,
         3, 4, 2, 1,
@@ -139,11 +141,18 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
   @override
   void initState() {
     super.initState();
-    _loadStep(_currentStepIdx);
+    // Initialize with step 0 grid data directly (grid data is not localized)
+    _grid = [1, 2, 3, 0, 3, 4, 0, 1, 0, 1, 4, 2, 4, 3, 1, 0];
+    _errorState = List.filled(16, false);
+    _selectedRow = 0;
+    _selectedCol = 3;
+    _stepCompleted = false;
   }
 
-  void _loadStep(int index) {
-    final step = _steps[index];
+  void _loadStep(int index, [List<TutorialStep>? steps]) {
+    final resolvedSteps = steps ?? _cachedSteps;
+    if (resolvedSteps == null || index >= resolvedSteps.length) return;
+    final step = resolvedSteps[index];
     _grid = List.from(step.initialGrid);
     _errorState = List.filled(16, false);
     _selectedRow = step.targetRow;
@@ -166,7 +175,8 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
     final c = _selectedCol;
     if (r == null || c == null) return;
 
-    final step = _steps[_currentStepIdx];
+    final step = _cachedSteps?[_currentStepIdx];
+    if (step == null) return;
     final idx = r * 4 + c;
 
     if (step.isGiven[idx]) return;
@@ -197,14 +207,17 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final step = _steps[_currentStepIdx];
+    final l10n = AppLocalizations.of(context);
+    final steps = _buildSteps(l10n);
+    _cachedSteps = steps;
+    final step = steps[_currentStepIdx];
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D0E15),
       appBar: AppBar(
-        title: const Text(
-          'SUDOKU ACADEMY: LEARN',
-          style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5),
+        title: Text(
+          l10n.get('tutorial_appbar_title'),
+          style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -217,12 +230,12 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
           IconButton(
             icon: const Icon(Icons.undo),
             onPressed: _undoHistory.isNotEmpty ? undo : null,
-            tooltip: 'Undo last move',
+            tooltip: l10n.get('tutorial_undo_tooltip'),
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: reset,
-            tooltip: 'Reset tutorial step',
+            tooltip: l10n.get('tutorial_reset_tooltip'),
           ),
         ],
       ),
@@ -374,28 +387,26 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
                     children: [
                       const Icon(Icons.check_circle_outline, color: Colors.greenAccent),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Correct! Well done.',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.greenAccent),
+                          l10n.get('tutorial_correct'),
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.greenAccent),
                         ),
                       ),
                       if (_currentStepIdx < _steps.length - 1)
-                        // ignore: unstyled_button
                         TextButton(
                           onPressed: () {
                             setState(() {
                               _currentStepIdx++;
-                              _loadStep(_currentStepIdx);
+                              _loadStep(_currentStepIdx, steps);
                             });
                           },
-                          child: const Text('NEXT STEP', style: TextStyle(color: Colors.indigoAccent)),
+                          child: Text(l10n.get('tutorial_next_step'), style: const TextStyle(color: Colors.indigoAccent)),
                         )
                       else
-                        // ignore: unstyled_button
-                        TextButton(
+                          TextButton(
                           onPressed: () => context.pop(),
-                          child: const Text('FINISH', style: TextStyle(color: Colors.indigoAccent)),
+                          child: Text(l10n.get('tutorial_finish'), style: const TextStyle(color: Colors.indigoAccent)),
                         ),
                     ],
                   ),

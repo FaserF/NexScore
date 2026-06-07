@@ -37,7 +37,7 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
     ref.invalidate(completedCampaignLevelsProvider);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Campaign progress reset successfully!')),
+        SnackBar(content: Text(AppLocalizations.of(context).get('campaign_reset_success'))),
       );
     }
   }
@@ -72,7 +72,7 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
             IconButton(
               icon: const Icon(Icons.undo, color: Colors.white),
               onPressed: () => setState(() => _selectedLevel = null),
-              tooltip: 'Deselect Level',
+              tooltip: l10n.get('campaign_deselect_tooltip'),
             ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
@@ -80,25 +80,25 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
               showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Reset Campaign Progress?'),
-                  content: const Text('This will delete all completed campaign missions.'),
+                  title: Text(l10n.get('campaign_reset_title')),
+                  content: Text(l10n.get('campaign_reset_body')),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx),
-                      child: const Text('CANCEL'),
+                      child: Text(l10n.get('campaign_cancel')),
                     ),
                     TextButton(
                       onPressed: () {
                         Navigator.pop(ctx);
                         _resetCampaignProgress();
                       },
-                      child: const Text('RESET'),
+                      child: Text(l10n.get('campaign_reset_confirm')),
                     ),
                   ],
                 ),
               );
             },
-            tooltip: 'Reset Campaign',
+            tooltip: l10n.get('campaign_reset_tooltip'),
           ),
         ],
       ),
@@ -188,7 +188,7 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'LEVEL ${level.levelId}',
+                                        '${l10n.get('campaign_level_label')} ${level.levelId}',
                                         style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.bold,
@@ -248,7 +248,7 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error loading progress: $err')),
+        error: (err, stack) => Center(child: Text('${l10n.get('campaign_error_loading')}: $err')),
       ),
     ),
       ),
@@ -297,7 +297,7 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'MISSION ${level.levelId}',
+                    '${l10n.get('campaign_mission_label')} ${level.levelId}',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -332,9 +332,9 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildMetaItem(Icons.grid_3x3, 'Variant', level.variant.name.toUpperCase()),
-              _buildMetaItem(Icons.signal_cellular_alt, 'Difficulty', level.difficulty.name.toUpperCase()),
-              _buildMetaItem(Icons.timer_outlined, 'Target', '${level.targetTimeSeconds}s'),
+              _buildMetaItem(Icons.grid_3x3, l10n.get('campaign_meta_variant'), level.variant.name.toUpperCase()),
+              _buildMetaItem(Icons.signal_cellular_alt, l10n.get('campaign_meta_difficulty'), level.difficulty.name.toUpperCase()),
+              _buildMetaItem(Icons.timer_outlined, l10n.get('campaign_meta_target'), '${level.targetTimeSeconds}s'),
             ],
           ),
           const SizedBox(height: 20),
@@ -356,7 +356,7 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
               child: Text(
-                isCompleted ? 'REPLAY MISSION' : 'START MISSION',
+                isCompleted ? l10n.get('campaign_replay_mission') : l10n.get('campaign_start_mission'),
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             )
@@ -368,14 +368,14 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.grey.withAlpha(40)),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.lock, color: Colors.grey, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.lock, color: Colors.grey, size: 20),
+                  const SizedBox(width: 8),
                   Text(
-                    'LOCKED',
-                    style: TextStyle(
+                    l10n.get('campaign_locked'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                       color: Colors.grey,
