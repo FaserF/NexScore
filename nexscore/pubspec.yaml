@@ -60,6 +60,8 @@ dependency_overrides:
   image: ^4.9.1
   xml: ^7.0.1
   vector_math: ^2.4.0
+  flutter_tts:
+    path: ./third_party/flutter_tts
 
 flutter:
   uses-material-design: true

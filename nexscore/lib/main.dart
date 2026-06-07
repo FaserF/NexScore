@@ -16,7 +16,8 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/app_scroll_behavior.dart';
 import 'core/lifecycle/app_lifecycle_observer.dart';
 import 'core/utils/app_logger.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'core/utils/url_strategy.dart'
+    if (dart.library.js_interop) 'core/utils/url_strategy_web.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,9 +47,7 @@ void main() async {
   };
 
   if (kIsWeb) {
-    // For GitHub Pages compatibility, the Hash strategy is preferred.
-    //   usePathUrlStrategy();
-    setUrlStrategy(null);
+    configureUrlStrategy();
   }
 
   try {
