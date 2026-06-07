@@ -45,9 +45,20 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
   late List<bool> _errorState;
   bool _stepCompleted = false;
   final _confettiController = WinnerConfettiController();
+  final List<List<int>> _undoHistory = [];
 
   void finishGame() {
     // Parity: finishGame method
+  }
+
+  void undo() {
+    if (_undoHistory.isNotEmpty) {
+      setState(() {
+        _grid = _undoHistory.removeLast();
+        _errorState = List.filled(16, false);
+        _stepCompleted = false;
+      });
+    }
   }
 
   void reset() {
@@ -138,6 +149,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
     _selectedRow = step.targetRow;
     _selectedCol = step.targetCol;
     _stepCompleted = false;
+    _undoHistory.clear();
   }
 
   void _onCellTap(int row, int col) {
@@ -159,6 +171,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
 
     if (step.isGiven[idx]) return;
 
+    _undoHistory.add(List<int>.from(_grid));
     setState(() {
       _grid[idx] = num;
       if (r == step.targetRow && c == step.targetCol && num == step.targetValue) {
@@ -191,6 +204,11 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
           onPressed: () => context.pop(),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.undo),
+            onPressed: _undoHistory.isNotEmpty ? undo : null,
+            tooltip: 'Undo last move',
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: reset,
@@ -407,7 +425,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
                     );
                   }),
                 ),
-                const SizedBox(height: 20),
+              ],
             ],
           ),
         ),

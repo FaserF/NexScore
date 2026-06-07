@@ -53,6 +53,36 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
     // Parity: finishGame method
   }
 
+  void _showHelpDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Designing a Sudoku Puzzle'),
+        content: const SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('1. Tap cells on the grid to select them.'),
+              SizedBox(height: 8),
+              Text('2. Use the numpad at the bottom to place digits (1-9 or 1-6 for 6x6).'),
+              SizedBox(height: 8),
+              Text('3. Tap "Verify Board & Play" to run our logical solver.'),
+              SizedBox(height: 8),
+              Text('4. A valid Sudoku must have exactly one unique solution. If multiple solutions are found, try placing more digits.'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _confettiController.dispose();
@@ -278,6 +308,11 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
           onPressed: () => context.pop(),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: _showHelpDialog,
+            tooltip: 'How to design a board',
+          ),
           IconButton(
             icon: const Icon(Icons.undo),
             onPressed: _undoHistory.isNotEmpty ? undo : null,

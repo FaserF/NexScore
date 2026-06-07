@@ -16,7 +16,10 @@ void main() {
           if (!entity.path.contains('games_list_screen.dart') &&
               !entity.path.contains('game_setup_screen.dart') &&
               !entity.path.contains('generic_scoreboard_setup.dart') &&
-              !entity.path.contains('volleyball_signals_screen.dart')) {
+              !entity.path.contains('volleyball_signals_screen.dart') &&
+              !entity.path.contains('sudoku_campaign_screen.dart') &&
+              !entity.path.contains('sudoku_creator_screen.dart') &&
+              !entity.path.contains('sudoku_tutorial_screen.dart')) {
             // ignoring any generic non-main screens if present
             screenFiles.add(entity);
           }

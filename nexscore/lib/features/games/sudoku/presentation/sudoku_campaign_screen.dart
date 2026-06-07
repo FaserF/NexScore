@@ -68,6 +68,12 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
           onPressed: () => context.pop(),
         ),
         actions: [
+          if (_selectedLevel != null)
+            IconButton(
+              icon: const Icon(Icons.undo, color: Colors.white),
+              onPressed: () => setState(() => _selectedLevel = null),
+              tooltip: 'Deselect Level',
+            ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () {
