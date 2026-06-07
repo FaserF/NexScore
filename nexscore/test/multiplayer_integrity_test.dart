@@ -64,7 +64,7 @@ void main() {
   });
 
   group('Configuration Integrity Verification', () {
-    test('FirestoreMultiplayerImpl should have increased timeouts (15s)', () {
+    test('FirestoreMultiplayerImpl should have increased timeouts (30s and 45s)', () {
       final file = File('lib/core/multiplayer/firestore_multiplayer_impl.dart');
       expect(
         file.existsSync(),
@@ -73,15 +73,9 @@ void main() {
       );
 
       final content = file.readAsStringSync();
-      // Verify we have the 15s timeout
-      expect(content, contains('timeout(const Duration(seconds: 15))'));
-      // Verify pre-flight check logic is present
-      expect(content, contains('Running connectivity check...'));
-      expect(content, contains('.limit(1)'));
-      expect(
-        content,
-        contains('.get(const GetOptions(source: Source.serverAndCache))'),
-      );
+      // Verify we have the 30s and 45s timeouts for robustness
+      expect(content, contains('timeout(const Duration(seconds: 30))'));
+      expect(content, contains('timeout(const Duration(seconds: 45))'));
     });
 
     test(

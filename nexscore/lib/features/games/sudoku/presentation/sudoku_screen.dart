@@ -16,6 +16,7 @@ import '../models/sudoku_models.dart';
 import '../providers/sudoku_provider.dart';
 import '../services/sudoku_sync_service.dart';
 import '../services/sudoku_stats_service.dart';
+import '../services/sudoku_share_service.dart';
 
 class SudokuScreen extends ConsumerStatefulWidget {
   const SudokuScreen({super.key});
@@ -45,6 +46,8 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   SudokuVariant _selectedVariant = SudokuVariant.standard;
   SudokuDifficulty _selectedDifficulty = SudokuDifficulty.medium;
   SudokuMode _selectedMode = SudokuMode.classic;
+  bool _isVsBotsEnabled = false;
+  String _botDifficulty = 'medium';
   
   // Stats details
   SudokuStats? _cachedStats;
@@ -726,6 +729,52 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                 ),
               ),
             ),
+
+            // Create Custom Puzzle & Import Code Row
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: AnimatedScaleButton(
+                      onPressed: () => context.push('/games/sudoku/create'),
+                      child: GlassContainer(
+                        borderRadius: 16,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        border: Border.all(color: colors.primary.withAlpha(80), width: 1.2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add_box_outlined, color: colors.primary, size: 20),
+                            const SizedBox(width: 8),
+                            const Text('CREATE PUZZLE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: AnimatedScaleButton(
+                      onPressed: () => _showImportDialog(context, colors, l10n),
+                      child: GlassContainer(
+                        borderRadius: 16,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        border: Border.all(color: colors.primary.withAlpha(80), width: 1.2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.file_download_outlined, color: colors.primary, size: 20),
+                            const SizedBox(width: 8),
+                            const Text('IMPORT CODE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
 
           // ── Config Form
@@ -757,7 +806,6 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
           ),
           const SizedBox(height: 20),
 
-          if (lobby == null) ...[
             Text(l10n.get('sudoku_mode'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             SegmentedButton<SudokuMode>(
@@ -769,6 +817,30 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
               selected: {_selectedMode},
               onSelectionChanged: (set) => setState(() => _selectedMode = set.first),
             ),
+            const SizedBox(height: 20),
+
+            // Vs Bots Toggle and Difficulty
+            SwitchListTile(
+              title: const Text('VS BOTS PRACTICE MODE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              subtitle: const Text('Compete against a simulated AI on the board'),
+              value: _isVsBotsEnabled,
+              activeColor: colors.primary,
+              onChanged: (val) => setState(() => _isVsBotsEnabled = val),
+            ),
+            if (_isVsBotsEnabled) ...[
+              const SizedBox(height: 8),
+              const Text('BOT DIFFICULTY', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.grey)),
+              const SizedBox(height: 8),
+              SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(value: 'easy', label: Text('Easy')),
+                  ButtonSegment(value: 'medium', label: Text('Medium')),
+                  ButtonSegment(value: 'expert', label: Text('Expert')),
+                ],
+                selected: {_botDifficulty},
+                onSelectionChanged: (set) => setState(() => _botDifficulty = set.first),
+              ),
+            ],
             const SizedBox(height: 32),
           ],
 
@@ -783,6 +855,8 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                   difficulty: _selectedDifficulty,
                   mode: lobby != null ? SudokuMode.classic : _selectedMode,
                   isMultiplayer: lobby != null,
+                  isVsBots: lobby == null && _isVsBotsEnabled,
+                  botDifficulty: lobby == null && _isVsBotsEnabled ? _botDifficulty : null,
                 );
 
                 _completedRows.clear();
@@ -834,8 +908,8 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
         children: [
-          // Multiplayer Scoreboard
-          if (state.isMultiplayer) _buildMultiplayerScoreboard(state, colors),
+          // Scoreboard (Multiplayer or Vs Bots)
+          if (state.isMultiplayer || state.isVsBots) _buildMultiplayerScoreboard(state, colors),
 
           // Metadata Bar
           if (!state.isMultiplayer)
@@ -998,6 +1072,71 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   // --- Multiplayer Header ---
 
   Widget _buildMultiplayerScoreboard(SudokuGameState state, _SudokuThemeColors colors) {
+    if (state.isVsBots) {
+      final botName = state.botDifficulty == 'easy'
+          ? 'LogicBot'
+          : (state.botDifficulty == 'medium' ? 'GridMaster' : 'QuantumSolver');
+      
+      final playerStats = {
+        'uid': 'player',
+        'name': 'You',
+        'color': 0xFF00E5FF,
+      };
+      
+      final botStats = {
+        'uid': botName,
+        'name': botName,
+        'color': 0xFFFF0055,
+      };
+
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [playerStats, botStats].map((u) {
+            final score = state.playerScores[u['uid'] as String] ?? 0;
+            final mistakes = state.playerMistakes[u['uid'] as String] ?? 0;
+            final colorVal = u['color'] as int;
+
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: Color(colorVal),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      u['name'] as String,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Pts: $score · Err: $mistakes',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Color(colorVal),
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+      );
+    }
+
     final lobby = ref.watch(currentLobbyProvider);
     if (lobby == null) return const SizedBox.shrink();
 
@@ -1107,7 +1246,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
 
     // Coloring multiplayer inputs
     Color? playerColor;
-    if (state.isMultiplayer && cell.filledByColor != null) {
+    if ((state.isMultiplayer || state.isVsBots) && cell.filledByColor != null) {
       final colorCode = int.tryParse(cell.filledByColor!) ?? 0xFFFF0055;
       playerColor = Color(colorCode).withAlpha(35);
     }
@@ -1132,7 +1271,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
         ? colors.cellOriginal
         : (cell.isError ? colors.cellError : colors.cellUser);
     
-    if (state.isMultiplayer && cell.filledByColor != null) {
+    if ((state.isMultiplayer || state.isVsBots) && cell.filledByColor != null) {
       final colorCode = int.tryParse(cell.filledByColor!) ?? 0xFFFF0055;
       textCol = Color(colorCode);
     }
@@ -1183,7 +1322,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
             ),
 
             // Mini player indicator label in top-left
-            if (state.isMultiplayer && cell.filledByName != null)
+            if ((state.isMultiplayer || state.isVsBots) && cell.filledByName != null)
               Positioned(
                 top: 1,
                 left: 2,
@@ -1334,6 +1473,19 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
         }
         multiWinner = lobby.users[bestUid]?.name ?? 'Anonymous';
       }
+    } else if (state.isVsBots) {
+      final botName = state.botDifficulty == 'easy'
+          ? 'LogicBot'
+          : (state.botDifficulty == 'medium' ? 'GridMaster' : 'QuantumSolver');
+      final playerScore = state.playerScores['player'] ?? 0;
+      final botScore = state.playerScores[botName] ?? 0;
+      if (playerScore > botScore) {
+        multiWinner = 'You ($playerScore vs $botScore)';
+      } else if (botScore > playerScore) {
+        multiWinner = '$botName ($botScore vs $playerScore)';
+      } else {
+        multiWinner = 'Tie ($playerScore each)';
+      }
     }
 
     return Center(
@@ -1345,20 +1497,20 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              solved ? Icons.emoji_events : Icons.heart_broken_outlined,
+              (solved || state.isVsBots) ? Icons.emoji_events : Icons.heart_broken_outlined,
               size: 72,
-              color: solved ? colors.primary : colors.cellError,
+              color: (solved || state.isVsBots) ? colors.primary : colors.cellError,
             ),
             const SizedBox(height: 16),
             Text(
-              state.isMultiplayer
-                  ? 'Multiplayer Match Over!'
+              (state.isMultiplayer || state.isVsBots)
+                  ? 'Match Over!'
                   : (solved ? l10n.get('sudoku_congrats') : l10n.get('sudoku_game_over')),
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colors.primary),
             ),
             const SizedBox(height: 8),
             Text(
-              state.isMultiplayer
+              (state.isMultiplayer || state.isVsBots)
                   ? 'Winner: $multiWinner!'
                   : (solved
                       ? l10n.getWith('sudoku_solved_in', [_formatTime(state.timeSeconds)])
@@ -1618,6 +1770,59 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
               _completedBoxes.clear();
             },
             child: Text(l10n.get('ok')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showImportDialog(BuildContext context, _SudokuThemeColors colors, AppLocalizations l10n) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('IMPORT PUZZLE'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Paste a share code to load the puzzle directly:'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'variant:00305...',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('CANCEL'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final code = controller.text.trim();
+              final result = SudokuShareService.importFromCode(code);
+              if (result != null) {
+                Navigator.pop(ctx);
+                final customState = SudokuGameState(
+                  grid: result.grid,
+                  difficulty: SudokuDifficulty.medium,
+                  variant: result.variant,
+                  mode: SudokuMode.classic,
+                );
+                ref.read(sudokuStateProvider.notifier).loadState(customState);
+                ref.read(activeGameIdProvider.notifier).state = 'sudoku';
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Invalid puzzle code or has no unique solution!')),
+                );
+              }
+            },
+            child: const Text('IMPORT'),
           ),
         ],
       ),

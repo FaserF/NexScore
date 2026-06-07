@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:math' as math;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,6 +23,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
   SudokuGameState build() {
     ref.onDispose(() {
       _timer?.cancel();
+      _botTimer?.cancel();
       _eventsSubscription?.cancel();
       _gameStateSubscription?.cancel();
     });
@@ -71,18 +74,36 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
     }
   }
 
+  Timer? _botTimer;
+  final _random = math.Random();
+
   void setupMatch({
     required SudokuVariant variant,
     required SudokuDifficulty difficulty,
     required SudokuMode mode,
     bool isMultiplayer = false,
+    bool isVsBots = false,
+    String? botDifficulty,
   }) {
     _history.clear();
     _timer?.cancel();
+    _botTimer?.cancel();
     _eventsSubscription?.cancel();
     _gameStateSubscription?.cancel();
 
     final grid = SudokuGenerator.generate(variant: variant, difficulty: difficulty);
+
+    // Initial score board for bots if isVsBots is true
+    final Map<String, int> initialScores = {};
+    final Map<String, int> initialMistakes = {};
+
+    if (isVsBots && botDifficulty != null) {
+      final botName = _getBotName(botDifficulty);
+      initialScores['player'] = 0;
+      initialScores[botName] = 0;
+      initialMistakes['player'] = 0;
+      initialMistakes[botName] = 0;
+    }
 
     state = SudokuGameState(
       grid: grid,
@@ -95,8 +116,10 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
       timeSeconds: 0,
       isFinished: false,
       isMultiplayer: isMultiplayer,
-      playerScores: {},
-      playerMistakes: {},
+      isVsBots: isVsBots,
+      botDifficulty: botDifficulty,
+      playerScores: initialScores,
+      playerMistakes: initialMistakes,
     );
 
     if (isMultiplayer) {
@@ -109,8 +132,122 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
       }
     } else {
       startTimer();
+      if (isVsBots && botDifficulty != null) {
+        _startBotSimulation();
+      }
     }
   }
+
+  String _getBotName(String difficulty) {
+    return switch (difficulty.toLowerCase()) {
+      'easy' => 'LogicBot',
+      'medium' => 'GridMaster',
+      'expert' => 'QuantumSolver',
+      _ => 'Bot',
+    };
+  }
+
+  void _startBotSimulation() {
+    _botTimer?.cancel();
+    final difficulty = state.botDifficulty ?? 'medium';
+
+    // Easy Bot: 22-30s
+    // Medium Bot: 15-20s
+    // Expert Bot: 9-14s
+    int getNextIntervalSeconds() {
+      return switch (difficulty.toLowerCase()) {
+        'easy' => 22 + _random.nextInt(9),
+        'medium' => 15 + _random.nextInt(6),
+        'expert' => 9 + _random.nextInt(6),
+        _ => 15,
+      };
+    }
+
+    void scheduleNextMove() {
+      if (state.isFinished) return;
+      final seconds = getNextIntervalSeconds();
+      _botTimer = Timer(Duration(seconds: seconds), () {
+        if (!state.isFinished) {
+          _triggerBotMove();
+          scheduleNextMove();
+        }
+      });
+    }
+
+    scheduleNextMove();
+  }
+
+  void _triggerBotMove() {
+    if (state.isFinished) return;
+
+    // Get list of empty cells
+    final emptyIndices = <int>[];
+    for (int i = 0; i < state.grid.length; i++) {
+      if (state.grid[i].currentValue == 0) {
+        emptyIndices.add(i);
+      }
+    }
+
+    if (emptyIndices.isEmpty) return;
+
+    // Pick a random empty cell
+    final cellIdx = emptyIndices[_random.nextInt(emptyIndices.length)];
+    final cell = state.grid[cellIdx];
+    final size = state.variant == SudokuVariant.mini6x6 ? 6 : 9;
+
+    // Determine correctness probability based on difficulty
+    // Easy: 10% error
+    // Medium: 5% error
+    // Expert: 2% error
+    final errorProbability = switch (state.botDifficulty?.toLowerCase()) {
+      'easy' => 10,
+      'medium' => 5,
+      'expert' => 2,
+      _ => 5,
+    };
+
+    final isCorrect = _random.nextInt(100) >= errorProbability;
+    final botName = _getBotName(state.botDifficulty ?? 'medium');
+    final botColor = '0xFFFF0055'; // Pink/Accent color for Bot moves
+
+    final enterValue = isCorrect ? cell.value : (cell.value == size ? 1 : cell.value + 1);
+
+    var newGrid = List<SudokuCell>.from(state.grid);
+    final scores = Map<String, int>.from(state.playerScores);
+    final mistakes = Map<String, int>.from(state.playerMistakes);
+
+    if (isCorrect) {
+      newGrid[cellIdx] = cell.copyWith(
+        currentValue: enterValue,
+        notes: {},
+        isError: false,
+        filledByUid: botName,
+        filledByName: botName,
+        filledByColor: botColor,
+      );
+      // Auto erase pencil marks
+      newGrid = _autoEraseNotes(newGrid, cell.row, cell.col, enterValue, size);
+      scores[botName] = (scores[botName] ?? 0) + 100;
+    } else {
+      scores[botName] = (scores[botName] ?? 0) - 50;
+      mistakes[botName] = (mistakes[botName] ?? 0) + 1;
+    }
+
+    bool solved = newGrid.every((c) => c.currentValue == c.value);
+
+    state = state.copyWith(
+      grid: newGrid,
+      playerScores: scores,
+      playerMistakes: mistakes,
+      isFinished: solved,
+    );
+
+    if (state.isFinished) {
+      _timer?.cancel();
+      _botTimer?.cancel();
+    }
+  }
+
 
   void setupDaily(
     String dateStr, {
@@ -304,11 +441,25 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
 
         bool solved = validatedGrid.every((c) => c.currentValue == c.value);
 
+        Map<String, int> scores = Map<String, int>.from(state.playerScores);
+        Map<String, int> playerMistakesMap = Map<String, int>.from(state.playerMistakes);
+
+        if (state.isVsBots) {
+          if (isCorrect) {
+            scores['player'] = (scores['player'] ?? 0) + 100;
+          } else {
+            scores['player'] = (scores['player'] ?? 0) - 50;
+            playerMistakesMap['player'] = (playerMistakesMap['player'] ?? 0) + 1;
+          }
+        }
+
         state = state.copyWith(
           grid: validatedGrid,
           mistakes: mistakes,
           timeSeconds: state.timeSeconds + penalty,
-          isFinished: solved || mistakes >= state.maxMistakes,
+          isFinished: solved || (!state.isVsBots && mistakes >= state.maxMistakes),
+          playerScores: state.isVsBots ? scores : state.playerScores,
+          playerMistakes: state.isVsBots ? playerMistakesMap : state.playerMistakes,
         );
 
         if (state.isFinished) {

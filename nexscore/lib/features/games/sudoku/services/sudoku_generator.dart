@@ -357,6 +357,34 @@ class SudokuGenerator {
     return solutions == 1;
   }
 
+  static bool hasUniqueSolution(List<int> board, SudokuVariant variant) {
+    return _hasUniqueSolution(board, variant);
+  }
+
+  static List<int>? solve(List<int> puzzle, SudokuVariant variant) {
+    List<int> board = List.from(puzzle);
+    bool solved = _solveBoard(board, variant);
+    return solved ? board : null;
+  }
+
+  static bool _solveBoard(List<int> board, SudokuVariant variant) {
+    final size = variant == SudokuVariant.mini6x6 ? 6 : 9;
+    final total = size * size;
+    for (int i = 0; i < total; i++) {
+      if (board[i] == 0) {
+        for (int val = 1; val <= size; val++) {
+          if (_isValid(board, val, i, variant)) {
+            board[i] = val;
+            if (_solveBoard(board, variant)) return true;
+            board[i] = 0;
+          }
+        }
+        return false;
+      }
+    }
+    return true;
+  }
+
   /// Check conflicts for a grid where the user is entering numbers
   static List<SudokuCell> validateBoard(List<SudokuCell> originalGrid, SudokuVariant variant) {
     final size = variant == SudokuVariant.mini6x6 ? 6 : 9;

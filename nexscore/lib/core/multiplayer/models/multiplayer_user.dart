@@ -24,14 +24,29 @@ class MultiplayerUser {
   }
 
   factory MultiplayerUser.fromMap(Map<String, dynamic> map) {
+    final activeRaw = map['lastActive'];
+    DateTime parsedActive = DateTime.now();
+    if (activeRaw is int) {
+      parsedActive = DateTime.fromMillisecondsSinceEpoch(activeRaw);
+    } else if (activeRaw != null) {
+      // Handle cloud_firestore Timestamp or other DateTime representations safely
+      try {
+        if (activeRaw.runtimeType.toString() == 'Timestamp' || activeRaw.toString().contains('Timestamp')) {
+          parsedActive = (activeRaw as dynamic).toDate();
+        } else if (activeRaw is String) {
+          parsedActive = DateTime.parse(activeRaw);
+        }
+      } catch (_) {
+        parsedActive = DateTime.now();
+      }
+    }
+
     return MultiplayerUser(
       uid: map['uid'] as String,
       name: map['name'] ?? 'Unknown',
       avatarColor: map['avatarColor'] ?? '#FFFFFF',
       isHost: map['isHost'] ?? false,
-      lastActive: map['lastActive'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['lastActive'] as int)
-          : DateTime.now(),
+      lastActive: parsedActive,
     );
   }
 

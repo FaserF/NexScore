@@ -109,6 +109,8 @@ class SudokuGameState {
   final int? campaignLevelId;
   final String? analyzerExplanation;
   final int? highlightedHintCell;
+  final bool isVsBots;
+  final String? botDifficulty;
 
   const SudokuGameState({
     required this.grid,
@@ -133,6 +135,8 @@ class SudokuGameState {
     this.campaignLevelId,
     this.analyzerExplanation,
     this.highlightedHintCell,
+    this.isVsBots = false,
+    this.botDifficulty,
   });
 
   SudokuGameState copyWith({
@@ -158,6 +162,8 @@ class SudokuGameState {
     int? campaignLevelId,
     String? analyzerExplanation,
     int? highlightedHintCell,
+    bool? isVsBots,
+    String? botDifficulty,
   }) {
     return SudokuGameState(
       grid: grid ?? this.grid,
@@ -182,6 +188,8 @@ class SudokuGameState {
       campaignLevelId: campaignLevelId ?? this.campaignLevelId,
       analyzerExplanation: analyzerExplanation ?? this.analyzerExplanation,
       highlightedHintCell: highlightedHintCell ?? this.highlightedHintCell,
+      isVsBots: isVsBots ?? this.isVsBots,
+      botDifficulty: botDifficulty ?? this.botDifficulty,
     );
   }
 
@@ -209,6 +217,8 @@ class SudokuGameState {
       campaignLevelId: campaignLevelId,
       analyzerExplanation: null,
       highlightedHintCell: null,
+      isVsBots: isVsBots,
+      botDifficulty: botDifficulty,
     );
   }
 
@@ -236,6 +246,8 @@ class SudokuGameState {
       'campaignLevelId': campaignLevelId,
       'analyzerExplanation': analyzerExplanation,
       'highlightedHintCell': highlightedHintCell,
+      'isVsBots': isVsBots ? 1 : 0,
+      'botDifficulty': botDifficulty,
     };
   }
 
@@ -277,6 +289,8 @@ class SudokuGameState {
       campaignLevelId: map['campaignLevelId'] as int?,
       analyzerExplanation: map['analyzerExplanation'] as String?,
       highlightedHintCell: map['highlightedHintCell'] as int?,
+      isVsBots: (map['isVsBots'] as int? ?? 0) == 1,
+      botDifficulty: map['botDifficulty'] as String?,
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:nexscore/features/games/sudoku/models/sudoku_models.dart';
 import 'package:nexscore/features/games/sudoku/providers/sudoku_provider.dart';
 import 'package:nexscore/features/games/sudoku/services/sudoku_generator.dart';
 import 'package:nexscore/features/games/sudoku/services/sudoku_analyzer.dart';
+import 'package:nexscore/features/games/sudoku/services/sudoku_share_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -263,6 +264,57 @@ void main() {
       final analysis = SudokuAnalyzer.analyze(cells, SudokuVariant.standard);
       expect(analysis, isNotNull);
       expect(analysis!.explanation, contains('Single'));
+    });
+
+    test('SudokuShareService exports and imports with perfect parity', () {
+      final cells = SudokuGenerator.generate(
+        variant: SudokuVariant.mini6x6,
+        difficulty: SudokuDifficulty.easy,
+      );
+
+      final code = SudokuShareService.exportToCode(cells, SudokuVariant.mini6x6);
+      expect(code, startsWith('mini6x6:'));
+
+      final result = SudokuShareService.importFromCode(code);
+      expect(result, isNotNull);
+      expect(result!.variant, SudokuVariant.mini6x6);
+      expect(result.grid.length, 36);
+
+      for (int i = 0; i < cells.length; i++) {
+        if (cells[i].isOriginal) {
+          expect(result.grid[i].currentValue, cells[i].currentValue);
+          expect(result.grid[i].isOriginal, isTrue);
+        } else {
+          expect(result.grid[i].currentValue, 0);
+          expect(result.grid[i].isOriginal, isFalse);
+        }
+      }
+    });
+
+    test('Vs Bots Mode setup and score updates correctly', () {
+      final notifier = container.read(sudokuStateProvider.notifier);
+      notifier.setupMatch(
+        variant: SudokuVariant.standard,
+        difficulty: SudokuDifficulty.easy,
+        mode: SudokuMode.classic,
+        isVsBots: true,
+        botDifficulty: 'medium',
+      );
+
+      final state = container.read(sudokuStateProvider);
+      expect(state.isVsBots, isTrue);
+      expect(state.botDifficulty, 'medium');
+      expect(state.playerScores.containsKey('player'), isTrue);
+      expect(state.playerScores.containsKey('GridMaster'), isTrue);
+
+      // Solve one cell correctly as player and verify points
+      final emptyIdx = state.grid.indexWhere((c) => !c.isOriginal);
+      final cell = state.grid[emptyIdx];
+      notifier.selectCell(cell.row, cell.col);
+      notifier.enterNumber(cell.value, 'Tester');
+
+      final updatedState = container.read(sudokuStateProvider);
+      expect(updatedState.playerScores['player'], 100);
     });
   });
 }
