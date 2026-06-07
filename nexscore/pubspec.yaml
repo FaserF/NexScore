@@ -44,7 +44,7 @@ dependencies:
   printing: ^5.13.2
   signature: 6.3.0
   file_picker: 10.3.10
-  flutter_local_notifications: ^21.0.0
+  flutter_local_notifications: ^22.0.0
 
 dependency_overrides:
   _fe_analyzer_shared: 97.0.0
