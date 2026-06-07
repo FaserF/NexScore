@@ -129,6 +129,7 @@ jobs:
       - name: Build APK
         run: |
           flutter pub get
+          flutter pub run flutter_launcher_icons
           flutter build apk --release --no-pub \
             --build-name=${{ needs.version-calc.outputs.version_name }} \
             --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }}
@@ -170,6 +171,7 @@ jobs:
         run: |
           flutter config --no-enable-swift-package-manager
           flutter pub get
+          flutter pub run flutter_launcher_icons
           flutter build ipa --no-codesign --release --no-pub \
             --build-name=${{ needs.version-calc.outputs.version_name }} \
             --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }}
@@ -178,7 +180,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: NexScore-iOS
-          path: nexscore/build/ios/archive/*.xcarchive
+          path: nexscore/build/ios/ipa/*.ipa
 
   build-web:
     needs: [version-calc, sync-version]
@@ -289,6 +291,14 @@ jobs:
           else
             echo "Android APK artifact not found. Skipping APK attachment."
           fi
+          
+          # Find and copy any generated .ipa file to release assets
+          IPA_FILE=$(find artifacts/NexScore-iOS -name "*.ipa" | head -n 1)
+          if [ -n "$IPA_FILE" ] && [ -f "$IPA_FILE" ]; then
+            cp "$IPA_FILE" release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.ipa
+          else
+            echo "iOS IPA artifact not found. Skipping IPA attachment."
+          fi
 
       - name: Generate Changelog
         run: |
@@ -299,11 +309,30 @@ jobs:
 
       - name: Prepare Release Notes
         run: |
-          APK_SHA="${{ needs.build-android.outputs.sha256 }}"
-          if [ -z "$APK_SHA" ]; then
-            APK_ROW="| **Android** | _Build Failed/Skipped_ | _N/A_ |"
-          else
+          # Android APK check
+          if [ -f "release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk" ]; then
+            APK_SHA="${{ needs.build-android.outputs.sha256 }}"
+            if [ -z "$APK_SHA" ] && [ -f "release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk.sha256" ]; then
+              APK_SHA=$(cat release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk.sha256 | awk '{print $1}')
+            fi
             APK_ROW="| **Android** | [NexScore.apk](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk) | \`$APK_SHA\` |"
+          elif [ "${{ needs.build-android.result }}" = "failure" ]; then
+            APK_ROW="| **Android** | _Build Failed_ | _N/A_ |"
+          elif [ "${{ needs.build-android.result }}" = "skipped" ]; then
+            APK_ROW="| **Android** | _Build Skipped_ | _N/A_ |"
+          else
+            APK_ROW="| **Android** | _Building..._ | _TBD_ |"
+          fi
+
+          # iOS IPA check
+          if [ -f "release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.ipa" ]; then
+            IOS_ROW="| **iOS** | [NexScore.ipa](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.ipa) | _Unsigned_ |"
+          elif [ "${{ needs.build-ios.result }}" = "failure" ]; then
+            IOS_ROW="| **iOS** | _Build Failed_ | _N/A_ |"
+          elif [ "${{ needs.build-ios.result }}" = "skipped" ]; then
+            IOS_ROW="| **iOS** | _Build Skipped_ | _N/A_ |"
+          else
+            IOS_ROW="| **iOS** | _Building..._ | _TBD_ |"
           fi
 
           cat << EOF > release_body.md
@@ -316,6 +345,7 @@ jobs:
           | Platform | File | SHA256 Checksum |
           |----------|------|-----------------|
           $APK_ROW
+          $IOS_ROW
           | **Web (Docker)** | \`docker pull ${{ needs.build-web.outputs.image_name }}:${{ needs.version-calc.outputs.docker_tag }}\` | _Container Image_ |
           | **Docs** | [Documentation](https://faserf.github.io/NexScore/docs/) | _Online_ |
 
@@ -332,3 +362,88 @@ jobs:
           prerelease: ${{ needs.version-calc.outputs.is_prerelease == 'true' }}
           files: release_assets/*
           body_path: release_body.md
+
+  update-release-android:
+    needs: [version-calc, create-release, build-android]
+    if: always() && needs.create-release.result == 'success' && needs.build-android.result == 'success'
+    name: Attach Android APK to Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download APK Artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: NexScore-Android
+          path: android_artifacts
+
+      - name: Prepare APK Asset
+        run: |
+          mkdir release_assets
+          cp android_artifacts/app-release.apk release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk
+          cp android_artifacts/app-release.apk.sha256 release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk.sha256
+
+      - name: Upload APK to Release
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        with:
+          tag_name: ${{ needs.version-calc.outputs.tag_name }}
+          files: release_assets/*
+
+      - name: Update Release Notes with Android APK Info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APK_SHA="${{ needs.build-android.outputs.sha256 }}"
+          APK_LINK="[NexScore.apk](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk)"
+          
+          # Retrieve current release body
+          gh release view ${{ needs.version-calc.outputs.tag_name }} --json body --template '{{.body}}' > release_body.md
+          
+          # Only replace if placeholder was set (meaning it was not already updated in create-release)
+          if grep -q "| \*\*Android\*\* | _Building..._ | _TBD_ |" release_body.md; then
+            sed -i "s|\| \*\*Android\*\* \| \_Building\...\_ \| \_TBD\_ \||\| **Android** | $APK_LINK | \`$APK_SHA\` ||g" release_body.md
+            gh release edit ${{ needs.version-calc.outputs.tag_name }} --notes-file release_body.md
+          fi
+
+  update-release-ios:
+    needs: [version-calc, create-release, build-ios]
+    if: always() && needs.create-release.result == 'success' && needs.build-ios.result == 'success'
+    name: Attach iOS IPA to Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download IPA Artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: NexScore-iOS
+          path: ios_artifacts
+
+      - name: Prepare IPA Asset
+        run: |
+          mkdir release_assets
+          IPA_FILE=$(find ios_artifacts -name "*.ipa" | head -n 1)
+          if [ -n "$IPA_FILE" ]; then
+            cp "$IPA_FILE" release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.ipa
+          fi
+
+      - name: Upload IPA to Release
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        with:
+          tag_name: ${{ needs.version-calc.outputs.tag_name }}
+          files: release_assets/*
+
+      - name: Update Release Notes with iOS IPA Info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Retrieve current release body
+          gh release view ${{ needs.version-calc.outputs.tag_name }} --json body --template '{{.body}}' > release_body.md
+          
+          IPA_LINK="[NexScore.ipa](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.ipa)"
+          
+          # Only replace if placeholder was set (meaning it was not already updated in create-release)
+          if grep -q "| \*\*iOS\*\* | _Building..._ | _TBD_ |" release_body.md; then
+            sed -i "s|\| \*\*iOS\*\* \| \_Building\...\_ \| \_TBD\_ \||\| **iOS** | $IPA_LINK | _Unsigned_ ||g" release_body.md
+            gh release edit ${{ needs.version-calc.outputs.tag_name }} --notes-file release_body.md
+          fi
