@@ -63,8 +63,8 @@
           "_LeaderboardScreenState"
         ],
         "providers": [
-          "sessionsProvider",
-          "playersProvider"
+          "playersProvider",
+          "sessionsProvider"
         ]
       }
     ],
@@ -95,9 +95,9 @@
           "SessionRepository"
         ],
         "providers": [
-          "sessionRepositoryProvider",
           "sessionsProvider",
-          "AsyncNotifierProvider"
+          "AsyncNotifierProvider",
+          "sessionRepositoryProvider"
         ]
       },
       {
@@ -107,8 +107,8 @@
           "_SessionCard"
         ],
         "providers": [
-          "sessionsProvider",
-          "playersProvider"
+          "playersProvider",
+          "sessionsProvider"
         ]
       }
     ],
@@ -120,8 +120,8 @@
           "_JoinLobbyScreenState"
         ],
         "providers": [
-          "multiplayerServiceProvider",
-          "settingsProvider"
+          "settingsProvider",
+          "multiplayerServiceProvider"
         ]
       },
       {
@@ -138,11 +138,11 @@
           "_LobbyScreenState"
         ],
         "providers": [
-          "multiplayerServiceProvider",
-          "currentLobbyProvider",
           "settingsProvider",
+          "gameStateSyncProvider",
           "isHostProvider",
-          "gameStateSyncProvider"
+          "currentLobbyProvider",
+          "multiplayerServiceProvider"
         ]
       }
     ],
@@ -155,8 +155,8 @@
         ],
         "providers": [
           "sessionsProvider",
-          "activePlayersProvider",
           "audioServiceProvider",
+          "activePlayersProvider",
           "kniffelStateProvider"
         ]
       },
@@ -166,8 +166,8 @@
           "KniffelStateNotifier"
         ],
         "providers": [
-          "kniffelStateProvider",
-          "NotifierProvider"
+          "NotifierProvider",
+          "kniffelStateProvider"
         ]
       },
       {
@@ -187,9 +187,9 @@
         ],
         "providers": [
           "sessionsProvider",
-          "activePlayersProvider",
           "audioServiceProvider",
-          "qwixxStateProvider"
+          "qwixxStateProvider",
+          "activePlayersProvider"
         ]
       },
       {
@@ -252,8 +252,8 @@
         ],
         "providers": [
           "sessionsProvider",
-          "audioServiceProvider",
           "dartsStateProvider",
+          "audioServiceProvider",
           "dartsPlayersProvider"
         ]
       },
@@ -265,8 +265,8 @@
         ],
         "providers": [
           "sessionsProvider",
-          "activePlayersProvider",
           "audioServiceProvider",
+          "activePlayersProvider",
           "genericScoreProvider"
         ]
       },
@@ -279,12 +279,12 @@
           "_RommeScoreHeader"
         ],
         "providers": [
-          "audioServiceProvider",
-          "rommeStateProvider",
-          "sessionsProvider",
-          "activePlayersProvider",
+          "rommePlayersProvider",
           "NotifierProvider",
-          "rommePlayersProvider"
+          "activePlayersProvider",
+          "audioServiceProvider",
+          "sessionsProvider",
+          "rommeStateProvider"
         ]
       },
       {
@@ -296,12 +296,12 @@
           "_PhaseSelector"
         ],
         "providers": [
+          "phase10StateProvider",
+          "NotifierProvider",
+          "activePlayersProvider",
           "audioServiceProvider",
           "sessionsProvider",
-          "phase10PlayersProvider",
-          "activePlayersProvider",
-          "phase10StateProvider",
-          "NotifierProvider"
+          "phase10PlayersProvider"
         ]
       },
       {
@@ -323,8 +323,8 @@
         ],
         "providers": [
           "activePlayersProvider",
-          "genericScoreProvider",
-          "NotifierProvider"
+          "NotifierProvider",
+          "genericScoreProvider"
         ]
       },
       {
@@ -371,10 +371,10 @@
           "_BavarianCardWidget"
         ],
         "providers": [
+          "schafkopfDigitalProvider",
           "sessionsProvider",
-          "activePlayersProvider",
           "audioServiceProvider",
-          "schafkopfDigitalProvider"
+          "activePlayersProvider"
         ]
       },
       {
@@ -417,14 +417,14 @@
           "_SipDeckScreenState"
         ],
         "providers": [
-          "audioServiceProvider",
           "settingsProvider",
           "sessionsProvider",
-          "shareServiceProvider",
-          "activePlayersProvider",
-          "ttsActiveProvider",
+          "ttsServiceProvider",
           "sipDeckStateProvider",
-          "ttsServiceProvider"
+          "activePlayersProvider",
+          "audioServiceProvider",
+          "shareServiceProvider",
+          "ttsActiveProvider"
         ]
       },
       {
@@ -433,8 +433,8 @@
           "SipDeckStateNotifier"
         ],
         "providers": [
-          "NotifierProvider",
-          "sipDeckStateProvider"
+          "sipDeckStateProvider",
+          "NotifierProvider"
         ]
       },
       {
@@ -457,10 +457,10 @@
           "_Phase10DigitalScreenState"
         ],
         "providers": [
+          "phase10DigitalProvider",
           "sessionsProvider",
-          "activePlayersProvider",
           "audioServiceProvider",
-          "phase10DigitalProvider"
+          "activePlayersProvider"
         ]
       },
       {
@@ -469,8 +469,8 @@
           "Phase10DigitalNotifier"
         ],
         "providers": [
-          "NotifierProvider",
-          "phase10DigitalProvider"
+          "phase10DigitalProvider",
+          "NotifierProvider"
         ]
       },
       {
@@ -491,8 +491,8 @@
           "_WizardScreenState"
         ],
         "providers": [
-          "sessionsProvider",
           "wizardStateProvider",
+          "sessionsProvider",
           "audioServiceProvider",
           "activePlayersProvider"
         ]
@@ -524,8 +524,8 @@
         ],
         "providers": [
           "sessionsProvider",
-          "qwixxDigitalProvider",
           "audioServiceProvider",
+          "qwixxDigitalProvider",
           "activePlayersProvider"
         ]
       },
@@ -569,9 +569,9 @@
           "_GameSetupScreenState"
         ],
         "providers": [
-          "activePlayersProvider",
-          "playersProvider",
           "playerGroupsProvider",
+          "playersProvider",
+          "activePlayersProvider",
           "activeGameIdProvider"
         ]
       },
@@ -582,10 +582,10 @@
         ],
         "providers": [
           "playersProvider",
-          "activeGameIdProvider",
+          "persistenceServiceProvider",
           "activePlayersProvider",
           "persistenceNotifierProvider",
-          "persistenceServiceProvider"
+          "activeGameIdProvider"
         ]
       },
       {
@@ -596,9 +596,9 @@
         ],
         "providers": [
           "sessionsProvider",
-          "activePlayersProvider",
           "audioServiceProvider",
-          "rommeDigitalProvider"
+          "rommeDigitalProvider",
+          "activePlayersProvider"
         ]
       },
       {
@@ -631,14 +631,14 @@
           "_WayQuestGame"
         ],
         "providers": [
-          "audioServiceProvider",
           "settingsProvider",
           "sessionsProvider",
-          "shareServiceProvider",
-          "wayQuestStateProvider",
+          "ttsServiceProvider",
           "activePlayersProvider",
+          "audioServiceProvider",
+          "shareServiceProvider",
           "ttsActiveProvider",
-          "ttsServiceProvider"
+          "wayQuestStateProvider"
         ]
       },
       {
@@ -647,8 +647,8 @@
           "WayQuestStateNotifier"
         ],
         "providers": [
-          "NotifierProvider",
-          "wayQuestStateProvider"
+          "wayQuestStateProvider",
+          "NotifierProvider"
         ]
       },
       {
@@ -681,10 +681,10 @@
           "_FinishedTeamScore"
         ],
         "providers": [
-          "sessionsProvider",
-          "audioServiceProvider",
           "shareServiceProvider",
-          "volleyballStateProvider"
+          "volleyballStateProvider",
+          "sessionsProvider",
+          "audioServiceProvider"
         ]
       },
       {
@@ -716,8 +716,8 @@
           "VolleyballStateNotifier"
         ],
         "providers": [
-          "NotifierProvider",
-          "volleyballStateProvider"
+          "volleyballStateProvider",
+          "NotifierProvider"
         ]
       },
       {
@@ -740,14 +740,14 @@
           "_DiagonalPainter"
         ],
         "providers": [
+          "completedCampaignLevelsProvider",
+          "isHostProvider",
+          "persistenceServiceProvider",
           "audioServiceProvider",
           "currentLobbyProvider",
           "multiplayerServiceProvider",
-          "activeGameIdProvider",
-          "isHostProvider",
-          "completedCampaignLevelsProvider",
           "sudokuStateProvider",
-          "persistenceServiceProvider"
+          "activeGameIdProvider"
         ]
       },
       {
@@ -768,9 +768,9 @@
           "_SudokuCreatorScreenState"
         ],
         "providers": [
-          "audioServiceProvider",
           "sudokuStateProvider",
-          "activeGameIdProvider"
+          "activeGameIdProvider",
+          "audioServiceProvider"
         ]
       },
       {
@@ -781,9 +781,9 @@
         ],
         "providers": [
           "audioServiceProvider",
-          "sudokuStateProvider",
+          "activeGameIdProvider",
           "completedCampaignLevelsProvider",
-          "activeGameIdProvider"
+          "sudokuStateProvider"
         ]
       },
       {
@@ -831,14 +831,14 @@
           "SudokuStateNotifier"
         ],
         "providers": [
-          "currentLobbyProvider",
-          "FutureProvider",
-          "isHostProvider",
           "completedCampaignLevelsProvider",
+          "isHostProvider",
+          "persistenceServiceProvider",
           "NotifierProvider",
+          "FutureProvider",
+          "currentLobbyProvider",
           "syncEngineProvider",
-          "sudokuStateProvider",
-          "persistenceServiceProvider"
+          "sudokuStateProvider"
         ]
       },
       {
@@ -865,8 +865,8 @@
           "_CardWidget"
         ],
         "providers": [
-          "activePlayersProvider",
           "audioServiceProvider",
+          "activePlayersProvider",
           "wizardDigitalProvider",
           "sessionsProvider"
         ]
@@ -877,8 +877,8 @@
           "WizardDigitalNotifier"
         ],
         "providers": [
-          "NotifierProvider",
-          "wizardDigitalProvider"
+          "wizardDigitalProvider",
+          "NotifierProvider"
         ]
       },
       {
@@ -913,13 +913,13 @@
           "_FactQuestGame"
         ],
         "providers": [
-          "audioServiceProvider",
           "settingsProvider",
           "sessionsProvider",
+          "ttsServiceProvider",
+          "audioServiceProvider",
           "shareServiceProvider",
-          "factQuestStateProvider",
           "ttsActiveProvider",
-          "ttsServiceProvider"
+          "factQuestStateProvider"
         ]
       },
       {
@@ -928,8 +928,8 @@
           "FactQuestStateNotifier"
         ],
         "providers": [
-          "NotifierProvider",
-          "factQuestStateProvider"
+          "factQuestStateProvider",
+          "NotifierProvider"
         ]
       },
       {
@@ -952,14 +952,14 @@
           "_BuzzTapScreenState"
         ],
         "providers": [
-          "audioServiceProvider",
-          "ttsActiveProvider",
           "settingsProvider",
           "sessionsProvider",
-          "shareServiceProvider",
+          "ttsServiceProvider",
           "activePlayersProvider",
           "buzzTapStateProvider",
-          "ttsServiceProvider"
+          "audioServiceProvider",
+          "shareServiceProvider",
+          "ttsActiveProvider"
         ]
       },
       {
@@ -992,8 +992,8 @@
           "_SchafkopfScreenState"
         ],
         "providers": [
-          "activePlayersProvider",
           "audioServiceProvider",
+          "activePlayersProvider",
           "schafkopfStateProvider",
           "sessionsProvider"
         ]
@@ -1023,10 +1023,10 @@
           "_ArschlochScreenState"
         ],
         "providers": [
+          "arschlochStateProvider",
           "sessionsProvider",
-          "activePlayersProvider",
           "audioServiceProvider",
-          "arschlochStateProvider"
+          "activePlayersProvider"
         ]
       },
       {
@@ -1035,8 +1035,8 @@
           "ArschlochStateNotifier"
         ],
         "providers": [
-          "NotifierProvider",
-          "arschlochStateProvider"
+          "arschlochStateProvider",
+          "NotifierProvider"
         ]
       },
       {
@@ -1057,10 +1057,10 @@
           "_StandardCardWidget"
         ],
         "providers": [
+          "arschlochDigitalProvider",
           "activePlayersProvider",
           "audioServiceProvider",
-          "sessionsProvider",
-          "arschlochDigitalProvider"
+          "sessionsProvider"
         ]
       },
       {
@@ -1069,8 +1069,8 @@
           "ArschlochDigitalNotifier"
         ],
         "providers": [
-          "NotifierProvider",
-          "arschlochDigitalProvider"
+          "arschlochDigitalProvider",
+          "NotifierProvider"
         ]
       },
       {
@@ -1105,9 +1105,9 @@
           "PlayerGroupRepository"
         ],
         "providers": [
-          "playerGroupRepositoryProvider",
+          "playerGroupsProvider",
           "AsyncNotifierProvider",
-          "playerGroupsProvider"
+          "playerGroupRepositoryProvider"
         ]
       },
       {
@@ -1117,9 +1117,9 @@
           "PlayerRepository"
         ],
         "providers": [
+          "playersProvider",
           "playerRepositoryProvider",
-          "AsyncNotifierProvider",
-          "playersProvider"
+          "AsyncNotifierProvider"
         ]
       },
       {
@@ -1128,8 +1128,8 @@
           "PlayersScreen"
         ],
         "providers": [
-          "playersProvider",
-          "playerGroupsProvider"
+          "playerGroupsProvider",
+          "playersProvider"
         ]
       }
     ],
@@ -1146,12 +1146,12 @@
           "_SectionLabel"
         ],
         "providers": [
-          "gistSyncServiceProvider",
-          "lastBackupProvider",
           "settingsProvider",
-          "isPrimaryProvider",
           "authUserProvider",
-          "authServiceProvider"
+          "isPrimaryProvider",
+          "authServiceProvider",
+          "gistSyncServiceProvider",
+          "lastBackupProvider"
         ]
       },
       {
@@ -1160,18 +1160,18 @@
           "AuthService"
         ],
         "providers": [
-          "linkWithProvider",
+          "GithubAuthProvider",
+          "authUserProvider",
+          "primaryProvider",
+          "StreamProvider",
           "signInWithProvider",
           "isPrimaryProvider",
-          "GoogleAuthProvider",
-          "StreamProvider",
+          "googleProvider",
           "authServiceProvider",
           "githubProvider",
-          "authUserProvider",
-          "firebaseAuthProvider",
-          "GithubAuthProvider",
-          "googleProvider",
-          "primaryProvider"
+          "GoogleAuthProvider",
+          "linkWithProvider",
+          "firebaseAuthProvider"
         ]
       }
     ],
@@ -1184,13 +1184,13 @@
           "_SubSettingSwitch"
         ],
         "providers": [
-          "lastBackupProvider",
-          "playersProvider",
           "settingsProvider",
-          "sessionsProvider",
-          "localBackupServiceProvider",
+          "playersProvider",
           "authUserProvider",
-          "authServiceProvider"
+          "authServiceProvider",
+          "localBackupServiceProvider",
+          "sessionsProvider",
+          "lastBackupProvider"
         ]
       },
       {
@@ -1211,9 +1211,9 @@
           "SettingsNotifier"
         ],
         "providers": [
-          "lastBackupProvider",
+          "settingsProvider",
           "NotifierProvider",
-          "settingsProvider"
+          "lastBackupProvider"
         ]
       }
     ]
@@ -1281,8 +1281,8 @@
       "path": "lib/core/providers/audio_provider.dart",
       "classes": [],
       "providers": [
-        "audioServiceProvider",
-        "settingsProvider"
+        "settingsProvider",
+        "audioServiceProvider"
       ]
     },
     {
@@ -1293,10 +1293,10 @@
       ],
       "providers": [
         "AsyncNotifierProvider",
-        "activeGameIdProvider",
         "NotifierProvider",
+        "persistenceServiceProvider",
         "persistenceNotifierProvider",
-        "persistenceServiceProvider"
+        "activeGameIdProvider"
       ]
     },
     {
@@ -1312,9 +1312,9 @@
         "TtsActiveNotifier"
       ],
       "providers": [
+        "settingsProvider",
         "ttsActiveProvider",
         "NotifierProvider",
-        "settingsProvider",
         "ttsServiceProvider"
       ]
     },
@@ -1409,8 +1409,8 @@
         "_WinnerConfettiOverlayState"
       ],
       "providers": [
-        "audioServiceProvider",
-        "shareServiceProvider"
+        "shareServiceProvider",
+        "audioServiceProvider"
       ]
     }
   ],
