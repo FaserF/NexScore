@@ -393,7 +393,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
                           style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.greenAccent),
                         ),
                       ),
-                      if (_currentStepIdx < _steps.length - 1)
+                      if (_currentStepIdx < steps.length - 1)
                         TextButton(
                           onPressed: () {
                             setState(() {
