@@ -14,12 +14,17 @@ class EnvironmentBanner extends StatelessWidget {
     defaultValue: false,
   );
 
+  static const bool isDev = bool.fromEnvironment(
+    'IS_DEV',
+    defaultValue: false,
+  );
+
   @override
   Widget build(BuildContext context) {
-    if (!kDebugMode && !isBeta) return child;
+    if (!kDebugMode && !isBeta && !isDev) return child;
 
-    final String label = kDebugMode ? 'DEV' : 'BETA';
-    final Color color = kDebugMode ? Colors.orange : Colors.blue;
+    final String label = (kDebugMode || isDev) ? 'DEV' : 'BETA';
+    final Color color = (kDebugMode || isDev) ? Colors.orange : Colors.blue;
 
     return Directionality(
       textDirection: TextDirection.ltr,
