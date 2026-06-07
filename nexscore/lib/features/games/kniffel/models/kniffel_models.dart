@@ -58,6 +58,15 @@ class YahtzeePlayerSheet {
 
   int get totalScore => upperSectionSum + upperSectionBonus + lowerSectionSum;
 
+  YahtzeePlayerSheet removeCategory(YahtzeeCategory category) {
+    final newScores = Map<YahtzeeCategory, int>.from(scores);
+    newScores.remove(category);
+    return YahtzeePlayerSheet(
+      scores: newScores,
+      bonusYahtzees: bonusYahtzees,
+    );
+  }
+
   YahtzeePlayerSheet copyWith({
     Map<YahtzeeCategory, int>? scores,
     int? bonusYahtzees,

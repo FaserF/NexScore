@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/session_model.dart';
 import '../storage/state_persistence_service.dart';
 
 /// Provider for the ID of the game currently being played.
@@ -6,7 +7,12 @@ class ActiveGameIdNotifier extends Notifier<String?> {
   @override
   String? build() => null;
   @override
-  set state(String? value) => super.state = value;
+  set state(String? value) {
+    if (value != null && value != state) {
+      Session.recordGameStart(value);
+    }
+    super.state = value;
+  }
 }
 
 final activeGameIdProvider = NotifierProvider<ActiveGameIdNotifier, String?>(

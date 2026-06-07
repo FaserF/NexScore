@@ -24,6 +24,40 @@ class QwixxGameState {
     return List.generate(11, (i) => 12 - i);
   }
 
+  static int getCellColorIndex(int rowIndex, int number, QwixxVariant variant) {
+    if (variant != QwixxVariant.mixedColors) {
+      return rowIndex;
+    }
+    // Mixed colors (Variant A) cell color configuration
+    // Symmetrical 2-by-2 sequence:
+    // Row 0: 2,3: Red (0), 4,5: Yellow (1), 6,7: Green (2), 8,9: Blue (3), 10,11: Red (0), 12: Yellow (1)
+    // Row 1: 2,3: Yellow (1), 4,5: Red (0), 6,7: Blue (3), 8,9: Green (2), 10,11: Yellow (1), 12: Red (0)
+    // Row 2: 12,11: Green (2), 10,9: Blue (3), 8,7: Red (0), 6,5: Yellow (1), 4,3: Green (2), 2: Blue (3)
+    // Row 3: 12,11: Blue (3), 10,9: Green (2), 8,7: Yellow (1), 6,5: Red (0), 4,3: Blue (3), 2: Green (2)
+    if (rowIndex == 0) {
+      if (number == 2 || number == 3 || number == 10 || number == 11) return 0;
+      if (number == 4 || number == 5 || number == 12) return 1;
+      if (number == 6 || number == 7) return 2;
+      return 3;
+    } else if (rowIndex == 1) {
+      if (number == 2 || number == 3 || number == 10 || number == 11) return 1;
+      if (number == 4 || number == 5 || number == 12) return 0;
+      if (number == 6 || number == 7) return 3;
+      return 2;
+    } else if (rowIndex == 2) {
+      if (number == 12 || number == 11 || number == 4 || number == 3) return 2;
+      if (number == 10 || number == 9 || number == 2) return 3;
+      if (number == 8 || number == 7) return 0;
+      return 1;
+    } else if (rowIndex == 3) {
+      if (number == 12 || number == 11 || number == 4 || number == 3) return 3;
+      if (number == 10 || number == 9 || number == 2) return 2;
+      if (number == 8 || number == 7) return 1;
+      return 0;
+    }
+    return rowIndex;
+  }
+
   const QwixxGameState({
     this.sheets = const {},
     this.variant = QwixxVariant.original,
@@ -64,6 +98,8 @@ class QwixxGameState {
 }
 
 class QwixxPlayerSheet {
+  static const int lockValue = 99;
+
   final List<int> red;
   final List<int> yellow;
   final List<int> green;

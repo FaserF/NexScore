@@ -1,6 +1,77 @@
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Session {
+  static final Map<String, DateTime> _gameStartTimes = {};
+
+  static void recordGameStart(String gameType) {
+    _gameStartTimes[gameType] = DateTime.now();
+  }
+
+  static DateTime? getGameStartTime(String gameType) {
+    return _gameStartTimes[gameType];
+  }
+
+  static Future<Session> resolveActualDuration(Session session) async {
+    DateTime? startTime = _gameStartTimes[session.gameType];
+    if (startTime == null) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final json = prefs.getString('game_state_${session.gameType}');
+        if (json != null) {
+          final decoded = jsonDecode(json) as Map<String, dynamic>;
+          if (decoded['timestamp'] != null) {
+            startTime = DateTime.parse(decoded['timestamp'] as String);
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (startTime != null) {
+      _gameStartTimes.remove(session.gameType);
+      final now = DateTime.now();
+      final duration = now.difference(startTime).inSeconds;
+      return session.copyWith(
+        startTime: startTime,
+        endTime: now,
+        durationSeconds: duration > 0 ? duration : 0,
+      );
+    }
+    return session;
+  }
+
+  String get gameEmoji {
+    switch (gameType.replaceAll('_digital', '')) {
+      case 'wizard':
+        return '🧙';
+      case 'qwixx':
+      case 'kniffel':
+        return '🎲';
+      case 'schafkopf':
+      case 'arschloch':
+      case 'romme':
+      case 'phase10':
+        return '🃏';
+      case 'sipdeck':
+        return '🍺';
+      case 'buzztap':
+        return '⚡';
+      case 'wayquest':
+        return '🗺️';
+      case 'factquest':
+        return '❓';
+      case 'volleyball':
+        return '🏐';
+      case 'darts':
+        return '🎯';
+      case 'sudoku':
+        return '🧩';
+      case 'generic':
+      default:
+        return '🏆';
+    }
+  }
+
   final String id;
   final String gameType; // wizard, qwixx, etc.
   final DateTime startTime;

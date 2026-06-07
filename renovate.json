@@ -71,6 +71,14 @@
                 "dependencies",
                 "major-update"
             ]
+        },
+        {
+            "description": "Ignore local Flutter plugin loader Gradle plugin",
+            "matchPackageNames": [
+                "dev.flutter.flutter-plugin-loader",
+                "dev.flutter.flutter-plugin-loader:dev.flutter.flutter-plugin-loader.gradle.plugin"
+            ],
+            "enabled": false
         }
     ]
 }

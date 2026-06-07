@@ -227,4 +227,11 @@ class WizardGameState {
     }
     return playerIds.where((pid) => scores[pid] == maxScore).toList();
   }
+
+  /// Validates whether the sum of tricks matches the target round tricks count.
+  bool validateTricks(Map<String, int> tricks, int blownTricks, int targetRoundIndex) {
+    final sum = tricks.values.fold(0, (a, b) => a + b) + (anniversaryCards ? blownTricks : 0);
+    return sum == targetRoundIndex;
+  }
 }
+

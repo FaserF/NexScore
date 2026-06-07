@@ -42,6 +42,17 @@ class KniffelStateNotifier extends Notifier<KniffelGameState> {
     );
   }
 
+  void clearScore(String playerId, YahtzeeCategory category) {
+    _pushState();
+    final updatedMap = Map<String, YahtzeePlayerSheet>.from(state.playerSheets);
+    final sheet = updatedMap[playerId] ?? const YahtzeePlayerSheet();
+    updatedMap[playerId] = sheet.removeCategory(category);
+    state = state.copyWith(
+      playerSheets: updatedMap,
+      canUndo: _history.isNotEmpty,
+    );
+  }
+
   void updateBonus(String playerId, int value) {
     _pushState();
     final updatedMap = Map<String, YahtzeePlayerSheet>.from(state.playerSheets);

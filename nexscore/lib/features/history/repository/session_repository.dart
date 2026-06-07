@@ -87,7 +87,8 @@ class SessionRepository {
 
   Future<Result<void>> insertSession(Session session) async {
     try {
-      await DatabaseService.instance.insert('sessions', session.toMap());
+      final resolvedSession = await Session.resolveActualDuration(session);
+      await DatabaseService.instance.insert('sessions', resolvedSession.toMap());
       return const Result.success(null);
     } catch (e, stack) {
       return Result.failure(

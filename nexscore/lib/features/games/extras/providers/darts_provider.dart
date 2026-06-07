@@ -103,6 +103,10 @@ class DartsNotifier extends Notifier<DartsGameState> {
       canUndo: _history.isNotEmpty,
     );
   }
+
+  void toggleDirectEntryMode() {
+    state = state.copyWith(isDirectEntryMode: !state.isDirectEntryMode);
+  }
 }
 
 final dartsStateProvider = NotifierProvider<DartsNotifier, DartsGameState>(DartsNotifier.new);

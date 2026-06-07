@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:confetti/confetti.dart';
+import 'custom_confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/audio_provider.dart';

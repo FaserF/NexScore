@@ -108,6 +108,14 @@ class _DartsScreenState extends ConsumerState<DartsScreen> {
             tooltip: l10n.get('nav_help'),
           ),
           IconButton(
+            icon: Icon(
+              gameState.isDirectEntryMode ? Icons.pin : Icons.ads_click,
+              color: gameState.isDirectEntryMode ? Colors.amber : null,
+            ),
+            onPressed: () => ref.read(dartsStateProvider.notifier).toggleDirectEntryMode(),
+            tooltip: gameState.isDirectEntryMode ? 'Direct Score Entry (Direkte Punkteeingabe)' : 'Manual Throws Entry',
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => _confirmSettings(context, gameState, l10n),
             tooltip: l10n.get('darts_settings'),
@@ -242,12 +250,211 @@ class _DartsScreenState extends ConsumerState<DartsScreen> {
   ) async {
     final List<DartThrow> currentThrows = [];
     int multiplier = 1;
+    final TextEditingController directScoreController = TextEditingController();
 
     await showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
+            if (gameState.isDirectEntryMode) {
+              final directVal = int.tryParse(directScoreController.text) ?? 0;
+              final previewScore = pState.currentScore - directVal;
+              final isBust = previewScore < 0 || previewScore == 1;
+
+              return AlertDialog(
+                title: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Color(
+                        int.parse(player.avatarColor.replaceFirst('#', '0xff')),
+                      ),
+                      child: Text(
+                        player.name.substring(0, 1).toUpperCase(),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text('${player.name} - Direkte Punkteeingabe')),
+                  ],
+                ),
+                content: SizedBox(
+                  width: 320,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isBust
+                              ? Colors.red.withValues(alpha: 0.1)
+                              : Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.get('darts_remaining'),
+                                  style: Theme.of(context).textTheme.labelSmall,
+                                ),
+                                Text(
+                                  isBust
+                                      ? l10n.get('darts_bust')
+                                      : '$previewScore',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: isBust ? Colors.red : null,
+                                      ),
+                                ),
+                                if (!isBust &&
+                                    previewScore <= 170 &&
+                                    ![
+                                      159,
+                                      162,
+                                      163,
+                                      165,
+                                      166,
+                                      168,
+                                      169,
+                                    ].contains(previewScore)) ...[
+                                  Text(
+                                    l10n.get('darts_checkout_possible'),
+                                    style: const TextStyle(
+                                      color: Colors.green,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (getCheckoutSuggestion(previewScore) != null)
+                                    Text(
+                                      'Suggestion: ${getCheckoutSuggestion(previewScore)!.join(" ➔ ")}',
+                                      style: const TextStyle(
+                                        color: Colors.green,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                ],
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  l10n.get('history_pts'),
+                                  style: Theme.of(context).textTheme.labelSmall,
+                                ),
+                                Text(
+                                  '$directVal',
+                                  style: Theme.of(context).textTheme.headlineSmall,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: directScoreController,
+                        readOnly: true,
+                        showCursor: true,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        decoration: const InputDecoration(
+                          hintText: '0',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Numpad Grid
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          childAspectRatio: 1.5,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                        ),
+                        itemCount: 12,
+                        itemBuilder: (context, idx) {
+                          if (idx < 9) {
+                            final digit = idx + 1;
+                            return OutlinedButton(
+                              onPressed: () {
+                                setState(() {
+                                  directScoreController.text =
+                                      '${directScoreController.text}$digit';
+                                });
+                              },
+                              child: Text('$digit', style: const TextStyle(fontSize: 18)),
+                            );
+                          } else if (idx == 9) {
+                            return OutlinedButton(
+                              onPressed: () {
+                                if (directScoreController.text.isNotEmpty) {
+                                  setState(() {
+                                    directScoreController.text =
+                                        directScoreController.text.substring(0, directScoreController.text.length - 1);
+                                  });
+                                }
+                              },
+                              child: const Icon(Icons.backspace_outlined),
+                            );
+                          } else if (idx == 10) {
+                            return OutlinedButton(
+                              onPressed: () {
+                                setState(() {
+                                  directScoreController.text = '${directScoreController.text}0';
+                                });
+                              },
+                              child: const Text('0', style: TextStyle(fontSize: 18)),
+                            );
+                          } else {
+                            return OutlinedButton(
+                              onPressed: () {
+                                setState(() {
+                                  directScoreController.clear();
+                                });
+                              },
+                              child: const Text('Clear', style: TextStyle(fontSize: 14)),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.get('cancel')),
+                  ),
+                  FilledButton(
+                    onPressed: !isBust && directVal > 0
+                        ? () {
+                            final round = DartRound(
+                              isDirect: true,
+                              directScore: directVal,
+                            );
+                            ref.read(dartsStateProvider.notifier).addRound(player.id, round);
+                            Navigator.pop(context);
+                          }
+                        : null,
+                    child: Text(l10n.get('add')),
+                  ),
+                ],
+              );
+            }
+
             int previewScore = pState.currentScore;
             bool isBust = false;
 
@@ -374,7 +581,7 @@ class _DartsScreenState extends ConsumerState<DartsScreen> {
                                     166,
                                     168,
                                     169,
-                                  ].contains(previewScore))
+                                  ].contains(previewScore)) ...[
                                 Text(
                                   l10n.get('darts_checkout_possible'),
                                   style: const TextStyle(
@@ -383,6 +590,16 @@ class _DartsScreenState extends ConsumerState<DartsScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                if (getCheckoutSuggestion(previewScore) != null)
+                                  Text(
+                                    'Suggestion: ${getCheckoutSuggestion(previewScore)!.join(" ➔ ")}',
+                                    style: const TextStyle(
+                                      color: Colors.green,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                              ],
                             ],
                           ),
                           Column(
@@ -411,8 +628,8 @@ class _DartsScreenState extends ConsumerState<DartsScreen> {
                         final hasThrow = index < currentThrows.length;
                         final t = hasThrow ? currentThrows[index] : null;
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Chip(
+                           padding: const EdgeInsets.symmetric(horizontal: 4),
+                           child: Chip(
                             label: Text(
                               t == null
                                   ? '-'

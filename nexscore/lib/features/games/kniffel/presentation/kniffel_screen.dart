@@ -118,12 +118,12 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
               ),
             IconButton(
               icon: const Icon(Icons.help_outline),
-              onPressed: () {}, // Help
+              onPressed: () => _showRulesDialog(context),
               tooltip: l10n.get('nav_help'),
             ),
             IconButton(
               icon: const Icon(Icons.settings),
-              onPressed: () {}, // Placeholder for local settings
+              onPressed: () => _showSettingsDialog(context, ref, l10n),
               tooltip: l10n.get('game_settings'),
             ),
             IconButton(
@@ -399,6 +399,376 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
     );
   }
 
+  int _getCategoryFactor(YahtzeeCategory category) {
+    switch (category) {
+      case YahtzeeCategory.ones: return 1;
+      case YahtzeeCategory.twos: return 2;
+      case YahtzeeCategory.threes: return 3;
+      case YahtzeeCategory.fours: return 4;
+      case YahtzeeCategory.fives: return 5;
+      case YahtzeeCategory.sixes: return 6;
+      default: return 1;
+    }
+  }
+
+  void _showFreeformPicker(
+    BuildContext context,
+    WidgetRef ref,
+    String playerId,
+    YahtzeeCategory category,
+    String label,
+    AppLocalizations l10n,
+  ) {
+    final factor = _getCategoryFactor(category);
+    final currentScore = ref.read(kniffelStateProvider).playerSheets[playerId]?.scores[category];
+    final hasScore = ref.read(kniffelStateProvider).playerSheets[playerId]?.scores.containsKey(category) ?? false;
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    if (hasScore)
+                      TextButton.icon(
+                        icon: const Icon(Icons.clear, color: Colors.red),
+                        label: Text(l10n.get('game_reset'), style: const TextStyle(color: Colors.red)),
+                        onPressed: () {
+                          ref.read(kniffelStateProvider.notifier).clearScore(playerId, category);
+                          Navigator.pop(context);
+                        },
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Select how many dice show this value:',
+                  style: TextStyle(color: isDark ? Colors.white70 : Colors.grey[600], fontSize: 14),
+                ),
+                const SizedBox(height: 20),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.center,
+                  children: List.generate(6, (index) {
+                    final diceCount = index;
+                    final scoreValue = diceCount * factor;
+                    final isSelected = hasScore && currentScore == scoreValue;
+
+                    return InkWell(
+                      onTap: () {
+                        ref.read(kniffelStateProvider.notifier).updateScore(playerId, category, scoreValue);
+                        Navigator.pop(context);
+                      },
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        width: 90,
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.blue.withOpacity(0.15) : (isDark ? Colors.grey[850] : Colors.grey[100]),
+                          border: Border.all(
+                            color: isSelected ? Colors.blue : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          children: [
+                            if (diceCount == 0)
+                              const Icon(Icons.block, size: 28, color: Colors.red)
+                            else
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '$diceCount',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: isSelected ? Colors.blue : (isDark ? Colors.white : Colors.black87),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.casino,
+                                    size: 18,
+                                    color: isSelected ? Colors.blue : (isDark ? Colors.grey[400] : Colors.grey[700]),
+                                  ),
+                                ],
+                              ),
+                            const SizedBox(height: 8),
+                            Text(
+                              diceCount == 0 ? 'Scratch' : '$scoreValue pts',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: isSelected ? Colors.blue : (isDark ? Colors.white70 : Colors.black87),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showFixedScorePicker(
+    BuildContext context,
+    WidgetRef ref,
+    String playerId,
+    YahtzeeCategory category,
+    String label,
+    int fixedValue,
+    AppLocalizations l10n,
+  ) {
+    final hasScore = ref.read(kniffelStateProvider).playerSheets[playerId]?.scores.containsKey(category) ?? false;
+    final currentScore = ref.read(kniffelStateProvider).playerSheets[playerId]?.scores[category];
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Choose an option for this category:',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                const SizedBox(height: 20),
+                ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: Colors.green,
+                    child: Icon(Icons.check, color: Colors.white),
+                  ),
+                  title: Text('Score $fixedValue Points'),
+                  subtitle: const Text('You completed the pattern'),
+                  trailing: hasScore && currentScore == fixedValue
+                      ? const Icon(Icons.check_circle, color: Colors.blue)
+                      : null,
+                  onTap: () {
+                    ref.read(kniffelStateProvider.notifier).updateScore(playerId, category, fixedValue);
+                    Navigator.pop(context);
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: Colors.redAccent,
+                    child: Icon(Icons.block, color: Colors.white),
+                  ),
+                  title: const Text('Scratch (0 Points)'),
+                  subtitle: const Text('Could not complete this pattern'),
+                  trailing: hasScore && currentScore == 0
+                      ? const Icon(Icons.check_circle, color: Colors.blue)
+                      : null,
+                  onTap: () {
+                    ref.read(kniffelStateProvider.notifier).updateScore(playerId, category, 0);
+                    Navigator.pop(context);
+                  },
+                ),
+                if (hasScore) ...[
+                  const Divider(),
+                  ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: Colors.grey,
+                      child: Icon(Icons.clear, color: Colors.white),
+                    ),
+                    title: const Text('Clear / Unassign'),
+                    subtitle: const Text('Remove current score assignment'),
+                    onTap: () {
+                      ref.read(kniffelStateProvider.notifier).clearScore(playerId, category);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRulesDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.help_outline, color: Colors.blue),
+            SizedBox(width: 8),
+            Text('Kniffel / Yahtzee Rules'),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Goal:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const Text('Roll dice to build combinations and score points.'),
+                const SizedBox(height: 12),
+                const Text(
+                  'Upper Section (Aces - Sixes):',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const Text('Score only the sum of dice showing that value.'),
+                const SizedBox(height: 8),
+                Card(
+                  color: Colors.blue.withOpacity(0.15),
+                  elevation: 0,
+                  child: const Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.star, color: Colors.amber),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Bonus: If upper section sum is 63 or more, you get a +35 points bonus!',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Lower Section:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 4),
+                _buildRuleItem('3 of a Kind', 'Sum of all dice if 3 or more are same.', context),
+                _buildRuleItem('4 of a Kind', 'Sum of all dice if 4 or more are same.', context),
+                _buildRuleItem('Full House', '3 of one value & 2 of another. Fixed 25 pts.', context),
+                _buildRuleItem('Small Straight', '4 consecutive values. Fixed 30 pts.', context),
+                _buildRuleItem('Large Straight', '5 consecutive values. Fixed 40 pts.', context),
+                _buildRuleItem('Yahtzee', '5 of the same value. Fixed 50 pts.', context),
+                _buildRuleItem('Chance', 'Sum of all dice. Any combination.', context),
+                _buildRuleItem('Yahtzee Bonus', 'Extra Yahtzees score +50 points each.', context),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRuleItem(String title, String desc, BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Text.rich(
+        TextSpan(
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 14),
+          children: [
+            TextSpan(text: '$title: ', style: const TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(text: desc),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSettingsDialog(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.settings, color: Colors.blueGrey),
+            const SizedBox(width: 8),
+            Text(l10n.get('game_settings')),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Active Rule Configuration:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            const ListTile(
+              leading: Icon(Icons.star_border),
+              title: Text('Upper Section Bonus'),
+              subtitle: Text('Score ≥ 63 gives +35 pts'),
+              dense: true,
+            ),
+            const ListTile(
+              leading: Icon(Icons.repeat),
+              title: Text('Multiple Yahtzees'),
+              subtitle: Text('Each extra Yahtzee gives +50 pts'),
+              dense: true,
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.refresh, color: Colors.red),
+              title: Text(l10n.get('game_reset'), style: const TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(context);
+                _confirmReset(context, ref, l10n);
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildScoreRow(
     BuildContext context,
     WidgetRef ref,
@@ -423,10 +793,24 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
           : const Icon(Icons.edit, size: 20, color: Colors.grey),
       onTap: () {
         if (isFixed) {
-          int newValue = (!hasScore || score == 0) ? fixedValue! : 0;
-          ref
-              .read(kniffelStateProvider.notifier)
-              .updateScore(playerId, category, newValue);
+          _showFixedScorePicker(
+            context,
+            ref,
+            playerId,
+            category,
+            label,
+            fixedValue!,
+            l10n,
+          );
+        } else if (const [
+          YahtzeeCategory.ones,
+          YahtzeeCategory.twos,
+          YahtzeeCategory.threes,
+          YahtzeeCategory.fours,
+          YahtzeeCategory.fives,
+          YahtzeeCategory.sixes,
+        ].contains(category)) {
+          _showFreeformPicker(context, ref, playerId, category, label, l10n);
         } else {
           _showInputDialog(context, ref, playerId, category, label, l10n);
         }
@@ -478,45 +862,90 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
     String label,
     AppLocalizations l10n,
   ) {
-    final controller = TextEditingController();
+    final hasScore = ref.read(kniffelStateProvider).playerSheets[playerId]?.scores.containsKey(category) ?? false;
+    final currentScore = ref.read(kniffelStateProvider).playerSheets[playerId]?.scores[category];
+    final controller = TextEditingController(text: hasScore ? currentScore.toString() : '');
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.getWith('kniffel_enter_score', [label])),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(hintText: l10n.get('history_pts')),
-          autofocus: true,
-          onSubmitted: (val) {
-            final v = int.tryParse(val);
-            if (v != null) {
-              ref
-                  .read(kniffelStateProvider.notifier)
-                  .updateScore(playerId, category, v);
+      builder: (context) {
+        String? errorText;
+        return StatefulBuilder(
+          builder: (context, setState) {
+            bool isValid(String text) {
+              if (text.isEmpty) return false;
+              final val = int.tryParse(text);
+              if (val == null) return false;
+              return val == 0 || (val >= 5 && val <= 30);
             }
-            Navigator.pop(context);
+
+            return AlertDialog(
+              title: Text(l10n.getWith('kniffel_enter_score', [label])),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    controller: controller,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: l10n.get('history_pts'),
+                      errorText: errorText,
+                      helperText: 'Enter 0 (scratch) or sum of 5 dice (5 to 30)',
+                    ),
+                    autofocus: true,
+                    onChanged: (val) {
+                      setState(() {
+                        if (val.isEmpty) {
+                          errorText = null;
+                        } else if (!isValid(val)) {
+                          errorText = 'Invalid score (must be 0, or 5 to 30)';
+                        } else {
+                          errorText = null;
+                        }
+                      });
+                    },
+                    onSubmitted: (val) {
+                      if (isValid(val)) {
+                        ref
+                            .read(kniffelStateProvider.notifier)
+                            .updateScore(playerId, category, int.parse(val));
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                if (hasScore)
+                  TextButton(
+                    onPressed: () {
+                      ref.read(kniffelStateProvider.notifier).clearScore(playerId, category);
+                      Navigator.pop(context);
+                    },
+                    child: Text(l10n.get('game_reset'), style: const TextStyle(color: Colors.red)),
+                  ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.get('cancel')),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final val = controller.text;
+                    if (isValid(val)) {
+                      ref
+                          .read(kniffelStateProvider.notifier)
+                          .updateScore(playerId, category, int.parse(val));
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text(l10n.get('save')),
+                ),
+              ],
+            );
           },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.get('cancel')),
-          ),
-          TextButton(
-            onPressed: () {
-              final val = int.tryParse(controller.text);
-              if (val != null) {
-                ref
-                    .read(kniffelStateProvider.notifier)
-                    .updateScore(playerId, category, val);
-              }
-              Navigator.pop(context);
-            },
-            child: Text(l10n.get('save')),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

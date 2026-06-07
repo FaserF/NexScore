@@ -569,102 +569,159 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
     List<Player> players,
   ) async {
     final roundIndex = state.rounds.length + state.customStartRound;
-    final Map<String, TextEditingController> bidControllers = {
-      for (var p in players) p.id: TextEditingController(text: '0'),
+    final Map<String, int> bids = {
+      for (var p in players) p.id: 0,
     };
 
     await showDialog(
       context: context,
       builder: (context) {
         final l10n = AppLocalizations.of(context);
-        return AlertDialog(
-          title: Text(
-            '${l10n.get('wizard_round')} $roundIndex — ${l10n.get('wizard_predictions')}',
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ...players.map((p) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            p.name,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final bidsSum = bids.values.fold<int>(0, (sum, val) => sum + val);
+            final isBidsSumInvalid = state.ruleSticheDuertenNichtAufgehen && bidsSum == roundIndex;
+
+            return AlertDialog(
+              title: Text(
+                '${l10n.get('wizard_round')} $roundIndex — ${l10n.get('wizard_predictions')}',
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: isBidsSumInvalid
+                            ? Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.3)
+                            : Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isBidsSumInvalid
+                              ? Theme.of(context).colorScheme.error.withValues(alpha: 0.5)
+                              : Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
                         ),
-                        const SizedBox(width: 8),
-                        SizedBox(
-                          width: 80,
-                          child: TextField(
-                            controller: bidControllers[p.id],
-                            keyboardType: TextInputType.number,
-                            textAlign: TextAlign.center,
-                            decoration: InputDecoration(
-                              labelText: l10n.get('wizard_bid'),
-                              border: const OutlineInputBorder(),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Bids Sum: $bidsSum',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: isBidsSumInvalid
+                                  ? Theme.of(context).colorScheme.error
+                                  : Theme.of(context).colorScheme.primary,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.get('cancel')),
-            ),
-            FilledButton(
-              onPressed: () {
-                final bids = {
-                  for (var p in players)
-                    p.id: int.tryParse(bidControllers[p.id]!.text) ?? 0,
-                };
-
-                // Validation for Uneven Tricks Setting
-                if (state.ruleSticheDuertenNichtAufgehen) {
-                  final bidsSum = bids.values.fold<int>(
-                    0,
-                    (sum, val) => sum + val,
-                  );
-                  if (bidsSum == roundIndex) {
-                    final lastPlayer = players.last;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          l10n.getWith('wizard_rule_uneven_error', [
-                            lastPlayer.name,
-                          ]),
-                        ),
-                        backgroundColor: Theme.of(context).colorScheme.error,
+                          if (isBidsSumInvalid) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              l10n.getWith('wizard_rule_uneven_error', [players.last.name]),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context).colorScheme.error,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                    );
-                    return; // Prevent saving
-                  }
-                }
-
-                ref
-                    .read(wizardStateProvider.notifier)
-                    .updateState(state.copyWith(currentRoundBids: bids));
-                Navigator.pop(context);
-              },
-              child: Text(l10n.get('save')),
-            ),
-          ],
+                    ),
+                    ...players.map((p) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: Color(
+                                int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+                              ),
+                              radius: 16,
+                              child: p.emoji != null
+                                  ? Text(p.emoji!, style: const TextStyle(fontSize: 14))
+                                  : Text(
+                                      p.name.substring(0, 1).toUpperCase(),
+                                      style: const TextStyle(fontSize: 14, color: Colors.white),
+                                    ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                p.name,
+                                style: const TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove, size: 18),
+                                    onPressed: bids[p.id]! > 0
+                                        ? () => setState(() => bids[p.id] = bids[p.id]! - 1)
+                                        : null,
+                                  ),
+                                  SizedBox(
+                                    width: 32,
+                                    child: Text(
+                                      bids[p.id]!.toString(),
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add, size: 18),
+                                    onPressed: bids[p.id]! < roundIndex
+                                        ? () => setState(() => bids[p.id] = bids[p.id]! + 1)
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.get('cancel')),
+                ),
+                FilledButton(
+                  onPressed: isBidsSumInvalid
+                      ? null
+                      : () {
+                          ref
+                              .read(wizardStateProvider.notifier)
+                              .updateState(state.copyWith(currentRoundBids: bids));
+                          Navigator.pop(context);
+                        },
+                  child: Text(l10n.get('save')),
+                ),
+              ],
+            );
+          },
         );
       },
     );
-
-    for (var c in bidControllers.values) {
-      c.dispose();
-    }
   }
 
   Future<void> _showResultsDialog(
@@ -674,10 +731,8 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
     List<Player> players,
   ) async {
     final roundIndex = state.rounds.length + state.customStartRound;
-    final Map<String, TextEditingController> trickControllers = {
-      for (var p in players) p.id: TextEditingController(text: '0'),
-    };
-    final bombController = TextEditingController(text: '0');
+    final Map<String, int> tricks = {for (var p in players) p.id: 0};
+    int bombTricks = 0;
     final Map<String, bool> playedDragon = {for (var p in players) p.id: false};
     final Map<String, bool> playedFairy = {for (var p in players) p.id: false};
 
@@ -692,51 +747,108 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
           content: SingleChildScrollView(
             child: StatefulBuilder(
               builder: (context, setDialogState) {
-                final currentTricksSum = trickControllers.values
-                    .map((c) => int.tryParse(c.text) ?? 0)
-                    .fold(0, (a, b) => a + b);
-                final currentBombs = int.tryParse(bombController.text) ?? 0;
-                final totalSum = currentTricksSum + currentBombs;
+                final currentTricksSum = tricks.values.fold(0, (a, b) => a + b);
+                final totalSum = currentTricksSum + (state.anniversaryCards ? bombTricks : 0);
+                final isSumCorrect = totalSum == roundIndex;
+
+                Color statusColor;
+                String statusText;
+                IconData statusIcon;
+
+                if (totalSum == roundIndex) {
+                  statusColor = Colors.green;
+                  statusText = 'All tricks allocated (Sum: $totalSum / $roundIndex)';
+                  statusIcon = Icons.check_circle;
+                } else if (totalSum < roundIndex) {
+                  statusColor = Colors.orange;
+                  statusText = '${roundIndex - totalSum} tricks remaining (Sum: $totalSum / $roundIndex)';
+                  statusIcon = Icons.info_outline;
+                } else {
+                  statusColor = Theme.of(context).colorScheme.error;
+                  statusText = '${totalSum - roundIndex} tricks too many! (Sum: $totalSum / $roundIndex)';
+                  statusIcon = Icons.warning_amber_rounded;
+                }
 
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
+                      width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                        color: statusColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                       ),
-                      child: Text(
-                        state.anniversaryCards
-                            ? 'Tricks: $currentTricksSum + Bombs: $currentBombs = $totalSum / $roundIndex'
-                            : 'Total Tricks: $currentTricksSum / $roundIndex',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: totalSum == roundIndex
-                              ? Colors.green
-                              : Theme.of(context).colorScheme.error,
-                        ),
+                      child: Row(
+                        children: [
+                          Icon(statusIcon, color: statusColor, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              statusText,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: statusColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),
                     if (state.anniversaryCards) ...[
-                      TextField(
-                        controller: bombController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: l10n.get('wizard_bombs'),
-                          prefixIcon: const Icon(
-                            Icons.emergency_share,
-                            size: 20,
-                          ),
-                          border: const OutlineInputBorder(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.emergency_share, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                l10n.get('wizard_bombs'),
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove, size: 18),
+                                    onPressed: bombTricks > 0
+                                        ? () => setDialogState(() => bombTricks--)
+                                        : null,
+                                  ),
+                                  SizedBox(
+                                    width: 32,
+                                    child: Text(
+                                      bombTricks.toString(),
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add, size: 18),
+                                    onPressed: totalSum < roundIndex
+                                        ? () => setDialogState(() => bombTricks++)
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        onChanged: (_) => setDialogState(() {}),
                       ),
-                      const SizedBox(height: 16),
                       const Divider(),
                     ],
                     ...players.map((p) {
@@ -746,10 +858,22 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                           children: [
                             Row(
                               children: [
+                                CircleAvatar(
+                                  backgroundColor: Color(
+                                    int.parse(p.avatarColor.replaceFirst('#', '0xff')),
+                                  ),
+                                  radius: 16,
+                                  child: p.emoji != null
+                                      ? Text(p.emoji!, style: const TextStyle(fontSize: 14))
+                                      : Text(
+                                          p.name.substring(0, 1).toUpperCase(),
+                                          style: const TextStyle(fontSize: 14, color: Colors.white),
+                                        ),
+                                ),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         p.name,
@@ -759,25 +883,46 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                                       ),
                                       Text(
                                         '${l10n.get('wizard_bid')}: ${state.currentRoundBids?[p.id] ?? 0}',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.bodySmall,
+                                        style: Theme.of(context).textTheme.bodySmall,
                                       ),
                                     ],
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                SizedBox(
-                                  width: 80,
-                                  child: TextField(
-                                    controller: trickControllers[p.id],
-                                    keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,
-                                    decoration: InputDecoration(
-                                      labelText: l10n.get('wizard_won'),
-                                      border: const OutlineInputBorder(),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
                                     ),
-                                    onChanged: (_) => setDialogState(() {}),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.remove, size: 18),
+                                        onPressed: tricks[p.id]! > 0
+                                            ? () => setDialogState(() => tricks[p.id] = tricks[p.id]! - 1)
+                                            : null,
+                                      ),
+                                      SizedBox(
+                                        width: 32,
+                                        child: Text(
+                                          tricks[p.id]!.toString(),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.add, size: 18),
+                                        onPressed: totalSum < roundIndex
+                                            ? () => setDialogState(() => tricks[p.id] = tricks[p.id]! + 1)
+                                            : null,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -830,8 +975,8 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
                 state,
                 players,
                 roundIndex,
-                trickControllers,
-                bombController,
+                tricks,
+                bombTricks,
                 playedDragon,
                 playedFairy,
                 l10n,
@@ -842,11 +987,6 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
         );
       },
     );
-
-    for (var c in trickControllers.values) {
-      c.dispose();
-    }
-    bombController.dispose();
   }
 
   void _saveResults(
@@ -855,23 +995,16 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
     WizardGameState state,
     List<Player> players,
     int roundIndex,
-    Map<String, TextEditingController> trickControllers,
-    TextEditingController bombController,
+    Map<String, int> tricks,
+    int bombTricks,
     Map<String, bool> playedDragon,
     Map<String, bool> playedFairy,
     AppLocalizations l10n,
   ) {
-    final Map<String, int> tricks = {
-      for (var p in players)
-        p.id: int.tryParse(trickControllers[p.id]!.text) ?? 0,
-    };
-
     final tricksSum = tricks.values.fold<int>(0, (sum, val) => sum + val);
-    final bombTricks = int.tryParse(bombController.text) ?? 0;
 
-    // Validation for round sum
-    if (state.anniversaryCards) {
-      if (tricksSum + bombTricks != roundIndex) {
+    if (!state.validateTricks(tricks, bombTricks, roundIndex)) {
+      if (state.anniversaryCards) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -884,10 +1017,7 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
-        return;
-      }
-    } else {
-      if (tricksSum != roundIndex) {
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -899,8 +1029,8 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
-        return;
       }
+      return;
     }
 
     final newRound = WizardRound(
@@ -919,6 +1049,7 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
         );
     Navigator.pop(context);
   }
+
 
   void _confirmReset(
     BuildContext context,

@@ -23,11 +23,23 @@ class LeaderboardEntry {
   });
 }
 
-class LeaderboardScreen extends ConsumerWidget {
+class LeaderboardScreen extends ConsumerStatefulWidget {
   const LeaderboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LeaderboardScreen> createState() => _LeaderboardScreenState();
+}
+
+class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
+  String? _selectedGameType;
+
+  bool _isLowestScoreBest(String gameType) {
+    final clean = gameType.replaceAll('_digital', '');
+    return clean == 'darts' || clean == 'romme';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final playersAsync = ref.watch(playersProvider);
     final sessionsAsync = ref.watch(sessionsProvider);
     final l10n = AppLocalizations.of(context);
@@ -46,6 +58,58 @@ class LeaderboardScreen extends ConsumerWidget {
             centerTitle: false,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             surfaceTintColor: Colors.transparent,
+          ),
+          sessionsAsync.when(
+            loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
+            error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+            data: (sessions) {
+              final gameTypes = sessions
+                  .where((s) => s.completed)
+                  .map((s) => s.gameType)
+                  .toSet()
+                  .toList()
+                ..sort();
+
+              if (gameTypes.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+
+              return SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                  child: Card(
+                    elevation: 0,
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String?>(
+                          value: _selectedGameType,
+                          isExpanded: true,
+                          hint: Text(l10n.get('filter_game_type') ?? 'All Games'),
+                          items: [
+                            DropdownMenuItem<String?>(
+                              value: null,
+                              child: Text(l10n.get('all_games') ?? 'All Games'),
+                            ),
+                            ...gameTypes.map((type) {
+                              return DropdownMenuItem<String?>(
+                                value: type,
+                                child: Text(l10n.get('game_$type') ?? type),
+                              );
+                            }),
+                          ],
+                          onChanged: (val) {
+                            setState(() {
+                              _selectedGameType = val;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
           playersAsync.when(
             loading: () => const SliverFillRemaining(
@@ -161,16 +225,23 @@ class LeaderboardScreen extends ConsumerWidget {
     final Map<String, int> gamesWon = {};
     final Map<String, int> totalScores = {};
 
-    for (final session in sessions.where((s) => s.completed)) {
-      // Determine winner(s): highest score
+    final filteredSessions = _selectedGameType != null
+        ? sessions.where((s) => s.completed && s.gameType == _selectedGameType)
+        : sessions.where((s) => s.completed);
+
+    for (final session in filteredSessions) {
       if (session.scores.isEmpty) continue;
-      final maxScore = session.scores.values.reduce((a, b) => a > b ? a : b);
+
+      final isLowestBest = _isLowestScoreBest(session.gameType);
+      final winningScore = isLowestBest
+          ? session.scores.values.reduce((a, b) => a < b ? a : b)
+          : session.scores.values.reduce((a, b) => a > b ? a : b);
 
       for (final entry in session.scores.entries) {
         final pid = entry.key;
         gamesPlayed[pid] = (gamesPlayed[pid] ?? 0) + 1;
         totalScores[pid] = (totalScores[pid] ?? 0) + entry.value;
-        if (entry.value == maxScore) {
+        if (entry.value == winningScore) {
           gamesWon[pid] = (gamesWon[pid] ?? 0) + 1;
         }
       }

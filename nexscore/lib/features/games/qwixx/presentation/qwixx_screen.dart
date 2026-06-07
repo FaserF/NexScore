@@ -146,6 +146,11 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
               tooltip: l10n.get('game_settings'),
             ),
             IconButton(
+              icon: const Icon(Icons.table_rows),
+              onPressed: () => _showScoringTable(context, l10n),
+              tooltip: 'Scoring Table',
+            ),
+            IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => _confirmReset(context, ref, l10n),
               tooltip: l10n.get('game_reset'),
@@ -200,6 +205,84 @@ class _QwixxScreenState extends ConsumerState<QwixxScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showScoringTable(BuildContext context, AppLocalizations l10n) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Qwixx Scoring Table',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Table(
+                    defaultColumnWidth: const FixedColumnWidth(60),
+                    border: TableBorder.all(
+                      color: Theme.of(context).dividerColor,
+                      width: 1,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    children: [
+                      TableRow(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                        ),
+                        children: List.generate(12, (index) => Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              '${index + 1} ❌',
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        )),
+                      ),
+                      TableRow(
+                        children: List.generate(12, (index) {
+                          final crosses = index + 1;
+                          final points = (crosses * (crosses + 1)) ~/ 2;
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text(
+                                '$points',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Each penalty costs 5 minus points.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -286,6 +369,16 @@ class _QwixxPlayerView extends StatelessWidget {
     required this.l10n,
   });
 
+  Color _getColorForIndex(BuildContext context, int colorIndex) {
+    return switch (colorIndex) {
+      0 => Colors.red.shade300,
+      1 => Colors.yellow.shade600,
+      2 => Colors.green.shade400,
+      3 => Colors.blue.shade300,
+      _ => Colors.grey,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -293,10 +386,32 @@ class _QwixxPlayerView extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            padding: const EdgeInsets.only(top: 16.0, bottom: 4.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (player.emoji != null) ...[
+                  Text(
+                    player.emoji!,
+                    style: const TextStyle(fontSize: 28),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Text(
+                  player.name,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
             child: Text(
               l10n.getWith('qwixx_score_label', [sheet.totalScore.toString()]),
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -349,10 +464,6 @@ class _QwixxPlayerView extends StatelessWidget {
   ) {
     final numbers = QwixxGameState.getRowNumbers(rowIndex, variant);
 
-    // Mixx A (Mixed Colors) official mapping (simplified: we still use the row's base color mostly)
-    // In a real Mixx A app, each cell would have its own color.
-    // For now, we use the base row color.
-
     return Container(
       decoration: BoxDecoration(
         color: baseColor.withValues(alpha: 0.1),
@@ -366,12 +477,36 @@ class _QwixxPlayerView extends StatelessWidget {
         children: [
           ...numbers.map((number) {
             bool isCrossed = crossed.contains(number);
+            final cellColorIndex = QwixxGameState.getCellColorIndex(rowIndex, number, variant);
+            final cellColor = _getColorForIndex(context, cellColorIndex);
+
             return GestureDetector(
               onTap: () {
                 List<int> newList = List.from(crossed);
                 if (isCrossed) {
                   newList.remove(number);
                 } else {
+                  // Left-to-right rule validation check
+                  final index = numbers.indexOf(number);
+                  final skippedNumbers = <int>[];
+                  for (int i = 0; i < index; i++) {
+                    if (!crossed.contains(numbers[i])) {
+                      skippedNumbers.add(numbers[i]);
+                    }
+                  }
+                  if (skippedNumbers.isNotEmpty) {
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Qwixx Rule: Skipping ${skippedNumbers.join(', ')} means you cannot cross them later!',
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.orange.shade800,
+                        duration: const Duration(seconds: 4),
+                      ),
+                    );
+                  }
                   newList.add(number);
                 }
                 onRowUpdate(newList);
@@ -382,9 +517,9 @@ class _QwixxPlayerView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isCrossed
                       ? Colors.white
-                      : baseColor.withValues(alpha: 0.4),
+                      : cellColor.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: baseColor, width: 2),
+                  border: Border.all(color: cellColor, width: 2),
                 ),
                 alignment: Alignment.center,
                 child: isCrossed
@@ -400,16 +535,37 @@ class _QwixxPlayerView extends StatelessWidget {
               ),
             );
           }),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: baseColor, width: 2),
-              color: baseColor.withValues(alpha: 0.4),
-            ),
-            child: const Icon(Icons.lock_outline, color: Colors.black54),
-          ),
+          (() {
+            final isLocked = crossed.contains(QwixxPlayerSheet.lockValue);
+            final lastNumber = numbers.last;
+            final lockColorIndex = QwixxGameState.getCellColorIndex(rowIndex, lastNumber, variant);
+            final lockColor = _getColorForIndex(context, lockColorIndex);
+
+            return GestureDetector(
+              onTap: () {
+                List<int> newList = List.from(crossed);
+                if (isLocked) {
+                  newList.remove(QwixxPlayerSheet.lockValue);
+                } else {
+                  newList.add(QwixxPlayerSheet.lockValue);
+                }
+                onRowUpdate(newList);
+              },
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: lockColor, width: 2),
+                  color: isLocked ? Colors.white : lockColor.withValues(alpha: 0.4),
+                ),
+                child: Icon(
+                  isLocked ? Icons.lock : Icons.lock_outline,
+                  color: isLocked ? Colors.black : Colors.black54,
+                ),
+              ),
+            );
+          })(),
         ],
       ),
     );
