@@ -46,9 +46,41 @@ NexScore is an **Offline-First** application. All reads and immediate writes hit
 - **Web (PWA)**: Uses `sqflite_common_ffi_web` to persist a SQLite database within the browser's IndexedDB. This was a critical architectural choice to ensure PWA users don't lose their data on page reloads.
 
 ### Database Schema
-The database consists of two primary tables:
-1.  **`players`**: Stores player entities with `id`, `name`, `avatarColor`, `ownerUid` (for sync), and `isDeleted` (for soft deletes).
-2.  **`sessions`**: Stores game sessions. Because games like Wizard and Qwixx have vastly different scoring structures, the `gameData` column stores JSON-serialized game state, while `scores` stores a normalized map of `playerId` to final score for easy leaderboard calculation.
+
+The SQLite database consists of three primary tables (schema version 3):
+
+1. **`players`**: Stores player profiles.
+   - `id TEXT PRIMARY KEY`: Universally unique identifier.
+   - `name TEXT NOT NULL`: Display name.
+   - `avatarColor TEXT NOT NULL`: Hex color or theme name for UI avatars.
+   - `emoji TEXT`: Optional avatar emoji icon (added in v2).
+   - `ownerUid TEXT`: Firebase user ID for synchronization ownership.
+   - `isDeleted INTEGER NOT NULL DEFAULT 0`: Soft deletion flag (0 for active, 1 for deleted).
+   - *Index*: `idx_players_is_deleted` on the `isDeleted` column to optimize filtering active players.
+
+2. **`sessions`**: Stores completed and active game sessions.
+   - `id TEXT PRIMARY KEY`: Unique session ID.
+   - `gameType TEXT NOT NULL`: Name/type of the game (e.g., Wizard, Qwixx, Volleyball, Sudoku).
+   - `startTime TEXT NOT NULL`: ISO 8601 string of the start time.
+   - `endTime TEXT`: ISO 8601 string of the end time.
+   - `durationSeconds INTEGER NOT NULL DEFAULT 0`: Played duration.
+   - `players TEXT NOT NULL`: JSON-serialized list of player IDs participating in the session.
+   - `scores TEXT NOT NULL`: JSON-serialized map of `playerId` to their final score.
+   - `gameData TEXT NOT NULL`: Game-specific JSON structure containing scores per round, dice roles, cards dealt, or board states.
+   - `ownerUid TEXT`: Firebase owner ID for synchronization ownership.
+   - `completed INTEGER NOT NULL DEFAULT 0`: Flags whether the game session is finished (1) or in-progress (0).
+   - *Index*: `idx_sessions_start_time` on the `startTime` column to optimize historical list fetches.
+
+3. **`player_groups`**: Stores pre-configured squads/groups of players for faster game creation (added in v3).
+   - `id TEXT PRIMARY KEY`: Group identifier.
+   - `name TEXT NOT NULL`: Custom group name.
+   - `playerIds TEXT NOT NULL`: JSON-serialized list of player IDs belonging to this group.
+
+### Schema Migrations
+
+The database migration logic resides in `DatabaseService._onUpgrade` and handles the following schema upgrades:
+- **v1 to v2**: Adds the `emoji` column to the `players` table dynamically.
+- **v2 to v3**: Creates the `player_groups` table to support preset player squads.
 
 ## Synchronization Engine
 

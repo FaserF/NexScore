@@ -84,146 +84,95 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                _SectionHeader(title: l10n.get('settings_theme')),
-                GlassContainer(
-                  borderRadius: 24,
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
-                    ),
-                    leading: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.brightness_medium,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
+                Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: ExpansionTile(
+                    initiallyExpanded: true,
+                    leading: const Icon(Icons.tune),
                     title: Text(
-                      l10n.get('settings_theme'),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      l10n.get('settings_section_general'),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    trailing: DropdownButton<ThemeMode>(
-                      value: settings.themeMode,
-                      underline: const SizedBox(),
-                      icon: const Icon(Icons.keyboard_arrow_down),
-                      borderRadius: BorderRadius.circular(16),
-                      onChanged: (mode) {
-                        if (mode != null) {
-                          ref
-                              .read(settingsProvider.notifier)
-                              .setThemeMode(mode);
-                        }
-                      },
-                      items: [
-                        DropdownMenuItem(
-                          value: ThemeMode.system,
-                          child: Text(l10n.get('settings_theme_system')),
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.brightness_medium),
+                        title: Text(l10n.get('settings_theme')),
+                        trailing: DropdownButton<ThemeMode>(
+                          value: settings.themeMode,
+                          underline: const SizedBox(),
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                          borderRadius: BorderRadius.circular(16),
+                          onChanged: (mode) {
+                            if (mode != null) {
+                              ref
+                                  .read(settingsProvider.notifier)
+                                  .setThemeMode(mode);
+                            }
+                          },
+                          items: [
+                            DropdownMenuItem(
+                              value: ThemeMode.system,
+                              child: Text(l10n.get('settings_theme_system')),
+                            ),
+                            DropdownMenuItem(
+                              value: ThemeMode.light,
+                              child: Text(l10n.get('settings_theme_light')),
+                            ),
+                            DropdownMenuItem(
+                              value: ThemeMode.dark,
+                              child: Text(l10n.get('settings_theme_dark')),
+                            ),
+                          ],
                         ),
-                        DropdownMenuItem(
-                          value: ThemeMode.light,
-                          child: Text(l10n.get('settings_theme_light')),
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
+                        leading: const Icon(Icons.language),
+                        title: Text(l10n.get('settings_language')),
+                        trailing: DropdownButton<String?>(
+                          value: settings.locale?.languageCode,
+                          underline: const SizedBox(),
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                          borderRadius: BorderRadius.circular(16),
+                          onChanged: (code) {
+                            final locale = code != null ? Locale(code) : null;
+                            ref.read(settingsProvider.notifier).setLocale(locale);
+                          },
+                          items: [
+                            DropdownMenuItem(
+                              value: null,
+                              child: Text(l10n.get('settings_theme_system')),
+                            ),
+                            DropdownMenuItem(
+                              value: 'en',
+                              child: Text(l10n.get('settings_language_en')),
+                            ),
+                            DropdownMenuItem(
+                              value: 'de',
+                              child: Text(l10n.get('settings_language_de')),
+                            ),
+                          ],
                         ),
-                        DropdownMenuItem(
-                          value: ThemeMode.dark,
-                          child: Text(l10n.get('settings_theme_dark')),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 24),
-                _SectionHeader(title: l10n.get('settings_language')),
-                GlassContainer(
-                  borderRadius: 24,
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
-                    ),
-                    leading: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.tertiary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.language,
-                        color: Theme.of(context).colorScheme.tertiary,
-                      ),
-                    ),
+                const SizedBox(height: 16),
+                Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: ExpansionTile(
+                    initiallyExpanded: true,
+                    leading: const Icon(Icons.volume_up),
                     title: Text(
-                      l10n.get('settings_language'),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      l10n.get('settings_section_audio_profile'),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    trailing: DropdownButton<String?>(
-                      value: settings.locale?.languageCode,
-                      underline: const SizedBox(),
-                      icon: const Icon(Icons.keyboard_arrow_down),
-                      borderRadius: BorderRadius.circular(16),
-                      onChanged: (code) {
-                        final locale = code != null ? Locale(code) : null;
-                        ref.read(settingsProvider.notifier).setLocale(locale);
-                      },
-                      items: [
-                        DropdownMenuItem(
-                          value: null,
-                          child: Text(l10n.get('settings_theme_system')),
-                        ),
-                        DropdownMenuItem(
-                          value: 'en',
-                          child: Text(l10n.get('settings_language_en')),
-                        ),
-                        DropdownMenuItem(
-                          value: 'de',
-                          child: Text(l10n.get('settings_language_de')),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _SectionHeader(title: l10n.get('settings_sfx')),
-                GlassContainer(
-                  borderRadius: 24,
-                  child: Column(
                     children: [
                       SwitchListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
-                        ),
-                        secondary: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.secondary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.volume_up,
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
-                        ),
-                        title: Text(
-                          l10n.get('settings_sfx'),
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                        title: Text(l10n.get('settings_sfx')),
                         subtitle: Text(
                           l10n.get('settings_sfx_desc'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                          style: const TextStyle(fontSize: 12),
                         ),
                         value: settings.sfxEnabled,
                         onChanged: (val) {
@@ -231,7 +180,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         },
                       ),
                       if (settings.sfxEnabled) ...[
-                        const Divider(height: 1),
                         _SubSettingSwitch(
                           title: l10n.get('settings_sfx_beep'),
                           value: settings.sfxBeepEnabled,
@@ -254,92 +202,131 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               .setSfxOtherEnabled(val),
                         ),
                       ],
+                      const Divider(height: 1),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              l10n.get('settings_host_profile'),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 12),
+                            TextField(
+                              controller: TextEditingController(
+                                text: settings.hostName,
+                              ),
+                              onChanged: (val) => ref
+                                  .read(settingsProvider.notifier)
+                                  .setHostName(val),
+                              decoration: InputDecoration(
+                                labelText: l10n.get('settings_host_name'),
+                                prefixIcon: const Icon(Icons.person),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Text(
+                                  l10n.get('settings_host_color'),
+                                  style: const TextStyle(fontWeight: FontWeight.w600),
+                                ),
+                                const Spacer(),
+                                ...[
+                                  '#4287f5',
+                                  '#f54242',
+                                  '#42f560',
+                                  '#f5d142',
+                                  '#a142f5',
+                                ].map((colorStr) {
+                                  final color = Color(
+                                    int.parse(colorStr.replaceFirst('#', '0xff')),
+                                  );
+                                  final isSelected = settings.hostColor == colorStr;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: GestureDetector(
+                                      onTap: () => ref
+                                          .read(settingsProvider.notifier)
+                                          .setHostColor(colorStr),
+                                      child: Container(
+                                        width: 32,
+                                        height: 32,
+                                        decoration: BoxDecoration(
+                                          color: color,
+                                          shape: BoxShape.circle,
+                                          border: isSelected
+                                              ? Border.all(
+                                                  color: Theme.of(context).colorScheme.onSurface,
+                                                  width: 2,
+                                                )
+                                              : null,
+                                        ),
+                                        child: isSelected
+                                            ? const Icon(
+                                                Icons.check,
+                                                size: 16,
+                                                color: Colors.white,
+                                              )
+                                            : null,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            OutlinedButton.icon(
+                              onPressed: () => context.push('/multiplayer'),
+                              icon: const Icon(Icons.wifi_tethering),
+                              label: Text(l10n.get('multiplayer_hub')),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
-                if (showPwaInstall) ...[
-                  _SectionHeader(title: l10n.get('settings_pwa_install')),
-                  AnimatedScaleButton(
-                    onPressed: () async {
-                      final handled = await pwa.showInstallPrompt();
-                      if (context.mounted) {
-                        if (!handled) {
-                          // If prompt wasn't shown (e.g. iOS or prompt blocked), show the guide
-                          PWAInstallDialog.show(context);
-                        } else {
-                          setState(() {});
-                        }
-                      }
-                    },
-                    child: GlassContainer(
-                      borderRadius: 24,
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
-                        ),
-                        leading: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.secondary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.install_mobile,
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
-                        ),
-                        title: Text(
-                          l10n.get('settings_pwa_install'),
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        subtitle: Text(
-                          l10n.get('settings_pwa_install_desc'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                      ),
+                const SizedBox(height: 16),
+                Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: ExpansionTile(
+                    leading: const Icon(Icons.settings_applications),
+                    title: Text(
+                      l10n.get('settings_section_advanced'),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-                _SectionHeader(title: l10n.get('backup_local_section')),
-                GlassContainer(
-                  borderRadius: 24,
-                  child: Column(
                     children: [
+                      if (showPwaInstall) ...[
+                        ListTile(
+                          leading: const Icon(Icons.install_mobile),
+                          title: Text(l10n.get('settings_pwa_install')),
+                          subtitle: Text(
+                            l10n.get('settings_pwa_install_desc'),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                          onTap: () async {
+                            final handled = await pwa.showInstallPrompt();
+                            if (context.mounted) {
+                              if (!handled) {
+                                PWAInstallDialog.show(context);
+                              } else {
+                                setState(() {});
+                              }
+                            }
+                          },
+                        ),
+                        const Divider(height: 1),
+                      ],
                       ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
-                        ),
-                        leading: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.upload_file,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                        title: Text(
-                          l10n.get('backup_local_export'),
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        subtitle:
-                            settings.lastBackupTime != null &&
+                        leading: const Icon(Icons.upload_file),
+                        title: Text(l10n.get('backup_local_export')),
+                        subtitle: settings.lastBackupTime != null &&
                                 settings.lastBackupProvider == 'local'
                             ? Text(
                                 '${l10n.get('last_backup')}: ${settings.lastBackupTime!.day}.${settings.lastBackupTime!.month}.${settings.lastBackupTime!.year}',
@@ -379,27 +366,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                       const Divider(height: 1),
                       ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
-                        ),
-                        leading: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.tertiary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.download_for_offline,
-                            color: Theme.of(context).colorScheme.tertiary,
-                          ),
-                        ),
-                        title: Text(
-                          l10n.get('backup_local_import'),
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                        leading: const Icon(Icons.download_for_offline),
+                        title: Text(l10n.get('backup_local_import')),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () async {
                           final messenger = ScaffoldMessenger.of(context);
@@ -408,7 +376,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 .read(localBackupServiceProvider)
                                 .importBackup();
                             if (success && context.mounted) {
-                              // Invalidate players and sessions to refresh UI
                               ref.invalidate(playersProvider);
                               ref.invalidate(sessionsProvider);
                               messenger.showSnackBar(
@@ -434,45 +401,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           }
                         },
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _SectionHeader(title: l10n.get('settings_debug_mode')),
-                GlassContainer(
-                  borderRadius: 24,
-                  child: Column(
-                    children: [
+                      const Divider(height: 1),
                       SwitchListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
-                        ),
-                        secondary: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.error.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.bug_report,
-                            color: Theme.of(context).colorScheme.error,
-                          ),
-                        ),
-                        title: Text(
-                          l10n.get('settings_debug_mode'),
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                        title: Text(l10n.get('settings_debug_mode')),
                         subtitle: Text(
                           l10n.get('settings_debug_mode_desc'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                          ),
+                          style: const TextStyle(fontSize: 12),
                         ),
                         value: settings.debugMode,
                         onChanged: (val) {
@@ -481,147 +415,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                       const Divider(height: 1),
                       ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
-                        ),
-                        leading: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.tertiary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.ios_share,
-                            color: Theme.of(context).colorScheme.tertiary,
-                          ),
-                        ),
-                        title: Text(
-                          l10n.get('settings_export_logs'),
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                        leading: const Icon(Icons.ios_share),
+                        title: Text(l10n.get('settings_export_logs')),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () async {
                           await AppLogger.exportLogs();
                         },
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _SectionHeader(title: l10n.get('settings_data')),
-                AnimatedScaleButton(
-                  onPressed: () => _confirmReset(context, ref, l10n),
-                  child: GlassContainer(
-                    borderRadius: 24,
-                    color: Colors.red.withValues(alpha: 0.05),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 8,
-                      ),
-                      leading: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
+                      const Divider(height: 1),
+                      ListTile(
+                        leading: const Icon(Icons.delete_forever, color: Colors.red),
+                        title: Text(
+                          l10n.get('settings_db_reset'),
+                          style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                         ),
-                        child: const Icon(
-                          Icons.delete_forever,
-                          color: Colors.red,
-                        ),
-                      ),
-                      title: Text(
-                        l10n.get('settings_db_reset'),
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      trailing: const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _SectionHeader(title: l10n.get('settings_host_profile')),
-                GlassContainer(
-                  borderRadius: 24,
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: TextEditingController(
-                          text: settings.hostName,
-                        ),
-                        onChanged: (val) => ref
-                            .read(settingsProvider.notifier)
-                            .setHostName(val),
-                        decoration: InputDecoration(
-                          labelText: l10n.get('settings_host_name'),
-                          prefixIcon: const Icon(Icons.person),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Text(
-                            l10n.get('settings_host_color'),
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          const Spacer(),
-                          ...[
-                            '#4287f5',
-                            '#f54242',
-                            '#42f560',
-                            '#f5d142',
-                            '#a142f5',
-                          ].map((colorStr) {
-                            final color = Color(
-                              int.parse(colorStr.replaceFirst('#', '0xff')),
-                            );
-                            final isSelected = settings.hostColor == colorStr;
-                            return Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: GestureDetector(
-                                onTap: () => ref
-                                    .read(settingsProvider.notifier)
-                                    .setHostColor(colorStr),
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    color: color,
-                                    shape: BoxShape.circle,
-                                    border: isSelected
-                                        ? Border.all(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
-                                            width: 2,
-                                          )
-                                        : null,
-                                  ),
-                                  child: isSelected
-                                      ? const Icon(
-                                          Icons.check,
-                                          size: 16,
-                                          color: Colors.white,
-                                        )
-                                      : null,
-                                ),
-                              ),
-                            );
-                          }),
-                        ],
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.red),
+                        onTap: () => _confirmReset(context, ref, l10n),
                       ),
                     ],
                   ),

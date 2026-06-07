@@ -104,6 +104,75 @@ FactQuest is the ultimate trivia companion for road trips – present true, veri
 - **Detailed Explanations**: Each fact comes with a rich, multi-sentence explanation giving context and background.
 - **Multiplayer Support**: Plays seamlessly in a group – just pass the phone around or use the multiplayer hub.
 
+## 🏐 Volleyball
+
+NexScore offers a comprehensive scoreboard built for indoor and beach volleyball, matching professional regional and national association regulations.
+
+*   **Rule Set Presets**:
+    *   **DVV (German Volleyball Association)**: Configured for competitive standard formats (best-of-5 sets, first four sets to 25 points, deciding fifth set to 15 points, with 2 timeouts per set).
+    *   **BVV (Bavarian Volleyball Association) Freizeitliga**: Optimized for recreational and senior leagues where matches always play exactly 3 sets to 25 points (no shortened deciding set).
+    *   **Beach Volleyball**: Custom settings for best-of-3 sets (sets to 21 points, deciding set to 15 points, with 1 timeout per set).
+*   **Court Side-Switching Rules**:
+    *   **Beach Format**: Prompts automatic side-switching every 7 points in standard sets and every 5 points in deciding sets to balance out wind and sun advantages.
+    *   **Mid-Set Switches**: Automates side-swapping once a team reaches 8 points in a 15-point deciding set (or 13 points in a 25-point set).
+*   **Referee & Scorekeeper Panel**:
+    *   **Hand Signals Reference**: Quick-access visual reference guidelines for standard referee hand signals.
+    *   **Timeline & Event Log**: Logs point progression, serve sequences, and exactly when timeouts were requested relative to the current score.
+*   **Match Reports & PDF Export**:
+    *   Capture signatures of both team captains and the chief referee directly on the screen at match completion.
+    *   Generate and preview a standardized PDF match report (`VolleyballPdfService`) containing complete sets, serving histories, timeout timestamps, league point distributions (e.g. 3-0 vs 2-1 points splitting), and embedded signatures.
+
+---
+
+## 🧩 Sudoku
+
+A fully featured Sudoku engine offering multiple play modes, local campaigns, and multiplayer support.
+
+*   **Campaign Mode**:
+    *   Includes **20 handcrafted campaign levels** spanning four board formats (6x6 mini, 9x9 standard, diagonal X-Sudoku, hyper Windoku).
+    *   Each stage includes specific target times, layout descriptions, and a pre-configured seed value to unlock progression.
+*   **Custom Board Builder (Classic, Zen, Time Attack)**:
+    *   **Classic**: Standard puzzle rules with a 3-mistake limit.
+    *   **Zen**: Relaxing gameplay with no mistake limits, timers, or score penalties.
+    *   **Time Attack**: Solve puzzles under a strict countdown timer.
+*   **Visual Themes**: Custom interface profiles (Aether, Zen, Midnight, Cyberpunk).
+*   **Core Engine Services**:
+    *   **Generator**: Uses seeds to build valid puzzles across four difficulties (Easy, Medium, Hard, Expert).
+    *   **Analyzer**: Validates board state uniqueness and generates logical hint step explanations.
+    *   **Share Service**: Creates small URL hashes containing board setups to share puzzles via standard link parameters.
+    *   **Stats & Sync**: Tracks historical speeds, mistake ratios, and synchronizes progression across devices.
+
+---
+
+## 🎮 Interactive Digital Game Engines
+
+Unlike standard scorecards that act as passive note pads, NexScore's digital simulators contain fully active game logic engines:
+
+*   **Digital Simulators**:
+    *   **Wizard Digital**: Complete card-trick calculator. Simulates dealing cards, accepting bids, validating trick-taking card priorities (wizards, jesters, trumps), and resolving points per round automatically.
+    *   **Kniffel Digital**: Interactive Yahtzee scorecard. Tracks die rolls, locks chosen categories, and dynamically computes upper section bonuses (+35 points) and multiple Yahtzee bonuses.
+    *   **Phase 10 Digital**: Tracks player phases, handles stage qualifications, and automatically enforces phase requirements before advancing.
+    *   **Qwixx Digital**: Digitally registers crossed numbers across red, yellow, green, and blue rows, locks colors, checks misthrows, and calculates total scores using triangular series.
+    *   **Rommé (Rummy) / Schafkopf / Arschloch**: Features custom deck generators (including Bavarian cards for Schafkopf), card-passing rules, role distribution tracking (e.g. President, Vice President, etc.), and turn sequence validations.
+*   **Bot Integration**: Play offline against configurable virtual bot players.
+
+---
+
+## 🍻 Drinking Game Customizations
+
+Tailor the party feature sets inside **SipDeck** and **BuzzTap** to your group's dynamic:
+
+*   **Granular Task Filters**:
+    *   **Dares**: Toggle high-intensity challenges.
+    *   **Social**: Restrict or enable tasks requiring interactions with strangers.
+    *   **Messaging**: Toggle prompts requiring text messages or phone interactions.
+    *   **Physical**: Filter out physical coordination stunts.
+*   **Sip Modifiers & Intensity Presets**:
+    *   **Chill Preset**: Low sip requirements, higher frequency of water-hydration break reminders.
+    *   **Extreme Preset**: Increased sip penalties and frequent wild cards.
+    *   **Hydration Alerts**: Automated reminders adjust dynamically based on chosen intensity to ensure safe play.
+    *   **2-Player Optimization**: Automatically flags and hides cards requesting 3+ participants when playing in a dual player setup.
+
 ---
 
 !!! info "Suggestions?"

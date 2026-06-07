@@ -100,3 +100,50 @@ We use GitHub Actions to automate testing and deployment. Merging code into `mai
 4. Uploads the combined artifact to GitHub Pages.
 
 **Note on Manual Deployments**: You can manually trigger this workflow from the GitHub Actions tab. It accepts inputs for `deploy_pwa` (boolean, forces the Flutter app to rebuild), `version_name` (string), and `is_beta` (boolean).
+
+## 4. Platform Configurations & Architecture
+
+NexScore utilizes specialized abstractions to ensure compiling across both native applications and PWAs runs smoothly.
+
+### Local JSON Backup & Restore
+*   **Implementation**: `LocalBackupService` manages exporting and importing full database backups.
+*   **Native vs. Web Storage Handlers**:
+    *   **Native**: Uses `file_picker` to prompt the system file explorer to save and read the backup `.json` file.
+    *   **Web (PWA)**: Uses conditional platform imports (`local_backup_stub.dart` if compile targets native, or `local_backup_web.dart` on the Web) to construct blob payloads and trigger direct browser downloads.
+
+### PWA Engine & Update Prompts
+*   **Platform Abstractions**: Files like `pwa_prompt_stub.dart` and `pwa_prompt_web.dart` separate native logic from web logic.
+*   **Update Notification Service**: `pwa_update_service_web.dart` registers a callback to detect service worker updates. When a new version is detected, it triggers a custom visual banner asking the user to update and reloads the browser to apply changes.
+
+### Notification System & Permissions
+*   **Local Notifications**: `NotificationService` wraps `flutter_local_notifications` for cross-platform local alerts.
+*   **Use Cases**: Alerts users for turn changes in multiplayer lobbies, server discovery events, and background match starters.
+*   **Permission Screen**: A dedicated screen (`NotificationPermissionScreen`) guides users through requesting system permissions on startup.
+
+---
+
+## 5. Developer Tools & Scripts
+
+The repository includes utility scripts located in `/scripts` to automate development tasks.
+
+### Codebase Manifest Generator (`generate_manifest.py`)
+This script scans the entire `/lib` codebase and updates `project_manifest.json`.
+*   **Usage**:
+    ```bash
+    python scripts/generate_manifest.py
+    ```
+*   **Mechanics**:
+    *   Maps the directory structure recursively.
+    *   Identifies Riverpod providers, UI widgets, services, and models.
+    *   Registers connections between modules for quick reference.
+
+### Release & Version Manager (`version_manager.py`)
+A python script designed to automate release management and deployment pipelines.
+*   **Usage**:
+    ```bash
+    python scripts/version_manager.py --release-type [stable|beta|dev] --bump-type [major|minor|patch|none]
+    ```
+*   **Key Functions**:
+    *   **Tag Parsing**: Resolves version formats (e.g. `v1.2.3b1` or `v1.2.3-dev4`).
+    *   **Automated Bumps**: Increments semver properties based on project tags.
+    *   **Pipeline Synchronization**: Feeds updated tags into GitHub actions for compilation and Docker tag deployments.

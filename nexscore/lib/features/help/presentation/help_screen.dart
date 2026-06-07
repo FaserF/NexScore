@@ -74,6 +74,55 @@ class HelpScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 _SectionHeader(
+                  icon: Icons.question_answer_outlined,
+                  title: l10n.get('help_faq'),
+                ),
+                Card(
+                  child: ExpansionTile(
+                    title: Text(
+                      l10n.get('help_faq_q1'),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(l10n.get('help_faq_a1')),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  child: ExpansionTile(
+                    title: Text(
+                      l10n.get('help_faq_q2'),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(l10n.get('help_faq_a2')),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  child: ExpansionTile(
+                    title: Text(
+                      l10n.get('help_faq_q3'),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(l10n.get('help_faq_a3')),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _SectionHeader(
                   icon: Icons.feedback_outlined,
                   title: 'Feedback',
                 ),

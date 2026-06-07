@@ -71,12 +71,20 @@ class MultiplayerHubScreen extends ConsumerWidget {
                       icon: const Icon(Icons.add_box),
                       label: Text(l10n.get('multiplayer_host')),
                       style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(16),
                         textStyle: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.get('multiplayer_host_desc'),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                     ),
                     const SizedBox(height: 24),
                     FilledButton.tonalIcon(
@@ -84,10 +92,49 @@ class MultiplayerHubScreen extends ConsumerWidget {
                       icon: const Icon(Icons.login),
                       label: Text(l10n.get('multiplayer_join')),
                       style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(16),
                         textStyle: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.get('multiplayer_join_desc'),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(height: 32),
+                    Card(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  size: 20,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  l10n.get('multiplayer_diagnostics'),
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              l10n.get('multiplayer_error_offline_desc'),
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
                         ),
                       ),
                     ),

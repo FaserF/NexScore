@@ -22,6 +22,20 @@ class GameSetupScreen extends ConsumerStatefulWidget {
 class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
   final Set<String> _selectedPlayerIds = {};
 
+  static const List<String> _aestheticColors = [
+    '#F44336', // Red
+    '#E91E63', // Pink
+    '#9C27B0', // Purple
+    '#3F51B5', // Indigo
+    '#2196F3', // Blue
+    '#00BCD4', // Cyan
+    '#009688', // Teal
+    '#4CAF50', // Green
+    '#FFC107', // Amber
+    '#FF9800', // Orange
+    '#FF5722', // Deep Orange
+  ];
+
   int get _minPlayers {
     switch (widget.gameId) {
       case 'schafkopf':
@@ -75,10 +89,43 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
                 child: Text(
                   l10n.getWith('game_setup_choose_players', [gameName]),
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+              Card(
+                margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton.icon(
+                          icon: const Icon(Icons.bookmarks_outlined),
+                          label: Text(l10n.get('presets_load')),
+                          onPressed: () => _showPresetsSheet(context, ref),
+                        ),
+                        TextButton.icon(
+                          icon: const Icon(Icons.group_add_outlined),
+                          label: Text(l10n.get('presets_save')),
+                          onPressed: _selectedPlayerIds.isEmpty
+                              ? null
+                              : () => _showSaveGroupDialog(context, ref),
+                        ),
+                        TextButton.icon(
+                          icon: const Icon(Icons.person_add),
+                          label: Text(l10n.get('add_player')),
+                          onPressed: () => _showAddPlayerDialog(context, ref),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               Expanded(
@@ -180,41 +227,106 @@ class _GameSetupScreenState extends ConsumerState<GameSetupScreen> {
   void _showAddPlayerDialog(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
+    final defaultColorIndex = DateTime.now().microsecondsSinceEpoch % _aestheticColors.length;
+    String selectedColor = _aestheticColors[defaultColorIndex];
 
     showDialog(
       context: context,
       builder: (dialogContext) {
-        void submit() {
-          final name = controller.text.trim();
-          if (name.isNotEmpty) {
-            final newPlayer = Player(
-              id: const Uuid().v4(),
-              name: name,
-              avatarColor: '#2196F3',
-            );
-            ref.read(playersProvider.notifier).addPlayer(newPlayer);
-            setState(() {
-              _selectedPlayerIds.add(newPlayer.id);
-            });
-          }
-          Navigator.pop(dialogContext);
-        }
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            void submit() {
+              final name = controller.text.trim();
+              if (name.isNotEmpty) {
+                final newPlayer = Player(
+                  id: const Uuid().v4(),
+                  name: name,
+                  avatarColor: selectedColor,
+                );
+                ref.read(playersProvider.notifier).addPlayer(newPlayer);
+                setState(() {
+                  _selectedPlayerIds.add(newPlayer.id);
+                });
+              }
+              Navigator.pop(dialogContext);
+            }
 
-        return AlertDialog(
-          title: Text(l10n.get('add_player')),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(hintText: l10n.get('player_name')),
-            autofocus: true,
-            onSubmitted: (_) => submit(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(l10n.get('cancel')),
-            ),
-            FilledButton(onPressed: submit, child: Text(l10n.get('add'))),
-          ],
+            return AlertDialog(
+              title: Text(l10n.get('add_player')),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: controller,
+                    decoration: InputDecoration(hintText: l10n.get('player_name')),
+                    autofocus: true,
+                    onSubmitted: (_) => submit(),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.get('settings_host_color'),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _aestheticColors.length,
+                      itemBuilder: (context, index) {
+                        final colorHex = _aestheticColors[index];
+                        final colorVal = Color(
+                          int.parse(colorHex.replaceFirst('#', '0xff')),
+                        );
+                        final isSelected = selectedColor == colorHex;
+                        return GestureDetector(
+                          onTap: () {
+                            setDialogState(() {
+                              selectedColor = colorHex;
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: colorVal,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.transparent,
+                                width: 3,
+                              ),
+                            ),
+                            child: isSelected
+                                ? Icon(
+                                    Icons.check,
+                                    size: 18,
+                                    color: colorVal.computeLuminance() > 0.5
+                                        ? Colors.black
+                                        : Colors.white,
+                                  )
+                                : null,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(l10n.get('cancel')),
+                ),
+                FilledButton(onPressed: submit, child: Text(l10n.get('add'))),
+              ],
+            );
+          },
         );
       },
     );
