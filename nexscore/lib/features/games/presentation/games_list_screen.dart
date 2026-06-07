@@ -8,7 +8,14 @@ import '../../../core/theme/widgets/glass_container.dart';
 import '../../../core/utils/app_version.dart';
 import '../../../core/pwa/pwa_prompt.dart' as pwa;
 import '../../../core/theme/widgets/pwa_update_banner.dart';
+import '../../../core/services/apk_verification_service.dart';
+import '../../../core/presentation/apk_verification_dialog.dart';
 import 'widgets/resume_banner.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../settings/provider/settings_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 
 /// The main game selection screen shown at app start.
 /// Displays all supported games as rich cards with name, icon, and description.
@@ -22,11 +29,89 @@ class GamesListScreen extends ConsumerStatefulWidget {
 class _GamesListScreenState extends ConsumerState<GamesListScreen> {
   String _searchQuery = '';
   String? _selectedTag;
+  bool _verificationDialogShown = false;
 
   @override
   void initState() {
     super.initState();
     _initPwaListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkApkVerification();
+      _checkPwaVersionUpdate();
+    });
+  }
+
+  void _checkApkVerification() {
+    if (_verificationDialogShown) return;
+    final state = ref.read(apkVerificationProvider);
+    state.whenData((result) {
+      if (result == ApkVerificationResult.mismatch || result == ApkVerificationResult.networkError) {
+        _verificationDialogShown = true;
+        ApkVerificationDialog.show(context, result);
+      }
+    });
+  }
+
+  Future<void> _checkPwaVersionUpdate() async {
+    if (!kIsWeb) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final prevVer = prefs.getString('pwa_last_known_version');
+    final prevChannel = prefs.getString('pwa_last_known_channel');
+
+    final currentVer = AppVersion.current;
+    final currentChannel = ref.read(settingsProvider).updateChannel;
+
+    if (prevVer != null && (prevVer != currentVer || prevChannel != currentChannel)) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            final l10n = AppLocalizations.of(context);
+            final title = l10n.get('pwa_updated_title');
+            final desc = l10n.getWith('pwa_updated_desc', [
+              prevVer,
+              prevChannel ?? 'stable',
+              currentVer,
+              currentChannel,
+            ]);
+            return AlertDialog(
+              title: Text(title.isNotEmpty ? title : 'PWA Updated'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(desc.isNotEmpty ? desc : 'NexScore has been updated!'),
+                    const SizedBox(height: 16),
+                    TextButton.icon(
+                      onPressed: () async {
+                        final tag = currentVer.split('+').first;
+                        final url = Uri.parse('https://github.com/FaserF/NexScore/releases/tag/v$tag');
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                        }
+                      },
+                      icon: const Icon(Icons.open_in_new),
+                      label: const Text('GitHub Changelog'),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+
+    await prefs.setString('pwa_last_known_version', currentVer);
+    await prefs.setString('pwa_last_known_channel', currentChannel);
   }
 
   void _initPwaListeners() {
@@ -48,6 +133,18 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
   @override
   Widget build(BuildContext context) {
     final ref = this.ref;
+
+    ref.listen<AsyncValue<ApkVerificationResult>>(apkVerificationProvider, (previous, next) {
+      if (!_verificationDialogShown) {
+        next.whenData((result) {
+          if (result == ApkVerificationResult.mismatch || result == ApkVerificationResult.networkError) {
+            _verificationDialogShown = true;
+            ApkVerificationDialog.show(context, result);
+          }
+        });
+      }
+    });
+
     final l10n = AppLocalizations.of(context);
     final allGames = _gameEntries(context, l10n);
     final favorites = ref.watch(favoritesProvider);

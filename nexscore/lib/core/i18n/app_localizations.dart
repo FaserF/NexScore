@@ -253,6 +253,9 @@ class AppLocalizations {
       'winner_share_text': 'I just won {0} on NexScore! 🏆',
       'winner_banner': 'WINNER!',
       'sudoku_analyzer_explanation': 'ANALYZER EXPLANATION',
+      'pwa_updated_title': 'PWA Updated!',
+      'pwa_updated_desc': 'NexScore PWA was successfully updated from version {0} ({1}) to {2} ({3}).',
+
 
 
 
@@ -2767,6 +2770,14 @@ class AppLocalizations {
       'sudoku_stats_avg_time': 'Average Time',
       'sudoku_stats_streak': 'Current Streak',
       'sudoku_stats_longest_streak': 'Longest Streak',
+      'apk_verify_title': 'App Security Check',
+      'apk_verify_mismatch_desc': 'The integrity check of this application failed. The signature/hash of this APK does not match the official release published on GitHub.',
+      'apk_verify_network_desc': 'No internet connection. The app could not verify if it has been tampered with or modified. Please check your network connection.',
+      'apk_verify_danger_headline': 'Potential Dangers:',
+      'apk_verify_dangers': '• Keyloggers / Spyware: Third parties could steal your passwords or personal data.\n• Malware: Modified apps can run malicious background code.\n• Data Leakage: Your game history or cloud logins could be compromised.',
+      'apk_verify_checkbox': 'I understand the risks and want to proceed anyway.',
+      'apk_verify_btn_proceed': 'Proceed',
+      'apk_verify_btn_retry': 'Retry Connection',
     },
     'de': {
       // ── Navigation
@@ -2940,6 +2951,9 @@ class AppLocalizations {
       'winner_share_text': 'Ich habe gerade {0} auf NexScore gewonnen! 🏆',
       'winner_banner': 'GEWINNER!',
       'sudoku_analyzer_explanation': 'ANALYSE-ERKLÄRUNG',
+      'pwa_updated_title': 'PWA aktualisiert!',
+      'pwa_updated_desc': 'Die NexScore PWA wurde erfolgreich von Version {0} ({1}) auf {2} ({3}) aktualisiert.',
+
 
 
       'desc_buzztap':
@@ -5565,6 +5579,14 @@ class AppLocalizations {
       'sudoku_stats_avg_time': 'Durchschnittszeit',
       'sudoku_stats_streak': 'Aktuelle Gewinnserie',
       'sudoku_stats_longest_streak': 'Längste Gewinnserie',
+      'apk_verify_title': 'Sicherheitsüberprüfung',
+      'apk_verify_mismatch_desc': 'Die Integritätsprüfung dieser Anwendung ist fehlgeschlagen. Der Hash dieser APK stimmt nicht mit dem offiziellen Release auf GitHub überein.',
+      'apk_verify_network_desc': 'Keine Internetverbindung. Die App konnte nicht verifizieren, ob sie manipuliert oder verändert wurde. Bitte überprüfe deine Netzwerkverbindung.',
+      'apk_verify_danger_headline': 'Mögliche Gefahren:',
+      'apk_verify_dangers': '• Keylogger / Spyware: Dritte könnten deine Passwörter oder persönlichen Daten stehlen.\n• Schadsoftware: Modifizierte Apps können schädlichen Code im Hintergrund ausführen.\n• Datenverlust: Dein Spielverlauf oder Cloud-Logins könnten kompromittiert werden.',
+      'apk_verify_checkbox': 'Ich verstehe die Risiken und möchte trotzdem fortfahren.',
+      'apk_verify_btn_proceed': 'Fortfahren',
+      'apk_verify_btn_retry': 'Verbindung erneut versuchen',
     },
   };
 
