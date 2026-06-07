@@ -13,6 +13,8 @@ import '../services/sudoku_generator.dart';
 import '../services/sudoku_sync_service.dart';
 import '../services/sudoku_stats_service.dart';
 import '../services/sudoku_analyzer.dart';
+import '../../settings/provider/settings_provider.dart';
+
 
 class SudokuStateNotifier extends Notifier<SudokuGameState> {
   final List<List<SudokuCell>> _history = [];
@@ -539,21 +541,53 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
   void useHint() {
     if (state.isMultiplayer) return; // No hints in competitive match
 
-    final analysis = SudokuAnalyzer.analyze(state.grid, state.variant);
+    final size = state.variant == SudokuVariant.mini6x6 ? 6 : 9;
+    int? selectedCellIdx;
+    if (state.selectedRow != null && state.selectedCol != null) {
+      selectedCellIdx = state.selectedRow! * size + state.selectedCol!;
+    }
+
+    final analysis = SudokuAnalyzer.analyze(state.grid, state.variant, selectedCellIndex: selectedCellIdx);
     if (analysis == null) return;
 
-    final size = state.variant == SudokuVariant.mini6x6 ? 6 : 9;
     final r = analysis.cellIndex ~/ size;
     final c = analysis.cellIndex % size;
+
+    final settings = ref.read(settingsProvider);
+    final languageCode = settings.locale?.languageCode ?? WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    final isDe = languageCode == 'de';
+
+    String explanation = '';
+    final args = analysis.explanationArgs;
+    if (isDe) {
+      explanation = switch (analysis.explanationKey) {
+        'sudoku_hint_naked_single' => 'Nacktes Einerfeld: In Zeile ${args[0]}, Spalte ${args[1]} kann legal nur die Zahl ${args[2]} eingetragen werden. Alle anderen Zahlen [1-${args[3]}] stehen im Konflikt mit bereits vorhandenen Zahlen in der Zeile, Spalte oder dem Block.',
+        'sudoku_hint_hidden_row' => 'Verstecktes Einerfeld (Zeile): In Zeile ${args[0]} kann die Zahl ${args[1]} legal nur in Spalte ${args[2]} platziert werden. Alle anderen leeren Zellen in dieser Zeile sind durch ${args[1]} in den entsprechenden Spalten oder Blöcken blockiert.',
+        'sudoku_hint_hidden_col' => 'Verstecktes Einerfeld (Spalte): In Spalte ${args[0]} kann die Zahl ${args[1]} legal nur in Zeile ${args[2]} platziert werden. Keine andere leere Zelle in dieser Spalte kann ${args[1]} aufgrund von Zeilen- oder Blockeinschränkungen aufnehmen.',
+        'sudoku_hint_hidden_block' => 'Verstecktes Einerfeld (Block): In Block ${args[0]} hat die Zahl ${args[1]} nur eine gültige Zelle, in die sie passt (Zeile ${args[2]}, Spalte ${args[3]}). Alle anderen leeren Plätze in diesem Block sind durch ${args[1]} in benachbarten Zeilen oder Spalten blockiert.',
+        'sudoku_hint_reveal' => 'Hinweis aufdecken: In Zeile ${args[0]}, Spalte ${args[1]} ist der korrekte Wert ${args[2]}. Nutze logische Elimination, um herauszufinden, warum andere Ziffern blockiert sind!',
+        _ => '',
+      };
+    } else {
+      explanation = switch (analysis.explanationKey) {
+        'sudoku_hint_naked_single' => 'Naked Single: At Row ${args[0]}, Column ${args[1]}, the only number that can legally fit is ${args[2]}. All other numbers [1-${args[3]}] clash with numbers already present in its row, column, or block.',
+        'sudoku_hint_hidden_row' => 'Hidden Single (Row): In Row ${args[0]}, the number ${args[1]} can only be legally placed in Column ${args[2]}. All other empty cells in this row are blocked by ${args[1]} in corresponding columns or blocks.',
+        'sudoku_hint_hidden_col' => 'Hidden Single (Column): In Column ${args[0]}, the number ${args[1]} can only be legally placed in Row ${args[2]}. No other empty cells in this column can accept ${args[1]} due to row or block constraints.',
+        'sudoku_hint_hidden_block' => 'Hidden Single (Block): In Block ${args[0]}, the number ${args[1]} has only one valid cell where it can fit (Row ${args[2]}, Column ${args[3]}). All other empty spaces in this block are blocked by ${args[1]} in neighboring rows or columns.',
+        'sudoku_hint_reveal' => 'Reveal Hint: At Row ${args[0]}, Column ${args[1]}, the correct value is ${args[2]}. Use logical elimination to figure out why other digits are blocked!',
+        _ => '',
+      };
+    }
 
     state = state.copyWith(
       selectedRow: r,
       selectedCol: c,
-      analyzerExplanation: analysis.explanation,
+      analyzerExplanation: explanation,
       highlightedHintCell: analysis.cellIndex,
       hasUsedHint: true,
     );
   }
+
 
   Future<void> _saveCampaignProgress(int levelId) async {
     final prefs = await SharedPreferences.getInstance();

@@ -92,7 +92,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       setState(() => _isMusicPlaying = false);
     } else {
       try {
-        await player.play(UrlSource('https://coderadio-admin.freecodecamp.org/radio/8010/radio.mp3'));
+        await player.play(UrlSource('https://coderadio-relay-nyc.freecodecamp.org/radio/8010/radio.mp3'));
         await player.setVolume(0.25);
         setState(() => _isMusicPlaying = true);
       } catch (e) {
@@ -1058,9 +1058,9 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'ANALYZER EXPLANATION',
-                            style: TextStyle(
+                          Text(
+                            l10n.get('sudoku_analyzer_explanation'),
+                            style: const TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: Colors.amber,
@@ -1530,11 +1530,11 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       final playerScore = state.playerScores['player'] ?? 0;
       final botScore = state.playerScores[botName] ?? 0;
       if (playerScore > botScore) {
-        multiWinner = 'You ($playerScore vs $botScore)';
+        multiWinner = '${l10n.get('winner_you')} ($playerScore ${l10n.get('winner_vs')} $botScore)';
       } else if (botScore > playerScore) {
-        multiWinner = '$botName ($botScore vs $playerScore)';
+        multiWinner = '$botName ($botScore ${l10n.get('winner_vs')} $playerScore)';
       } else {
-        multiWinner = 'Tie ($playerScore each)';
+        multiWinner = '${l10n.get('winner_tie')} ($playerScore ${l10n.get('winner_each')})';
       }
     }
 
@@ -1554,14 +1554,14 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
             const SizedBox(height: 16),
             Text(
               (state.isMultiplayer || state.isVsBots)
-                  ? 'Match Over!'
+                  ? l10n.get('match_over')
                   : (solved ? l10n.get('sudoku_congrats') : l10n.get('sudoku_game_over')),
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colors.primary),
             ),
             const SizedBox(height: 8),
             Text(
               (state.isMultiplayer || state.isVsBots)
-                  ? 'Winner: $multiWinner!'
+                  ? l10n.getWith('winner_label', [multiWinner ?? ''])
                   : (solved
                       ? l10n.getWith('sudoku_solved_in', [_formatTime(state.timeSeconds)])
                       : l10n.get('sudoku_game_over_desc')),

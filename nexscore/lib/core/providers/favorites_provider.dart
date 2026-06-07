@@ -11,10 +11,10 @@ class FavoritesNotifier extends Notifier<Set<String>> {
 
   @override
   Set<String> build() {
-    // Initial state is an empty set.
+    // Initial state includes 'sudoku' as default favorite.
     // _loadFavorites will update this asynchronously.
     _loadFavorites();
-    return {};
+    return {'sudoku'};
   }
 
   Future<void> _loadFavorites() async {
@@ -22,6 +22,8 @@ class FavoritesNotifier extends Notifier<Set<String>> {
     final favList = prefs.getStringList(_favoritesKey);
     if (favList != null) {
       state = favList.toSet();
+    } else {
+      state = {'sudoku'};
     }
   }
 

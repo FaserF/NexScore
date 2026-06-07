@@ -242,6 +242,19 @@ class AppLocalizations {
       'game_settings': 'Game Settings',
       'winner': 'Winner',
       'home_tag_ext': 'Extra',
+      'match_over': 'Match Over!',
+      'winner_label': 'Winner: {0}!',
+      'winner_you': 'You',
+      'winner_tie': 'Tie',
+      'winner_vs': 'vs',
+      'winner_each': 'each',
+      'share_results': 'Share Results',
+      'continue_btn': 'Continue',
+      'winner_share_text': 'I just won {0} on NexScore! 🏆',
+      'winner_banner': 'WINNER!',
+      'sudoku_analyzer_explanation': 'ANALYZER EXPLANATION',
+
+
 
       // ── Help screen
       'help_title': 'Help & Feedback',
@@ -2916,6 +2929,19 @@ class AppLocalizations {
       'game_settings': 'Spiel-Einstellungen',
       'winner': 'Gewinner',
       'home_tag_ext': 'Extra',
+      'match_over': 'Match vorbei!',
+      'winner_label': 'Gewinner: {0}!',
+      'winner_you': 'Du',
+      'winner_tie': 'Unentschieden',
+      'winner_vs': 'gegen',
+      'winner_each': 'jeweils',
+      'share_results': 'Ergebnisse teilen',
+      'continue_btn': 'Weiter',
+      'winner_share_text': 'Ich habe gerade {0} auf NexScore gewonnen! 🏆',
+      'winner_banner': 'GEWINNER!',
+      'sudoku_analyzer_explanation': 'ANALYSE-ERKLÄRUNG',
+
+
       'desc_buzztap':
           'Dynamische challenges und Trinkaufgaben für deine Party.',
 

@@ -107,6 +107,8 @@ class ResumeBanner extends ConsumerWidget {
       context.push('/games/romme-digital');
     } else if (gameId == 'phase10_digital') {
       context.push('/games/phase10-digital');
+    } else if (gameId == 'schafkopf_digital') {
+      context.push('/games/schafkopf-digital');
     } else if (gameId == 'sipdeck') {
       context.push('/games/sipdeck');
     } else if (gameId == 'buzztap') {
@@ -115,6 +117,28 @@ class ResumeBanner extends ConsumerWidget {
       context.push('/games/wayquest');
     } else if (gameId == 'volleyball') {
       context.push('/games/volleyball');
+    } else if (gameId == 'sudoku') {
+      context.push('/games/sudoku');
+    } else if (gameId == 'wizard') {
+      context.push('/games/wizard');
+    } else if (gameId == 'qwixx') {
+      context.push('/games/qwixx');
+    } else if (gameId == 'schafkopf') {
+      context.push('/games/schafkopf');
+    } else if (gameId == 'kniffel') {
+      context.push('/games/kniffel');
+    } else if (gameId == 'phase10') {
+      context.push('/games/phase10');
+    } else if (gameId == 'darts') {
+      context.push('/games/darts');
+    } else if (gameId == 'romme') {
+      context.push('/games/romme');
+    } else if (gameId == 'arschloch') {
+      context.push('/games/arschloch');
+    } else if (gameId == 'generic') {
+      context.push('/games/generic');
+    } else if (gameId == 'factquest') {
+      context.push('/games/factquest');
     }
   }
 }

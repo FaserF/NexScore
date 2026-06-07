@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nexscore/core/i18n/app_localizations.dart';
 import 'package:nexscore/shared/widgets/winner_confetti_overlay.dart';
 
 void main() {
@@ -8,14 +10,21 @@ void main() {
       final controller = WinnerConfettiController();
       await tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('en'),
+          supportedLocales: const [Locale('en'), Locale('de')],
+          localizationsDelegates: const [AppLocalizationsDelegate()],
           home: Scaffold(
-            body: WinnerConfettiOverlay(
-              controller: controller,
-              child: const Text('Game Body'),
+            body: ProviderScope(
+              child: WinnerConfettiOverlay(
+                controller: controller,
+                child: const Text('Game Body'),
+              ),
             ),
           ),
         ),
       );
+
+      await tester.pumpAndSettle();
 
       expect(find.text('Game Body'), findsOneWidget);
     });

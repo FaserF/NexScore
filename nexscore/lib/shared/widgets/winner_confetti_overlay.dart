@@ -7,6 +7,8 @@ import '../../core/providers/audio_provider.dart';
 import '../../core/services/audio_service.dart';
 import '../../core/providers/share_provider.dart';
 import 'shareable_scorecard.dart';
+import '../../core/i18n/app_localizations.dart';
+
 
 /// A reusable confetti celebration overlay widget.
 ///
@@ -114,7 +116,9 @@ class _WinnerConfettiOverlayState extends ConsumerState<WinnerConfettiOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Stack(
+
       children: [
         widget.child,
         // Center-top confetti burst
@@ -201,15 +205,16 @@ class _WinnerConfettiOverlayState extends ConsumerState<WinnerConfettiOverlay> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'WINNER!',
-                        style: TextStyle(
+                      Text(
+                        l10n.get('winner_banner'),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
                           letterSpacing: 3,
                         ),
                       ),
+
                     ],
                   ),
                 ),
@@ -238,12 +243,14 @@ class _WinnerConfettiOverlayState extends ConsumerState<WinnerConfettiOverlay> {
                             winnerColor: widget.controller.winnerColor,
                             finalScores: widget.controller.scores,
                           ),
-                          text:
-                              'I just won ${widget.controller.gameName} on NexScore! 🏆',
+                          text: l10n.getWith(
+                            'winner_share_text',
+                            [widget.controller.gameName],
+                          ),
                         );
                   },
                   icon: const Icon(Icons.share),
-                  label: const Text('Share Results'),
+                  label: Text(l10n.get('share_results')),
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.white.withValues(alpha: 0.2),
                     foregroundColor: Colors.white,
@@ -257,7 +264,7 @@ class _WinnerConfettiOverlayState extends ConsumerState<WinnerConfettiOverlay> {
                 FilledButton.icon(
                   onPressed: () => widget.controller.hide(),
                   icon: const Icon(Icons.replay),
-                  label: const Text('Continue'),
+                  label: Text(l10n.get('continue_btn')),
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.amber,
                     foregroundColor: Colors.black,
@@ -267,6 +274,7 @@ class _WinnerConfettiOverlayState extends ConsumerState<WinnerConfettiOverlay> {
                     ),
                   ),
                 ),
+
               ],
             ),
           ),

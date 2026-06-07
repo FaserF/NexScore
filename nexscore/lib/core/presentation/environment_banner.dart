@@ -28,11 +28,27 @@ class EnvironmentBanner extends StatelessWidget {
 
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: Banner(
-        message: label,
-        location: BannerLocation.topEnd,
-        color: color,
-        child: child,
+      child: Stack(
+        children: [
+          child,
+          Positioned(
+            top: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: ClipRect(
+                child: SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: Banner(
+                    message: label,
+                    location: BannerLocation.topEnd,
+                    color: color,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

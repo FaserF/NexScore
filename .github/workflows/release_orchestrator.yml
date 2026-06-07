@@ -376,7 +376,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Retrieve current release body
-          gh release view ${{ needs.version-calc.outputs.tag_name }} --json body --template '{{.body}}' > release_body.md
+          gh release view ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --json body --template '{{.body}}' > release_body.md
           
           if [ "${{ needs.build-android.result }}" = "success" ]; then
             APK_SHA="${{ needs.build-android.outputs.sha256 }}"
@@ -391,7 +391,7 @@ jobs:
           # Only replace if placeholder was set (meaning it was not already updated in create-release)
           if grep -q "| \*\*Android\*\* | _Building..._ | _TBD_ |" release_body.md; then
             sed -i "s|\| \*\*Android\*\* \| \_Building\...\_ \| \_TBD\_ \||$NEW_ROW|g" release_body.md
-            gh release edit ${{ needs.version-calc.outputs.tag_name }} --notes-file release_body.md
+            gh release edit ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --notes-file release_body.md
           fi
 
   update-release-ios:
@@ -430,7 +430,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Retrieve current release body
-          gh release view ${{ needs.version-calc.outputs.tag_name }} --json body --template '{{.body}}' > release_body.md
+          gh release view ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --json body --template '{{.body}}' > release_body.md
           
           if [ "${{ needs.build-ios.result }}" = "success" ]; then
             IPA_LINK="[NexScore.ipa](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.ipa)"
@@ -444,5 +444,5 @@ jobs:
           # Only replace if placeholder was set (meaning it was not already updated in create-release)
           if grep -q "| \*\*iOS\*\* | _Building..._ | _TBD_ |" release_body.md; then
             sed -i "s|\| \*\*iOS\*\* \| \_Building\...\_ \| \_TBD\_ \||$NEW_ROW|g" release_body.md
-            gh release edit ${{ needs.version-calc.outputs.tag_name }} --notes-file release_body.md
+            gh release edit ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --notes-file release_body.md
           fi

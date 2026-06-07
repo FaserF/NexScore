@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/utils/app_logger.dart';
+import '../../../core/utils/app_version.dart';
+
 
 /// Settings state model.
 class Settings {
@@ -124,7 +126,7 @@ class SettingsNotifier extends Notifier<Settings> {
       sfxBeepEnabled: true,
       sfxFanfareEnabled: true,
       sfxOtherEnabled: true,
-      updateChannel: 'stable',
+      updateChannel: _getDefaultUpdateChannel(),
     );
   }
 
@@ -154,7 +156,8 @@ class SettingsNotifier extends Notifier<Settings> {
         ? DateTime.parse(lastBackupTimeStr)
         : null;
     final lastBackupProvider = prefs.getString(_lastBackupProviderKey);
-    final updateChannel = prefs.getString(_updateChannelKey) ?? 'stable';
+    final updateChannel = prefs.getString(_updateChannelKey) ?? _getDefaultUpdateChannel();
+
 
     state = Settings(
       themeMode: themeMode,
@@ -174,11 +177,22 @@ class SettingsNotifier extends Notifier<Settings> {
     );
   }
 
+  String _getDefaultUpdateChannel() {
+    final ver = AppVersion.current.toLowerCase();
+    if (ver.contains('dev')) {
+      return 'dev';
+    } else if (ver.contains('beta') || ver.contains('b') || ver.startsWith('0.')) {
+      return 'beta';
+    }
+    return 'stable';
+  }
+
   String _generateDefaultName() {
     final random = math.Random();
     final number = 10000 + random.nextInt(90000); // 5-digit random number
     return 'Player#$number';
   }
+
 
   Future<void> setThemeMode(ThemeMode mode) async {
     final prefs = await SharedPreferences.getInstance();

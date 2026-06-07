@@ -3,19 +3,21 @@ import '../models/sudoku_models.dart';
 class AnalysisResult {
   final int cellIndex;
   final int value;
-  final String explanation;
+  final String explanationKey;
+  final List<String> explanationArgs;
 
   const AnalysisResult({
     required this.cellIndex,
     required this.value,
-    required this.explanation,
+    required this.explanationKey,
+    required this.explanationArgs,
   });
 }
 
 class SudokuAnalyzer {
   /// Analyzes the grid to find a logical next step.
   /// Returns the first Naked Single or Hidden Single found, or null if no simple logic applies.
-  static AnalysisResult? analyze(List<SudokuCell> grid, SudokuVariant variant) {
+  static AnalysisResult? analyze(List<SudokuCell> grid, SudokuVariant variant, {int? selectedCellIndex}) {
     final size = variant == SudokuVariant.mini6x6 ? 6 : 9;
 
     // 1. Calculate candidates for all empty cells
@@ -26,7 +28,106 @@ class SudokuAnalyzer {
       }
     }
 
-    // 2. Look for Naked Singles (cell with exactly 1 candidate)
+    // 2. Prioritize selected cell if it is empty
+    if (selectedCellIndex != null && selectedCellIndex >= 0 && selectedCellIndex < grid.length) {
+      final i = selectedCellIndex;
+      if (grid[i].currentValue == 0) {
+        final r = i ~/ size;
+        final c = i % size;
+
+        // Check Naked Single for this cell
+        if (candidates[i].length == 1) {
+          final val = candidates[i].first;
+          return AnalysisResult(
+            cellIndex: i,
+            value: val,
+            explanationKey: 'sudoku_hint_naked_single',
+            explanationArgs: ['${r + 1}', '${c + 1}', '$val', '$size'],
+          );
+        }
+
+        // Check Hidden Single in Row for this cell
+        for (int val = 1; val <= size; val++) {
+          if (candidates[i].contains(val)) {
+            int possibleColsCount = 0;
+            for (int colIdx = 0; colIdx < size; colIdx++) {
+              final idx = r * size + colIdx;
+              if (grid[idx].currentValue == 0 && candidates[idx].contains(val)) {
+                possibleColsCount++;
+              }
+            }
+            if (possibleColsCount == 1) {
+              return AnalysisResult(
+                cellIndex: i,
+                value: val,
+                explanationKey: 'sudoku_hint_hidden_row',
+                explanationArgs: ['${r + 1}', '$val', '${c + 1}'],
+              );
+            }
+          }
+        }
+
+        // Check Hidden Single in Column for this cell
+        for (int val = 1; val <= size; val++) {
+          if (candidates[i].contains(val)) {
+            int possibleRowsCount = 0;
+            for (int rowIdx = 0; rowIdx < size; rowIdx++) {
+              final idx = rowIdx * size + c;
+              if (grid[idx].currentValue == 0 && candidates[idx].contains(val)) {
+                possibleRowsCount++;
+              }
+            }
+            if (possibleRowsCount == 1) {
+              return AnalysisResult(
+                cellIndex: i,
+                value: val,
+                explanationKey: 'sudoku_hint_hidden_col',
+                explanationArgs: ['${c + 1}', '$val', '${r + 1}'],
+              );
+            }
+          }
+        }
+
+        // Check Hidden Single in Block for this cell
+        final boxRows = size == 6 ? 2 : 3;
+        final boxCols = size == 6 ? 3 : 3;
+        final b = (r ~/ boxRows) * (size ~/ boxRows) + (c ~/ boxCols);
+        final startRow = (b ~/ (size ~/ boxRows)) * boxRows;
+        final startCol = (b % (size ~/ boxRows)) * boxCols;
+
+        for (int val = 1; val <= size; val++) {
+          if (candidates[i].contains(val)) {
+            int possibleCellsCount = 0;
+            for (int rowIdx = startRow; rowIdx < startRow + boxRows; rowIdx++) {
+              for (int colIdx = startCol; colIdx < startCol + boxCols; colIdx++) {
+                final idx = rowIdx * size + colIdx;
+                if (grid[idx].currentValue == 0 && candidates[idx].contains(val)) {
+                  possibleCellsCount++;
+                }
+              }
+            }
+            if (possibleCellsCount == 1) {
+              return AnalysisResult(
+                cellIndex: i,
+                value: val,
+                explanationKey: 'sudoku_hint_hidden_block',
+                explanationArgs: ['${b + 1}', '$val', '${r + 1}', '${c + 1}'],
+              );
+            }
+          }
+        }
+
+        // Fallback: Reveal this specific cell if no logic found
+        return AnalysisResult(
+          cellIndex: i,
+          value: grid[i].value,
+          explanationKey: 'sudoku_hint_reveal',
+          explanationArgs: ['${r + 1}', '${c + 1}', '${grid[i].value}'],
+        );
+      }
+    }
+
+    // 3. Look for Naked Singles anywhere on the board (standard scan)
     for (int i = 0; i < grid.length; i++) {
       if (grid[i].currentValue == 0 && candidates[i].length == 1) {
         final val = candidates[i].first;
@@ -35,12 +136,13 @@ class SudokuAnalyzer {
         return AnalysisResult(
           cellIndex: i,
           value: val,
-          explanation: 'Naked Single: At Row ${r + 1}, Column ${c + 1}, the only number that can legally fit is $val. All other numbers [1-$size] clash with numbers already present in its row, column, or block.',
+          explanationKey: 'sudoku_hint_naked_single',
+          explanationArgs: ['${r + 1}', '${c + 1}', '$val', '$size'],
         );
       }
     }
 
-    // 3. Look for Hidden Singles in Rows
+    // 4. Look for Hidden Singles in Rows anywhere on the board
     for (int r = 0; r < size; r++) {
       for (int val = 1; val <= size; val++) {
         int possibleColsCount = 0;
@@ -57,13 +159,14 @@ class SudokuAnalyzer {
           return AnalysisResult(
             cellIndex: targetIdx,
             value: val,
-            explanation: 'Hidden Single (Row): In Row ${r + 1}, the number $val can only be legally placed in Column ${c + 1}. All other empty cells in this row are blocked by $val in corresponding columns or blocks.',
+            explanationKey: 'sudoku_hint_hidden_row',
+            explanationArgs: ['${r + 1}', '$val', '${c + 1}'],
           );
         }
       }
     }
 
-    // 4. Look for Hidden Singles in Columns
+    // 5. Look for Hidden Singles in Columns anywhere on the board
     for (int c = 0; c < size; c++) {
       for (int val = 1; val <= size; val++) {
         int possibleRowsCount = 0;
@@ -80,13 +183,14 @@ class SudokuAnalyzer {
           return AnalysisResult(
             cellIndex: targetIdx,
             value: val,
-            explanation: 'Hidden Single (Column): In Column ${c + 1}, the number $val can only be legally placed in Row ${r + 1}. No other empty cells in this column can accept $val due to row or block constraints.',
+            explanationKey: 'sudoku_hint_hidden_col',
+            explanationArgs: ['${c + 1}', '$val', '${r + 1}'],
           );
         }
       }
     }
 
-    // 5. Look for Hidden Singles in Blocks
+    // 6. Look for Hidden Singles in Blocks anywhere on the board
     final boxRows = size == 6 ? 2 : 3;
     final boxCols = size == 6 ? 3 : 3;
     final numBoxes = size == 6 ? 6 : 9;
@@ -115,13 +219,14 @@ class SudokuAnalyzer {
           return AnalysisResult(
             cellIndex: targetIdx,
             value: val,
-            explanation: 'Hidden Single (Block): In Block ${b + 1}, the number $val has only one valid cell where it can fit (Row ${r + 1}, Column ${c + 1}). All other empty spaces in this block are blocked by $val in neighboring rows or columns.',
+            explanationKey: 'sudoku_hint_hidden_block',
+            explanationArgs: ['${b + 1}', '$val', '${r + 1}', '${c + 1}'],
           );
         }
       }
     }
 
-    // 6. Fallback: return the first empty cell value
+    // 7. Fallback: return the first empty cell value anywhere on the board
     for (int i = 0; i < grid.length; i++) {
       if (grid[i].currentValue == 0) {
         final r = i ~/ size;
@@ -129,7 +234,8 @@ class SudokuAnalyzer {
         return AnalysisResult(
           cellIndex: i,
           value: grid[i].value,
-          explanation: 'Reveal Hint: At Row ${r + 1}, Column ${c + 1}, the correct value is ${grid[i].value}. Use logical elimination to figure out why other digits are blocked!',
+          explanationKey: 'sudoku_hint_reveal',
+          explanationArgs: ['${r + 1}', '${c + 1}', '${grid[i].value}'],
         );
       }
     }

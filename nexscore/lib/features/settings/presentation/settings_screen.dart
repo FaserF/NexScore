@@ -603,10 +603,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
 
-    final release = await BuiltInUpdaterService.checkForUpdates(channel);
-    
-    if (context.mounted) {
-      Navigator.pop(context); // Close loading indicator
+    GitHubRelease? release;
+    try {
+      release = await BuiltInUpdaterService.checkForUpdates(channel);
+    } finally {
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop(); // Close loading indicator
+      }
     }
 
     if (release == null) {
