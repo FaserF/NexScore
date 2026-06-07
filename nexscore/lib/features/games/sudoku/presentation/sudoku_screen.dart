@@ -268,7 +268,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     if (key == LogicalKeyboardKey.digit2 || key == LogicalKeyboardKey.numpad2) enteredNum = 2;
     if (key == LogicalKeyboardKey.digit3 || key == LogicalKeyboardKey.numpad3) enteredNum = 3;
     if (key == LogicalKeyboardKey.digit4 || key == LogicalKeyboardKey.numpad4) enteredNum = 4;
-    if (key == LogicalKeyboardKey.digit5 || key == LogicalKeyboardKey.numpad5) enteredNum = 6;
+    if (key == LogicalKeyboardKey.digit5 || key == LogicalKeyboardKey.numpad5) enteredNum = 5;
     if (key == LogicalKeyboardKey.digit6 || key == LogicalKeyboardKey.numpad6) enteredNum = 6;
     if (size == 9) {
       if (key == LogicalKeyboardKey.digit7 || key == LogicalKeyboardKey.numpad7) enteredNum = 7;

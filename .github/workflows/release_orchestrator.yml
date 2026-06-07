@@ -342,12 +342,12 @@ jobs:
       is_beta: ${{ github.event.inputs.release_type == 'beta' }}
 
   create-release:
-    needs: [version-calc, build-web, deploy-pwa]
+    needs: [version-calc, sync-version, build-web]
     if: |
       always() &&
       needs.version-calc.result == 'success' &&
-      needs.build-web.result == 'success' &&
-      needs.deploy-pwa.result == 'success'
+      needs.sync-version.result == 'success' &&
+      needs.build-web.result == 'success'
     name: Create GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -391,12 +391,13 @@ jobs:
           cat changelog.md >> release_body.md
           echo -e "\n---\n*Released by Orchestrator on $(date +'%Y-%m-%d %H:%M:%S')*" >> release_body.md
 
-      - name: Create Release
+      - name: Create Draft Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
           tag_name: ${{ needs.version-calc.outputs.tag_name }}
           name: NexScore ${{ needs.version-calc.outputs.version_name }}
           prerelease: ${{ needs.version-calc.outputs.is_prerelease == 'true' }}
+          draft: true
           files: release_assets/*
           body_path: release_body.md
 
@@ -427,15 +428,16 @@ jobs:
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
           tag_name: ${{ needs.version-calc.outputs.tag_name }}
+          draft: true
           files: release_assets/*
 
       - name: Update Release Notes with Android APK Info
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Retrieve current release body
-          gh release view ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --json body --template '{{.body}}' > release_body.md
-          
+          # Retrieve current release body safely
+          gh release view ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --json body --jq '.body' > release_body.md
+
           if [ "${{ needs.build-android.result }}" = "success" ]; then
             APK_SHA="${{ needs.build-android.outputs.sha256 }}"
             APK_LINK="[NexScore.apk](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk)"
@@ -445,10 +447,17 @@ jobs:
           else
             NEW_ROW="| **Android** | _Build Failed_ | _N/A_ |"
           fi
-          
-          # Only replace if placeholder was set (meaning it was not already updated in create-release)
-          if grep -q "| \*\*Android\*\* | _Building..._ | _TBD_ |" release_body.md; then
-            sed -i "s#\| \*\*Android\*\* \| \_Building\...\_ \| \_TBD\_ \|#$NEW_ROW#g" release_body.md
+
+          # Use Python for safe placeholder replacement (avoids sed issues with markdown pipe chars)
+          if grep -qF "| **Android** | _Building..._ | _TBD_ |" release_body.md; then
+            python3 -c "
+import sys
+with open('release_body.md', 'r') as f:
+    content = f.read()
+content = content.replace('| **Android** | _Building..._ | _TBD_ |', sys.argv[1])
+with open('release_body.md', 'w') as f:
+    f.write(content)
+" "$NEW_ROW"
             gh release edit ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --notes-file release_body.md
           fi
 
@@ -481,15 +490,16 @@ jobs:
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
           tag_name: ${{ needs.version-calc.outputs.tag_name }}
+          draft: true
           files: release_assets/*
 
       - name: Update Release Notes with iOS IPA Info
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Retrieve current release body
-          gh release view ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --json body --template '{{.body}}' > release_body.md
-          
+          # Retrieve current release body safely
+          gh release view ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --json body --jq '.body' > release_body.md
+
           if [ "${{ needs.build-ios.result }}" = "success" ]; then
             IPA_LINK="[NexScore.ipa](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.ipa)"
             NEW_ROW="| **iOS** | $IPA_LINK | _Unsigned_ |"
@@ -498,9 +508,50 @@ jobs:
           else
             NEW_ROW="| **iOS** | _Build Failed_ | _N/A_ |"
           fi
-          
-          # Only replace if placeholder was set (meaning it was not already updated in create-release)
-          if grep -q "| \*\*iOS\*\* | _Building..._ | _TBD_ |" release_body.md; then
-            sed -i "s#\| \*\*iOS\*\* \| \_Building\...\_ \| \_TBD\_ \|#$NEW_ROW#g" release_body.md
+
+          # Use Python for safe placeholder replacement (avoids sed issues with markdown pipe chars)
+          if grep -qF "| **iOS** | _Building..._ | _TBD_ |" release_body.md; then
+            python3 -c "
+import sys
+with open('release_body.md', 'r') as f:
+    content = f.read()
+content = content.replace('| **iOS** | _Building..._ | _TBD_ |', sys.argv[1])
+with open('release_body.md', 'w') as f:
+    f.write(content)
+" "$NEW_ROW"
             gh release edit ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --notes-file release_body.md
           fi
+
+  publish-release:
+    needs: [version-calc, create-release, update-release-android, update-release-ios]
+    if: always() && needs.create-release.result == 'success' && (needs.update-release-android.result == 'success' || needs.update-release-android.result == 'skipped') && (needs.update-release-ios.result == 'success' || needs.update-release-ios.result == 'skipped')
+    name: Publish Draft Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Publish Release Draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --draft=false
+
+  cleanup-failed-release:
+    needs: [version-calc, create-release, update-release-android, update-release-ios, publish-release]
+    if: |
+      always() &&
+      needs.create-release.result == 'success' &&
+      (needs.build-android.result == 'failure' ||
+       needs.build-ios.result == 'failure' ||
+       needs.publish-release.result == 'failure' ||
+       needs.publish-release.result == 'skipped')
+    name: Delete Failed Release Draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Delete Release Draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --yes
