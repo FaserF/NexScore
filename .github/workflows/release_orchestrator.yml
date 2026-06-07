@@ -37,6 +37,11 @@ on:
         required: true
         type: boolean
         default: false
+      generate_keystore:
+        description: 'Auto-Generate a new Android release keystore and output configuration instructions'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -137,15 +142,62 @@ jobs:
         if: env.HAS_ANDROID_SECRET == 'true'
         env:
           HAS_ANDROID_SECRET: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 != '' }}
+      - name: Decode Android Keystore
+        if: env.HAS_KEYSTORE == 'true'
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > nexscore/android/app/release.jks
+        env:
+          HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+      - name: Auto-Generate Android Keystore
+        if: github.event.inputs.generate_keystore == 'true' && secrets.ANDROID_KEYSTORE_BASE64 == ''
+        run: |
+          RAND_PASS=$(openssl rand -base64 18 | tr -dc 'a-zA-Z0-9')
+          keytool -genkeypair -v \
+            -keystore nexscore/android/app/release.jks \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -alias nexscore \
+            -dname "CN=NexScore, O=NexScore, C=DE" \
+            -storepass "$RAND_PASS" \
+            -keypass "$RAND_PASS"
+          B64_KEYSTORE=$(base64 -w 0 nexscore/android/app/release.jks)
+          echo "### 🔑 Android Keystore Auto-Generation Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "Please save the following values as GitHub Secrets in your repository (*Settings > Secrets and variables > Actions*):" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Name:** \`ANDROID_KEYSTORE_BASE64\`" >> $GITHUB_STEP_SUMMARY
+          echo "  **Value:** \`$B64_KEYSTORE\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Name:** \`RELEASE_STORE_PASSWORD\`" >> $GITHUB_STEP_SUMMARY
+          echo "  **Value:** \`$RAND_PASS\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Name:** \`RELEASE_KEY_ALIAS\`" >> $GITHUB_STEP_SUMMARY
+          echo "  **Value:** \`nexscore\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Name:** \`RELEASE_KEY_PASSWORD\`" >> $GITHUB_STEP_SUMMARY
+          echo "  **Value:** \`$RAND_PASS\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> ⚠️ **Security Warning**: Anyone with access to the workflow logs or summary can see these values. Once you have copied them to GitHub Secrets, run the release workflow again with the auto-generation option disabled to ensure logs and caches are clean." >> $GITHUB_STEP_SUMMARY
+          echo "GEN_PASS=$RAND_PASS" >> $GITHUB_ENV
       - name: Build APK
         run: |
           flutter pub get
           flutter pub run flutter_launcher_icons
+          if [ -f "android/app/release.jks" ]; then
+            export RELEASE_STORE_FILE="release.jks"
+            if [ -n "$GEN_PASS" ]; then
+              export RELEASE_STORE_PASSWORD="$GEN_PASS"
+              export RELEASE_KEY_ALIAS="nexscore"
+              export RELEASE_KEY_PASSWORD="$GEN_PASS"
+            fi
+          fi
           flutter build apk --release --no-pub \
             --build-name=${{ needs.version-calc.outputs.version_name }} \
             --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }} \
             --dart-define=GITHUB_REPOSITORY_URL=https://api.github.com/repos/${{ github.repository }}
         working-directory: nexscore
+        env:
+          RELEASE_STORE_FILE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && 'release.jks' || '' }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          GEN_PASS: ${{ env.GEN_PASS }}
       - name: Generate SHA256
         id: generate_sha
         run: |
