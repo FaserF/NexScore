@@ -14,7 +14,9 @@ ARG IS_BETA=false
 
 RUN if [ -n "$PREBUILT_PATH" ] && [ -d "$PREBUILT_PATH" ]; then \
       echo "Using pre-built assets from $PREBUILT_PATH"; \
-      mkdir -p build/web && cp -R $PREBUILT_PATH/* build/web/; \
+      if [ "$PREBUILT_PATH" != "build/web" ]; then \
+        mkdir -p build/web && cp -R $PREBUILT_PATH/* build/web/; \
+      fi; \
     else \
       echo "Building from source..."; \
       apt-get update && apt-get install -y --no-install-recommends curl git wget unzip xz-utils libglu1-mesa ca-certificates && rm -rf /var/lib/apt/lists/*; \

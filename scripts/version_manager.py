@@ -19,8 +19,8 @@ def get_latest_tag():
         return "v0.0.0"
 
 def parse_version(tag):
-    # Matches v1.2.3, v1.2.3b1, v1.2.3-dev4-sha
-    pattern = r'^v?(\d+)\.(\d+)\.(\d+)(?:(b|[-+]dev|[-+]rc)(\d+))?(?:-([a-z0-9]+))?$'
+    # Matches v1.2.3, v1.2.3-beta.1, v1.2.3-dev4-sha
+    pattern = r'^v?(\d+)\.(\d+)\.(\d+)(?:-?(beta\.|b|[-+]dev|[-+]rc)(\d+))?(?:-([a-z0-9]+))?$'
     match = re.match(pattern, tag)
     if not match:
         return [0, 0, 0, None, -1, None] # -1 means no suffix
@@ -43,7 +43,7 @@ def format_version(major, minor, patch, prefix, suffix_num, commit_sha=None):
                 ver += f"-{commit_sha}"
             return ver
         elif prefix == "b":
-            return f"{base}b{suffix_num}"
+            return f"{base}-beta.{suffix_num}"
     return base
 
 def has_stable_tag():
@@ -99,7 +99,7 @@ def main():
     current_tag = get_latest_tag()
     major, minor, patch, prefix, suffix_num, _ = parse_version(current_tag)
 
-    current_is_beta = (prefix == 'b')
+    current_is_beta = (prefix == 'b' or (prefix and 'beta' in prefix))
     current_is_dev = (prefix and 'dev' in prefix)
     current_is_stable = not prefix
 
