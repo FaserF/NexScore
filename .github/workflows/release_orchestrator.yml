@@ -27,6 +27,16 @@ on:
         required: false
         type: string
         default: ''
+      build_apk:
+        description: 'Build Android APK'
+        required: true
+        type: boolean
+        default: true
+      build_ipa:
+        description: 'Build iOS IPA'
+        required: true
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -100,7 +110,8 @@ jobs:
           fi
 
   build-android:
-    needs: [version-calc, sync-version]
+    needs: [version-calc, sync-version, build-web]
+    if: ${{ always() && needs.version-calc.result == 'success' && needs.build-web.result == 'success' && github.event.inputs.build_apk != 'false' }}
     name: Build Android APK
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -149,7 +160,8 @@ jobs:
           path: nexscore/build/app/outputs/flutter-apk/app-release.apk*
 
   build-ios:
-    needs: [version-calc, sync-version]
+    needs: [version-calc, sync-version, build-web]
+    if: ${{ always() && needs.version-calc.result == 'success' && needs.build-web.result == 'success' && github.event.inputs.build_ipa != 'false' }}
     name: Build iOS IPA
     runs-on: macos-latest
     timeout-minutes: 30
@@ -236,9 +248,6 @@ jobs:
         uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3 # v4.1.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
-        with:
-          driver-opts: |
-            image=ghcr.io/moby/buildkit:latest
       - name: Login to GitHub Container Registry
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
         with:
@@ -335,7 +344,7 @@ jobs:
 
   update-release-android:
     needs: [version-calc, create-release, build-android]
-    if: always() && needs.create-release.result == 'success' && (needs.build-android.result == 'success' || needs.build-android.result == 'failure')
+    if: always() && needs.create-release.result == 'success' && (needs.build-android.result == 'success' || needs.build-android.result == 'failure' || needs.build-android.result == 'skipped')
     name: Attach Android APK to Release
     runs-on: ubuntu-latest
     permissions:
@@ -373,6 +382,8 @@ jobs:
             APK_SHA="${{ needs.build-android.outputs.sha256 }}"
             APK_LINK="[NexScore.apk](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk)"
             NEW_ROW="| **Android** | $APK_LINK | \`$APK_SHA\` |"
+          elif [ "${{ needs.build-android.result }}" = "skipped" ]; then
+            NEW_ROW="| **Android** | _Build Skipped_ | _N/A_ |"
           else
             NEW_ROW="| **Android** | _Build Failed_ | _N/A_ |"
           fi
@@ -385,7 +396,7 @@ jobs:
 
   update-release-ios:
     needs: [version-calc, create-release, build-ios]
-    if: always() && needs.create-release.result == 'success' && (needs.build-ios.result == 'success' || needs.build-ios.result == 'failure')
+    if: always() && needs.create-release.result == 'success' && (needs.build-ios.result == 'success' || needs.build-ios.result == 'failure' || needs.build-ios.result == 'skipped')
     name: Attach iOS IPA to Release
     runs-on: ubuntu-latest
     permissions:
@@ -424,6 +435,8 @@ jobs:
           if [ "${{ needs.build-ios.result }}" = "success" ]; then
             IPA_LINK="[NexScore.ipa](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.ipa)"
             NEW_ROW="| **iOS** | $IPA_LINK | _Unsigned_ |"
+          elif [ "${{ needs.build-ios.result }}" = "skipped" ]; then
+            NEW_ROW="| **iOS** | _Build Skipped_ | _N/A_ |"
           else
             NEW_ROW="| **iOS** | _Build Failed_ | _N/A_ |"
           fi
