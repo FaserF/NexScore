@@ -236,6 +236,8 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
         content: Text(errorDisplay),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
+        showCloseIcon: true,
+        closeIconColor: Colors.white,
         duration: const Duration(seconds: 10),
       ),
     );
@@ -705,6 +707,8 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
       SnackBar(
         content: Text(errorDisplay),
         backgroundColor: Colors.red,
+        showCloseIcon: true,
+        closeIconColor: Colors.white,
         action: isAlreadyLinked
             ? SnackBarAction(
                 label: l10n.get('account_action_sign_out_switch'),

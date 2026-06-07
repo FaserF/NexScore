@@ -14,6 +14,7 @@ import 'volleyball_signature_dialog.dart';
 import 'volleyball_signals_screen.dart';
 import '../../../../shared/widgets/shareable_scorecard.dart';
 import '../../../../core/providers/audio_provider.dart';
+import '../../../../core/providers/share_provider.dart';
 import '../../../../core/services/audio_service.dart';
 import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
 import '../../../../core/models/session_model.dart';

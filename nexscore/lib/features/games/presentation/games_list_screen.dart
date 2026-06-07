@@ -442,6 +442,16 @@ class _GamesListScreenState extends ConsumerState<GamesListScreen> {
         tag: l10n.get('home_tag_sport'),
       ),
       _GameEntry(
+        id: 'sudoku',
+        name: l10n.get('game_sudoku'),
+        description: l10n.get('desc_sudoku'),
+        route: '/games/sudoku',
+        icon: Icons.grid_3x3,
+        color: Colors.indigo.shade600,
+        playerCount: '1',
+        tag: l10n.get('home_tag_board'),
+      ),
+      _GameEntry(
         id: 'generic',
         name: l10n.get('game_generic'),
         description: l10n.get('desc_generic'),

@@ -18,6 +18,7 @@ import '../../features/games/wayquest/presentation/wayquest_screen.dart';
 import '../../features/games/factquest/presentation/factquest_screen.dart';
 import '../../features/games/volleyball/presentation/volleyball_scoreboard.dart';
 import '../../features/games/volleyball/presentation/volleyball_signals_screen.dart';
+import '../../features/games/sudoku/presentation/sudoku_screen.dart';
 import '../../features/leaderboards/presentation/leaderboard_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/help/presentation/help_screen.dart';
@@ -124,6 +125,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'generic',
                     builder: (context, state) => const GenericScoreScreen(),
+                  ),
+                  GoRoute(
+                    path: 'sudoku',
+                    builder: (context, state) => const SudokuScreen(),
                   ),
                   GoRoute(
                     path: 'arschloch',
