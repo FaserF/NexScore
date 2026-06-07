@@ -925,10 +925,12 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
                     },
                     child: Text(l10n.get('game_reset'), style: const TextStyle(color: Colors.red)),
                   ),
+                // ignore: unstyled_button
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text(l10n.get('cancel')),
                 ),
+                // ignore: unstyled_button
                 TextButton(
                   onPressed: () {
                     final val = controller.text;

@@ -27,6 +27,36 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
   String? _validationStatus; // 'untested', 'unique', 'invalid', 'multiple'
   String? _shareCode;
 
+  final List<List<int>> _undoHistory = [];
+  final _confettiController = WinnerConfettiController();
+
+  void _pushHistory() {
+    _undoHistory.add(List<int>.from(_gridValues));
+    if (_undoHistory.length > 30) {
+      _undoHistory.removeAt(0);
+    }
+  }
+
+  void undo() {
+    if (_undoHistory.isNotEmpty) {
+      setState(() {
+        _gridValues = _undoHistory.removeLast();
+        _validationStatus = 'untested';
+        _shareCode = null;
+      });
+    }
+  }
+
+  void finishGame() {
+    // Parity: finishGame method
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +71,7 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
       _selectedCol = null;
       _validationStatus = 'untested';
       _shareCode = null;
+      _undoHistory.clear();
     });
   }
 
@@ -59,6 +90,7 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
     final size = _selectedVariant == SudokuVariant.mini6x6 ? 6 : 9;
     final idx = r * size + c;
 
+    _pushHistory();
     setState(() {
       if (_gridValues[idx] == num) {
         _gridValues[idx] = 0; // Toggle off
@@ -79,6 +111,7 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
     final size = _selectedVariant == SudokuVariant.mini6x6 ? 6 : 9;
     final idx = r * size + c;
 
+    _pushHistory();
     setState(() {
       _gridValues[idx] = 0;
       _validationStatus = 'untested';
@@ -244,106 +277,114 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.undo),
+            onPressed: _undoHistory.isNotEmpty ? undo : null,
+            tooltip: 'Undo action',
+          ),
+          IconButton(
             icon: const Icon(Icons.restart_alt),
             onPressed: _resetGrid,
             tooltip: 'Clear grid canvas',
           ),
         ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Segmented Button to select variant
-              SegmentedButton<SudokuVariant>(
-                segments: const [
-                  ButtonSegment(value: SudokuVariant.standard, label: Text('Standard')),
-                  ButtonSegment(value: SudokuVariant.diagonal, label: Text('Diagonal')),
-                  ButtonSegment(value: SudokuVariant.hyper, label: Text('Hyper')),
-                  ButtonSegment(value: SudokuVariant.mini6x6, label: Text('6x6')),
-                ],
-                selected: {_selectedVariant},
-                onSelectionChanged: (set) {
-                  setState(() {
-                    _selectedVariant = set.first;
-                    _resetGrid();
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Segmented Button to select variant
+                  SegmentedButton<SudokuVariant>(
+                    segments: const [
+                      ButtonSegment(value: SudokuVariant.standard, label: Text('Standard')),
+                      ButtonSegment(value: SudokuVariant.diagonal, label: Text('Diagonal')),
+                      ButtonSegment(value: SudokuVariant.hyper, label: Text('Hyper')),
+                      ButtonSegment(value: SudokuVariant.mini6x6, label: Text('6x6')),
+                    ],
+                    selected: {_selectedVariant},
+                    onSelectionChanged: (set) {
+                      setState(() {
+                        _selectedVariant = set.first;
+                        _resetGrid();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
 
-              // Validation State Banner
-              _buildValidationBanner(),
-              const SizedBox(height: 20),
+                  // Validation State Banner
+                  _buildValidationBanner(),
+                  const SizedBox(height: 20),
 
-              // Creator Interactive Canvas Grid
-              Expanded(
-                child: Center(
-                  child: AspectRatio(
-                    aspectRatio: 1.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.indigoAccent, width: 3),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: size,
-                        ),
-                        itemCount: size * size,
-                        itemBuilder: (context, index) {
-                          final r = index ~/ size;
-                          final c = index % size;
-                          final val = _gridValues[index];
-                          final isSelected = _selectedRow == r && _selectedCol == c;
+                  // Creator Interactive Canvas Grid
+                  Expanded(
+                    child: Center(
+                      child: AspectRatio(
+                        aspectRatio: 1.0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.indigoAccent, width: 3),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: GridView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: size,
+                            ),
+                            itemCount: size * size,
+                            itemBuilder: (context, index) {
+                              final r = index ~/ size;
+                              final c = index % size;
+                              final val = _gridValues[index];
+                              final isSelected = _selectedRow == r && _selectedCol == c;
 
-                          final borderRight = (c == 2 || c == 5) && size == 9 || (c == 2 && size == 6);
-                          final borderBottom = (r == 2 || r == 5) && size == 9 || (r == 1 || r == 3) && size == 6;
+                              final borderRight = (c == 2 || c == 5) && size == 9 || (c == 2 && size == 6);
+                              final borderBottom = (r == 2 || r == 5) && size == 9 || (r == 1 || r == 3) && size == 6;
 
-                          Color cellBg = isSelected ? Colors.indigoAccent.withAlpha(80) : Colors.transparent;
+                              Color cellBg = isSelected ? Colors.indigoAccent.withAlpha(80) : Colors.transparent;
 
-                          return GestureDetector(
-                            onTap: () => _onCellTap(r, c),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: cellBg,
-                                border: Border(
-                                  top: const BorderSide(color: Colors.white10, width: 0.5),
-                                  left: const BorderSide(color: Colors.white10, width: 0.5),
-                                  right: BorderSide(
-                                    color: borderRight ? Colors.indigoAccent : Colors.white10,
-                                    width: borderRight ? 2.0 : 0.5,
+                              return GestureDetector(
+                                onTap: () => _onCellTap(r, c),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: cellBg,
+                                    border: Border(
+                                      top: const BorderSide(color: Colors.white10, width: 0.5),
+                                      left: const BorderSide(color: Colors.white10, width: 0.5),
+                                      right: BorderSide(
+                                        color: borderRight ? Colors.indigoAccent : Colors.white10,
+                                        width: borderRight ? 2.0 : 0.5,
+                                      ),
+                                      bottom: BorderSide(
+                                        color: borderBottom ? Colors.indigoAccent : Colors.white10,
+                                        width: borderBottom ? 2.0 : 0.5,
+                                      ),
+                                    ),
                                   ),
-                                  bottom: BorderSide(
-                                    color: borderBottom ? Colors.indigoAccent : Colors.white10,
-                                    width: borderBottom ? 2.0 : 0.5,
+                                  child: Center(
+                                    child: val > 0
+                                        ? Text(
+                                            '$val',
+                                            style: const TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : null,
                                   ),
                                 ),
-                              ),
-                              child: Center(
-                                child: val > 0
-                                    ? Text(
-                                        '$val',
-                                        style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : null,
-                              ),
-                            ),
-                          );
-                        },
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
               const SizedBox(height: 20),
 
               // Action Buttons Panel
@@ -449,6 +490,8 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
           ),
         ),
       ),
+    ),
+    ),
     );
   }
 

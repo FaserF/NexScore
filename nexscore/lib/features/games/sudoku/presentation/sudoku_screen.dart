@@ -388,6 +388,27 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
               onPressed: () => context.go('/games'),
             ),
             actions: [
+              // Share action (Parity: Icons.share)
+              if (gameState.grid.isNotEmpty)
+                IconButton(
+                  icon: const Icon(Icons.share),
+                  onPressed: () {
+                    final shareCode = SudokuShareService.exportToCode(gameState.grid, gameState.variant);
+                    Clipboard.setData(ClipboardData(text: shareCode));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Puzzle share code copied to clipboard!')),
+                    );
+                  },
+                  tooltip: 'Share Puzzle Code',
+                ),
+              // Settings action (Parity: Icons.settings)
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  _showSettingsDialog();
+                },
+                tooltip: 'Settings',
+              ),
               // Music toggle
               IconButton(
                 icon: Icon(_isMusicPlaying ? Icons.music_note : Icons.music_off),
@@ -398,7 +419,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
               // Leaderboard toggle
               if (gameState.grid.isNotEmpty && !gameState.isMultiplayer)
                 IconButton(
-                  icon: const Icon(Icons.emoji_events),
+                  icon: const Icon(Icons.leaderboard),
                   onPressed: () => _loadLeaderboardData(gameState),
                   tooltip: l10n.get('sudoku_leaderboard'),
                 ),
@@ -1764,6 +1785,51 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     final minutes = totalSeconds ~/ 60;
     final seconds = totalSeconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  void _showSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final state = ref.watch(sudokuStateProvider);
+        return AlertDialog(
+          title: const Text('Sudoku Settings'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SwitchListTile(
+                title: const Text('Pencil Notes Mode'),
+                subtitle: const Text('Enable pencil notation to draft possibilities'),
+                value: state.notesMode,
+                onChanged: (val) {
+                  ref.read(sudokuStateProvider.notifier).toggleNotesMode();
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CLOSE'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void finishGame() {
+    final state = ref.read(sudokuStateProvider);
+    if (!state.isFinished && state.grid.isNotEmpty) {
+      // Auto-solve remaining to finish early (logical parity action)
+      final size = state.variant == SudokuVariant.mini6x6 ? 6 : 9;
+      final solvedGrid = state.grid.map((c) => c.copyWith(currentValue: c.value)).toList();
+      ref.read(sudokuStateProvider.notifier).loadState(state.copyWith(
+        grid: solvedGrid,
+        isFinished: true,
+      ));
+    }
   }
 
   void _showConfirmResetDialog(SudokuGameState state, AppLocalizations l10n) {

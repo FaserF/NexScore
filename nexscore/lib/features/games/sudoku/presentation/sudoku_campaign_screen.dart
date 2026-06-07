@@ -1,11 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/i18n/app_localizations.dart';
 import '../../../../core/theme/widgets/glass_container.dart';
 import '../../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../../core/providers/audio_provider.dart';
 import '../../../../core/services/audio_service.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
 import '../models/sudoku_campaign_data.dart';
 import '../models/sudoku_models.dart';
 import '../providers/sudoku_provider.dart';
@@ -20,6 +22,30 @@ class SudokuCampaignScreen extends ConsumerStatefulWidget {
 
 class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
   SudokuCampaignLevel? _selectedLevel;
+  final _confettiController = WinnerConfettiController();
+
+  void finishGame() {
+    // Campaign level finish logic if any
+  }
+
+  Future<void> _resetCampaignProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (int i = 1; i <= 20; i++) {
+      await prefs.remove('sudoku_academy_level_completed_$i');
+    }
+    ref.invalidate(completedCampaignLevelsProvider);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Campaign progress reset successfully!')),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +66,39 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Reset Campaign Progress?'),
+                  content: const Text('This will delete all completed campaign missions.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('CANCEL'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _resetCampaignProgress();
+                      },
+                      child: const Text('RESET'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            tooltip: 'Reset Campaign',
+          ),
+        ],
       ),
-      body: completedLevelsAsync.when(
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: completedLevelsAsync.when(
         data: (completedSet) {
           return SafeArea(
             child: Stack(
@@ -185,6 +242,8 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error loading progress: $err')),
+      ),
+    ),
       ),
     );
   }

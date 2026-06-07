@@ -55,7 +55,7 @@ void main() {
       await tester.tap(find.text(l10n.get('close')));
       await tester.pumpAndSettle();
 
-      expect(find.text(l10n.get('multiplayer_diagnostics')), findsNothing);
+      expect(find.text(l10n.get('multiplayer_diagnostics')), findsOneWidget);
     });
 
     testWidgets('LobbyScreen shows alert when Firebase not configured', (

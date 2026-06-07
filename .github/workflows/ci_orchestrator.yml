@@ -127,14 +127,3 @@ jobs:
       - name: Build iOS IPA (Unsigned)
         run: flutter build ios --release --no-codesign --no-pub
         working-directory: nexscore
-
-  deploy-docs:
-    needs: [changes, build-android-web]
-    if: ${{ needs.changes.outputs.docs == 'true' || needs.changes.outputs.workflows == 'true' || needs.changes.outputs.code == 'true' }}
-    name: 2. Deploy Docs & PWA
-    uses: ./.github/workflows/deploy_pages.yml
-    with:
-      deploy_pwa: ${{ needs.changes.outputs.code == 'true' }}
-      web_artifact_name: 'nexscore-web-pwa'
-      version_name: 'latest'
-      is_beta: false

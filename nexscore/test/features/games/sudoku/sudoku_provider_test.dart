@@ -336,6 +336,7 @@ void main() {
       notifier.enterNumber(cell.value, 'Tester');
 
       final service = container.read(persistenceServiceProvider);
+      await Future.delayed(Duration.zero);
       final savedStateMap = await service.loadGameState('sudoku');
       expect(savedStateMap, isNotNull);
     });

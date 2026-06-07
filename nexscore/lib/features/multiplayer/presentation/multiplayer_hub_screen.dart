@@ -54,12 +54,13 @@ class MultiplayerHubScreen extends ConsumerWidget {
             ),
           Expanded(
             child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                     Icon(
                       Icons.wifi_tethering,
                       size: 100,
@@ -141,6 +142,7 @@ class MultiplayerHubScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+            ),
             ),
           ),
         ],

@@ -83,10 +83,10 @@ void main() async {
       persistenceEnabled: false,
       // Using auto-detect for long polling is more robust as it defaults to standard
       // connection and falls back to long polling if blocked.
-      webExperimentalAutoDetectLongPolling: kIsWeb,
+      webExperimentalForceLongPolling: kIsWeb,
     );
     debugPrint(
-      'Firestore settings applied: persistenceEnabled=${firestore.FirebaseFirestore.instance.settings.persistenceEnabled}, webExperimentalAutoDetectLongPolling=$kIsWeb',
+      'Firestore settings applied: persistenceEnabled=${firestore.FirebaseFirestore.instance.settings.persistenceEnabled}, webExperimentalForceLongPolling=$kIsWeb',
     );
   } catch (e) {
     debugPrint('Firestore settings error: $e');

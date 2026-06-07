@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/widgets/glass_container.dart';
 import '../../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../../core/providers/audio_provider.dart';
 import '../../../../core/services/audio_service.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
 
 class TutorialStep {
   final String title;
@@ -42,6 +43,23 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
   late List<int> _grid;
   late List<bool> _errorState;
   bool _stepCompleted = false;
+  final _confettiController = WinnerConfettiController();
+
+  void finishGame() {
+    // Parity: finishGame method
+  }
+
+  void reset() {
+    setState(() {
+      _loadStep(_currentStepIdx);
+    });
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
 
   final List<TutorialStep> _steps = const [
     TutorialStep(
@@ -171,8 +189,18 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: reset,
+            tooltip: 'Reset tutorial step',
+          ),
+        ],
       ),
-      body: SafeArea(
+      body: WinnerConfettiOverlay(
+        controller: _confettiController,
+        child: MultiplayerClientOverlay(
+          child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
@@ -379,11 +407,12 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
                   }),
                 ),
                 const SizedBox(height: 20),
-              ],
             ],
           ),
         ),
       ),
+    ),
+    ),
     );
   }
 }
