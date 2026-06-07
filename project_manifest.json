@@ -1,0 +1,1553 @@
+{
+  "project": "NexScore",
+  "description": "Cross-platform score tracker and interactive engine for games like Sudoku (Campaign, Creator, Sync & Multiplayer), Wizard, Qwixx, Schafkopf, Kniffel, Phase 10, Romm\u00e9, Arschloch/President, SipDeck, BuzzTap, WayQuest, FactQuest, Volleyball, Darts, and Generic Score Tracking.",
+  "dependencies": {
+    "flutter": {
+      "sdk": "flutter"
+    },
+    "cupertino_icons": "^1.0.8",
+    "flutter_riverpod": "^3.2.1",
+    "riverpod_annotation": "^4.0.2",
+    "path_provider": "^2.1.3",
+    "share_plus": "^12.0.2",
+    "screenshot": "^3.0.0",
+    "go_router": "^17.1.0",
+    "firebase_core": "^4.5.0",
+    "firebase_auth": "^6.2.0",
+    "cloud_firestore": "^6.1.3",
+    "flex_color_scheme": "^8.4.0",
+    "shared_preferences": "^2.5.4",
+    "uuid": "^4.5.3",
+    "intl": "^0.20.2",
+    "flutter_localizations": {
+      "sdk": "flutter"
+    },
+    "sqflite": "^2.4.2",
+    "path": "^1.9.1",
+    "url_launcher": "^6.3.1",
+    "http": "^1.2.2",
+    "sqflite_common_ffi_web": "^1.1.1",
+    "sqlite3_flutter_libs": "^0.6.0+eol",
+    "sqlite3": "^3.3.0",
+    "appinio_swiper": "^2.1.1",
+    "confetti": "^0.8.0",
+    "flutter_tts": "^4.2.5",
+    "audioplayers": "^6.1.0",
+    "flutter_web_plugins": {
+      "sdk": "flutter"
+    },
+    "pdf": "^3.11.1",
+    "printing": "^5.13.2",
+    "signature": "6.3.0",
+    "flutter_local_notifications": "^22.0.0",
+    "file_picker": "11.0.2"
+  },
+  "dev_dependencies": {
+    "sqflite_common_ffi": "^2.3.3",
+    "flutter_test": {
+      "sdk": "flutter"
+    },
+    "flutter_lints": "^6.0.0",
+    "build_runner": "^2.4.14",
+    "riverpod_generator": "^4.0.3",
+    "mocktail": "^1.0.4",
+    "test": "^1.25.0"
+  },
+  "features": {
+    "auth": [
+      {
+        "path": "lib/features/auth/presentation/profile_screen.dart",
+        "classes": [
+          "ProfileScreen",
+          "_SignedOutView",
+          "_SignedOutViewState",
+          "_SignedInView",
+          "_SignedInViewState",
+          "_AuthButton",
+          "_SectionLabel"
+        ],
+        "providers": [
+          "authUserProvider",
+          "gistSyncServiceProvider",
+          "lastBackupProvider",
+          "isPrimaryProvider",
+          "authServiceProvider",
+          "settingsProvider"
+        ]
+      },
+      {
+        "path": "lib/features/auth/providers/auth_providers.dart",
+        "classes": [
+          "AuthService"
+        ],
+        "providers": [
+          "authUserProvider",
+          "primaryProvider",
+          "signInWithProvider",
+          "linkWithProvider",
+          "isPrimaryProvider",
+          "StreamProvider",
+          "authServiceProvider",
+          "googleProvider",
+          "GithubAuthProvider",
+          "firebaseAuthProvider",
+          "githubProvider",
+          "GoogleAuthProvider"
+        ]
+      }
+    ],
+    "games": [
+      {
+        "path": "lib/features/games/arschloch/models/arschloch_models.dart",
+        "classes": [
+          "ArschlochPlayerState",
+          "ArschlochRound",
+          "ArschlochGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/arschloch/presentation/arschloch_screen.dart",
+        "classes": [
+          "ArschlochScreen",
+          "_ArschlochScreenState"
+        ],
+        "providers": [
+          "arschlochStateProvider",
+          "audioServiceProvider",
+          "sessionsProvider",
+          "activePlayersProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/arschloch/providers/arschloch_provider.dart",
+        "classes": [
+          "ArschlochStateNotifier"
+        ],
+        "providers": [
+          "arschlochStateProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/arschloch_digital/models/arschloch_digital_engine.dart",
+        "classes": [
+          "ArschlochDigitalEngine"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/arschloch_digital/models/arschloch_digital_state.dart",
+        "classes": [
+          "ArschlochDigitalPlayerState",
+          "ArschlochDigitalState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/arschloch_digital/models/standard_card_models.dart",
+        "classes": [
+          "StandardCard",
+          "StandardDeckGenerator"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/arschloch_digital/presentation/arschloch_digital_screen.dart",
+        "classes": [
+          "ArschlochDigitalScreen",
+          "_ArschlochDigitalScreenState",
+          "_StandardCardChip",
+          "_StandardCardWidget"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "sessionsProvider",
+          "activePlayersProvider",
+          "arschlochDigitalProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/arschloch_digital/providers/arschloch_digital_provider.dart",
+        "classes": [
+          "ArschlochDigitalNotifier"
+        ],
+        "providers": [
+          "NotifierProvider",
+          "arschlochDigitalProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/buzztap/models/buzztap_expansion.dart",
+        "classes": [],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/buzztap/models/buzztap_models.dart",
+        "classes": [
+          "BuzzTapCard",
+          "BuzzTapGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/buzztap/presentation/buzztap_screen.dart",
+        "classes": [
+          "BuzzTapScreen",
+          "_BuzzTapScreenState"
+        ],
+        "providers": [
+          "activePlayersProvider",
+          "shareServiceProvider",
+          "sessionsProvider",
+          "audioServiceProvider",
+          "ttsServiceProvider",
+          "buzzTapStateProvider",
+          "settingsProvider",
+          "ttsActiveProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/buzztap/providers/buzztap_provider.dart",
+        "classes": [
+          "BuzzTapStateNotifier"
+        ],
+        "providers": [
+          "NotifierProvider",
+          "buzzTapStateProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/extras/models/darts_models.dart",
+        "classes": [
+          "DartThrow",
+          "DartRound",
+          "DartPlayerState",
+          "DartsGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/extras/models/generic_score_models.dart",
+        "classes": [
+          "GenericScoreState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/extras/models/phase10_models.dart",
+        "classes": [
+          "Phase10Phase",
+          "Phase10PhaseSet",
+          "Phase10PlayerState",
+          "Phase10GameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/extras/models/romme_models.dart",
+        "classes": [
+          "RommeRound",
+          "RommeGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/extras/presentation/darts_screen.dart",
+        "classes": [
+          "DartsScreen",
+          "_DartsScreenState",
+          "_BoardButton"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "sessionsProvider",
+          "dartsPlayersProvider",
+          "dartsStateProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/extras/presentation/generic_score_screen.dart",
+        "classes": [
+          "GenericScoreScreen",
+          "_GenericScoreScreenState"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "sessionsProvider",
+          "genericScoreProvider",
+          "activePlayersProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/extras/presentation/phase10_screen.dart",
+        "classes": [
+          "Phase10StateNotifier",
+          "Phase10Screen",
+          "_Phase10ScreenState",
+          "_PhaseSelector"
+        ],
+        "providers": [
+          "activePlayersProvider",
+          "sessionsProvider",
+          "NotifierProvider",
+          "audioServiceProvider",
+          "phase10PlayersProvider",
+          "phase10StateProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/extras/presentation/romme_screen.dart",
+        "classes": [
+          "RommeStateNotifier",
+          "RommeScreen",
+          "_RommeScreenState",
+          "_RommeScoreHeader"
+        ],
+        "providers": [
+          "activePlayersProvider",
+          "rommePlayersProvider",
+          "sessionsProvider",
+          "NotifierProvider",
+          "audioServiceProvider",
+          "rommeStateProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/extras/providers/darts_provider.dart",
+        "classes": [
+          "DartsNotifier"
+        ],
+        "providers": [
+          "dartsPlayersProvider",
+          "activePlayersProvider",
+          "NotifierProvider",
+          "dartsStateProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/extras/providers/generic_score_provider.dart",
+        "classes": [
+          "GenericScoreNotifier"
+        ],
+        "providers": [
+          "activePlayersProvider",
+          "genericScoreProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/factquest/models/factquest_database.dart",
+        "classes": [],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/factquest/models/factquest_models.dart",
+        "classes": [
+          "FactQuestCard",
+          "FactQuestGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/factquest/presentation/factquest_screen.dart",
+        "classes": [
+          "FactQuestScreen",
+          "_FactQuestScreenState",
+          "_FactQuestSetup",
+          "_FactQuestGame"
+        ],
+        "providers": [
+          "factQuestStateProvider",
+          "shareServiceProvider",
+          "sessionsProvider",
+          "audioServiceProvider",
+          "ttsServiceProvider",
+          "settingsProvider",
+          "ttsActiveProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/factquest/providers/factquest_provider.dart",
+        "classes": [
+          "FactQuestStateNotifier"
+        ],
+        "providers": [
+          "factQuestStateProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/kniffel/models/kniffel_models.dart",
+        "classes": [
+          "YahtzeePlayerSheet",
+          "KniffelGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/kniffel/presentation/kniffel_screen.dart",
+        "classes": [
+          "KniffelScreen",
+          "_KniffelScreenState"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "sessionsProvider",
+          "activePlayersProvider",
+          "kniffelStateProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/kniffel/providers/kniffel_provider.dart",
+        "classes": [
+          "KniffelStateNotifier"
+        ],
+        "providers": [
+          "NotifierProvider",
+          "kniffelStateProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/kniffel_digital/models/kniffel_digital_engine.dart",
+        "classes": [
+          "KniffelDigitalPlayerState",
+          "KniffelDigitalState",
+          "KniffelDigitalEngine"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/kniffel_digital/presentation/kniffel_digital_screen.dart",
+        "classes": [
+          "KniffelDigitalScreen",
+          "_KniffelDigitalScreenState",
+          "_DieWidget"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "sessionsProvider",
+          "activePlayersProvider",
+          "kniffelDigitalProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/kniffel_digital/providers/kniffel_digital_provider.dart",
+        "classes": [
+          "KniffelDigitalNotifier"
+        ],
+        "providers": [
+          "NotifierProvider",
+          "kniffelDigitalProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/phase10_digital/models/phase10_digital_engine.dart",
+        "classes": [
+          "Phase10PhaseDefinition",
+          "Phase10Card",
+          "Phase10DigitalPlayerState",
+          "Phase10DigitalState",
+          "Phase10DigitalEngine"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/phase10_digital/presentation/phase10_digital_screen.dart",
+        "classes": [
+          "Phase10DigitalScreen",
+          "_Phase10DigitalScreenState"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "sessionsProvider",
+          "phase10DigitalProvider",
+          "activePlayersProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/phase10_digital/providers/phase10_digital_provider.dart",
+        "classes": [
+          "Phase10DigitalNotifier"
+        ],
+        "providers": [
+          "phase10DigitalProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/presentation/games_list_screen.dart",
+        "classes": [
+          "GamesListScreen",
+          "_GamesListScreenState",
+          "_GameEntry",
+          "_GameCard",
+          "_Chip"
+        ],
+        "providers": [
+          "favoritesProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/presentation/game_setup_screen.dart",
+        "classes": [
+          "GameSetupScreen",
+          "_GameSetupScreenState"
+        ],
+        "providers": [
+          "playersProvider",
+          "activeGameIdProvider",
+          "playerGroupsProvider",
+          "activePlayersProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/presentation/widgets/resume_banner.dart",
+        "classes": [
+          "ResumeBanner"
+        ],
+        "providers": [
+          "persistenceNotifierProvider",
+          "activePlayersProvider",
+          "playersProvider",
+          "activeGameIdProvider",
+          "persistenceServiceProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/qwixx/models/qwixx_models.dart",
+        "classes": [
+          "QwixxGameState",
+          "QwixxPlayerSheet"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/qwixx/presentation/qwixx_screen.dart",
+        "classes": [
+          "QwixxScreen",
+          "_QwixxScreenState",
+          "_QwixxPlayerView"
+        ],
+        "providers": [
+          "qwixxStateProvider",
+          "audioServiceProvider",
+          "sessionsProvider",
+          "activePlayersProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/qwixx/providers/qwixx_provider.dart",
+        "classes": [
+          "QwixxStateNotifier"
+        ],
+        "providers": [
+          "qwixxStateProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/qwixx_digital/models/qwixx_digital_engine.dart",
+        "classes": [
+          "QwixxRowState",
+          "QwixxDigitalPlayerState",
+          "QwixxDigitalState",
+          "QwixxDigitalEngine"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/qwixx_digital/presentation/qwixx_digital_screen.dart",
+        "classes": [
+          "QwixxDigitalScreen",
+          "_QwixxDigitalScreenState",
+          "_DiceChip"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "sessionsProvider",
+          "qwixxDigitalProvider",
+          "activePlayersProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/qwixx_digital/providers/qwixx_digital_provider.dart",
+        "classes": [
+          "QwixxDigitalNotifier"
+        ],
+        "providers": [
+          "qwixxDigitalProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/romme_digital/models/romme_digital_engine.dart",
+        "classes": [
+          "RommeCard",
+          "RommeMeld",
+          "RommeDigitalPlayerState",
+          "RommeDigitalState",
+          "RommeDigitalEngine"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/romme_digital/presentation/romme_digital_screen.dart",
+        "classes": [
+          "RommeDigitalScreen",
+          "_RommeDigitalScreenState"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "sessionsProvider",
+          "activePlayersProvider",
+          "rommeDigitalProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/romme_digital/providers/romme_digital_provider.dart",
+        "classes": [
+          "RommeDigitalNotifier"
+        ],
+        "providers": [
+          "NotifierProvider",
+          "rommeDigitalProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/schafkopf/models/schafkopf_models.dart",
+        "classes": [
+          "SchafkopfRound",
+          "SchafkopfGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/schafkopf/presentation/schafkopf_screen.dart",
+        "classes": [
+          "SchafkopfScreen",
+          "_SchafkopfScreenState"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "schafkopfStateProvider",
+          "sessionsProvider",
+          "activePlayersProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/schafkopf/providers/schafkopf_provider.dart",
+        "classes": [
+          "SchafkopfStateNotifier"
+        ],
+        "providers": [
+          "schafkopfStateProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/schafkopf_digital/models/bavarian_card_models.dart",
+        "classes": [
+          "BavarianCard",
+          "BavarianDeckGenerator",
+          "SchafkopfTrick"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/schafkopf_digital/models/schafkopf_digital_engine.dart",
+        "classes": [
+          "SchafkopfDigitalEngine"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/schafkopf_digital/models/schafkopf_digital_state.dart",
+        "classes": [
+          "SchafkopfDigitalState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/schafkopf_digital/presentation/schafkopf_digital_screen.dart",
+        "classes": [
+          "SchafkopfDigitalScreen",
+          "_SchafkopfDigitalScreenState",
+          "_BavarianCardChip",
+          "_BavarianCardWidget"
+        ],
+        "providers": [
+          "schafkopfDigitalProvider",
+          "audioServiceProvider",
+          "sessionsProvider",
+          "activePlayersProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/schafkopf_digital/providers/schafkopf_digital_provider.dart",
+        "classes": [
+          "SchafkopfDigitalNotifier"
+        ],
+        "providers": [
+          "schafkopfDigitalProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/sipdeck/models/sipdeck_expansion.dart",
+        "classes": [],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/sipdeck/models/sipdeck_models.dart",
+        "classes": [
+          "SipDeckCard",
+          "SipDeckGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/sipdeck/presentation/sipdeck_screen.dart",
+        "classes": [
+          "SipDeckScreen",
+          "_SipDeckScreenState"
+        ],
+        "providers": [
+          "sipDeckStateProvider",
+          "activePlayersProvider",
+          "shareServiceProvider",
+          "sessionsProvider",
+          "audioServiceProvider",
+          "ttsServiceProvider",
+          "settingsProvider",
+          "ttsActiveProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/sipdeck/providers/sipdeck_provider.dart",
+        "classes": [
+          "SipDeckStateNotifier"
+        ],
+        "providers": [
+          "sipDeckStateProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/sudoku/models/sudoku_campaign_data.dart",
+        "classes": [
+          "SudokuCampaignLevel"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/sudoku/models/sudoku_models.dart",
+        "classes": [
+          "SudokuCell",
+          "SudokuGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/sudoku/presentation/sudoku_campaign_screen.dart",
+        "classes": [
+          "SudokuCampaignScreen",
+          "_SudokuCampaignScreenState"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "activeGameIdProvider",
+          "completedCampaignLevelsProvider",
+          "sudokuStateProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/sudoku/presentation/sudoku_creator_screen.dart",
+        "classes": [
+          "SudokuCreatorScreen",
+          "_SudokuCreatorScreenState"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "activeGameIdProvider",
+          "sudokuStateProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/sudoku/presentation/sudoku_screen.dart",
+        "classes": [
+          "SudokuScreen",
+          "_SudokuScreenState",
+          "_SudokuThemeColors",
+          "_DiagonalPainter"
+        ],
+        "providers": [
+          "activeGameIdProvider",
+          "persistenceServiceProvider",
+          "isHostProvider",
+          "sudokuStateProvider",
+          "audioServiceProvider",
+          "multiplayerServiceProvider",
+          "completedCampaignLevelsProvider",
+          "currentLobbyProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/sudoku/presentation/sudoku_tutorial_screen.dart",
+        "classes": [
+          "TutorialStep",
+          "SudokuTutorialScreen",
+          "_SudokuTutorialScreenState"
+        ],
+        "providers": [
+          "audioServiceProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/sudoku/providers/sudoku_provider.dart",
+        "classes": [
+          "SudokuStateNotifier"
+        ],
+        "providers": [
+          "FutureProvider",
+          "persistenceServiceProvider",
+          "isHostProvider",
+          "NotifierProvider",
+          "sudokuStateProvider",
+          "completedCampaignLevelsProvider",
+          "syncEngineProvider",
+          "currentLobbyProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/sudoku/services/sudoku_analyzer.dart",
+        "classes": [
+          "AnalysisResult",
+          "SudokuAnalyzer"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/sudoku/services/sudoku_generator.dart",
+        "classes": [
+          "SudokuGenerator"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/sudoku/services/sudoku_share_service.dart",
+        "classes": [
+          "ImportResult",
+          "SudokuShareService"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/sudoku/services/sudoku_stats_service.dart",
+        "classes": [
+          "SudokuStats",
+          "SudokuStatsService"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/sudoku/services/sudoku_sync_service.dart",
+        "classes": [
+          "SudokuScore",
+          "SudokuSyncService"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/volleyball/models/volleyball_models.dart",
+        "classes": [
+          "VolleyballRules",
+          "VolleyballPoint",
+          "VolleyballTimeout",
+          "VolleyballSet",
+          "VolleyballGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/volleyball/presentation/volleyball_scoreboard.dart",
+        "classes": [
+          "VolleyballScoreboard",
+          "_VolleyballScoreboardState",
+          "_ScoreboardBody",
+          "_SetupMatchDialog",
+          "_SetupMatchDialogState",
+          "_PortraitScoreboard",
+          "_LandscapeScoreboard",
+          "_SetSummary",
+          "_SetWinsIndicator",
+          "_TeamScoreArea",
+          "_MatchFinishedView",
+          "_FinishedTeamScore"
+        ],
+        "providers": [
+          "shareServiceProvider",
+          "audioServiceProvider",
+          "sessionsProvider",
+          "volleyballStateProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/volleyball/presentation/volleyball_signals_screen.dart",
+        "classes": [
+          "VolleyballSignalsScreen",
+          "_Signal"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/volleyball/presentation/volleyball_signature_dialog.dart",
+        "classes": [
+          "VolleyballSignatureDialog",
+          "_VolleyballSignatureDialogState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/volleyball/providers/volleyball_provider.dart",
+        "classes": [
+          "VolleyballStateNotifier"
+        ],
+        "providers": [
+          "volleyballStateProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/volleyball/services/volleyball_pdf_service.dart",
+        "classes": [
+          "VolleyballPdfService"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/wayquest/models/wayquest_database.dart",
+        "classes": [],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/wayquest/models/wayquest_models.dart",
+        "classes": [
+          "WayQuestCard",
+          "WayQuestGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/wayquest/presentation/wayquest_screen.dart",
+        "classes": [
+          "WayQuestScreen",
+          "_WayQuestScreenState",
+          "_WayQuestSetup",
+          "_WayQuestGame"
+        ],
+        "providers": [
+          "wayQuestStateProvider",
+          "activePlayersProvider",
+          "shareServiceProvider",
+          "sessionsProvider",
+          "audioServiceProvider",
+          "ttsServiceProvider",
+          "settingsProvider",
+          "ttsActiveProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/wayquest/providers/wayquest_provider.dart",
+        "classes": [
+          "WayQuestStateNotifier"
+        ],
+        "providers": [
+          "wayQuestStateProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/wizard/models/wizard_models.dart",
+        "classes": [
+          "WizardRound",
+          "WizardGameState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/wizard/presentation/wizard_screen.dart",
+        "classes": [
+          "WizardScreen",
+          "_WizardScreenState"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "sessionsProvider",
+          "wizardStateProvider",
+          "activePlayersProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/wizard/providers/wizard_provider.dart",
+        "classes": [
+          "WizardGameStateNotifier"
+        ],
+        "providers": [
+          "wizardStateProvider",
+          "NotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/wizard_digital/models/card_models.dart",
+        "classes": [
+          "GameCard",
+          "DeckGenerator"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/wizard_digital/models/wizard_digital_state.dart",
+        "classes": [
+          "Trick",
+          "WizardDigitalState"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/wizard_digital/models/wizard_engine.dart",
+        "classes": [
+          "WizardEngine"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/games/wizard_digital/presentation/wizard_digital_screen.dart",
+        "classes": [
+          "WizardDigitalScreen",
+          "_WizardDigitalScreenState",
+          "_CardChip",
+          "_CardWidget"
+        ],
+        "providers": [
+          "audioServiceProvider",
+          "activePlayersProvider",
+          "sessionsProvider",
+          "wizardDigitalProvider"
+        ]
+      },
+      {
+        "path": "lib/features/games/wizard_digital/providers/wizard_digital_provider.dart",
+        "classes": [
+          "WizardDigitalNotifier"
+        ],
+        "providers": [
+          "wizardDigitalProvider",
+          "NotifierProvider"
+        ]
+      }
+    ],
+    "help": [
+      {
+        "path": "lib/features/help/presentation/help_screen.dart",
+        "classes": [
+          "HelpScreen",
+          "_SectionHeader",
+          "_HelpTile"
+        ],
+        "providers": []
+      },
+      {
+        "path": "lib/features/help/presentation/privacy_docs_screen.dart",
+        "classes": [
+          "PrivacyDocsScreen",
+          "_PrivacySection"
+        ],
+        "providers": []
+      }
+    ],
+    "history": [
+      {
+        "path": "lib/features/history/presentation/history_screen.dart",
+        "classes": [
+          "HistoryScreen",
+          "_SessionCard"
+        ],
+        "providers": [
+          "playersProvider",
+          "sessionsProvider"
+        ]
+      },
+      {
+        "path": "lib/features/history/repository/session_repository.dart",
+        "classes": [
+          "SessionsNotifier",
+          "SessionRepository"
+        ],
+        "providers": [
+          "sessionRepositoryProvider",
+          "sessionsProvider",
+          "AsyncNotifierProvider"
+        ]
+      }
+    ],
+    "leaderboards": [
+      {
+        "path": "lib/features/leaderboards/presentation/leaderboard_screen.dart",
+        "classes": [
+          "LeaderboardEntry",
+          "LeaderboardScreen"
+        ],
+        "providers": [
+          "playersProvider",
+          "sessionsProvider"
+        ]
+      }
+    ],
+    "multiplayer": [
+      {
+        "path": "lib/features/multiplayer/presentation/join_lobby_screen.dart",
+        "classes": [
+          "JoinLobbyScreen",
+          "_JoinLobbyScreenState"
+        ],
+        "providers": [
+          "multiplayerServiceProvider",
+          "settingsProvider"
+        ]
+      },
+      {
+        "path": "lib/features/multiplayer/presentation/lobby_screen.dart",
+        "classes": [
+          "LobbyScreen",
+          "_LobbyScreenState"
+        ],
+        "providers": [
+          "isHostProvider",
+          "gameStateSyncProvider",
+          "multiplayerServiceProvider",
+          "settingsProvider",
+          "currentLobbyProvider"
+        ]
+      },
+      {
+        "path": "lib/features/multiplayer/presentation/multiplayer_hub_screen.dart",
+        "classes": [
+          "MultiplayerHubScreen"
+        ],
+        "providers": []
+      }
+    ],
+    "players": [
+      {
+        "path": "lib/features/players/presentation/players_screen.dart",
+        "classes": [
+          "PlayersScreen"
+        ],
+        "providers": [
+          "playersProvider",
+          "playerGroupsProvider"
+        ]
+      },
+      {
+        "path": "lib/features/players/repository/player_group_repository.dart",
+        "classes": [
+          "PlayerGroupsNotifier",
+          "PlayerGroupRepository"
+        ],
+        "providers": [
+          "playerGroupsProvider",
+          "playerGroupRepositoryProvider",
+          "AsyncNotifierProvider"
+        ]
+      },
+      {
+        "path": "lib/features/players/repository/player_repository.dart",
+        "classes": [
+          "PlayersNotifier",
+          "PlayerRepository"
+        ],
+        "providers": [
+          "playersProvider",
+          "playerRepositoryProvider",
+          "AsyncNotifierProvider"
+        ]
+      }
+    ],
+    "settings": [
+      {
+        "path": "lib/features/settings/presentation/notification_permission_screen.dart",
+        "classes": [
+          "NotificationPermissionScreen",
+          "_NotificationPermissionScreenState",
+          "_FeatureRow"
+        ],
+        "providers": [
+          "notificationServiceProvider"
+        ]
+      },
+      {
+        "path": "lib/features/settings/presentation/settings_screen.dart",
+        "classes": [
+          "SettingsScreen",
+          "_SettingsScreenState",
+          "_SectionHeader",
+          "_SubSettingSwitch"
+        ],
+        "providers": [
+          "authUserProvider",
+          "playersProvider",
+          "sessionsProvider",
+          "lastBackupProvider",
+          "localBackupServiceProvider",
+          "authServiceProvider",
+          "settingsProvider"
+        ]
+      },
+      {
+        "path": "lib/features/settings/provider/settings_provider.dart",
+        "classes": [
+          "Settings",
+          "SettingsNotifier"
+        ],
+        "providers": [
+          "settingsProvider",
+          "lastBackupProvider",
+          "NotifierProvider"
+        ]
+      }
+    ]
+  },
+  "core_services": [
+    {
+      "path": "lib/core/services/audio_service.dart",
+      "classes": [
+        "AudioService"
+      ],
+      "providers": []
+    },
+    {
+      "path": "lib/core/services/notification_service.dart",
+      "classes": [
+        "NotificationService"
+      ],
+      "providers": [
+        "notificationServiceProvider"
+      ]
+    },
+    {
+      "path": "lib/core/services/share_service.dart",
+      "classes": [
+        "ShareService"
+      ],
+      "providers": []
+    },
+    {
+      "path": "lib/core/services/tts_service.dart",
+      "classes": [
+        "TtsService"
+      ],
+      "providers": []
+    }
+  ],
+  "core_providers": [
+    {
+      "path": "lib/core/providers/active_players_provider.dart",
+      "classes": [
+        "ActivePlayersNotifier"
+      ],
+      "providers": [
+        "activePlayersProvider",
+        "NotifierProvider"
+      ]
+    },
+    {
+      "path": "lib/core/providers/audio_provider.dart",
+      "classes": [],
+      "providers": [
+        "audioServiceProvider",
+        "settingsProvider"
+      ]
+    },
+    {
+      "path": "lib/core/providers/favorites_provider.dart",
+      "classes": [
+        "FavoritesNotifier"
+      ],
+      "providers": [
+        "favoritesProvider",
+        "NotifierProvider"
+      ]
+    },
+    {
+      "path": "lib/core/providers/persistence_provider.dart",
+      "classes": [
+        "ActiveGameIdNotifier",
+        "PersistenceNotifier"
+      ],
+      "providers": [
+        "persistenceNotifierProvider",
+        "AsyncNotifierProvider",
+        "activeGameIdProvider",
+        "persistenceServiceProvider",
+        "NotifierProvider"
+      ]
+    },
+    {
+      "path": "lib/core/providers/share_provider.dart",
+      "classes": [],
+      "providers": [
+        "shareServiceProvider"
+      ]
+    },
+    {
+      "path": "lib/core/providers/tts_provider.dart",
+      "classes": [
+        "TtsActiveNotifier"
+      ],
+      "providers": [
+        "NotifierProvider",
+        "ttsServiceProvider",
+        "settingsProvider",
+        "ttsActiveProvider"
+      ]
+    }
+  ],
+  "models": [
+    {
+      "path": "lib/core/models/drink_intensity.dart",
+      "classes": [],
+      "providers": []
+    },
+    {
+      "path": "lib/core/models/player_group.dart",
+      "classes": [
+        "PlayerGroup"
+      ],
+      "providers": []
+    },
+    {
+      "path": "lib/core/models/player_model.dart",
+      "classes": [
+        "Player"
+      ],
+      "providers": []
+    },
+    {
+      "path": "lib/core/models/session_model.dart",
+      "classes": [
+        "Session"
+      ],
+      "providers": []
+    }
+  ],
+  "routes": [
+    {
+      "path": "lib/core/router/app_router.dart",
+      "classes": [],
+      "providers": [
+        "routerProvider"
+      ]
+    }
+  ],
+  "shared_widgets": [
+    {
+      "path": "lib/shared/widgets/shareable_card.dart",
+      "classes": [
+        "ShareableCard"
+      ],
+      "providers": []
+    },
+    {
+      "path": "lib/shared/widgets/shareable_scorecard.dart",
+      "classes": [
+        "ShareableScorecard",
+        "PlayerScore"
+      ],
+      "providers": []
+    },
+    {
+      "path": "lib/shared/widgets/swipeable_card.dart",
+      "classes": [
+        "SwipeableCard",
+        "_SwipeableCardState"
+      ],
+      "providers": []
+    },
+    {
+      "path": "lib/shared/widgets/winner_confetti_overlay.dart",
+      "classes": [
+        "WinnerConfettiController",
+        "WinnerConfettiOverlay",
+        "_WinnerConfettiOverlayState"
+      ],
+      "providers": [
+        "shareServiceProvider",
+        "audioServiceProvider"
+      ]
+    }
+  ],
+  "file_tree": [
+    "lib/main.dart",
+    "lib/core/error/failures.dart",
+    "lib/core/error/result.dart",
+    "lib/core/firebase/firebase_options_web.dart",
+    "lib/core/i18n/app_localizations.dart",
+    "lib/core/lifecycle/app_lifecycle_observer.dart",
+    "lib/core/lifecycle/game_save_manager.dart",
+    "lib/core/models/drink_intensity.dart",
+    "lib/core/models/player_group.dart",
+    "lib/core/models/player_model.dart",
+    "lib/core/models/session_model.dart",
+    "lib/core/multiplayer/firestore_multiplayer_impl.dart",
+    "lib/core/multiplayer/multiplayer_service.dart",
+    "lib/core/multiplayer/sync_engine.dart",
+    "lib/core/multiplayer/models/lobby.dart",
+    "lib/core/multiplayer/models/multiplayer_user.dart",
+    "lib/core/multiplayer/providers/multiplayer_provider.dart",
+    "lib/core/multiplayer/widgets/multiplayer_client_overlay.dart",
+    "lib/core/presentation/environment_banner.dart",
+    "lib/core/presentation/scaffold_with_nav_bar.dart",
+    "lib/core/providers/active_players_provider.dart",
+    "lib/core/providers/audio_provider.dart",
+    "lib/core/providers/favorites_provider.dart",
+    "lib/core/providers/persistence_provider.dart",
+    "lib/core/providers/share_provider.dart",
+    "lib/core/providers/tts_provider.dart",
+    "lib/core/pwa/pwa_install_dialog.dart",
+    "lib/core/pwa/pwa_prompt.dart",
+    "lib/core/pwa/pwa_prompt_stub.dart",
+    "lib/core/pwa/pwa_prompt_web.dart",
+    "lib/core/pwa/pwa_update_service.dart",
+    "lib/core/pwa/pwa_update_service_stub.dart",
+    "lib/core/pwa/pwa_update_service_web.dart",
+    "lib/core/router/app_router.dart",
+    "lib/core/services/audio_service.dart",
+    "lib/core/services/notification_service.dart",
+    "lib/core/services/share_service.dart",
+    "lib/core/services/tts_service.dart",
+    "lib/core/storage/database_service.dart",
+    "lib/core/storage/state_persistence_service.dart",
+    "lib/core/sync/gist_sync_service.dart",
+    "lib/core/sync/local_backup_service.dart",
+    "lib/core/sync/local_backup_stub.dart",
+    "lib/core/sync/local_backup_web.dart",
+    "lib/core/theme/app_scroll_behavior.dart",
+    "lib/core/theme/app_theme.dart",
+    "lib/core/theme/widgets/animated_scale_button.dart",
+    "lib/core/theme/widgets/glass_container.dart",
+    "lib/core/theme/widgets/pwa_update_banner.dart",
+    "lib/core/utils/app_logger.dart",
+    "lib/core/utils/app_version.dart",
+    "lib/core/utils/logger.dart",
+    "lib/features/auth/presentation/profile_screen.dart",
+    "lib/features/auth/providers/auth_providers.dart",
+    "lib/features/games/arschloch/models/arschloch_models.dart",
+    "lib/features/games/arschloch/presentation/arschloch_screen.dart",
+    "lib/features/games/arschloch/providers/arschloch_provider.dart",
+    "lib/features/games/arschloch_digital/models/arschloch_digital_engine.dart",
+    "lib/features/games/arschloch_digital/models/arschloch_digital_state.dart",
+    "lib/features/games/arschloch_digital/models/standard_card_models.dart",
+    "lib/features/games/arschloch_digital/presentation/arschloch_digital_screen.dart",
+    "lib/features/games/arschloch_digital/providers/arschloch_digital_provider.dart",
+    "lib/features/games/buzztap/models/buzztap_expansion.dart",
+    "lib/features/games/buzztap/models/buzztap_models.dart",
+    "lib/features/games/buzztap/presentation/buzztap_screen.dart",
+    "lib/features/games/buzztap/providers/buzztap_provider.dart",
+    "lib/features/games/extras/models/darts_models.dart",
+    "lib/features/games/extras/models/generic_score_models.dart",
+    "lib/features/games/extras/models/phase10_models.dart",
+    "lib/features/games/extras/models/romme_models.dart",
+    "lib/features/games/extras/presentation/darts_screen.dart",
+    "lib/features/games/extras/presentation/generic_score_screen.dart",
+    "lib/features/games/extras/presentation/phase10_screen.dart",
+    "lib/features/games/extras/presentation/romme_screen.dart",
+    "lib/features/games/extras/providers/darts_provider.dart",
+    "lib/features/games/extras/providers/generic_score_provider.dart",
+    "lib/features/games/factquest/models/factquest_database.dart",
+    "lib/features/games/factquest/models/factquest_models.dart",
+    "lib/features/games/factquest/presentation/factquest_screen.dart",
+    "lib/features/games/factquest/providers/factquest_provider.dart",
+    "lib/features/games/kniffel/models/kniffel_models.dart",
+    "lib/features/games/kniffel/presentation/kniffel_screen.dart",
+    "lib/features/games/kniffel/providers/kniffel_provider.dart",
+    "lib/features/games/kniffel_digital/models/kniffel_digital_engine.dart",
+    "lib/features/games/kniffel_digital/presentation/kniffel_digital_screen.dart",
+    "lib/features/games/kniffel_digital/providers/kniffel_digital_provider.dart",
+    "lib/features/games/phase10_digital/models/phase10_digital_engine.dart",
+    "lib/features/games/phase10_digital/presentation/phase10_digital_screen.dart",
+    "lib/features/games/phase10_digital/providers/phase10_digital_provider.dart",
+    "lib/features/games/presentation/games_list_screen.dart",
+    "lib/features/games/presentation/game_setup_screen.dart",
+    "lib/features/games/presentation/widgets/resume_banner.dart",
+    "lib/features/games/qwixx/models/qwixx_models.dart",
+    "lib/features/games/qwixx/presentation/qwixx_screen.dart",
+    "lib/features/games/qwixx/providers/qwixx_provider.dart",
+    "lib/features/games/qwixx_digital/models/qwixx_digital_engine.dart",
+    "lib/features/games/qwixx_digital/presentation/qwixx_digital_screen.dart",
+    "lib/features/games/qwixx_digital/providers/qwixx_digital_provider.dart",
+    "lib/features/games/romme_digital/models/romme_digital_engine.dart",
+    "lib/features/games/romme_digital/presentation/romme_digital_screen.dart",
+    "lib/features/games/romme_digital/providers/romme_digital_provider.dart",
+    "lib/features/games/schafkopf/models/schafkopf_models.dart",
+    "lib/features/games/schafkopf/presentation/schafkopf_screen.dart",
+    "lib/features/games/schafkopf/providers/schafkopf_provider.dart",
+    "lib/features/games/schafkopf_digital/models/bavarian_card_models.dart",
+    "lib/features/games/schafkopf_digital/models/schafkopf_digital_engine.dart",
+    "lib/features/games/schafkopf_digital/models/schafkopf_digital_state.dart",
+    "lib/features/games/schafkopf_digital/presentation/schafkopf_digital_screen.dart",
+    "lib/features/games/schafkopf_digital/providers/schafkopf_digital_provider.dart",
+    "lib/features/games/sipdeck/models/sipdeck_expansion.dart",
+    "lib/features/games/sipdeck/models/sipdeck_models.dart",
+    "lib/features/games/sipdeck/presentation/sipdeck_screen.dart",
+    "lib/features/games/sipdeck/providers/sipdeck_provider.dart",
+    "lib/features/games/sudoku/models/sudoku_campaign_data.dart",
+    "lib/features/games/sudoku/models/sudoku_models.dart",
+    "lib/features/games/sudoku/presentation/sudoku_campaign_screen.dart",
+    "lib/features/games/sudoku/presentation/sudoku_creator_screen.dart",
+    "lib/features/games/sudoku/presentation/sudoku_screen.dart",
+    "lib/features/games/sudoku/presentation/sudoku_tutorial_screen.dart",
+    "lib/features/games/sudoku/providers/sudoku_provider.dart",
+    "lib/features/games/sudoku/services/sudoku_analyzer.dart",
+    "lib/features/games/sudoku/services/sudoku_generator.dart",
+    "lib/features/games/sudoku/services/sudoku_share_service.dart",
+    "lib/features/games/sudoku/services/sudoku_stats_service.dart",
+    "lib/features/games/sudoku/services/sudoku_sync_service.dart",
+    "lib/features/games/volleyball/models/volleyball_models.dart",
+    "lib/features/games/volleyball/presentation/volleyball_scoreboard.dart",
+    "lib/features/games/volleyball/presentation/volleyball_signals_screen.dart",
+    "lib/features/games/volleyball/presentation/volleyball_signature_dialog.dart",
+    "lib/features/games/volleyball/providers/volleyball_provider.dart",
+    "lib/features/games/volleyball/services/volleyball_pdf_service.dart",
+    "lib/features/games/wayquest/models/wayquest_database.dart",
+    "lib/features/games/wayquest/models/wayquest_models.dart",
+    "lib/features/games/wayquest/presentation/wayquest_screen.dart",
+    "lib/features/games/wayquest/providers/wayquest_provider.dart",
+    "lib/features/games/wizard/models/wizard_models.dart",
+    "lib/features/games/wizard/presentation/wizard_screen.dart",
+    "lib/features/games/wizard/providers/wizard_provider.dart",
+    "lib/features/games/wizard_digital/models/card_models.dart",
+    "lib/features/games/wizard_digital/models/wizard_digital_state.dart",
+    "lib/features/games/wizard_digital/models/wizard_engine.dart",
+    "lib/features/games/wizard_digital/presentation/wizard_digital_screen.dart",
+    "lib/features/games/wizard_digital/providers/wizard_digital_provider.dart",
+    "lib/features/help/presentation/help_screen.dart",
+    "lib/features/help/presentation/privacy_docs_screen.dart",
+    "lib/features/history/presentation/history_screen.dart",
+    "lib/features/history/repository/session_repository.dart",
+    "lib/features/leaderboards/presentation/leaderboard_screen.dart",
+    "lib/features/multiplayer/presentation/join_lobby_screen.dart",
+    "lib/features/multiplayer/presentation/lobby_screen.dart",
+    "lib/features/multiplayer/presentation/multiplayer_hub_screen.dart",
+    "lib/features/players/presentation/players_screen.dart",
+    "lib/features/players/repository/player_group_repository.dart",
+    "lib/features/players/repository/player_repository.dart",
+    "lib/features/settings/presentation/notification_permission_screen.dart",
+    "lib/features/settings/presentation/settings_screen.dart",
+    "lib/features/settings/provider/settings_provider.dart",
+    "lib/shared/widgets/shareable_card.dart",
+    "lib/shared/widgets/shareable_scorecard.dart",
+    "lib/shared/widgets/swipeable_card.dart",
+    "lib/shared/widgets/winner_confetti_overlay.dart"
+  ]
+}

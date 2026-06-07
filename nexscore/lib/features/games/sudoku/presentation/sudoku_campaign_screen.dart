@@ -9,6 +9,7 @@ import '../../../../core/services/audio_service.dart';
 import '../models/sudoku_campaign_data.dart';
 import '../models/sudoku_models.dart';
 import '../providers/sudoku_provider.dart';
+import '../../../../core/providers/persistence_provider.dart';
 
 class SudokuCampaignScreen extends ConsumerStatefulWidget {
   const SudokuCampaignScreen({super.key});
@@ -79,7 +80,7 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
                         // Node Card
                         AnimatedScaleButton(
                           onPressed: () {
-                            ref.read(audioServiceProvider).play(SfxType.tap);
+                            ref.read(audioServiceProvider).play(SfxType.swipe);
                             setState(() {
                               _selectedLevel = level;
                             });
@@ -87,16 +88,6 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
                           child: GlassContainer(
                             borderRadius: 16,
                             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Colors.indigoAccent
-                                  : (isCompleted
-                                      ? Colors.greenAccent.withAlpha(100)
-                                      : (isUnlocked
-                                          ? Colors.blueAccent.withAlpha(60)
-                                          : Colors.grey.withAlpha(40))),
-                              width: isSelected ? 2 : 1.5,
-                            ),
                             child: Row(
                               children: [
                                 // Icon indicator
@@ -230,7 +221,6 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
     return GlassContainer(
       borderRadius: 24,
       padding: const EdgeInsets.all(20),
-      border: Border.all(color: Colors.indigoAccent.withAlpha(100), width: 1.5),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -288,7 +278,7 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
           if (isUnlocked)
             FilledButton(
               onPressed: () {
-                ref.read(audioServiceProvider).play(SfxType.success);
+                ref.read(audioServiceProvider).play(SfxType.fanfare);
                 // Initialize game state with campaign level
                 ref.read(sudokuStateProvider.notifier).setupCampaignLevel(level.levelId);
                 ref.read(activeGameIdProvider.notifier).state = 'sudoku';

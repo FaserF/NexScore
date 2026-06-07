@@ -46,6 +46,22 @@ def format_version(major, minor, patch, prefix, suffix_num, commit_sha=None):
             return f"{base}b{suffix_num}"
     return base
 
+def has_stable_tag():
+    try:
+        result = subprocess.run(
+            ['git', 'tag'],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        tags = result.stdout.strip().split('\n')
+        for t in tags:
+            if re.match(r'^v?\d+\.\d+\.\d+$', t):
+                return True
+        return False
+    except Exception:
+        return False
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--release-type', choices=['stable', 'beta', 'dev'], required=True)
@@ -124,11 +140,20 @@ def main():
     # Further sanitize for Docker (only alpha, num, '.', '-', '_')
     docker_tag = re.sub(r'[^a-z0-9._-]', '-', docker_tag)
 
+    # Determine if we should deploy to pages
+    stable_exists = has_stable_tag()
+    should_deploy_pages = "false"
+    if args.release_type == "stable":
+        should_deploy_pages = "true"
+    elif args.release_type == "beta" and not stable_exists:
+        should_deploy_pages = "true"
+
     # Print for GitHub Actions
     print(f"VERSION_NAME={version_name}")
     print(f"TAG_NAME={tag_name}")
     print(f"DOCKER_TAG={docker_tag}")
     print(f"IS_PRERELEASE={is_prerelease}")
+    print(f"SHOULD_DEPLOY_PAGES={should_deploy_pages}")
 
 if __name__ == "__main__":
     main()

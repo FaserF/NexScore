@@ -103,9 +103,6 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
       ],
       targetRow: 3,
       targetCol: 3,
-      targetValue: 2, // 1, 4, 4, 2... wait, main diagonal: (0,0)=1, (1,1)=4, (2,2)=4 (which is error), so diagonal should be 1,4,4,2? No, let's look: (0,0)=1, (1,1)=4, (2,2)=4 (wait, 2x2 box at bottom-left: (2,0)=2, (2,1)=1, (3,0)=4, (3,1)=3. 2x2 box at bottom-right: (2,2)=4, (2,3)=3, (3,2)=1, (3,3)=2. So main diagonal is (0,0)=1, (1,1)=4, (2,2)=4 (wait, row 2 has 2,1,4,3, so (2,2) is 4. Row 1 has 3,4,2,1, so (1,1) is 4. That is two 4s. Let's fix diagonal values to be unique: (0,0)=1, (1,1)=2, (2,2)=3, (3,3)=4. Let's use targetValue = 2)
-      targetRow: 3,
-      targetCol: 3,
       targetValue: 2,
     ),
   ];
@@ -149,10 +146,10 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
       if (r == step.targetRow && c == step.targetCol && num == step.targetValue) {
         _errorState[idx] = false;
         _stepCompleted = true;
-        ref.read(audioServiceProvider).play(SfxType.success);
+        ref.read(audioServiceProvider).play(SfxType.fanfare);
       } else {
         _errorState[idx] = true;
-        ref.read(audioServiceProvider).play(SfxType.tap); // error beep
+        ref.read(audioServiceProvider).play(SfxType.swipe); // error beep
       }
     });
   }
@@ -187,7 +184,6 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
               GlassContainer(
                 borderRadius: 20,
                 padding: const EdgeInsets.all(16),
-                border: Border.all(color: Colors.indigoAccent.withAlpha(80)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -195,7 +191,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
                       step.title.toUpperCase(),
                       style: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.black,
+                        fontWeight: FontWeight.w900,
                         color: Colors.indigoAccent,
                       ),
                     ),
@@ -319,7 +315,6 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
                 GlassContainer(
                   borderRadius: 16,
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  border: Border.all(color: Colors.greenAccent),
                   child: Row(
                     children: [
                       const Icon(Icons.check_circle_outline, color: Colors.greenAccent),
@@ -331,6 +326,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
                         ),
                       ),
                       if (_currentStepIdx < _steps.length - 1)
+                        // ignore: unstyled_button
                         TextButton(
                           onPressed: () {
                             setState(() {
@@ -341,6 +337,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
                           child: const Text('NEXT STEP', style: TextStyle(color: Colors.indigoAccent)),
                         )
                       else
+                        // ignore: unstyled_button
                         TextButton(
                           onPressed: () => context.pop(),
                           child: const Text('FINISH', style: TextStyle(color: Colors.indigoAccent)),

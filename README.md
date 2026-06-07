@@ -31,21 +31,23 @@ NexScore is built with a focus on **Efficiency, Clarity, and Robustness**. It's 
 
 ## 🎮 Supported Games
 
-NexScore supports a wide variety of card, dice, and strategy games with specialized logic for each:
+NexScore supports a wide variety of card, dice, strategy, and casual games. Games support traditional scorekeeping as well as interactive digital engines (where the game is played fully digitally within the app):
 
-- **Wizard®**: Comprehensive trick bidding with multiple scoring variants (Standard/Lenient/Extreme).
-- **Qwixx®**: Digital scoresheet with locked-row logic and automated penalty calculation.
-- **Schafkopf**: Bavarian trick-taking with Sauspiel, Solo, and Wenz support.
-- **Kniffel®**: Full Yahtzee scoresheet with automated upper-section bonus calculation.
-- **Phase 10®**: Original, Masters, and Duel variants with phase tracking.
+- **Sudoku**: Fully interactive digital gameplay featuring a learning tutorial, campaign levels, custom board creator, puzzle analyzer, board generator, session statistics, local/cloud save sync, and realtime multiplayer lobbies.
+- **Wizard®**: Comprehensive trick bidding with multiple scoring variants (Standard/Lenient/Extreme). Features both scorekeeping and an interactive digital engine.
+- **Qwixx®**: Digital scoresheet with locked-row logic and automated penalty calculation. Features both scorekeeping and an interactive digital engine.
+- **Schafkopf**: Bavarian trick-taking with Sauspiel, Solo, and Wenz support. Features both scorekeeping and an interactive digital engine.
+- **Kniffel®**: Full Yahtzee scoresheet with automated upper-section bonus calculation. Features both scorekeeping and an interactive digital engine.
+- **Phase 10®**: Original, Masters, and Duel variants with phase tracking. Features both scorekeeping and an interactive digital engine.
+- **Rommé**: Multi-round penalty tracking for 2–6 players. Features both scorekeeping and an interactive digital engine.
+- **Arschloch / President**: Rank tracking with automated card exchange instructions. Supports 2–8 players. Features both scorekeeping and an interactive digital engine.
 - **Darts X01**: Fast-pass scoring board for 301/501/701/1001 with bust detection.
-- **Rommé**: Multi-round penalty tracking for 2–6 players.
-- **Arschloch / President**: Rank tracking with automated card exchange instructions. Supports 2–8 players.
 - **SipDeck (18+)**: Dynamic drinking game with 50+ challenges and automated sip tracking.
 - **BuzzTap (18+)**: High-energy, fast-paced tapping party game with automated sip tracking.
 - **WayQuest**: Entertaining questions and road challenges for long car rides.
 - **FactQuest**: True facts, "Dumb Ways to Die" stories, and detailed explanations with clickable source links – perfect for car rides.
-- **Volleyball**: Advanced score tracker for indoor and beach volleyball with sets, side-out tracking, and automatic side switching.
+- **Volleyball**: Advanced score tracker for indoor and beach volleyball with sets, side-out tracking, and automatic side switching. Includes PDF reports and referee signature.
+- **Generic Score Tracker**: Flexible score tracking layout customizable for any arbitrary card or board game.
 
 ---
 

@@ -55,6 +55,7 @@ class SudokuShareService {
             value: solution[idx],
             currentValue: clue,
             isOriginal: clue > 0,
+            notes: const {},
           ));
         }
       }

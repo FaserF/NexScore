@@ -1,0 +1,35 @@
+{
+  "multiplayer_flow": {
+    "description": "Multiplayer gameplay sync & state management",
+    "entry_point": "nexscore/lib/features/multiplayer/presentation/multiplayer_hub_screen.dart",
+    "state_management": "nexscore/lib/core/multiplayer/providers/multiplayer_provider.dart",
+    "core_services": [
+      "nexscore/lib/core/multiplayer/multiplayer_service.dart",
+      "nexscore/lib/core/multiplayer/firestore_multiplayer_impl.dart",
+      "nexscore/lib/core/multiplayer/sync_engine.dart"
+    ],
+    "database_models": [
+      "nexscore/lib/core/models/session_model.dart",
+      "nexscore/lib/core/models/player_model.dart"
+    ]
+  },
+  "game_creation_flow": {
+    "description": "Creating and saving games (both local and multiplayer)",
+    "entry_point": "nexscore/lib/features/games/presentation/game_setup_screen.dart",
+    "state_management": "nexscore/lib/core/providers/active_players_provider.dart",
+    "storage": "nexscore/lib/core/storage/database_service.dart",
+    "database_models": [
+      "nexscore/lib/core/models/session_model.dart",
+      "nexscore/lib/core/models/player_model.dart"
+    ]
+  },
+  "settings_sync_flow": {
+    "description": "User preferences and settings synchronization",
+    "entry_point": "nexscore/lib/features/settings/presentation/settings_screen.dart",
+    "storage": "nexscore/lib/core/storage/state_persistence_service.dart",
+    "services": [
+      "nexscore/lib/core/theme/app_theme.dart",
+      "nexscore/lib/core/i18n/app_localizations.dart"
+    ]
+  }
+}

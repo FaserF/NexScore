@@ -13,6 +13,9 @@ class MockMultiplayerService implements MultiplayerService {
   Lobby? get currentLobby => _currentLobby;
 
   @override
+  String? get lastCloseReason => null;
+
+  @override
   Stream<Lobby?> get lobbyUpdates => _lobbyStreamController.stream;
 
   @override

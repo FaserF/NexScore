@@ -6,6 +6,7 @@ import 'package:nexscore/features/games/sudoku/providers/sudoku_provider.dart';
 import 'package:nexscore/features/games/sudoku/services/sudoku_generator.dart';
 import 'package:nexscore/features/games/sudoku/services/sudoku_analyzer.dart';
 import 'package:nexscore/features/games/sudoku/services/sudoku_share_service.dart';
+import 'package:nexscore/core/providers/persistence_provider.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -315,6 +316,28 @@ void main() {
 
       final updatedState = container.read(sudokuStateProvider);
       expect(updatedState.playerScores['player'], 100);
+    });
+
+    test('Auto-saving works on cell input changes', () async {
+      SharedPreferences.setMockInitialValues({});
+      final notifier = container.read(sudokuStateProvider.notifier);
+      
+      notifier.setupMatch(
+        variant: SudokuVariant.standard,
+        difficulty: SudokuDifficulty.easy,
+        mode: SudokuMode.classic,
+      );
+
+      final state = container.read(sudokuStateProvider);
+      final emptyIdx = state.grid.indexWhere((c) => !c.isOriginal);
+      final cell = state.grid[emptyIdx];
+      
+      notifier.selectCell(cell.row, cell.col);
+      notifier.enterNumber(cell.value, 'Tester');
+
+      final service = container.read(persistenceServiceProvider);
+      final savedStateMap = await service.loadGameState('sudoku');
+      expect(savedStateMap, isNotNull);
     });
   });
 }

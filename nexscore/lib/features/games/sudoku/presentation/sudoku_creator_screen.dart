@@ -11,6 +11,7 @@ import '../models/sudoku_models.dart';
 import '../services/sudoku_generator.dart';
 import '../services/sudoku_share_service.dart';
 import '../providers/sudoku_provider.dart';
+import '../../../../core/providers/persistence_provider.dart';
 
 class SudokuCreatorScreen extends ConsumerStatefulWidget {
   const SudokuCreatorScreen({super.key});
@@ -69,7 +70,7 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
       _validationStatus = 'untested';
       _shareCode = null;
     });
-    ref.read(audioServiceProvider).play(SfxType.tap);
+    ref.read(audioServiceProvider).play(SfxType.swipe);
   }
 
   void _onErasePress() {
@@ -85,7 +86,7 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
       _validationStatus = 'untested';
       _shareCode = null;
     });
-    ref.read(audioServiceProvider).play(SfxType.tap);
+    ref.read(audioServiceProvider).play(SfxType.swipe);
   }
 
   Future<void> _validatePuzzle() async {
@@ -147,6 +148,7 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
             value: solution[idx],
             currentValue: _gridValues[idx],
             isOriginal: _gridValues[idx] > 0,
+            notes: const {},
           ));
         }
       }
@@ -157,7 +159,7 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
         _shareCode = code;
         _isValidating = false;
       });
-      ref.read(audioServiceProvider).play(SfxType.success);
+      ref.read(audioServiceProvider).play(SfxType.fanfare);
     } else {
       setState(() {
         _validationStatus = 'multiple';
@@ -215,6 +217,7 @@ class _SudokuCreatorScreenState extends ConsumerState<SudokuCreatorScreen> {
         difficulty: SudokuDifficulty.medium,
         variant: result.variant,
         mode: SudokuMode.classic,
+        theme: SudokuTheme.aether,
       );
 
       ref.read(sudokuStateProvider.notifier).loadState(customState);

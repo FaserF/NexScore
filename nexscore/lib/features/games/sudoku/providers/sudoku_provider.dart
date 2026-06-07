@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/multiplayer/providers/multiplayer_provider.dart';
+import '../../../../core/providers/persistence_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/sudoku_campaign_data.dart';
 import '../models/sudoku_models.dart';
@@ -135,6 +136,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
       if (isVsBots && botDifficulty != null) {
         _startBotSimulation();
       }
+      _autoSave();
     }
   }
 
@@ -318,11 +320,29 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
   void loadState(SudokuGameState savedState) {
     _history.clear();
     _timer?.cancel();
+    _botTimer?.cancel();
     _eventsSubscription?.cancel();
     _gameStateSubscription?.cancel();
     state = savedState;
     if (!state.isFinished && !state.isMultiplayer) {
       startTimer();
+      if (state.isVsBots && state.botDifficulty != null) {
+        _startBotSimulation();
+      }
+    }
+  }
+
+  Future<void> _autoSave() async {
+    if (state.isMultiplayer) return;
+    try {
+      final service = ref.read(persistenceServiceProvider);
+      if (state.isFinished || state.grid.isEmpty) {
+        await service.clearGameState('sudoku');
+      } else {
+        await service.saveGameState('sudoku', state.toMap());
+      }
+    } catch (e) {
+      debugPrint('Failed to auto-save Sudoku state: $e');
     }
   }
 
@@ -487,6 +507,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
             }
           }
         }
+        _autoSave();
       }
     }
   }
@@ -512,6 +533,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
 
     final validatedGrid = SudokuGenerator.validateBoard(newGrid, state.variant);
     state = state.copyWith(grid: validatedGrid);
+    _autoSave();
   }
 
   void useHint() {
@@ -547,7 +569,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
 
   void _startListeningToHostState() {
     _gameStateSubscription?.cancel();
-    _gameStateSubscription = ref.read(gameStateSyncProvider.stream).listen((updatedStateMap) {
+    _gameStateSubscription = ref.read(syncEngineProvider).gameStateStream.listen((updatedStateMap) {
       try {
         final hostState = SudokuGameState.fromMap(updatedStateMap);
         

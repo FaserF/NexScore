@@ -23,7 +23,7 @@ class LocalBackupService {
       if (kIsWeb) {
         _downloadWeb(bytes, fileName);
       } else {
-        final result = await FilePicker.platform.saveFile(
+        final result = await FilePicker.saveFile(
           dialogTitle: 'Save NexScore Backup',
           fileName: fileName,
           bytes: bytes,
@@ -58,7 +58,7 @@ class LocalBackupService {
   Future<bool> importBackup() async {
     final stopwatch = Stopwatch()..start();
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['json'],
         withData: true,

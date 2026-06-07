@@ -424,7 +424,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
             child: Stack(
               children: [
                 gameState.grid.isEmpty
-                    ? _buildSetupView(l10n, colors)
+                    ? _buildSetupView(l10n, colors, completedLevelsAsync)
                     : _buildGameView(gameState, l10n, colors),
       
                 // Confetti Overlay
@@ -489,7 +489,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
 
   // --- Setup / Config View ---
 
-  Widget _buildSetupView(AppLocalizations l10n, _SudokuThemeColors colors) {
+  Widget _buildSetupView(AppLocalizations l10n, _SudokuThemeColors colors, AsyncValue<Set<int>> completedLevelsAsync) {
     final lobby = ref.watch(currentLobbyProvider);
     final isHost = ref.watch(isHostProvider);
 
@@ -627,7 +627,6 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                     child: GlassContainer(
                       borderRadius: 20,
                       padding: const EdgeInsets.all(20),
-                      border: Border.all(color: colors.primary.withAlpha(120), width: 1.5),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -642,7 +641,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                                     'SUDOKU ACADEMY',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.black,
+                                      fontWeight: FontWeight.w900,
                                       color: colors.primary,
                                       letterSpacing: 1.5,
                                     ),
@@ -697,7 +696,6 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                 child: GlassContainer(
                   borderRadius: 20,
                   padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  border: Border.all(color: colors.accent.withAlpha(80), width: 1.2),
                   child: Row(
                     children: [
                       Icon(Icons.help_outline, color: colors.accent, size: 24),
@@ -741,7 +739,6 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                       child: GlassContainer(
                         borderRadius: 16,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        border: Border.all(color: colors.primary.withAlpha(80), width: 1.2),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -760,7 +757,6 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                       child: GlassContainer(
                         borderRadius: 16,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        border: Border.all(color: colors.primary.withAlpha(80), width: 1.2),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -805,7 +801,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
             onSelectionChanged: (set) => setState(() => _selectedDifficulty = set.first),
           ),
           const SizedBox(height: 20),
-
+          if (lobby == null) ...[
             Text(l10n.get('sudoku_mode'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             SegmentedButton<SudokuMode>(
@@ -1030,7 +1026,6 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
               child: GlassContainer(
                 borderRadius: 16,
                 padding: const EdgeInsets.all(12),
-                border: Border.all(color: Colors.amber.withAlpha(150), width: 1.5),
                 child: Row(
                   children: [
                     const Icon(Icons.psychology, color: Colors.amber, size: 28),
@@ -1222,8 +1217,25 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     final selectedCellIndex = (state.selectedRow != null && state.selectedCol != null)
         ? state.selectedRow! * size + state.selectedCol!
         : null;
-    final selectedVal = selectedCellIndex != null ? state.grid[selectedCellIndex].currentValue : 0;
+    final selectedCell = selectedCellIndex != null ? state.grid[selectedCellIndex] : null;
+    final selectedVal = selectedCell?.currentValue ?? 0;
     final isMatchingValue = selectedVal > 0 && cell.currentValue == selectedVal;
+
+    // Check if this cell has a conflict with the currently selected cell
+    bool hasValueConflict = false;
+    if (selectedVal > 0 && !cell.isOriginal && cell.currentValue == selectedVal && selectedCellIndex != index) {
+      final isSameRow = (r == state.selectedRow);
+      final isSameCol = (c == state.selectedCol);
+      bool isSameBlock = false;
+      if (size == 6) {
+        isSameBlock = (r ~/ 2 == state.selectedRow! ~/ 2) && (c ~/ 3 == state.selectedCol! ~/ 3);
+      } else {
+        isSameBlock = (r ~/ 3 == state.selectedRow! ~/ 3) && (c ~/ 3 == state.selectedCol! ~/ 3);
+      }
+      if (isSameRow || isSameCol || isSameBlock) {
+        hasValueConflict = true;
+      }
+    }
 
     final borderRight = (c == 2 || c == 5) && size == 9 || (c == 2 && size == 6);
     final borderBottom = (r == 2 || r == 5) && size == 9 || (r == 1 || r == 3) && size == 6;
@@ -1256,6 +1268,8 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       cellBg = colors.accent.withAlpha(150);
     } else if (isSelected) {
       cellBg = colors.cellSelection;
+    } else if (hasValueConflict) {
+      cellBg = colors.cellError.withAlpha(50);
     } else if (playerColor != null) {
       cellBg = playerColor;
     } else if (isMatchingValue) {
@@ -1388,11 +1402,13 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(size, (index) {
         final val = index + 1;
-        final completed = counts[val] == size;
+        final count = counts[val] ?? 0;
+        final remaining = size - count;
+        final completed = remaining <= 0;
 
         return Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            padding: const EdgeInsets.symmetric(horizontal: 3.0),
             child: AnimatedScaleButton(
               onPressed: completed
                   ? null
@@ -1401,7 +1417,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                       ref.read(sudokuStateProvider.notifier).enterNumber(val, '');
                     },
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
                   color: completed ? Colors.transparent : colors.surface,
                   borderRadius: BorderRadius.circular(12),
@@ -1410,15 +1426,27 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                     width: 1,
                   ),
                 ),
-                child: Center(
-                  child: Text(
-                    '$val',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      color: completed ? Colors.grey.withAlpha(80) : colors.primary,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '$val',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: completed ? Colors.grey.withAlpha(80) : colors.primary,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 2),
+                    Text(
+                      completed ? '✓' : '$remaining',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: completed ? Colors.green.withAlpha(150) : colors.primary.withAlpha(150),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -1813,6 +1841,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                   difficulty: SudokuDifficulty.medium,
                   variant: result.variant,
                   mode: SudokuMode.classic,
+                  theme: SudokuTheme.aether,
                 );
                 ref.read(sudokuStateProvider.notifier).loadState(customState);
                 ref.read(activeGameIdProvider.notifier).state = 'sudoku';

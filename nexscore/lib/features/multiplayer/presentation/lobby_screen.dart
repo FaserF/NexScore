@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/i18n/app_localizations.dart';
 import '../../../core/multiplayer/providers/multiplayer_provider.dart';
+import '../../../core/multiplayer/models/lobby.dart';
 import '../../settings/provider/settings_provider.dart';
 import 'package:go_router/go_router.dart';
 

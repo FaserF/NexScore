@@ -823,6 +823,7 @@ class AppLocalizations {
       'account_merge_button': 'Merge Accounts',
       'account_merge_success':
           'Accounts merged successfully! Please sign in again and link the account.',
+      'game_sudoku_academy': 'Sudoku Academy',
       'account_data_stay_note':
           'Your local data remains on this device when you sign out.',
       'account_privacy_info':
@@ -3502,6 +3503,7 @@ class AppLocalizations {
       'account_merge_button': 'Zusammenführen',
       'account_merge_success':
           'Konten erfolgreich zusammengeführt! Bitte melde dich erneut an und verknüpfe das Konto.',
+      'game_sudoku_academy': 'Sudoku-Akademie',
       'account_data_stay_note':
           'Deine lokalen Daten bleiben beim Abmelden auf diesem Gerät erhalten.',
       'account_privacy_info':

@@ -6,10 +6,14 @@ import '../../../core/utils/logger.dart';
 import '../../../core/error/failures.dart';
 import '../../../core/error/result.dart';
 
+/// Provider for the raw FirebaseAuth instance, allowing it to be overridden in tests.
+final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
+
 /// Provider for the current Firebase Auth user (null = signed out / anonymous).
 final authUserProvider = StreamProvider<User?>((ref) {
+  final auth = ref.watch(firebaseAuthProvider);
   try {
-    return FirebaseAuth.instance.authStateChanges().handleError((error) {
+    return auth.authStateChanges().handleError((error) {
       debugPrint('FirebaseAuth Stream Error: $error');
       return null;
     });
@@ -21,7 +25,8 @@ final authUserProvider = StreamProvider<User?>((ref) {
 
 /// Auth service encapsulating Google/GitHub Sign-In and sign-out logic.
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth;
+  AuthService({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance;
 
   Future<Result<UserCredential>> signInWithGoogleNative() async {
     final stopwatch = Stopwatch()..start();
@@ -248,4 +253,7 @@ extension UserPrimaryIdentity on User {
   }
 }
 
-final authServiceProvider = Provider<AuthService>((ref) => AuthService());
+final authServiceProvider = Provider<AuthService>((ref) {
+  final auth = ref.watch(firebaseAuthProvider);
+  return AuthService(auth: auth);
+});

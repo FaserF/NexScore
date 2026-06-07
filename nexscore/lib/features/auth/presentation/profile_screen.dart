@@ -7,6 +7,7 @@ import '../providers/auth_providers.dart';
 import '../../../core/sync/gist_sync_service.dart';
 import '../../settings/provider/settings_provider.dart';
 import '../../../core/storage/database_service.dart';
+import '../../../core/error/failures.dart';
 
 final gistSyncServiceProvider = Provider<GistSyncService>(
   (ref) => GistSyncService(ref: ref),

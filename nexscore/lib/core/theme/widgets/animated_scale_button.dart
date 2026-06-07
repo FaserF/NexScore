@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AnimatedScaleButton extends ConsumerStatefulWidget {
   final Widget child;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double scaleLowerBound;
   final Duration duration;
 
   const AnimatedScaleButton({
     super.key,
     required this.child,
-    required this.onPressed,
+    this.onPressed,
     this.scaleLowerBound = 0.95,
     this.duration = const Duration(milliseconds: 150),
   });
@@ -43,24 +43,28 @@ class _AnimatedScaleButtonState extends ConsumerState<AnimatedScaleButton>
   }
 
   void _onTapDown(TapDownDetails details) {
-    _controller.reverse();
+    if (widget.onPressed != null) {
+      _controller.reverse();
+    }
   }
 
   void _onTapUp(TapUpDetails details) {
     _controller.forward();
-    widget.onPressed();
+    widget.onPressed?.call();
   }
 
   void _onTapCancel() {
-    _controller.forward();
+    if (widget.onPressed != null) {
+      _controller.forward();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: _onTapDown,
-      onTapUp: _onTapUp,
-      onTapCancel: _onTapCancel,
+      onTapDown: widget.onPressed == null ? null : _onTapDown,
+      onTapUp: widget.onPressed == null ? null : _onTapUp,
+      onTapCancel: widget.onPressed == null ? null : _onTapCancel,
       behavior: HitTestBehavior.opaque,
       child: ScaleTransition(scale: _controller, child: widget.child),
     );
