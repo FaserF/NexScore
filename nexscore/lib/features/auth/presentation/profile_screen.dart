@@ -6,6 +6,7 @@ import '../../../core/i18n/app_localizations.dart';
 import '../providers/auth_providers.dart';
 import '../../../core/sync/gist_sync_service.dart';
 import '../../settings/provider/settings_provider.dart';
+import '../../../core/storage/database_service.dart';
 
 final gistSyncServiceProvider = Provider<GistSyncService>(
   (ref) => GistSyncService(ref: ref),
@@ -103,7 +104,7 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
                     if (mounted) {
                       setState(() => _isGoogleLoading = false);
                       result.fold((failure) {
-                        _showError(context, l10n, failure.message, messenger);
+                        _showError(context, l10n, failure, messenger);
                       }, (_) {});
                     }
                   },
@@ -130,7 +131,7 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
                       setState(() => _isGithubLoading = false);
                       result.fold(
                         (failure) {
-                          _showError(context, l10n, failure.message, messenger);
+                          _showError(context, l10n, failure, messenger);
                         },
                         (credential) {
                           final oauthCred =
@@ -213,7 +214,7 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
           SnackBar(content: Text(l10n.get('account_gist_restore_success'))),
         );
       } else {
-        _showError(context, l10n, result.failure.message, messenger);
+        _showError(context, l10n, result.failure, messenger);
       }
     }
   }
@@ -221,9 +222,10 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
   void _showError(
     BuildContext context,
     AppLocalizations l10n,
-    String message,
+    Failure failure,
     ScaffoldMessengerState messenger,
   ) {
+    final message = failure.message;
     final isAlreadyLinked = message == 'credential-already-in-use';
     final provider = message.contains('Google') ? 'Google' : 'GitHub';
 
@@ -236,8 +238,6 @@ class _SignedOutViewState extends ConsumerState<_SignedOutView> {
         content: Text(errorDisplay),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-        showCloseIcon: true,
-        closeIconColor: Colors.white,
         duration: const Duration(seconds: 10),
       ),
     );
@@ -396,7 +396,7 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                     .signInWithGoogleNative();
                 if (mounted) setState(() => _isGoogleLoading = false);
                 result.fold((failure) {
-                  _showError(context, l10n, failure.message, messenger);
+                  _showError(context, l10n, failure, messenger);
                 }, (_) {});
               },
             ),
@@ -414,7 +414,7 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                 if (mounted) setState(() => _isGithubLoading = false);
                 result.fold(
                   (failure) {
-                    _showError(context, l10n, failure.message, messenger);
+                    _showError(context, l10n, failure, messenger);
                   },
                   (credential) {
                     final oauthCred = credential.credential as OAuthCredential?;
@@ -509,7 +509,7 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                       if (mounted) setState(() => _isGoogleLoading = false);
                       result.fold(
                         (failure) {
-                          _showError(context, l10n, failure.message, messenger);
+                          _showError(context, l10n, failure, messenger);
                         },
                         (_) {
                           messenger.showSnackBar(
@@ -540,7 +540,7 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
                       if (mounted) setState(() => _isGithubLoading = false);
                       result.fold(
                         (failure) {
-                          _showError(context, l10n, failure.message, messenger);
+                          _showError(context, l10n, failure, messenger);
                         },
                         (credential) {
                           final oauthCred =
@@ -688,16 +688,97 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
     }
   }
 
+  Future<void> _handleMerge(BuildContext context, dynamic credential) async {
+    final l10n = AppLocalizations.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      final authService = ref.read(authServiceProvider);
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        if (context.mounted) Navigator.pop(context); // Close loading dialog
+        return;
+      }
+      final primaryUid = currentUser.uid;
+
+      // 1. Sign in with the duplicate credential (User B)
+      final signInResult = await FirebaseAuth.instance.signInWithCredential(credential);
+      final userB = signInResult.user;
+
+      if (userB != null) {
+        // 2. Fetch and merge data if it's GitHub
+        final oauthCred = credential as OAuthCredential?;
+        if (oauthCred != null && oauthCred.accessToken != null) {
+          final gistService = ref.read(gistSyncServiceProvider);
+          gistService.setAccessToken(oauthCred.accessToken!);
+          await gistService.restore();
+        }
+
+        // 3. Delete User B (frees credential)
+        await userB.delete();
+      }
+
+      // 4. Update SQLite ownerUid to the primary UID
+      final db = DatabaseService.instance;
+      await db.update('players', {'ownerUid': primaryUid});
+      await db.update('sessions', {'ownerUid': primaryUid});
+
+      // 5. Sign out of the temporary session
+      await authService.signOut();
+
+      if (context.mounted) {
+        Navigator.pop(context); // Close loading dialog
+        
+        // Show success dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.get('account_merge_title')),
+            content: Text(l10n.get('account_merge_success')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.get('ok')),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Close loading dialog
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.getWith('account_sign_in_error', [e.toString()])),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   void _showError(
     BuildContext context,
     AppLocalizations l10n,
-    String message,
+    Failure failure,
     ScaffoldMessengerState messenger,
   ) {
+    final message = failure.message;
     final isAlreadyLinked = message == 'credential-already-in-use';
     // Try to guess the provider from the message if it was hardcoded before
     // or just default to 'GitHub' for now as that's the main issue.
     final provider = message.contains('Google') ? 'Google' : 'GitHub';
+    final credential = failure is AuthFailure ? failure.credential : null;
 
     final errorDisplay = isAlreadyLinked
         ? l10n.getWith('account_error_already_linked', [provider])
@@ -733,7 +814,9 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
             if (isAlreadyLinked) ...[
               const SizedBox(height: 16),
               Text(
-                l10n.getWith('account_error_already_linked_advice', [provider]),
+                credential != null
+                    ? l10n.getWith('account_merge_body', [provider])
+                    : l10n.getWith('account_error_already_linked_advice', [provider]),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -745,6 +828,14 @@ class _SignedInViewState extends ConsumerState<_SignedInView> {
           ],
         ),
         actions: [
+          if (isAlreadyLinked && credential != null)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _handleMerge(context, credential);
+              },
+              child: Text(l10n.get('account_merge_button')),
+            ),
           if (isAlreadyLinked)
             TextButton(
               onPressed: () {

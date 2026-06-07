@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/sudoku_models.dart';
 import '../services/sudoku_generator.dart';
 import '../services/sudoku_sync_service.dart';
+import '../services/sudoku_stats_service.dart';
 
 class SudokuStateNotifier extends Notifier<SudokuGameState> {
   final List<List<SudokuCell>> _history = [];
@@ -135,6 +136,35 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
     state = state.copyWith(notesMode: !state.notesMode);
   }
 
+  List<SudokuCell> _autoEraseNotes(List<SudokuCell> grid, int row, int col, int value, int size) {
+    final updatedGrid = List<SudokuCell>.from(grid);
+    for (int i = 0; i < grid.length; i++) {
+      final cell = grid[i];
+      if (cell.currentValue > 0) continue;
+      
+      final r = i ~/ size;
+      final c = i % size;
+      
+      bool inSameRow = (r == row);
+      bool inSameCol = (c == col);
+      bool inSameBlock = false;
+      
+      if (size == 6) {
+        inSameBlock = (r ~/ 2 == row ~/ 2) && (c ~/ 3 == col ~/ 3);
+      } else {
+        inSameBlock = (r ~/ 3 == row ~/ 3) && (c ~/ 3 == col ~/ 3);
+      }
+      
+      if (inSameRow || inSameCol || inSameBlock) {
+        if (cell.notes.contains(value)) {
+          final updatedNotes = Set<int>.from(cell.notes)..remove(value);
+          updatedGrid[i] = cell.copyWith(notes: updatedNotes);
+        }
+      }
+    }
+    return updatedGrid;
+  }
+
   void enterNumber(int num, String currentUsername) {
     final r = state.selectedRow;
     final c = state.selectedCol;
@@ -163,12 +193,17 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
       // Standard input mode
       final isCorrect = cell.value == num;
       
-      final newGrid = List<SudokuCell>.from(state.grid);
+      var newGrid = List<SudokuCell>.from(state.grid);
       newGrid[cellIdx] = cell.copyWith(
         currentValue: num,
         notes: {}, // Clear pencil notes when placing a number
         isError: !isCorrect,
       );
+
+      // Auto-erase pencil marks in corresponding row/col/block if correct
+      if (isCorrect) {
+        newGrid = _autoEraseNotes(newGrid, r, c, num, size);
+      }
 
       // Validate board errors
       final validatedGrid = SudokuGenerator.validateBoard(newGrid, state.variant);
@@ -200,6 +235,15 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
 
       if (state.isFinished) {
         _timer?.cancel();
+        
+        // Record statistics locally
+        SudokuStatsService.recordGame(
+          variant: state.variant.name,
+          difficulty: state.difficulty.name,
+          won: solved,
+          timeSeconds: state.timeSeconds,
+        );
+
         if (solved) {
           // Submit completed game to sync service
           SudokuSyncService.saveAndSyncScore(

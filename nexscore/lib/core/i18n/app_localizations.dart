@@ -811,6 +811,12 @@ class AppLocalizations {
       'account_error_already_linked_advice':
           'If you want to use the data associated with this {0} account, please sign out of the current session and sign in with {0} directly.',
       'account_action_sign_out_switch': 'Sign Out & Switch',
+      'account_merge_title': 'Merge Accounts',
+      'account_merge_body':
+          'This {0} account is already linked to another user. Would you like to merge them? This will combine both accounts\' data on this device and release the {0} connection. You will need to sign in again afterwards.',
+      'account_merge_button': 'Merge Accounts',
+      'account_merge_success':
+          'Accounts merged successfully! Please sign in again and link the account.',
       'account_data_stay_note':
           'Your local data remains on this device when you sign out.',
       'account_privacy_info':
@@ -2719,6 +2725,14 @@ class AppLocalizations {
       'sudoku_congrats': 'Congratulations!',
       'sudoku_solved_in': 'You solved the puzzle in {0}!',
       'sudoku_sync_success': 'Score synced with leaderboard!',
+      'sudoku_stats': 'Sudoku Statistics',
+      'sudoku_stats_played': 'Games Played',
+      'sudoku_stats_won': 'Games Won',
+      'sudoku_stats_win_rate': 'Win Rate',
+      'sudoku_stats_best_time': 'Best Time',
+      'sudoku_stats_avg_time': 'Average Time',
+      'sudoku_stats_streak': 'Current Streak',
+      'sudoku_stats_longest_streak': 'Longest Streak',
     },
     'de': {
       // ── Navigation
@@ -3470,6 +3484,12 @@ class AppLocalizations {
       'account_error_already_linked_advice':
           'Wenn du die Daten dieses {0}-Kontos verwenden möchtest, melde dich bitte von der aktuellen Sitzung ab und melde dich direkt mit {0} an.',
       'account_action_sign_out_switch': 'Abmelden & Wechseln',
+      'account_merge_title': 'Konten zusammenführen',
+      'account_merge_body':
+          'Dieses {0}-Konto wird bereits von einem anderen Benutzer verwendet. Möchtest du beide Konten zusammenführen? Dadurch werden die Daten beider Konten auf diesem Gerät vereint und die {0}-Verbindung freigegeben. Du musst dich danach einmal neu anmelden.',
+      'account_merge_button': 'Zusammenführen',
+      'account_merge_success':
+          'Konten erfolgreich zusammengeführt! Bitte melde dich erneut an und verknüpfe das Konto.',
       'account_data_stay_note':
           'Deine lokalen Daten bleiben beim Abmelden auf diesem Gerät erhalten.',
       'account_privacy_info':
@@ -5469,6 +5489,14 @@ class AppLocalizations {
       'sudoku_congrats': 'Herzlichen Glückwunsch!',
       'sudoku_solved_in': 'Du hast das Rätsel in {0} gelöst!',
       'sudoku_sync_success': 'Ergebnis mit Bestenliste synchronisiert!',
+      'sudoku_stats': 'Sudoku Statistiken',
+      'sudoku_stats_played': 'Spiele Gespielt',
+      'sudoku_stats_won': 'Spiele Gewonnen',
+      'sudoku_stats_win_rate': 'Erfolgsquote',
+      'sudoku_stats_best_time': 'Beste Zeit',
+      'sudoku_stats_avg_time': 'Durchschnittszeit',
+      'sudoku_stats_streak': 'Aktuelle Gewinnserie',
+      'sudoku_stats_longest_streak': 'Längste Gewinnserie',
     },
   };
 

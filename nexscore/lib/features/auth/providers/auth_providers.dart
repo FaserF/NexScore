@@ -153,10 +153,12 @@ class AuthService {
       );
 
       String message = 'Linking failed';
+      AuthCredential? credential;
       if (e is FirebaseAuthException) {
         message = e.code;
+        credential = e.credential;
       }
-      return Result.failure(AuthFailure(message, error: e, stackTrace: stack));
+      return Result.failure(AuthFailure(message, error: e, stackTrace: stack, credential: credential));
     }
   }
 
@@ -195,10 +197,12 @@ class AuthService {
       );
 
       String message = 'GitHub linking failed';
+      AuthCredential? credential;
       if (e is FirebaseAuthException) {
         message = e.code;
+        credential = e.credential;
       }
-      return Result.failure(AuthFailure(message, error: e, stackTrace: stack));
+      return Result.failure(AuthFailure(message, error: e, stackTrace: stack, credential: credential));
     }
   }
 

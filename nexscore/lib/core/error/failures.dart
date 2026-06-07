@@ -18,7 +18,8 @@ class ValidationFailure extends Failure {
 }
 
 class AuthFailure extends Failure {
-  const AuthFailure(super.message, {super.error, super.stackTrace});
+  final dynamic credential;
+  const AuthFailure(super.message, {super.error, super.stackTrace, this.credential});
 }
 
 class SyncFailure extends Failure {
