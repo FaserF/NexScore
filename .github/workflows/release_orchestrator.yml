@@ -148,8 +148,12 @@ jobs:
         env:
           HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
       - name: Auto-Generate Android Keystore
-        if: github.event.inputs.generate_keystore == 'true' && secrets.ANDROID_KEYSTORE_BASE64 == ''
+        if: github.event.inputs.generate_keystore == 'true'
         run: |
+          if [ -n "$HAS_EXISTING_KEYSTORE" ]; then
+            echo "Keystore already configured in secrets. Skipping generation."
+            exit 0
+          fi
           RAND_PASS=$(openssl rand -base64 18 | tr -dc 'a-zA-Z0-9')
           keytool -genkeypair -v \
             -keystore nexscore/android/app/release.jks \
@@ -175,6 +179,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "> ⚠️ **Security Warning**: Anyone with access to the workflow logs or summary can see these values. Once you have copied them to GitHub Secrets, run the release workflow again with the auto-generation option disabled to ensure logs and caches are clean." >> $GITHUB_STEP_SUMMARY
           echo "GEN_PASS=$RAND_PASS" >> $GITHUB_ENV
+        env:
+          HAS_EXISTING_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
       - name: Build APK
         run: |
           flutter pub get
