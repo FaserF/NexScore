@@ -266,9 +266,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
 
     _heartbeatTimer?.cancel();
     _heartbeatTimer = null;
-    if (_lastCloseReason == null) {
-      _lastCloseReason = 'host_left';
-    }
+    _lastCloseReason ??= 'host_left';
 
     try {
       if (isHost) {

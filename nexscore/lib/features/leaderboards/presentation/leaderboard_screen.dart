@@ -61,7 +61,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
           ),
           sessionsAsync.when(
             loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-            error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+            error: (_, _) => const SliverToBoxAdapter(child: SizedBox.shrink()),
             data: (sessions) {
               final gameTypes = sessions
                   .where((s) => s.completed)
@@ -85,16 +85,16 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                         child: DropdownButton<String?>(
                           value: _selectedGameType,
                           isExpanded: true,
-                          hint: Text(l10n.get('filter_game_type') ?? 'All Games'),
+                          hint: Text(l10n.get('filter_game_type')),
                           items: [
                             DropdownMenuItem<String?>(
                               value: null,
-                              child: Text(l10n.get('all_games') ?? 'All Games'),
+                              child: Text(l10n.get('all_games')),
                             ),
                             ...gameTypes.map((type) {
                               return DropdownMenuItem<String?>(
                                 value: type,
-                                child: Text(l10n.get('game_$type') ?? type),
+                                child: Text(l10n.get('game_$type')),
                               );
                             }),
                           ],

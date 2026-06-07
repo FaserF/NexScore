@@ -749,7 +749,6 @@ class _WizardScreenState extends ConsumerState<WizardScreen> {
               builder: (context, setDialogState) {
                 final currentTricksSum = tricks.values.fold(0, (a, b) => a + b);
                 final totalSum = currentTricksSum + (state.anniversaryCards ? bombTricks : 0);
-                final isSumCorrect = totalSum == roundIndex;
 
                 Color statusColor;
                 String statusText;

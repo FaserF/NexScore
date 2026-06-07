@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexscore/features/games/arschloch_digital/models/arschloch_digital_engine.dart';
 import 'package:nexscore/features/games/arschloch_digital/models/arschloch_digital_state.dart';
-import 'package:nexscore/features/games/arschloch_digital/models/standard_card_models.dart';
 
 void main() {
   late ArschlochDigitalEngine engine;

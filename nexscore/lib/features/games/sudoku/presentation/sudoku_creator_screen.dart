@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/i18n/app_localizations.dart';
-import '../../../../core/theme/widgets/glass_container.dart';
 import '../../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../../core/providers/audio_provider.dart';
 import '../../../../core/services/audio_service.dart';

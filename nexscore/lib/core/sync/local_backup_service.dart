@@ -61,14 +61,12 @@ class LocalBackupService {
       final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['json'],
-        withData: true,
       );
 
       if (result == null || result.files.isEmpty) return false;
 
       final file = result.files.first;
-      final bytes = file.bytes;
-      if (bytes == null) return false;
+      final bytes = await file.readAsBytes();
 
       final jsonString = utf8.decode(bytes);
       final data = jsonDecode(jsonString) as Map<String, dynamic>;

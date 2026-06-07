@@ -35,7 +35,7 @@ class SudokuAnalyzer {
         return AnalysisResult(
           cellIndex: i,
           value: val,
-          explanation: 'Naked Single: At Row ${r + 1}, Column ${c + 1}, the only number that can legally fit is $val. All other numbers [1-${size}] clash with numbers already present in its row, column, or block.',
+          explanation: 'Naked Single: At Row ${r + 1}, Column ${c + 1}, the only number that can legally fit is $val. All other numbers [1-$size] clash with numbers already present in its row, column, or block.',
         );
       }
     }

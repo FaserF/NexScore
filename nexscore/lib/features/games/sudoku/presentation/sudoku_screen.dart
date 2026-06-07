@@ -190,11 +190,15 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       final flashing = <int>{};
       for (final r in newCompletedRows) {
         _completedRows.add(r);
-        for (int c = 0; c < size; c++) flashing.add(r * size + c);
+        for (int c = 0; c < size; c++) {
+          flashing.add(r * size + c);
+        }
       }
       for (final c in newCompletedCols) {
         _completedCols.add(c);
-        for (int r = 0; r < size; r++) flashing.add(r * size + c);
+        for (int r = 0; r < size; r++) {
+          flashing.add(r * size + c);
+        }
       }
       for (final b in newCompletedBoxes) {
         _completedBoxes.add(b);
@@ -462,8 +466,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       builder: (ctx) => AlertDialog(
         title: Text(l10n.get('resume_game_title')),
         content: Text(
-          l10n.getWith('resume_game_desc', [l10n.get('game_sudoku')]) +
-              '\n(${savedState.variant.name.toUpperCase()} · ${savedState.difficulty.name.toUpperCase()})',
+          '${l10n.getWith('resume_game_desc', [l10n.get('game_sudoku')])}\n(${savedState.variant.name.toUpperCase()} · ${savedState.difficulty.name.toUpperCase()})',
         ),
         actions: [
           TextButton(
@@ -685,7 +688,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                 );
               },
               loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
             ),
 
             // How to Play / Tutorial Card
@@ -820,7 +823,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
               title: const Text('VS BOTS PRACTICE MODE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               subtitle: const Text('Compete against a simulated AI on the board'),
               value: _isVsBotsEnabled,
-              activeColor: colors.primary,
+              activeThumbColor: colors.primary,
               onChanged: (val) => setState(() => _isVsBotsEnabled = val),
             ),
             if (_isVsBotsEnabled) ...[
@@ -1386,11 +1389,9 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   // --- Numpad Bar ---
 
   Widget _buildNumpad(int size, SudokuGameState state, _SudokuThemeColors colors) {
-    final counts = Map<int, int>.fromIterable(
-      List.generate(size, (i) => i + 1),
-      key: (i) => i as int,
-      value: (_) => 0,
-    );
+    final counts = <int, int>{
+      for (int i = 1; i <= size; i++) i: 0,
+    };
 
     for (final cell in state.grid) {
       if (cell.currentValue > 0 && !cell.isError) {

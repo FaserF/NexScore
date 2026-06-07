@@ -12,17 +12,14 @@ class ScreenshotController {
     double? pixelRatio,
     Duration delay = const Duration(milliseconds: 20),
   }) {
+    final context = _containerKey.currentContext;
+    final double ratio = pixelRatio ?? (context != null ? MediaQuery.of(context).devicePixelRatio : 1.0);
+
     return Future.delayed(delay, () async {
       try {
         final findRenderObject = _containerKey.currentContext?.findRenderObject();
         if (findRenderObject == null) return null;
         final RenderRepaintBoundary boundary = findRenderObject as RenderRepaintBoundary;
-        
-        double ratio = pixelRatio ?? 1.0;
-        final context = _containerKey.currentContext;
-        if (pixelRatio == null && context != null) {
-          ratio = MediaQuery.of(context).devicePixelRatio;
-        }
         
         final image = await boundary.toImage(pixelRatio: ratio);
         final byteData = await image.toByteData(format: ui.ImageByteFormat.png);

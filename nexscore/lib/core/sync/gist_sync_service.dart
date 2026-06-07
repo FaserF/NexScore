@@ -207,7 +207,7 @@ class GistSyncService {
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'players': players,
       'sessions': sessions,
-      if (settingsData != null) 'settings': settingsData,
+      'settings': ?settingsData,
     };
     return jsonEncode(data);
   }

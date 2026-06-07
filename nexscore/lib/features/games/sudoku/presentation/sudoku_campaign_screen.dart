@@ -30,7 +30,7 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
       backgroundColor: const Color(0xFF0D0E15),
       appBar: AppBar(
         title: Text(
-          l10n.get('game_sudoku_academy') ?? 'SUDOKU ACADEMY',
+          l10n.get('game_sudoku_academy'),
           style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
         ),
         centerTitle: true,
@@ -56,7 +56,6 @@ class _SudokuCampaignScreenState extends ConsumerState<SudokuCampaignScreen> {
                     
                     // Unlocked if first level or the previous one is completed
                     final isUnlocked = level.levelId == 1 || completedSet.contains(level.levelId - 1);
-                    final isSelected = _selectedLevel?.levelId == level.levelId;
 
                     return Column(
                       children: [

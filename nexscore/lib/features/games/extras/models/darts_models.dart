@@ -213,6 +213,7 @@ class DartsGameState {
   final DateTime? startedAt;
   final DateTime? endedAt;
   final bool isDirectEntryMode;
+  final bool canUndo;
 
   const DartsGameState({
     this.playerStates = const {},

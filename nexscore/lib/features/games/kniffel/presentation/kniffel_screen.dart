@@ -480,7 +480,7 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
                         width: 90,
                         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.blue.withOpacity(0.15) : (isDark ? Colors.grey[850] : Colors.grey[100]),
+                          color: isSelected ? Colors.blue.withValues(alpha: 0.15) : (isDark ? Colors.grey[850] : Colors.grey[100]),
                           border: Border.all(
                             color: isSelected ? Colors.blue : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
                             width: 2,
@@ -654,7 +654,7 @@ class _KniffelScreenState extends ConsumerState<KniffelScreen> {
                 const Text('Score only the sum of dice showing that value.'),
                 const SizedBox(height: 8),
                 Card(
-                  color: Colors.blue.withOpacity(0.15),
+                  color: Colors.blue.withValues(alpha: 0.15),
                   elevation: 0,
                   child: const Padding(
                     padding: EdgeInsets.all(12.0),

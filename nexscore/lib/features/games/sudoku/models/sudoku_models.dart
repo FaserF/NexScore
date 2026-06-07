@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 enum SudokuDifficulty { easy, medium, hard, expert }
 
 enum SudokuVariant { standard, diagonal, hyper, mini6x6 }

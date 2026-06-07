@@ -161,7 +161,6 @@ class SudokuGenerator {
   }) {
     // Generate a simple integer seed from the date string
     final seed = dateStr.hashCode;
-    final oldRandom = _random;
     // Temporarily override random with seeded random
     final seededRandom = Random(seed);
     
@@ -387,7 +386,6 @@ class SudokuGenerator {
 
   /// Check conflicts for a grid where the user is entering numbers
   static List<SudokuCell> validateBoard(List<SudokuCell> originalGrid, SudokuVariant variant) {
-    final size = variant == SudokuVariant.mini6x6 ? 6 : 9;
     List<int> values = originalGrid.map((c) => c.currentValue).toList();
     List<SudokuCell> checkedGrid = [];
 
