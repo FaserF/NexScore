@@ -1823,7 +1823,6 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     final state = ref.read(sudokuStateProvider);
     if (!state.isFinished && state.grid.isNotEmpty) {
       // Auto-solve remaining to finish early (logical parity action)
-      final size = state.variant == SudokuVariant.mini6x6 ? 6 : 9;
       final solvedGrid = state.grid.map((c) => c.copyWith(currentValue: c.value)).toList();
       ref.read(sudokuStateProvider.notifier).loadState(state.copyWith(
         grid: solvedGrid,

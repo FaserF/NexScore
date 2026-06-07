@@ -10,6 +10,8 @@ import '../services/sudoku_generator.dart';
 import '../services/sudoku_share_service.dart';
 import '../providers/sudoku_provider.dart';
 import '../../../../core/providers/persistence_provider.dart';
+import '../../../../core/multiplayer/widgets/multiplayer_client_overlay.dart';
+import '../../../../shared/widgets/winner_confetti_overlay.dart';
 
 class SudokuCreatorScreen extends ConsumerStatefulWidget {
   const SudokuCreatorScreen({super.key});

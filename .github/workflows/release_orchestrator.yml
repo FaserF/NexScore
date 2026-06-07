@@ -108,13 +108,8 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      - name: Cache Pub dependencies
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:"
+          pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
       - name: Setup Java
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
         with:
@@ -158,13 +153,8 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      - name: Cache Pub dependencies
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:"
+          pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
       - name: Decode GoogleService-Info.plist
         run: echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" | base64 -d > nexscore/ios/Runner/GoogleService-Info.plist
         if: env.HAS_IOS_SECRET == 'true'
@@ -198,13 +188,8 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      - name: Cache Pub dependencies
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:"
+          pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
 
       - name: Build Web App
         run: |
@@ -289,10 +274,31 @@ jobs:
           cp artifacts/NexScore-Android/app-release.apk.sha256 release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk.sha256
 
       - name: Generate Changelog
-        id: changelog
-        uses: metcalfc/changelog-generator@0440d0932f9a0dd1cc9ecd8412830761351323bd # v4.7.0
-        with:
-          myToken: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/generate_changelog.py \
+            --release-type ${{ github.event.inputs.release_type }} \
+            --repo ${{ github.repository }} \
+            --output-file changelog.md
+
+      - name: Prepare Release Notes
+        run: |
+          cat << 'EOF' > release_body.md
+          ## 🚀 NexScore ${{ needs.version-calc.outputs.version_name }}
+
+          ### 🌐 Live PWA
+          Available at: https://faserf.github.io/NexScore/
+
+          ### 📦 Downloads & Artifacts
+          | Platform | File | SHA256 Checksum |
+          |----------|------|-----------------|
+          | **Android** | [NexScore.apk](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk) | `${{ needs.build-android.outputs.sha256 }}` |
+          | **Web (Docker)** | `docker pull ${{ needs.build-web.outputs.image_name }}:${{ needs.version-calc.outputs.docker_tag }}` | _Container Image_ |
+          | **Docs** | [Documentation](https://faserf.github.io/NexScore/docs/) | _Online_ |
+
+          ### 📝 Changes
+          EOF
+          cat changelog.md >> release_body.md
+          echo -e "\n---\n*Released by Orchestrator on $(date +'%Y-%m-%d %H:%M:%S')*" >> release_body.md
 
       - name: Create Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
@@ -301,21 +307,4 @@ jobs:
           name: NexScore ${{ needs.version-calc.outputs.version_name }}
           prerelease: ${{ needs.version-calc.outputs.is_prerelease == 'true' }}
           files: release_assets/*
-          body: |
-            ## 🚀 NexScore ${{ needs.version-calc.outputs.version_name }}
-
-            ### 🌐 Live PWA
-            Available at: https://faserf.github.io/NexScore/
-
-            ### 📦 Downloads & Artifacts
-            | Platform | File | SHA256 Checksum |
-            |----------|------|-----------------|
-            | **Android** | [NexScore.apk](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk) | `${{ needs.build-android.outputs.sha256 }}` |
-            | **Web (Docker)** | `docker pull ${{ needs.build-web.outputs.image_name }}:${{ needs.version-calc.outputs.docker_tag }}` | _Container Image_ |
-            | **Docs** | [Documentation](https://faserf.github.io/NexScore/docs/) | _Online_ |
-
-            ### 📝 Changes
-            ${{ steps.changelog.outputs.changelog }}
-
-            ---
-            *Released by Orchestrator on $(date +'%Y-%m-%d %H:%M:%S')*
+          body_path: release_body.md

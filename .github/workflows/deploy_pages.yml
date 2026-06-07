@@ -61,6 +61,8 @@ jobs:
         with:
           channel: 'stable'
           cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:"
+          pub-cache-key: "flutter-pub-:os:-:channel:-:version:-:arch:-${{ hashFiles('**/pubspec.lock') }}"
 
       - name: Build Web App (PWA)
         # ONLY build if no pre-built artifact is provided AND deployment is requested
