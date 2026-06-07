@@ -19,6 +19,7 @@ class Settings {
   final String autoBackupFrequency; // 'daily', 'weekly', 'manual'
   final DateTime? lastBackupTime;
   final String? lastBackupProvider; // 'google', 'github'
+  final String updateChannel; // 'stable', 'beta', 'dev'
 
   const Settings({
     required this.themeMode,
@@ -34,6 +35,7 @@ class Settings {
     this.autoBackupFrequency = 'daily',
     this.lastBackupTime,
     this.lastBackupProvider,
+    this.updateChannel = 'stable',
   });
 
   Settings copyWith({
@@ -51,6 +53,7 @@ class Settings {
     String? autoBackupFrequency,
     DateTime? lastBackupTime,
     String? lastBackupProvider,
+    String? updateChannel,
   }) {
     return Settings(
       themeMode: themeMode ?? this.themeMode,
@@ -66,6 +69,7 @@ class Settings {
       autoBackupFrequency: autoBackupFrequency ?? this.autoBackupFrequency,
       lastBackupTime: lastBackupTime ?? this.lastBackupTime,
       lastBackupProvider: lastBackupProvider ?? this.lastBackupProvider,
+      updateChannel: updateChannel ?? this.updateChannel,
     );
   }
 
@@ -82,6 +86,7 @@ class Settings {
       'debugMode': debugMode,
       'autoBackupEnabled': autoBackupEnabled,
       'autoBackupFrequency': autoBackupFrequency,
+      'updateChannel': updateChannel,
     };
   }
 }
@@ -105,6 +110,7 @@ class SettingsNotifier extends Notifier<Settings> {
   static const _autoBackupFreqKey = 'settings_auto_backup_freq';
   static const _lastBackupTimeKey = 'settings_last_backup_time';
   static const _lastBackupProviderKey = 'settings_last_backup_provider';
+  static const _updateChannelKey = 'settings_update_channel';
 
   @override
   Settings build() {
@@ -118,6 +124,7 @@ class SettingsNotifier extends Notifier<Settings> {
       sfxBeepEnabled: true,
       sfxFanfareEnabled: true,
       sfxOtherEnabled: true,
+      updateChannel: 'stable',
     );
   }
 
@@ -147,6 +154,7 @@ class SettingsNotifier extends Notifier<Settings> {
         ? DateTime.parse(lastBackupTimeStr)
         : null;
     final lastBackupProvider = prefs.getString(_lastBackupProviderKey);
+    final updateChannel = prefs.getString(_updateChannelKey) ?? 'stable';
 
     state = Settings(
       themeMode: themeMode,
@@ -162,6 +170,7 @@ class SettingsNotifier extends Notifier<Settings> {
       autoBackupFrequency: autoBackupFreq,
       lastBackupTime: lastBackupTime,
       lastBackupProvider: lastBackupProvider,
+      updateChannel: updateChannel,
     );
   }
 
@@ -243,6 +252,12 @@ class SettingsNotifier extends Notifier<Settings> {
     state = state.copyWith(autoBackupFrequency: freq);
   }
 
+  Future<void> setUpdateChannel(String channel) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_updateChannelKey, channel);
+    state = state.copyWith(updateChannel: channel);
+  }
+
   Future<void> updateLastBackupMetadata(DateTime time, String provider) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_lastBackupTimeKey, time.toIso8601String());
@@ -300,6 +315,9 @@ class SettingsNotifier extends Notifier<Settings> {
     }
     if (data.containsKey('autoBackupFrequency')) {
       await prefs.setString(_autoBackupFreqKey, data['autoBackupFrequency'] as String);
+    }
+    if (data.containsKey('updateChannel')) {
+      await prefs.setString(_updateChannelKey, data['updateChannel'] as String);
     }
 
     // Reload settings into state

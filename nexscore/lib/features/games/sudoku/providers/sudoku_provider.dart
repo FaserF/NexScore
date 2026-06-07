@@ -477,7 +477,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
           grid: validatedGrid,
           mistakes: mistakes,
           timeSeconds: state.timeSeconds + penalty,
-          isFinished: solved || (!state.isVsBots && mistakes >= state.maxMistakes),
+          isFinished: solved || (mistakes >= state.maxMistakes),
           playerScores: state.isVsBots ? scores : state.playerScores,
           playerMistakes: state.isVsBots ? playerMistakesMap : state.playerMistakes,
         );

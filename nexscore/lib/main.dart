@@ -48,6 +48,7 @@ void main() async {
 
   if (kIsWeb) {
     configureUrlStrategy();
+    //   usePathUrlStrategy();
   }
 
   try {

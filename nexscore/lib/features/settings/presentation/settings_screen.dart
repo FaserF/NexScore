@@ -16,6 +16,7 @@ import '../../../core/pwa/pwa_install_dialog.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../core/sync/local_backup_service.dart';
+import '../../../core/services/updater_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -414,6 +415,57 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         },
                       ),
                       const Divider(height: 1),
+                      FutureBuilder<bool>(
+                        future: BuiltInUpdaterService.isSideloaded(),
+                        builder: (context, snapshot) {
+                          final showUpdateSettings = (snapshot.data == true) || kIsWeb;
+                          if (!showUpdateSettings) return const SizedBox.shrink();
+                          return Column(
+                            children: [
+                              ListTile(
+                                leading: const Icon(Icons.update),
+                                title: const Text('Update Channel'),
+                                subtitle: Text('Current: ${settings.updateChannel}'),
+                                trailing: DropdownButton<String>(
+                                  value: settings.updateChannel,
+                                  underline: const SizedBox(),
+                                  icon: const Icon(Icons.keyboard_arrow_down),
+                                  borderRadius: BorderRadius.circular(16),
+                                  onChanged: (channel) {
+                                    if (channel != null) {
+                                      ref
+                                          .read(settingsProvider.notifier)
+                                          .setUpdateChannel(channel);
+                                    }
+                                  },
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: 'stable',
+                                      child: Text('Stable'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'beta',
+                                      child: Text('Beta'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'dev',
+                                      child: Text('Developer (Dev)'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Divider(height: 1),
+                              ListTile(
+                                leading: const Icon(Icons.system_update_alt),
+                                title: const Text('Check for Updates'),
+                                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                                onTap: () => _checkForUpdates(context, settings.updateChannel),
+                              ),
+                              const Divider(height: 1),
+                            ],
+                          );
+                        },
+                      ),
                       ListTile(
                         leading: const Icon(Icons.ios_share),
                         title: Text(l10n.get('settings_export_logs')),
@@ -538,6 +590,96 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _checkForUpdates(BuildContext context, String channel) async {
+    final messenger = ScaffoldMessenger.of(context);
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    final release = await BuiltInUpdaterService.checkForUpdates(channel);
+    
+    if (context.mounted) {
+      Navigator.pop(context); // Close loading indicator
+    }
+
+    if (release == null) {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Up to Date'),
+            content: const Text('You are already running the latest version of NexScore for this channel.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+      return;
+    }
+
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('New Version Available: ${release.tagName}'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(kIsWeb
+                    ? 'A new version of NexScore has been released on GitHub.'
+                    : 'A new version of NexScore is available for download.'),
+                const SizedBox(height: 12),
+                const Text(
+                  'Changelog:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(release.body),
+              ],
+            ),
+          ),
+          actions: kIsWeb
+              ? [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('OK'),
+                  ),
+                ]
+              : [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Later'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      try {
+                        await BuiltInUpdaterService.performUpdate(release);
+                      } catch (e) {
+                        messenger.showSnackBar(
+                          SnackBar(content: Text('Failed to trigger update: $e')),
+                        );
+                      }
+                    },
+                    child: const Text('Update Now'),
+                  ),
+                ],
+        ),
+      );
+    }
   }
 
   Future<void> _confirmReset(

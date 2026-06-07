@@ -132,7 +132,8 @@ jobs:
           flutter pub run flutter_launcher_icons
           flutter build apk --release --no-pub \
             --build-name=${{ needs.version-calc.outputs.version_name }} \
-            --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }}
+            --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }} \
+            --dart-define=GITHUB_REPOSITORY_URL=https://api.github.com/repos/${{ github.repository }}
         working-directory: nexscore
       - name: Generate SHA256
         id: generate_sha
@@ -174,7 +175,8 @@ jobs:
           flutter pub run flutter_launcher_icons
           flutter build ipa --no-codesign --release --no-pub \
             --build-name=${{ needs.version-calc.outputs.version_name }} \
-            --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }}
+            --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }} \
+            --dart-define=GITHUB_REPOSITORY_URL=https://api.github.com/repos/${{ github.repository }}
         working-directory: nexscore
       - name: Upload IPA (Artifacts)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -212,7 +214,8 @@ jobs:
             --dart-define=FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} \
             --dart-define=FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }} \
             --dart-define=FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }} \
-            --dart-define=FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
+            --dart-define=FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }} \
+            --dart-define=GITHUB_REPOSITORY_URL=https://api.github.com/repos/${{ github.repository }}
         working-directory: nexscore
 
       - name: Upload Web Artifact
