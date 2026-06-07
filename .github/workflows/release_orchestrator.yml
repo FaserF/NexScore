@@ -448,7 +448,7 @@ jobs:
           
           # Only replace if placeholder was set (meaning it was not already updated in create-release)
           if grep -q "| \*\*Android\*\* | _Building..._ | _TBD_ |" release_body.md; then
-            sed -i "s|\| \*\*Android\*\* \| \_Building\...\_ \| \_TBD\_ \||$NEW_ROW|g" release_body.md
+            sed -i "s#\| \*\*Android\*\* \| \_Building\...\_ \| \_TBD\_ \|#$NEW_ROW#g" release_body.md
             gh release edit ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --notes-file release_body.md
           fi
 
@@ -501,6 +501,6 @@ jobs:
           
           # Only replace if placeholder was set (meaning it was not already updated in create-release)
           if grep -q "| \*\*iOS\*\* | _Building..._ | _TBD_ |" release_body.md; then
-            sed -i "s|\| \*\*iOS\*\* \| \_Building\...\_ \| \_TBD\_ \||$NEW_ROW|g" release_body.md
+            sed -i "s#\| \*\*iOS\*\* \| \_Building\...\_ \| \_TBD\_ \|#$NEW_ROW#g" release_body.md
             gh release edit ${{ needs.version-calc.outputs.tag_name }} --repo ${{ github.repository }} --notes-file release_body.md
           fi

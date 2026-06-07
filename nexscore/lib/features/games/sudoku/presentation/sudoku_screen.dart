@@ -360,6 +360,8 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       _keyboardFocusNode.requestFocus();
     }
 
+    final canPop = !(gameState.grid.isNotEmpty && !gameState.isFinished);
+
     return Theme(
       data: ThemeData(
         brightness: colors.brightness,
@@ -374,105 +376,145 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
         focusNode: _keyboardFocusNode,
         onKeyEvent: _handleKeyboardInput,
         autofocus: true,
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(
-              l10n.get('game_sudoku').toUpperCase(),
-              style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
-            ),
-            centerTitle: true,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.go('/games'),
-            ),
-            actions: [
-              // Share action (Parity: Icons.share)
-              if (gameState.grid.isNotEmpty)
-                IconButton(
-                  icon: const Icon(Icons.share),
-                  onPressed: () {
-                    final shareCode = SudokuShareService.exportToCode(gameState.grid, gameState.variant);
-                    Clipboard.setData(ClipboardData(text: shareCode));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Puzzle share code copied to clipboard!')),
-                    );
-                  },
-                  tooltip: 'Share Puzzle Code',
-                ),
-              // Settings action (Parity: Icons.settings)
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () {
-                  _showSettingsDialog();
+        child: PopScope(
+          canPop: canPop,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (didPop) return;
+            final shouldLeave = await _showExitWarningDialog(context, l10n);
+            if (shouldLeave && context.mounted) {
+              context.go('/games');
+            }
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(
+                l10n.get('game_sudoku').toUpperCase(),
+                style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () async {
+                  if (gameState.grid.isNotEmpty && !gameState.isFinished) {
+                    final shouldLeave = await _showExitWarningDialog(context, l10n);
+                    if (shouldLeave && context.mounted) {
+                      context.go('/games');
+                    }
+                  } else {
+                    context.go('/games');
+                  }
                 },
-                tooltip: 'Settings',
               ),
-              // Music toggle
-              IconButton(
-                icon: Icon(_isMusicPlaying ? Icons.music_note : Icons.music_off),
-                color: _isMusicPlaying ? colors.primary : null,
-                onPressed: _toggleBackgroundMusic,
-                tooltip: 'Ambient Focus Music',
-              ),
-              // Leaderboard toggle
-              if (gameState.grid.isNotEmpty && !gameState.isMultiplayer)
+              actions: [
+                // Share action (Parity: Icons.share)
+                if (gameState.grid.isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.share),
+                    onPressed: () {
+                      final shareCode = SudokuShareService.exportToCode(gameState.grid, gameState.variant);
+                      Clipboard.setData(ClipboardData(text: shareCode));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Puzzle share code copied to clipboard!')),
+                      );
+                    },
+                    tooltip: 'Share Puzzle Code',
+                  ),
+                // Settings action (Parity: Icons.settings)
                 IconButton(
-                  icon: const Icon(Icons.leaderboard),
-                  onPressed: () => _loadLeaderboardData(gameState),
-                  tooltip: l10n.get('sudoku_leaderboard'),
-                ),
-              // Reset game
-              if (gameState.grid.isNotEmpty && !gameState.isFinished && !gameState.isMultiplayer)
-                IconButton(
-                  icon: const Icon(Icons.refresh),
+                  icon: const Icon(Icons.settings),
                   onPressed: () {
-                    _showConfirmResetDialog(gameState, l10n);
+                    _showSettingsDialog();
                   },
-                  tooltip: l10n.get('sudoku_restart'),
+                  tooltip: 'Settings',
                 ),
-              // Theme selection menu
-              PopupMenuButton<SudokuTheme>(
-                icon: const Icon(Icons.palette_outlined),
-                onSelected: (t) => ref.read(sudokuStateProvider.notifier).selectTheme(t),
-                itemBuilder: (context) => [
-                  const PopupMenuItem(value: SudokuTheme.aether, child: Text('Aether (Dark Neon)')),
-                  const PopupMenuItem(value: SudokuTheme.zen, child: Text('Zen (Warm Wood)')),
-                  const PopupMenuItem(value: SudokuTheme.midnight, child: Text('Midnight Blue')),
-                  const PopupMenuItem(value: SudokuTheme.cyberpunk, child: Text('Cyberpunk (Slime)')),
+                // Music toggle
+                IconButton(
+                  icon: Icon(_isMusicPlaying ? Icons.music_note : Icons.music_off),
+                  color: _isMusicPlaying ? colors.primary : null,
+                  onPressed: _toggleBackgroundMusic,
+                  tooltip: 'Ambient Focus Music',
+                ),
+                // Leaderboard toggle
+                if (gameState.grid.isNotEmpty && !gameState.isMultiplayer)
+                  IconButton(
+                    icon: const Icon(Icons.leaderboard),
+                    onPressed: () => _loadLeaderboardData(gameState),
+                    tooltip: l10n.get('sudoku_leaderboard'),
+                  ),
+                // Reset game
+                if (gameState.grid.isNotEmpty && !gameState.isFinished && !gameState.isMultiplayer)
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () {
+                      _showConfirmResetDialog(gameState, l10n);
+                    },
+                    tooltip: l10n.get('sudoku_restart'),
+                  ),
+                // Theme selection menu
+                PopupMenuButton<SudokuTheme>(
+                  icon: const Icon(Icons.palette_outlined),
+                  onSelected: (t) => ref.read(sudokuStateProvider.notifier).selectTheme(t),
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(value: SudokuTheme.aether, child: Text('Aether (Dark Neon)')),
+                    const PopupMenuItem(value: SudokuTheme.zen, child: Text('Zen (Warm Wood)')),
+                    const PopupMenuItem(value: SudokuTheme.midnight, child: Text('Midnight Blue')),
+                    const PopupMenuItem(value: SudokuTheme.cyberpunk, child: Text('Cyberpunk (Slime)')),
+                  ],
+                ),
+              ],
+            ),
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  gameState.grid.isEmpty
+                      ? _buildSetupView(l10n, colors, completedLevelsAsync)
+                      : _buildGameView(gameState, l10n, colors),
+        
+                  // Confetti Overlay
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: ConfettiWidget(
+                      confettiController: _confettiController,
+                      blastDirectionality: BlastDirectionality.explosive,
+                      colors: const [Colors.amber, Colors.blue, Colors.pink, Colors.green],
+                    ),
+                  ),
+        
+                  // Leaderboard Overlay
+                  if (_showLeaderboard) _buildLeaderboardOverlay(colors, l10n),
+  
+                  // Local Stats Overlay
+                  if (_showStats) _buildStatsOverlay(colors, l10n),
                 ],
               ),
-            ],
-          ),
-          body: SafeArea(
-            child: Stack(
-              children: [
-                gameState.grid.isEmpty
-                    ? _buildSetupView(l10n, colors, completedLevelsAsync)
-                    : _buildGameView(gameState, l10n, colors),
-      
-                // Confetti Overlay
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: ConfettiWidget(
-                    confettiController: _confettiController,
-                    blastDirectionality: BlastDirectionality.explosive,
-                    colors: const [Colors.amber, Colors.blue, Colors.pink, Colors.green],
-                  ),
-                ),
-      
-                // Leaderboard Overlay
-                if (_showLeaderboard) _buildLeaderboardOverlay(colors, l10n),
-
-                // Local Stats Overlay
-                if (_showStats) _buildStatsOverlay(colors, l10n),
-              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future<bool> _showExitWarningDialog(BuildContext context, AppLocalizations l10n) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.get('game_exit_warning_title')),
+        content: Text(l10n.get('game_exit_warning_desc')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.get('ok')),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 
   // --- Resumption Flow Popup ---

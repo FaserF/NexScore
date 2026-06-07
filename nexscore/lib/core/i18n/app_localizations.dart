@@ -254,7 +254,10 @@ class AppLocalizations {
       'winner_banner': 'WINNER!',
       'sudoku_analyzer_explanation': 'ANALYZER EXPLANATION',
       'pwa_updated_title': 'PWA Updated!',
-      'pwa_updated_desc': 'NexScore PWA was successfully updated from version {0} ({1}) to {2} ({3}).',
+      'pwa_updated_desc': 'NexScore PWA was successfully updated from version {0} ({1}) to {2} ({3}).\n\nThe changelog shows the changes between these versions, including all updates from intermediate versions.',
+      'game_exit_warning_title': 'Exit Game?',
+      'game_exit_warning_desc': 'An active game is in progress. Are you sure you want to leave?',
+
 
 
 
@@ -2952,7 +2955,10 @@ class AppLocalizations {
       'winner_banner': 'GEWINNER!',
       'sudoku_analyzer_explanation': 'ANALYSE-ERKLÄRUNG',
       'pwa_updated_title': 'PWA aktualisiert!',
-      'pwa_updated_desc': 'Die NexScore PWA wurde erfolgreich von Version {0} ({1}) auf {2} ({3}) aktualisiert.',
+      'pwa_updated_desc': 'Die NexScore PWA wurde erfolgreich von Version {0} ({1}) auf {2} ({3}) aktualisiert.\n\nDer Changelog zeigt die Änderungen zwischen diesen Versionen, wobei alle Änderungen aus den Zwischenversionen ebenfalls enthalten sind.',
+      'game_exit_warning_title': 'Spiel verlassen?',
+      'game_exit_warning_desc': 'Ein aktives Spiel läuft gerade. Möchtest du wirklich gehen?',
+
 
 
 

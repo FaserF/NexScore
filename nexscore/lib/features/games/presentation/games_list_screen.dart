@@ -602,7 +602,7 @@ class _GameCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: AnimatedScaleButton(
-        onPressed: () => context.go(entry.route),
+        onPressed: () => context.push(entry.route),
         child: GlassContainer(
           borderRadius: 24,
           padding: const EdgeInsets.all(20),
