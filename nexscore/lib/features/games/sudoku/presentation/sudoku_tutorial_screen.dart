@@ -181,6 +181,16 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
       } else {
         _errorState[idx] = true;
         ref.read(audioServiceProvider).play(SfxType.swipe); // error beep
+        // Automatically fade out the error highlight after 1.5 seconds to keep tutorial forgiving
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted) {
+            setState(() {
+              if (_grid[idx] == num && !_stepCompleted) {
+                _errorState[idx] = false;
+              }
+            });
+          }
+        });
       }
     });
   }

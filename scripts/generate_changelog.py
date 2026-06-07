@@ -134,7 +134,7 @@ def get_start_tag(tags, release_type):
     # Beta: v1.2.3b1 (includes b suffix)
     # Dev: v1.2.3-dev4 (any suffix)
     stable_pattern = r'^v?\d+\.\d+\.\d+$'
-    beta_pattern = r'^v?\d+\.\d+\.\d+(b\d+)?$'
+    beta_pattern = r'^v?\d+\.\d+\.\d+(-beta\.\d+)?$'
     
     if release_type == 'stable':
         for t in tags:
@@ -187,7 +187,7 @@ def main():
     if start_tag:
         git_cmd = ['git', 'log', f"{start_tag}..HEAD", '--pretty=format:%h %s']
     else:
-        git_cmd = ['git', 'log', '--pretty=format:%h %s', '--max-count=2000']
+        git_cmd = ['git', 'log', '--pretty=format:%h %s', '--max-count=200']
 
     try:
         result = subprocess.run(git_cmd, capture_output=True, text=True, check=True)

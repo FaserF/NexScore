@@ -361,6 +361,13 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
     state = state.copyWith(notesMode: !state.notesMode);
   }
 
+  void toggleMaxMistakesLimit() {
+    // If currently unlimited (e.g. 9999), reset to 3, otherwise set to 9999
+    final newLimit = state.maxMistakes >= 9999 ? 3 : 9999;
+    state = state.copyWith(maxMistakes: newLimit);
+    _autoSave();
+  }
+
   List<SudokuCell> _autoEraseNotes(List<SudokuCell> grid, int row, int col, int value, int size) {
     final updatedGrid = List<SudokuCell>.from(grid);
     for (int i = 0; i < grid.length; i++) {

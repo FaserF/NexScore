@@ -382,6 +382,17 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
             if (didPop) return;
             final shouldLeave = await _showExitWarningDialog(context, l10n);
             if (shouldLeave && context.mounted) {
+              ref.read(persistenceServiceProvider).clearGameState('sudoku');
+              ref.read(sudokuStateProvider.notifier).loadState(
+                    const SudokuGameState(
+                      grid: [],
+                      difficulty: SudokuDifficulty.medium,
+                      variant: SudokuVariant.standard,
+                      mode: SudokuMode.classic,
+                      theme: SudokuTheme.aether,
+                    ),
+                  );
+              ref.read(activeGameIdProvider.notifier).state = null;
               context.go('/games');
             }
           },
@@ -400,6 +411,17 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                   if (gameState.grid.isNotEmpty && !gameState.isFinished) {
                     final shouldLeave = await _showExitWarningDialog(context, l10n);
                     if (shouldLeave && context.mounted) {
+                      ref.read(persistenceServiceProvider).clearGameState('sudoku');
+                      ref.read(sudokuStateProvider.notifier).loadState(
+                            const SudokuGameState(
+                              grid: [],
+                              difficulty: SudokuDifficulty.medium,
+                              variant: SudokuVariant.standard,
+                              mode: SudokuMode.classic,
+                              theme: SudokuTheme.aether,
+                            ),
+                          );
+                      ref.read(activeGameIdProvider.notifier).state = null;
                       context.go('/games');
                     }
                   } else {
@@ -536,6 +558,16 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
             onPressed: () {
               Navigator.pop(ctx);
               ref.read(persistenceServiceProvider).clearGameState('sudoku');
+              ref.read(sudokuStateProvider.notifier).loadState(
+                    const SudokuGameState(
+                      grid: [],
+                      difficulty: SudokuDifficulty.medium,
+                      variant: SudokuVariant.standard,
+                      mode: SudokuMode.classic,
+                      theme: SudokuTheme.aether,
+                    ),
+                  );
+              ref.read(activeGameIdProvider.notifier).state = null;
             },
             child: Text(l10n.get('discard')),
           ),
@@ -1006,7 +1038,9 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                 // Mistakes Indicator
                 if (state.mode != SudokuMode.zen)
                   Text(
-                    '${l10n.get('sudoku_mistakes')}: ${state.mistakes}/${state.maxMistakes}',
+                    state.maxMistakes >= 9999
+                        ? '${l10n.get('sudoku_mistakes')}: ${state.mistakes}/∞'
+                        : '${l10n.get('sudoku_mistakes')}: ${state.mistakes}/${state.maxMistakes}',
                     style: TextStyle(
                       fontSize: 14,
                       color: state.mistakes > 0 ? colors.cellError : Colors.grey,
@@ -1845,6 +1879,16 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                 value: state.notesMode,
                 onChanged: (val) {
                   ref.read(sudokuStateProvider.notifier).toggleNotesMode();
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 8),
+              SwitchListTile(
+                title: const Text('Disable Mistakes Limit'),
+                subtitle: const Text('Play with unlimited mistakes without losing'),
+                value: state.maxMistakes >= 9999,
+                onChanged: (val) {
+                  ref.read(sudokuStateProvider.notifier).toggleMaxMistakesLimit();
                   Navigator.pop(context);
                 },
               ),
