@@ -42,7 +42,7 @@ def format_version(major, minor, patch, prefix, suffix_num, commit_sha=None):
             if commit_sha:
                 ver += f"-{commit_sha}"
             return ver
-        elif prefix == "b":
+        elif prefix == "b" or prefix == "beta":
             return f"{base}-beta.{suffix_num}"
     return base
 
@@ -132,7 +132,7 @@ def main():
     # 2. Type Transition and Suffix management
     target_prefix = None
     if args.release_type == 'beta':
-        target_prefix = 'b'
+        target_prefix = 'beta'
     elif args.release_type == 'dev':
         target_prefix = '-dev'
 
@@ -150,7 +150,7 @@ def main():
 
     # Forced beta if < 1.0.0
     if major == 0 and args.release_type == 'stable':
-        target_prefix = 'b'
+        target_prefix = 'beta'
         if suffix_num == -1: suffix_num = 0
 
     # Shorten SHA if provided
