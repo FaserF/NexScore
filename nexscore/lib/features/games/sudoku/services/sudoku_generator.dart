@@ -79,6 +79,80 @@ class SudokuGenerator {
     return cells;
   }
 
+  /// Generates a Sudoku board using a custom string seed.
+  static List<SudokuCell> generateSeeded({
+    required String seed,
+    required SudokuVariant variant,
+    required SudokuDifficulty difficulty,
+  }) {
+    final seedInt = seed.hashCode;
+    final seededRandom = Random(seedInt);
+    
+    final size = variant == SudokuVariant.mini6x6 ? 6 : 9;
+    final totalCells = size * size;
+
+    List<int> solution = List.filled(totalCells, 0);
+    _fillGridSeeded(solution, variant, seededRandom);
+
+    List<int> puzzle = List.from(solution);
+    
+    int cluesToRemove;
+    if (variant == SudokuVariant.mini6x6) {
+      cluesToRemove = switch (difficulty) {
+        SudokuDifficulty.easy => 16,
+        SudokuDifficulty.medium => 20,
+        SudokuDifficulty.hard => 23,
+        SudokuDifficulty.expert => 26,
+      };
+    } else {
+      cluesToRemove = switch (difficulty) {
+        SudokuDifficulty.easy => 38,
+        SudokuDifficulty.medium => 46,
+        SudokuDifficulty.hard => 54,
+        SudokuDifficulty.expert => 60,
+      };
+    }
+
+    List<int> indices = List.generate(totalCells, (i) => i);
+    // Shuffle indices with seeded random
+    for (int i = indices.length - 1; i > 0; i--) {
+      int n = seededRandom.nextInt(i + 1);
+      int temp = indices[i];
+      indices[i] = indices[n];
+      indices[n] = temp;
+    }
+
+    int removed = 0;
+    for (final index in indices) {
+      if (removed >= cluesToRemove) break;
+      final originalVal = puzzle[index];
+      puzzle[index] = 0;
+      if (_hasUniqueSolution(puzzle, variant)) {
+        removed++;
+      } else {
+        puzzle[index] = originalVal;
+      }
+    }
+
+    List<SudokuCell> cells = [];
+    for (int r = 0; r < size; r++) {
+      for (int c = 0; c < size; c++) {
+        final idx = r * size + c;
+        final isGiven = puzzle[idx] != 0;
+        cells.add(SudokuCell(
+          row: r,
+          col: c,
+          value: solution[idx],
+          currentValue: puzzle[idx],
+          isOriginal: isGiven,
+          notes: {},
+        ));
+      }
+    }
+
+    return cells;
+  }
+
   /// Generates a Daily Challenge board using a seeded random based on the date string (e.g. "2026-06-07")
   static List<SudokuCell> generateDaily({
     required String dateStr,

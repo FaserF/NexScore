@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/multiplayer/providers/multiplayer_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/sudoku_campaign_data.dart';
 import '../models/sudoku_models.dart';
 import '../services/sudoku_generator.dart';
 import '../services/sudoku_sync_service.dart';
@@ -137,6 +139,39 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
       isFinished: false,
       isDailyChallenge: true,
       dailyDate: dateStr,
+    );
+
+    startTimer();
+  }
+
+  void setupCampaignLevel(int levelId) {
+    _history.clear();
+    _timer?.cancel();
+    _eventsSubscription?.cancel();
+    _gameStateSubscription?.cancel();
+
+    final level = sudokuCampaignLevels.firstWhere(
+      (l) => l.levelId == levelId,
+      orElse: () => sudokuCampaignLevels.first,
+    );
+
+    final grid = SudokuGenerator.generateSeeded(
+      seed: level.seed,
+      variant: level.variant,
+      difficulty: level.difficulty,
+    );
+
+    state = SudokuGameState(
+      grid: grid,
+      difficulty: level.difficulty,
+      variant: level.variant,
+      mode: SudokuMode.classic,
+      theme: state.theme,
+      mistakes: 0,
+      maxMistakes: 3,
+      timeSeconds: 0,
+      isFinished: false,
+      campaignLevelId: levelId,
     );
 
     startTimer();
@@ -284,15 +319,19 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
           );
 
           if (solved) {
-            SudokuSyncService.saveAndSyncScore(
-              playerName: currentUsername.isEmpty ? 'Player' : currentUsername,
-              timeSeconds: state.timeSeconds,
-              variant: state.variant.name,
-              difficulty: state.difficulty.name,
-              mode: state.mode.name,
-              isDaily: state.isDailyChallenge,
-              dailyDate: state.dailyDate,
-            );
+            if (state.campaignLevelId != null) {
+              _saveCampaignProgress(state.campaignLevelId!);
+            } else {
+              SudokuSyncService.saveAndSyncScore(
+                playerName: currentUsername.isEmpty ? 'Player' : currentUsername,
+                timeSeconds: state.timeSeconds,
+                variant: state.variant.name,
+                difficulty: state.difficulty.name,
+                mode: state.mode.name,
+                isDaily: state.isDailyChallenge,
+                dailyDate: state.dailyDate,
+              );
+            }
           }
         }
       }
@@ -354,7 +393,16 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
 
     if (state.isFinished) {
       _timer?.cancel();
+      if (solved && state.campaignLevelId != null) {
+        _saveCampaignProgress(state.campaignLevelId!);
+      }
     }
+  }
+
+  Future<void> _saveCampaignProgress(int levelId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sudoku_academy_level_completed_$levelId', true);
+    ref.invalidate(completedCampaignLevelsProvider);
   }
 
   // --- Multiplayer Engine Sync & Processors ---
@@ -460,3 +508,14 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
 final sudokuStateProvider = NotifierProvider<SudokuStateNotifier, SudokuGameState>(
   SudokuStateNotifier.new,
 );
+
+final completedCampaignLevelsProvider = FutureProvider<Set<int>>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  final completed = <int>{};
+  for (int i = 1; i <= 20; i++) {
+    if (prefs.getBool('sudoku_academy_level_completed_$i') ?? false) {
+      completed.add(i);
+    }
+  }
+  return completed;
+});

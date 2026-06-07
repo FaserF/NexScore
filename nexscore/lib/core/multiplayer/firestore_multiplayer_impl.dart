@@ -255,10 +255,14 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
 
     try {
       if (isHost) {
-        // Host leaves -> destroy lobby or close it
-        await docRef
-            .update({'state': LobbyState.closed.name})
-            .timeout(const Duration(seconds: 5));
+        // Host leaves -> delete events subcollection and the lobby document
+        final eventsSnapshot = await docRef.collection('events').get().timeout(const Duration(seconds: 5));
+        final batch = _firestore.batch();
+        for (final doc in eventsSnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        batch.delete(docRef);
+        await batch.commit().timeout(const Duration(seconds: 5));
       } else {
         // Client leaves -> remove from users
         await docRef

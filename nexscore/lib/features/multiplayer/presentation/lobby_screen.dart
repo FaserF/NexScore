@@ -180,13 +180,15 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   Widget build(BuildContext context) {
     final lobby = ref.watch(currentLobbyProvider);
     final l10n = AppLocalizations.of(context);
+    final isHost = ref.watch(isHostProvider);
 
-    // Automatically navigate client to Sudoku game when host starts it
+    // Automatically navigate client to game when host starts it
     ref.listen<AsyncValue<Map<String, dynamic>>>(gameStateSyncProvider, (previous, next) {
       final data = next.value;
-      if (data != null && data['grid'] != null && data['isMultiplayer'] == 1) {
-        if (context.mounted) {
-          context.pushReplacement('/games/sudoku');
+      if (data != null && data['isMultiplayer'] == 1) {
+        final gameId = data['gameId'] as String? ?? (data['grid'] != null ? 'sudoku' : null);
+        if (gameId != null && context.mounted) {
+          context.pushReplacement('/games/$gameId');
         }
       }
     });
@@ -269,20 +271,38 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(24.0),
-                    child: FilledButton(
-                      onPressed: lobby.users.length > 1
-                          ? () {
-                              context.push('/games');
-                            }
-                          : null,
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 60),
-                      ),
-                      child: Text(
-                        l10n.get('home_choose_game'),
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
+                    child: isHost
+                        ? FilledButton(
+                            onPressed: lobby.users.length > 1
+                                ? () {
+                                    context.push('/games');
+                                  }
+                                : null,
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 60),
+                            ),
+                            child: Text(
+                              l10n.get('home_choose_game'),
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          )
+                        : OutlinedButton.icon(
+                            onPressed: null,
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 60),
+                            ),
+                            icon: const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            ),
+                            label: Text(
+                              l10n.get('multiplayer_waiting_for_host'),
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          ),
                   ),
                 ],
               ],

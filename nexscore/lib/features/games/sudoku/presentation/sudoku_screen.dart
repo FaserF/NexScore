@@ -300,6 +300,31 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     // Get theme colors
     final colors = _getThemeColors(gameState.theme, Theme.of(context).colorScheme);
 
+    // Listen for multiplayer lobby closure
+    ref.listen<Lobby?>(currentLobbyProvider, (previous, next) {
+      if (gameState.isMultiplayer && next == null && mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            title: Text(l10n.get('multiplayer_lobby_closed_title')),
+            content: Text(l10n.get('multiplayer_lobby_closed_body')),
+            actions: [
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  if (context.mounted) {
+                    context.go('/games');
+                  }
+                },
+                child: Text(l10n.get('ok')),
+              ),
+            ],
+          ),
+        );
+      }
+    });
+
     // Confetti, fanfare, and grid checks trigger when state updates
     ref.listen<SudokuGameState>(sudokuStateProvider, (prev, next) {
       if (next.grid.isNotEmpty && prev != null && next.grid.length == prev.grid.length) {

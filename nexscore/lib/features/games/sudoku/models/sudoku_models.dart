@@ -105,6 +105,8 @@ class SudokuGameState {
   final bool isMultiplayer;
   final Map<String, int> playerScores;
   final Map<String, int> playerMistakes;
+  final String gameId;
+  final int? campaignLevelId;
 
   const SudokuGameState({
     required this.grid,
@@ -125,6 +127,8 @@ class SudokuGameState {
     this.isMultiplayer = false,
     this.playerScores = const {},
     this.playerMistakes = const {},
+    this.gameId = 'sudoku',
+    this.campaignLevelId,
   });
 
   SudokuGameState copyWith({
@@ -146,6 +150,8 @@ class SudokuGameState {
     bool? isMultiplayer,
     Map<String, int>? playerScores,
     Map<String, int>? playerMistakes,
+    String? gameId,
+    int? campaignLevelId,
   }) {
     return SudokuGameState(
       grid: grid ?? this.grid,
@@ -166,6 +172,8 @@ class SudokuGameState {
       isMultiplayer: isMultiplayer ?? this.isMultiplayer,
       playerScores: playerScores ?? this.playerScores,
       playerMistakes: playerMistakes ?? this.playerMistakes,
+      gameId: gameId ?? this.gameId,
+      campaignLevelId: campaignLevelId ?? this.campaignLevelId,
     );
   }
 
@@ -189,6 +197,8 @@ class SudokuGameState {
       'isMultiplayer': isMultiplayer ? 1 : 0,
       'playerScores': playerScores,
       'playerMistakes': playerMistakes,
+      'gameId': gameId,
+      'campaignLevelId': campaignLevelId,
     };
   }
 
@@ -226,6 +236,8 @@ class SudokuGameState {
       isMultiplayer: (map['isMultiplayer'] as int? ?? 0) == 1,
       playerScores: Map<String, int>.from(map['playerScores'] ?? {}),
       playerMistakes: Map<String, int>.from(map['playerMistakes'] ?? {}),
+      gameId: map['gameId'] as String? ?? 'sudoku',
+      campaignLevelId: map['campaignLevelId'] as int?,
     );
   }
 }
