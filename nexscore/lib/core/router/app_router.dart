@@ -20,6 +20,7 @@ import '../../features/games/volleyball/presentation/volleyball_scoreboard.dart'
 import '../../features/games/volleyball/presentation/volleyball_signals_screen.dart';
 import '../../features/games/sudoku/presentation/sudoku_screen.dart';
 import '../../features/games/sudoku/presentation/sudoku_campaign_screen.dart';
+import '../../features/games/sudoku/presentation/sudoku_tutorial_screen.dart';
 import '../../features/leaderboards/presentation/leaderboard_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/help/presentation/help_screen.dart';
@@ -130,10 +131,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'sudoku',
                     builder: (context, state) => const SudokuScreen(),
-                    routes: [
                       GoRoute(
                         path: 'campaign',
                         builder: (context, state) => const SudokuCampaignScreen(),
+                      ),
+                      GoRoute(
+                        path: 'tutorial',
+                        builder: (context, state) => const SudokuTutorialScreen(),
                       ),
                     ],
                   ),

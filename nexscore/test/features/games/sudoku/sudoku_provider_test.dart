@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nexscore/features/games/sudoku/models/sudoku_models.dart';
 import 'package:nexscore/features/games/sudoku/providers/sudoku_provider.dart';
 import 'package:nexscore/features/games/sudoku/services/sudoku_generator.dart';
+import 'package:nexscore/features/games/sudoku/services/sudoku_analyzer.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -251,6 +252,17 @@ void main() {
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getBool('sudoku_academy_level_completed_1'), isTrue);
+    });
+
+    test('SudokuAnalyzer identifies logical singles correctly', () {
+      final cells = SudokuGenerator.generate(
+        variant: SudokuVariant.standard,
+        difficulty: SudokuDifficulty.easy,
+      );
+
+      final analysis = SudokuAnalyzer.analyze(cells, SudokuVariant.standard);
+      expect(analysis, isNotNull);
+      expect(analysis!.explanation, contains('Single'));
     });
   });
 }

@@ -139,6 +139,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
             throw Exception('firestore_unavailable: ${e.message}');
           }
         }
+        rethrow;
       }
     }
 
@@ -356,6 +357,12 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
                   leaveLobby();
                   return;
                 }
+              }
+              if (!newLobby.users.containsKey(_uid)) {
+                debugPrint('Multiplayer: Client was removed from lobby. Leaving.');
+                _lastCloseReason = 'host_left';
+                leaveLobby();
+                return;
               }
             }
 

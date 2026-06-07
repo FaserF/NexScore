@@ -9,6 +9,7 @@ import '../models/sudoku_models.dart';
 import '../services/sudoku_generator.dart';
 import '../services/sudoku_sync_service.dart';
 import '../services/sudoku_stats_service.dart';
+import '../services/sudoku_analyzer.dart';
 
 class SudokuStateNotifier extends Notifier<SudokuGameState> {
   final List<List<SudokuCell>> _history = [];
@@ -190,7 +191,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
 
   void selectCell(int row, int col) {
     if (state.isFinished) return;
-    state = state.copyWith(selectedRow: row, selectedCol: col);
+    state = state.clearHint().copyWith(selectedRow: row, selectedCol: col);
   }
 
   void selectTheme(SudokuTheme theme) {
@@ -231,6 +232,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
   }
 
   void enterNumber(int num, String currentUsername) {
+    state = state.clearHint();
     final r = state.selectedRow;
     final c = state.selectedCol;
     if (r == null || c == null || state.isFinished) return;
@@ -341,6 +343,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
   void eraseCell() {
     if (state.isMultiplayer) return; // Disallow erasing solved entries in competitive multiplayer
 
+    state = state.clearHint();
     final r = state.selectedRow;
     final c = state.selectedCol;
     if (r == null || c == null || state.isFinished) return;
@@ -363,40 +366,20 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
   void useHint() {
     if (state.isMultiplayer) return; // No hints in competitive match
 
-    final r = state.selectedRow;
-    final c = state.selectedCol;
-    if (r == null || c == null || state.isFinished) return;
+    final analysis = SudokuAnalyzer.analyze(state.grid, state.variant);
+    if (analysis == null) return;
 
     final size = state.variant == SudokuVariant.mini6x6 ? 6 : 9;
-    final cellIdx = r * size + c;
-    final cell = state.grid[cellIdx];
-
-    if (cell.isOriginal || cell.currentValue == cell.value) return;
-
-    _pushHistory();
-
-    final newGrid = List<SudokuCell>.from(state.grid);
-    newGrid[cellIdx] = cell.copyWith(
-      currentValue: cell.value,
-      notes: {},
-      isError: false,
-    );
-
-    final validatedGrid = SudokuGenerator.validateBoard(newGrid, state.variant);
-    bool solved = validatedGrid.every((c) => c.currentValue == c.value);
+    final r = analysis.cellIndex ~/ size;
+    final c = analysis.cellIndex % size;
 
     state = state.copyWith(
-      grid: validatedGrid,
+      selectedRow: r,
+      selectedCol: c,
+      analyzerExplanation: analysis.explanation,
+      highlightedHintCell: analysis.cellIndex,
       hasUsedHint: true,
-      isFinished: solved,
     );
-
-    if (state.isFinished) {
-      _timer?.cancel();
-      if (solved && state.campaignLevelId != null) {
-        _saveCampaignProgress(state.campaignLevelId!);
-      }
-    }
   }
 
   Future<void> _saveCampaignProgress(int levelId) async {
@@ -414,28 +397,32 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
   void _startListeningToHostState() {
     _gameStateSubscription?.cancel();
     _gameStateSubscription = ref.read(gameStateSyncProvider.stream).listen((updatedStateMap) {
-      final hostState = SudokuGameState.fromMap(updatedStateMap);
-      
-      // Preserve local client notes
-      final mergedGrid = List<SudokuCell>.from(hostState.grid);
-      for (int i = 0; i < mergedGrid.length; i++) {
-        if (i < state.grid.length) {
-          final clientCell = state.grid[i];
-          final hostCell = mergedGrid[i];
-          // Only preserve notes if the cell is still empty (currentValue == 0)
-          if (hostCell.currentValue == 0 && clientCell.currentValue == 0) {
-            mergedGrid[i] = hostCell.copyWith(notes: clientCell.notes);
+      try {
+        final hostState = SudokuGameState.fromMap(updatedStateMap);
+        
+        // Preserve local client notes
+        final mergedGrid = List<SudokuCell>.from(hostState.grid);
+        for (int i = 0; i < mergedGrid.length; i++) {
+          if (i < state.grid.length) {
+            final clientCell = state.grid[i];
+            final hostCell = mergedGrid[i];
+            // Only preserve notes if the cell is still empty (currentValue == 0)
+            if (hostCell.currentValue == 0 && clientCell.currentValue == 0) {
+              mergedGrid[i] = hostCell.copyWith(notes: clientCell.notes);
+            }
           }
         }
-      }
 
-      // Client updates state but preserves their current local theme & selection settings
-      state = hostState.copyWith(
-        grid: mergedGrid,
-        theme: state.theme,
-        selectedRow: state.selectedRow,
-        selectedCol: state.selectedCol,
-      );
+        // Client updates state but preserves their current local theme & selection settings
+        state = hostState.copyWith(
+          grid: mergedGrid,
+          theme: state.theme,
+          selectedRow: state.selectedRow,
+          selectedCol: state.selectedCol,
+        );
+      } catch (e) {
+        debugPrint('Error parsing multiplayer host state: $e');
+      }
     });
   }
 

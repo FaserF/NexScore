@@ -685,6 +685,47 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
               loading: () => const SizedBox.shrink(),
               error: (_, __) => const SizedBox.shrink(),
             ),
+
+            // How to Play / Tutorial Card
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: AnimatedScaleButton(
+                onPressed: () => context.push('/games/sudoku/tutorial'),
+                child: GlassContainer(
+                  borderRadius: 20,
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  border: Border.all(color: colors.accent.withAlpha(80), width: 1.2),
+                  child: Row(
+                    children: [
+                      Icon(Icons.help_outline, color: colors.accent, size: 24),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'HOW TO PLAY / TUTORIAL',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: colors.primary,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              'New to Sudoku or want to learn the variants? Play our quick interactive guide.',
+                              style: TextStyle(fontSize: 11, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.chevron_right, color: colors.primary),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
 
           // ── Config Form
@@ -908,6 +949,44 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
           ),
           const SizedBox(height: 16),
 
+          // Logical Hint Explanation Card
+          if (state.analyzerExplanation != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: GlassContainer(
+                borderRadius: 16,
+                padding: const EdgeInsets.all(12),
+                border: Border.all(color: Colors.amber.withAlpha(150), width: 1.5),
+                child: Row(
+                  children: [
+                    const Icon(Icons.psychology, color: Colors.amber, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'ANALYZER EXPLANATION',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.amber,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            state.analyzerExplanation!,
+                            style: const TextStyle(fontSize: 11, color: Colors.white70, height: 1.4),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
           // Numerical Numpad
           _buildNumpad(size, state, colors),
           const SizedBox(height: 12),
@@ -1063,18 +1142,20 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       child: Container(
         decoration: BoxDecoration(
           color: cellBg,
-          border: Border(
-            top: BorderSide(color: colors.cellBorder, width: 0.5),
-            left: BorderSide(color: colors.cellBorder, width: 0.5),
-            right: BorderSide(
-              color: borderRight ? colors.primary : colors.cellBorder,
-              width: borderRight ? 2.5 : 0.5,
-            ),
-            bottom: BorderSide(
-              color: borderBottom ? colors.primary : colors.cellBorder,
-              width: borderBottom ? 2.5 : 0.5,
-            ),
-          ),
+          border: state.highlightedHintCell == index
+              ? Border.all(color: Colors.amberAccent, width: 3.0)
+              : Border(
+                  top: BorderSide(color: colors.cellBorder, width: 0.5),
+                  left: BorderSide(color: colors.cellBorder, width: 0.5),
+                  right: BorderSide(
+                    color: borderRight ? colors.primary : colors.cellBorder,
+                    width: borderRight ? 2.5 : 0.5,
+                  ),
+                  bottom: BorderSide(
+                    color: borderBottom ? colors.primary : colors.cellBorder,
+                    width: borderBottom ? 2.5 : 0.5,
+                  ),
+                ),
         ),
         child: Stack(
           children: [

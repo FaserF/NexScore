@@ -107,6 +107,8 @@ class SudokuGameState {
   final Map<String, int> playerMistakes;
   final String gameId;
   final int? campaignLevelId;
+  final String? analyzerExplanation;
+  final int? highlightedHintCell;
 
   const SudokuGameState({
     required this.grid,
@@ -129,6 +131,8 @@ class SudokuGameState {
     this.playerMistakes = const {},
     this.gameId = 'sudoku',
     this.campaignLevelId,
+    this.analyzerExplanation,
+    this.highlightedHintCell,
   });
 
   SudokuGameState copyWith({
@@ -152,6 +156,8 @@ class SudokuGameState {
     Map<String, int>? playerMistakes,
     String? gameId,
     int? campaignLevelId,
+    String? analyzerExplanation,
+    int? highlightedHintCell,
   }) {
     return SudokuGameState(
       grid: grid ?? this.grid,
@@ -174,6 +180,35 @@ class SudokuGameState {
       playerMistakes: playerMistakes ?? this.playerMistakes,
       gameId: gameId ?? this.gameId,
       campaignLevelId: campaignLevelId ?? this.campaignLevelId,
+      analyzerExplanation: analyzerExplanation ?? this.analyzerExplanation,
+      highlightedHintCell: highlightedHintCell ?? this.highlightedHintCell,
+    );
+  }
+
+  SudokuGameState clearHint() {
+    return SudokuGameState(
+      grid: grid,
+      difficulty: difficulty,
+      variant: variant,
+      mode: mode,
+      theme: theme,
+      mistakes: mistakes,
+      maxMistakes: maxMistakes,
+      timeSeconds: timeSeconds,
+      isFinished: isFinished,
+      selectedRow: selectedRow,
+      selectedCol: selectedCol,
+      notesMode: notesMode,
+      isDailyChallenge: isDailyChallenge,
+      dailyDate: dailyDate,
+      hasUsedHint: hasUsedHint,
+      isMultiplayer: isMultiplayer,
+      playerScores: playerScores,
+      playerMistakes: playerMistakes,
+      gameId: gameId,
+      campaignLevelId: campaignLevelId,
+      analyzerExplanation: null,
+      highlightedHintCell: null,
     );
   }
 
@@ -199,6 +234,8 @@ class SudokuGameState {
       'playerMistakes': playerMistakes,
       'gameId': gameId,
       'campaignLevelId': campaignLevelId,
+      'analyzerExplanation': analyzerExplanation,
+      'highlightedHintCell': highlightedHintCell,
     };
   }
 
@@ -238,6 +275,8 @@ class SudokuGameState {
       playerMistakes: Map<String, int>.from(map['playerMistakes'] ?? {}),
       gameId: map['gameId'] as String? ?? 'sudoku',
       campaignLevelId: map['campaignLevelId'] as int?,
+      analyzerExplanation: map['analyzerExplanation'] as String?,
+      highlightedHintCell: map['highlightedHintCell'] as int?,
     );
   }
 }
