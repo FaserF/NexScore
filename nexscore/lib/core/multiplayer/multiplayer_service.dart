@@ -7,6 +7,9 @@ abstract class MultiplayerService {
   /// The current active lobby if connected
   Lobby? get currentLobby;
 
+  /// The reason why the lobby was closed (e.g. host_left, host_disconnected)
+  String? get lastCloseReason;
+
   /// Stream of lobby updates for real-time reactivity
   Stream<Lobby?> get lobbyUpdates;
 

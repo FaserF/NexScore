@@ -32,12 +32,17 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
   StreamSubscription<DocumentSnapshot>? _lobbySubscription;
   final _lobbyStreamController = StreamController<Lobby?>.broadcast();
   Lobby? _currentLobby;
+  String? _lastCloseReason;
+  Timer? _heartbeatTimer;
 
   @override
   bool get isHost => _currentLobby?.hostUid == _uid && _uid != null;
 
   @override
   Lobby? get currentLobby => _currentLobby;
+
+  @override
+  String? get lastCloseReason => _lastCloseReason;
 
   @override
   Stream<Lobby?> get lobbyUpdates => _lobbyStreamController.stream;
@@ -87,6 +92,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     int maxPlayers = 10,
   }) async {
     debugPrint('Multiplayer: [Lobby] hostLobby called for $hostName');
+    _lastCloseReason = null;
 
     await _ensureAuth();
     final uid = _uid!;
@@ -133,8 +139,11 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
             throw Exception('firestore_unavailable: ${e.message}');
           }
         }
-        rethrow;
       }
+    }
+
+    if (!isUnique) {
+      throw Exception('room_code_generation_failed');
     }
 
     final hostUser = MultiplayerUser(
@@ -180,6 +189,7 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     debugPrint(
       'Multiplayer: [Join] joinLobby called for $roomCode by $playerName',
     );
+    _lastCloseReason = null;
 
     await _ensureAuth();
     final uid = _uid!;
@@ -253,6 +263,12 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
     final roomCode = _currentLobby!.id;
     final docRef = _firestore.collection('lobbies').doc(roomCode);
 
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
+    if (_lastCloseReason == null) {
+      _lastCloseReason = 'host_left';
+    }
+
     try {
       if (isHost) {
         // Host leaves -> delete events subcollection and the lobby document
@@ -322,23 +338,83 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
               _currentLobby = null;
               _lobbyStreamController.add(null);
               _lobbySubscription?.cancel();
+              _heartbeatTimer?.cancel();
               return;
             }
 
-            _currentLobby = Lobby.fromMap(
-              snapshot.data() as Map<String, dynamic>,
-            );
+            final lobbyMap = snapshot.data() as Map<String, dynamic>;
+            final newLobby = Lobby.fromMap(lobbyMap);
+
+            // Check if Host has disconnected (only for clients)
+            if (_uid != null && newLobby.hostUid != _uid) {
+              final hostUser = newLobby.users[newLobby.hostUid];
+              if (hostUser != null) {
+                final threshold = DateTime.now().subtract(const Duration(seconds: 45));
+                if (hostUser.lastActive.isBefore(threshold)) {
+                  debugPrint('Multiplayer: Host is offline. Automatically leaving.');
+                  _lastCloseReason = 'host_disconnected';
+                  leaveLobby();
+                  return;
+                }
+              }
+            }
+
+            _currentLobby = newLobby;
             _lobbyStreamController.add(_currentLobby);
           },
           onError: (error) {
             debugPrint('Error listening to lobby: $error');
           },
         );
+
+    _startHeartbeat(roomCode);
+  }
+
+  void _startHeartbeat(String roomCode) {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = Timer.periodic(const Duration(seconds: 15), (timer) async {
+      if (_currentLobby == null || _uid == null) {
+        timer.cancel();
+        return;
+      }
+
+      final docRef = _firestore.collection('lobbies').doc(roomCode);
+      try {
+        final now = DateTime.now();
+        // Update presence
+        await docRef.update({
+          'users.$_uid.lastActive': now.millisecondsSinceEpoch,
+        }).timeout(const Duration(seconds: 5));
+
+        // If Host, scan for inactive clients
+        if (isHost && _currentLobby != null) {
+          final staleUids = <String>[];
+          final threshold = now.subtract(const Duration(seconds: 45));
+          for (final user in _currentLobby!.users.values) {
+            if (!user.isHost && user.lastActive.isBefore(threshold)) {
+              staleUids.add(user.uid);
+            }
+          }
+
+          if (staleUids.isNotEmpty) {
+            final updates = <String, dynamic>{};
+            for (final uid in staleUids) {
+              updates['users.$uid'] = FieldValue.delete();
+            }
+            await docRef.update(updates).timeout(const Duration(seconds: 5));
+            debugPrint('Multiplayer: Pruned stale clients: $staleUids');
+          }
+        }
+      } catch (e) {
+        debugPrint('Multiplayer presence heartbeat error: $e');
+      }
+    });
   }
 
   // Ensure streams are closed when service is disposed
   void dispose() {
     _lobbySubscription?.cancel();
+    _heartbeatTimer?.cancel();
     _lobbyStreamController.close();
   }
 }

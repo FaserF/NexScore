@@ -241,7 +241,7 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
 
     if (cell.isOriginal || cell.currentValue == cell.value) return;
 
-    if (state.isMultiplayer) {
+    if (state.isMultiplayer && !state.notesMode) {
       // Multiplayer Mode: Client sends event to Host (or host directly processes if they input)
       final myUid = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
       final myName = currentUsername.isEmpty ? 'Player' : currentUsername;
@@ -415,8 +415,23 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
     _gameStateSubscription?.cancel();
     _gameStateSubscription = ref.read(gameStateSyncProvider.stream).listen((updatedStateMap) {
       final hostState = SudokuGameState.fromMap(updatedStateMap);
+      
+      // Preserve local client notes
+      final mergedGrid = List<SudokuCell>.from(hostState.grid);
+      for (int i = 0; i < mergedGrid.length; i++) {
+        if (i < state.grid.length) {
+          final clientCell = state.grid[i];
+          final hostCell = mergedGrid[i];
+          // Only preserve notes if the cell is still empty (currentValue == 0)
+          if (hostCell.currentValue == 0 && clientCell.currentValue == 0) {
+            mergedGrid[i] = hostCell.copyWith(notes: clientCell.notes);
+          }
+        }
+      }
+
       // Client updates state but preserves their current local theme & selection settings
       state = hostState.copyWith(
+        grid: mergedGrid,
         theme: state.theme,
         selectedRow: state.selectedRow,
         selectedCol: state.selectedCol,

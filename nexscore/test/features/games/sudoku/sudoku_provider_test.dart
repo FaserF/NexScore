@@ -212,5 +212,45 @@ void main() {
       notifier.undo();
       expect(container.read(sudokuStateProvider).grid[emptyIdx].currentValue, 0);
     });
+
+    test('setupCampaignLevel initializes level and completing unlocks next', () async {
+      SharedPreferences.setMockInitialValues({});
+      final notifier = container.read(sudokuStateProvider.notifier);
+      
+      notifier.setupCampaignLevel(1);
+      var state = container.read(sudokuStateProvider);
+      
+      expect(state.campaignLevelId, 1);
+      expect(state.variant, SudokuVariant.mini6x6);
+      expect(state.difficulty, SudokuDifficulty.easy);
+
+      final emptyCellsIndices = <int>[];
+      for (int i = 0; i < state.grid.length; i++) {
+        if (state.grid[i].currentValue == 0) {
+          emptyCellsIndices.add(i);
+        }
+      }
+
+      for (int i = 0; i < emptyCellsIndices.length - 1; i++) {
+        final idx = emptyCellsIndices[i];
+        final cell = state.grid[idx];
+        notifier.selectCell(cell.row, cell.col);
+        notifier.enterNumber(cell.value, 'Tester');
+      }
+
+      state = container.read(sudokuStateProvider);
+      expect(state.isFinished, isFalse);
+
+      final lastIdx = emptyCellsIndices.last;
+      final lastCell = state.grid[lastIdx];
+      notifier.selectCell(lastCell.row, lastCell.col);
+      notifier.enterNumber(lastCell.value, 'Tester');
+
+      state = container.read(sudokuStateProvider);
+      expect(state.isFinished, isTrue);
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getBool('sudoku_academy_level_completed_1'), isTrue);
+    });
   });
 }

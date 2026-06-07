@@ -296,6 +296,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final gameState = ref.watch(sudokuStateProvider);
+    final completedLevelsAsync = ref.watch(completedCampaignLevelsProvider);
 
     // Get theme colors
     final colors = _getThemeColors(gameState.theme, Theme.of(context).colorScheme);
@@ -303,12 +304,18 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     // Listen for multiplayer lobby closure
     ref.listen<Lobby?>(currentLobbyProvider, (previous, next) {
       if (gameState.isMultiplayer && next == null && mounted) {
+        final reason = ref.read(multiplayerServiceProvider).lastCloseReason;
+        final isHostDisconnected = reason == 'host_disconnected';
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (ctx) => AlertDialog(
-            title: Text(l10n.get('multiplayer_lobby_closed_title')),
-            content: Text(l10n.get('multiplayer_lobby_closed_body')),
+            title: Text(isHostDisconnected
+                ? l10n.get('multiplayer_host_disconnected_title')
+                : l10n.get('multiplayer_lobby_closed_title')),
+            content: Text(isHostDisconnected
+                ? l10n.get('multiplayer_host_disconnected_body')
+                : l10n.get('multiplayer_lobby_closed_body')),
             actions: [
               FilledButton(
                 onPressed: () {
@@ -605,6 +612,79 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
               ],
             ),
             const SizedBox(height: 24),
+            
+            // Sudoku Academy Card
+            completedLevelsAsync.when(
+              data: (completedSet) {
+                final completedCount = completedSet.length;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: AnimatedScaleButton(
+                    onPressed: () => context.push('/games/sudoku/campaign'),
+                    child: GlassContainer(
+                      borderRadius: 20,
+                      padding: const EdgeInsets.all(20),
+                      border: Border.all(color: colors.primary.withAlpha(120), width: 1.5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.school, color: colors.accent, size: 24),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'SUDOKU ACADEMY',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.black,
+                                      color: colors.primary,
+                                      letterSpacing: 1.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: colors.accent.withAlpha(50),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '$completedCount / 20',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: colors.accent,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Embark on a progressive 20-level logic mastery campaign. Solve custom rulesets and beat targeted time benchmarks.',
+                            style: TextStyle(fontSize: 12, color: Colors.grey, height: 1.4),
+                          ),
+                          const SizedBox(height: 12),
+                          LinearProgressIndicator(
+                            value: completedCount / 20.0,
+                            backgroundColor: Colors.grey.withAlpha(40),
+                            color: colors.accent,
+                            minHeight: 6,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            ),
           ],
 
           // ── Config Form
@@ -1462,6 +1542,63 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       ),
     );
   }
+}
+
+_SudokuThemeColors _getThemeColors(SudokuTheme theme, ColorScheme systemCs) {
+  return switch (theme) {
+    SudokuTheme.aether => _SudokuThemeColors(
+        brightness: Brightness.dark,
+        background: const Color(0xFF0D0E15),
+        surface: const Color(0xFF161926),
+        primary: Colors.indigoAccent.shade200,
+        accent: Colors.pinkAccent,
+        cellBorder: Colors.indigo.shade900,
+        cellOriginal: Colors.white,
+        cellUser: Colors.indigoAccent.shade100,
+        cellError: Colors.redAccent,
+        cellHighlight: Colors.indigoAccent.withAlpha(40),
+        cellSelection: Colors.indigoAccent.withAlpha(90),
+      ),
+    SudokuTheme.zen => _SudokuThemeColors(
+        brightness: Brightness.light,
+        background: const Color(0xFFF7F4EA),
+        surface: const Color(0xFFEFEAD8),
+        primary: const Color(0xFF8B5A2B), // Earthy wood brown
+        accent: const Color(0xFF4A752C), // Forest green
+        cellBorder: const Color(0xFFD3C5A3),
+        cellOriginal: const Color(0xFF3E2723),
+        cellUser: const Color(0xFF8B5A2B),
+        cellError: Colors.red.shade800,
+        cellHighlight: const Color(0xFFE2D9BC),
+        cellSelection: const Color(0xFFC7B78E),
+      ),
+    SudokuTheme.midnight => _SudokuThemeColors(
+        brightness: Brightness.dark,
+        background: const Color(0xFF050B14),
+        surface: const Color(0xFF0B1528),
+        primary: Colors.blueAccent.shade400,
+        accent: Colors.cyanAccent,
+        cellBorder: Colors.blue.shade900.withAlpha(150),
+        cellOriginal: Colors.white,
+        cellUser: Colors.blueAccent.shade100,
+        cellError: Colors.redAccent,
+        cellHighlight: Colors.blueAccent.withAlpha(30),
+        cellSelection: Colors.blueAccent.withAlpha(80),
+      ),
+    SudokuTheme.cyberpunk => _SudokuThemeColors(
+        brightness: Brightness.dark,
+        background: const Color(0xFF111111),
+        surface: const Color(0xFF1E1E1E),
+        primary: const Color(0xFFEEFF00), // Toxic yellow
+        accent: const Color(0xFF00FF66), // Toxic green
+        cellBorder: const Color(0xFF333333),
+        cellOriginal: Colors.white,
+        cellUser: const Color(0xFFEEFF00),
+        cellError: const Color(0xFFFF0055),
+        cellHighlight: const Color(0xFFEEFF00).withAlpha(30),
+        cellSelection: const Color(0xFFEEFF00).withAlpha(85),
+      ),
+  };
 }
 
 class _SudokuThemeColors {

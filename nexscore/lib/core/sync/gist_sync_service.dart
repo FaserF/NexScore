@@ -197,11 +197,17 @@ class GistSyncService {
     final players = await db.query('players');
     final sessions = await db.query('sessions');
 
+    Map<String, dynamic>? settingsData;
+    if (ref != null) {
+      settingsData = ref!.read(settingsProvider).toMap();
+    }
+
     final data = {
-      'version': 1,
+      'version': 2,
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'players': players,
       'sessions': sessions,
+      if (settingsData != null) 'settings': settingsData,
     };
     return jsonEncode(data);
   }
@@ -219,6 +225,11 @@ class GistSyncService {
     for (final s in sessions) {
       final map = Map<String, dynamic>.from(s as Map);
       await db.insert('sessions', map);
+    }
+
+    final settingsData = data['settings'] as Map<String, dynamic>?;
+    if (settingsData != null && ref != null) {
+      await ref!.read(settingsProvider.notifier).importSettings(settingsData);
     }
   }
 

@@ -68,6 +68,22 @@ class Settings {
       lastBackupProvider: lastBackupProvider ?? this.lastBackupProvider,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'themeMode': themeMode.index,
+      'locale': locale?.languageCode,
+      'hostName': hostName,
+      'hostColor': hostColor,
+      'sfxEnabled': sfxEnabled,
+      'sfxBeepEnabled': sfxBeepEnabled,
+      'sfxFanfareEnabled': sfxFanfareEnabled,
+      'sfxOtherEnabled': sfxOtherEnabled,
+      'debugMode': debugMode,
+      'autoBackupEnabled': autoBackupEnabled,
+      'autoBackupFrequency': autoBackupFrequency,
+    };
+  }
 }
 
 /// Provider for app settings using the modern Notifier pattern.
@@ -241,5 +257,52 @@ class SettingsNotifier extends Notifier<Settings> {
     if (defaultPattern.hasMatch(name) && newName.isNotEmpty) {
       await setHostName(newName);
     }
+  }
+
+  Future<void> importSettings(Map<String, dynamic> data) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (data.containsKey('themeMode')) {
+      final themeIndex = data['themeMode'] as int;
+      await prefs.setInt(_themeKey, themeIndex);
+    }
+    if (data.containsKey('locale')) {
+      final localeCode = data['locale'] as String?;
+      if (localeCode == null) {
+        await prefs.remove(_localeKey);
+      } else {
+        await prefs.setString(_localeKey, localeCode);
+      }
+    }
+    if (data.containsKey('hostName')) {
+      await prefs.setString(_hostNameKey, data['hostName'] as String);
+    }
+    if (data.containsKey('hostColor')) {
+      await prefs.setString(_hostColorKey, data['hostColor'] as String);
+    }
+    if (data.containsKey('sfxEnabled')) {
+      await prefs.setBool(_sfxEnabledKey, data['sfxEnabled'] as bool);
+    }
+    if (data.containsKey('sfxBeepEnabled')) {
+      await prefs.setBool(_sfxBeepKey, data['sfxBeepEnabled'] as bool);
+    }
+    if (data.containsKey('sfxFanfareEnabled')) {
+      await prefs.setBool(_sfxFanfareKey, data['sfxFanfareEnabled'] as bool);
+    }
+    if (data.containsKey('sfxOtherEnabled')) {
+      await prefs.setBool(_sfxOtherKey, data['sfxOtherEnabled'] as bool);
+    }
+    if (data.containsKey('debugMode')) {
+      await prefs.setBool(_debugModeKey, data['debugMode'] as bool);
+    }
+    if (data.containsKey('autoBackupEnabled')) {
+      await prefs.setBool(_autoBackupEnabledKey, data['autoBackupEnabled'] as bool);
+    }
+    if (data.containsKey('autoBackupFrequency')) {
+      await prefs.setString(_autoBackupFreqKey, data['autoBackupFrequency'] as String);
+    }
+
+    // Reload settings into state
+    await _loadSettings();
   }
 }

@@ -158,6 +158,30 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ],
             ),
           );
+        } else if (message.contains('room_code_generation_failed')) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.get('error')),
+              content: Text(l10n.get('multiplayer_room_creation_failed')),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _initLobby(); // Retry
+                  },
+                  child: Text(l10n.get('multiplayer_error_retry')),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.pop();
+                  },
+                  child: Text(l10n.get('ok')),
+                ),
+              ],
+            ),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -189,6 +213,54 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         final gameId = data['gameId'] as String? ?? (data['grid'] != null ? 'sudoku' : null);
         if (gameId != null && context.mounted) {
           context.pushReplacement('/games/$gameId');
+        }
+      }
+    });
+
+    // Automatically pop back when lobby is closed or host is disconnected
+    ref.listen<Lobby?>(currentLobbyProvider, (previous, next) {
+      if (previous != null && next == null && context.mounted) {
+        final reason = ref.read(multiplayerServiceProvider).lastCloseReason;
+        if (reason == 'host_disconnected') {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: Text(l10n.get('multiplayer_host_disconnected_title')),
+              content: Text(l10n.get('multiplayer_host_disconnected_body')),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    if (context.mounted) {
+                      context.pop();
+                    }
+                  },
+                  child: Text(l10n.get('ok')),
+                ),
+              ],
+            ),
+          );
+        } else if (reason == 'host_left') {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: Text(l10n.get('multiplayer_lobby_closed_title')),
+              content: Text(l10n.get('multiplayer_lobby_closed_body')),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    if (context.mounted) {
+                      context.pop();
+                    }
+                  },
+                  child: Text(l10n.get('ok')),
+                ),
+              ],
+            ),
+          );
         }
       }
     });
