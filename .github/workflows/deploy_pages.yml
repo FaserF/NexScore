@@ -28,7 +28,7 @@ on:
         default: false
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: deploy-pages-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:

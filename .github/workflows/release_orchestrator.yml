@@ -36,7 +36,7 @@ on:
         description: 'Build iOS IPA'
         required: true
         type: boolean
-        default: true
+        default: false
 
 permissions:
   contents: write
@@ -110,8 +110,8 @@ jobs:
           fi
 
   build-android:
-    needs: [version-calc, sync-version, build-web]
-    if: ${{ always() && needs.version-calc.result == 'success' && needs.build-web.result == 'success' && github.event.inputs.build_apk != 'false' }}
+    needs: [version-calc, sync-version, create-release]
+    if: ${{ always() && needs.version-calc.result == 'success' && needs.create-release.result == 'success' && github.event.inputs.build_apk != 'false' }}
     name: Build Android APK
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -160,8 +160,8 @@ jobs:
           path: nexscore/build/app/outputs/flutter-apk/app-release.apk*
 
   build-ios:
-    needs: [version-calc, sync-version, build-web]
-    if: ${{ always() && needs.version-calc.result == 'success' && needs.build-web.result == 'success' && github.event.inputs.build_ipa != 'false' }}
+    needs: [version-calc, sync-version, create-release]
+    if: ${{ always() && needs.version-calc.result == 'success' && needs.create-release.result == 'success' && github.event.inputs.build_ipa != 'false' }}
     name: Build iOS IPA
     runs-on: macos-latest
     timeout-minutes: 30
