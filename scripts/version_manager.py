@@ -67,7 +67,34 @@ def main():
     parser.add_argument('--release-type', choices=['stable', 'beta', 'dev'], required=True)
     parser.add_argument('--bump-type', choices=['major', 'minor', 'patch', 'none'], required=True)
     parser.add_argument('--commit-sha', default='')
+    parser.add_argument('--custom-version', default='')
     args = parser.parse_args()
+
+    if args.custom_version:
+        version_name = args.custom_version.lstrip('v')
+        tag_name = f"v{version_name}"
+        is_prerelease_bool = False
+        # Treat as prerelease if it contains pre-release strings, or starts with 0.
+        if '-' in version_name or 'b' in version_name or 'rc' in version_name or version_name.startswith('0.'):
+            is_prerelease_bool = True
+        is_prerelease = "true" if is_prerelease_bool else "false"
+        
+        docker_tag = version_name.lower().replace('+', '-')
+        docker_tag = re.sub(r'[^a-z0-9._-]', '-', docker_tag)
+        
+        stable_exists = has_stable_tag()
+        should_deploy_pages = "false"
+        if args.release_type == "stable" and not is_prerelease_bool:
+            should_deploy_pages = "true"
+        elif args.release_type == "beta" and not stable_exists:
+            should_deploy_pages = "true"
+            
+        print(f"VERSION_NAME={version_name}")
+        print(f"TAG_NAME={tag_name}")
+        print(f"DOCKER_TAG={docker_tag}")
+        print(f"IS_PRERELEASE={is_prerelease}")
+        print(f"SHOULD_DEPLOY_PAGES={should_deploy_pages}")
+        return
 
     current_tag = get_latest_tag()
     major, minor, patch, prefix, suffix_num, _ = parse_version(current_tag)
