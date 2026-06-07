@@ -254,13 +254,18 @@ jobs:
     name: Deploy PWA to GitHub Pages
     uses: ./.github/workflows/deploy_pages.yml
     with:
-      deploy_pwa: ${{ needs.version-calc.outputs.should_deploy_pages == 'true' }}
+      deploy_pwa: true
       web_artifact_name: 'nexscore-release-web'
       version_name: ${{ needs.version-calc.outputs.version_name }}
       is_beta: ${{ github.event.inputs.release_type == 'beta' }}
 
   create-release:
     needs: [version-calc, build-android, build-ios, build-web, deploy-pwa]
+    if: |
+      always() &&
+      needs.version-calc.result == 'success' &&
+      needs.build-web.result == 'success' &&
+      needs.deploy-pwa.result == 'success'
     name: Create GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -273,12 +278,17 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           path: artifacts
+        continue-on-error: true
 
       - name: Prepare Release Assets
         run: |
           mkdir release_assets
-          cp artifacts/NexScore-Android/app-release.apk release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk
-          cp artifacts/NexScore-Android/app-release.apk.sha256 release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk.sha256
+          if [ -f "artifacts/NexScore-Android/app-release.apk" ]; then
+            cp artifacts/NexScore-Android/app-release.apk release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk
+            cp artifacts/NexScore-Android/app-release.apk.sha256 release_assets/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk.sha256
+          else
+            echo "Android APK artifact not found. Skipping APK attachment."
+          fi
 
       - name: Generate Changelog
         run: |
@@ -289,7 +299,14 @@ jobs:
 
       - name: Prepare Release Notes
         run: |
-          cat << 'EOF' > release_body.md
+          APK_SHA="${{ needs.build-android.outputs.sha256 }}"
+          if [ -z "$APK_SHA" ]; then
+            APK_ROW="| **Android** | _Build Failed/Skipped_ | _N/A_ |"
+          else
+            APK_ROW="| **Android** | [NexScore.apk](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk) | \`$APK_SHA\` |"
+          fi
+
+          cat << EOF > release_body.md
           ## 🚀 NexScore ${{ needs.version-calc.outputs.version_name }}
 
           ### 🌐 Live PWA
@@ -298,8 +315,8 @@ jobs:
           ### 📦 Downloads & Artifacts
           | Platform | File | SHA256 Checksum |
           |----------|------|-----------------|
-          | **Android** | [NexScore.apk](https://github.com/${{ github.repository }}/releases/download/${{ needs.version-calc.outputs.tag_name }}/NexScore-v${{ needs.version-calc.outputs.version_name }}.apk) | `${{ needs.build-android.outputs.sha256 }}` |
-          | **Web (Docker)** | `docker pull ${{ needs.build-web.outputs.image_name }}:${{ needs.version-calc.outputs.docker_tag }}` | _Container Image_ |
+          $APK_ROW
+          | **Web (Docker)** | \`docker pull ${{ needs.build-web.outputs.image_name }}:${{ needs.version-calc.outputs.docker_tag }}\` | _Container Image_ |
           | **Docs** | [Documentation](https://faserf.github.io/NexScore/docs/) | _Online_ |
 
           ### 📝 Changes
