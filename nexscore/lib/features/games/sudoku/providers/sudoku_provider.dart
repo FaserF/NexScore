@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../core/multiplayer/providers/multiplayer_provider.dart';
 import '../models/sudoku_models.dart';
 import '../services/sudoku_generator.dart';
 import '../services/sudoku_sync_service.dart';
@@ -8,11 +11,15 @@ import '../services/sudoku_stats_service.dart';
 class SudokuStateNotifier extends Notifier<SudokuGameState> {
   final List<List<SudokuCell>> _history = [];
   Timer? _timer;
+  StreamSubscription? _eventsSubscription;
+  StreamSubscription? _gameStateSubscription;
 
   @override
   SudokuGameState build() {
     ref.onDispose(() {
       _timer?.cancel();
+      _eventsSubscription?.cancel();
+      _gameStateSubscription?.cancel();
     });
     
     // Default initial empty state
@@ -55,6 +62,9 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
     if (_history.isNotEmpty) {
       final prevGrid = _history.removeLast();
       state = state.copyWith(grid: prevGrid);
+      
+      // Sync state if multiplayer host
+      _syncMultiplayerState();
     }
   }
 
@@ -62,9 +72,12 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
     required SudokuVariant variant,
     required SudokuDifficulty difficulty,
     required SudokuMode mode,
+    bool isMultiplayer = false,
   }) {
     _history.clear();
     _timer?.cancel();
+    _eventsSubscription?.cancel();
+    _gameStateSubscription?.cancel();
 
     final grid = SudokuGenerator.generate(variant: variant, difficulty: difficulty);
 
@@ -73,14 +86,27 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
       difficulty: difficulty,
       variant: variant,
       mode: mode,
-      theme: state.theme, // Preserve current theme
+      theme: state.theme,
       mistakes: 0,
       maxMistakes: mode == SudokuMode.zen ? 9999 : 3,
       timeSeconds: 0,
       isFinished: false,
+      isMultiplayer: isMultiplayer,
+      playerScores: {},
+      playerMistakes: {},
     );
 
-    startTimer();
+    if (isMultiplayer) {
+      final isHost = ref.read(isHostProvider);
+      if (isHost) {
+        _syncMultiplayerState();
+        _startListeningToClientEvents();
+      } else {
+        _startListeningToHostState();
+      }
+    } else {
+      startTimer();
+    }
   }
 
   void setupDaily(
@@ -90,6 +116,8 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
   }) {
     _history.clear();
     _timer?.cancel();
+    _eventsSubscription?.cancel();
+    _gameStateSubscription?.cancel();
 
     final grid = SudokuGenerator.generateDaily(
       dateStr: dateStr,
@@ -117,8 +145,10 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
   void loadState(SudokuGameState savedState) {
     _history.clear();
     _timer?.cancel();
+    _eventsSubscription?.cancel();
+    _gameStateSubscription?.cancel();
     state = savedState;
-    if (!state.isFinished) {
+    if (!state.isFinished && !state.isMultiplayer) {
       startTimer();
     }
   }
@@ -176,91 +206,102 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
 
     if (cell.isOriginal || cell.currentValue == cell.value) return;
 
-    _pushHistory();
-
-    if (state.notesMode) {
-      // Toggle note/pencil mark
-      final newNotes = Set<int>.from(cell.notes);
-      if (newNotes.contains(num)) {
-        newNotes.remove(num);
-      } else {
-        newNotes.add(num);
-      }
-      final newGrid = List<SudokuCell>.from(state.grid);
-      newGrid[cellIdx] = cell.copyWith(notes: newNotes, currentValue: 0);
-      state = state.copyWith(grid: newGrid);
-    } else {
-      // Standard input mode
-      final isCorrect = cell.value == num;
+    if (state.isMultiplayer) {
+      // Multiplayer Mode: Client sends event to Host (or host directly processes if they input)
+      final myUid = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
+      final myName = currentUsername.isEmpty ? 'Player' : currentUsername;
       
-      var newGrid = List<SudokuCell>.from(state.grid);
-      newGrid[cellIdx] = cell.copyWith(
-        currentValue: num,
-        notes: {}, // Clear pencil notes when placing a number
-        isError: !isCorrect,
-      );
-
-      // Auto-erase pencil marks in corresponding row/col/block if correct
-      if (isCorrect) {
-        newGrid = _autoEraseNotes(newGrid, r, c, num, size);
+      final isHost = ref.read(isHostProvider);
+      if (isHost) {
+        _processCellInput(r, c, num, myUid, myName, '0xFF00E5FF'); // Neon Cyan for host
+      } else {
+        // Send event to host via SyncEngine
+        ref.read(syncEngineProvider).sendClientEvent('cell_input', {
+          'row': r,
+          'col': c,
+          'value': num,
+          'uid': myUid,
+          'name': myName,
+          'color': '0xFFFF0055', // Neon Pink for client
+        });
       }
+    } else {
+      // Standard Local Flow
+      _pushHistory();
 
-      // Validate board errors
-      final validatedGrid = SudokuGenerator.validateBoard(newGrid, state.variant);
-
-      int mistakes = state.mistakes;
-      int penalty = 0;
-      if (!isCorrect) {
-        mistakes++;
-        if (state.mode == SudokuMode.timeAttack) {
-          penalty = 30; // 30s penalty for incorrect input in Time Attack
+      if (state.notesMode) {
+        // Toggle note/pencil mark
+        final newNotes = Set<int>.from(cell.notes);
+        if (newNotes.contains(num)) {
+          newNotes.remove(num);
+        } else {
+          newNotes.add(num);
         }
-      }
-
-      // Check if grid is solved
-      bool solved = true;
-      for (final cell in validatedGrid) {
-        if (cell.currentValue != cell.value) {
-          solved = false;
-          break;
-        }
-      }
-
-      state = state.copyWith(
-        grid: validatedGrid,
-        mistakes: mistakes,
-        timeSeconds: state.timeSeconds + penalty,
-        isFinished: solved || mistakes >= state.maxMistakes,
-      );
-
-      if (state.isFinished) {
-        _timer?.cancel();
+        final newGrid = List<SudokuCell>.from(state.grid);
+        newGrid[cellIdx] = cell.copyWith(notes: newNotes, currentValue: 0);
+        state = state.copyWith(grid: newGrid);
+      } else {
+        final isCorrect = cell.value == num;
         
-        // Record statistics locally
-        SudokuStatsService.recordGame(
-          variant: state.variant.name,
-          difficulty: state.difficulty.name,
-          won: solved,
-          timeSeconds: state.timeSeconds,
+        var newGrid = List<SudokuCell>.from(state.grid);
+        newGrid[cellIdx] = cell.copyWith(
+          currentValue: num,
+          notes: {},
+          isError: !isCorrect,
         );
 
-        if (solved) {
-          // Submit completed game to sync service
-          SudokuSyncService.saveAndSyncScore(
-            playerName: currentUsername.isEmpty ? 'Player' : currentUsername,
-            timeSeconds: state.timeSeconds,
+        if (isCorrect) {
+          newGrid = _autoEraseNotes(newGrid, r, c, num, size);
+        }
+
+        final validatedGrid = SudokuGenerator.validateBoard(newGrid, state.variant);
+
+        int mistakes = state.mistakes;
+        int penalty = 0;
+        if (!isCorrect) {
+          mistakes++;
+          if (state.mode == SudokuMode.timeAttack) {
+            penalty = 30;
+          }
+        }
+
+        bool solved = validatedGrid.every((c) => c.currentValue == c.value);
+
+        state = state.copyWith(
+          grid: validatedGrid,
+          mistakes: mistakes,
+          timeSeconds: state.timeSeconds + penalty,
+          isFinished: solved || mistakes >= state.maxMistakes,
+        );
+
+        if (state.isFinished) {
+          _timer?.cancel();
+          SudokuStatsService.recordGame(
             variant: state.variant.name,
             difficulty: state.difficulty.name,
-            mode: state.mode.name,
-            isDaily: state.isDailyChallenge,
-            dailyDate: state.dailyDate,
+            won: solved,
+            timeSeconds: state.timeSeconds,
           );
+
+          if (solved) {
+            SudokuSyncService.saveAndSyncScore(
+              playerName: currentUsername.isEmpty ? 'Player' : currentUsername,
+              timeSeconds: state.timeSeconds,
+              variant: state.variant.name,
+              difficulty: state.difficulty.name,
+              mode: state.mode.name,
+              isDaily: state.isDailyChallenge,
+              dailyDate: state.dailyDate,
+            );
+          }
         }
       }
     }
   }
 
   void eraseCell() {
+    if (state.isMultiplayer) return; // Disallow erasing solved entries in competitive multiplayer
+
     final r = state.selectedRow;
     final c = state.selectedCol;
     if (r == null || c == null || state.isFinished) return;
@@ -276,13 +317,13 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
     final newGrid = List<SudokuCell>.from(state.grid);
     newGrid[cellIdx] = cell.copyWith(currentValue: 0, notes: {}, isError: false);
 
-    // Validate board errors
     final validatedGrid = SudokuGenerator.validateBoard(newGrid, state.variant);
-
     state = state.copyWith(grid: validatedGrid);
   }
 
   void useHint() {
+    if (state.isMultiplayer) return; // No hints in competitive match
+
     final r = state.selectedRow;
     final c = state.selectedCol;
     if (r == null || c == null || state.isFinished) return;
@@ -302,17 +343,8 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
       isError: false,
     );
 
-    // Validate board errors
     final validatedGrid = SudokuGenerator.validateBoard(newGrid, state.variant);
-
-    // Check if grid is solved
-    bool solved = true;
-    for (final cell in validatedGrid) {
-      if (cell.currentValue != cell.value) {
-        solved = false;
-        break;
-      }
-    }
+    bool solved = validatedGrid.every((c) => c.currentValue == c.value);
 
     state = state.copyWith(
       grid: validatedGrid,
@@ -323,6 +355,105 @@ class SudokuStateNotifier extends Notifier<SudokuGameState> {
     if (state.isFinished) {
       _timer?.cancel();
     }
+  }
+
+  // --- Multiplayer Engine Sync & Processors ---
+
+  void _syncMultiplayerState() {
+    ref.read(syncEngineProvider).pushState(state.toMap());
+  }
+
+  void _startListeningToHostState() {
+    _gameStateSubscription?.cancel();
+    _gameStateSubscription = ref.read(gameStateSyncProvider.stream).listen((updatedStateMap) {
+      final hostState = SudokuGameState.fromMap(updatedStateMap);
+      // Client updates state but preserves their current local theme & selection settings
+      state = hostState.copyWith(
+        theme: state.theme,
+        selectedRow: state.selectedRow,
+        selectedCol: state.selectedCol,
+      );
+    });
+  }
+
+  void _startListeningToClientEvents() {
+    _eventsSubscription?.cancel();
+    final lobby = ref.read(currentLobbyProvider);
+    if (lobby == null) return;
+
+    _eventsSubscription = FirebaseFirestore.instance
+        .collection('lobbies')
+        .doc(lobby.id)
+        .collection('events')
+        .orderBy('timestamp', descending: false)
+        .snapshots()
+        .listen((snapshot) {
+          for (final doc in snapshot.docChanges) {
+            if (doc.type == DocumentChangeType.added) {
+              final data = doc.doc.data();
+              if (data != null) {
+                final eventName = data['eventName'] as String;
+                final payload = Map<String, dynamic>.from(data['payload'] ?? {});
+                if (eventName == 'cell_input') {
+                  final row = payload['row'] as int;
+                  final col = payload['col'] as int;
+                  final val = payload['value'] as int;
+                  final uid = payload['uid'] as String;
+                  final name = payload['name'] as String;
+                  final color = payload['color'] as String;
+                  _processCellInput(row, col, val, uid, name, color);
+                }
+              }
+            }
+          }
+        });
+  }
+
+  void _processCellInput(int r, int c, int num, String uid, String name, String color) {
+    final size = state.variant == SudokuVariant.mini6x6 ? 6 : 9;
+    final cellIdx = r * size + c;
+    final cell = state.grid[cellIdx];
+
+    if (cell.isOriginal || cell.currentValue == cell.value) return;
+
+    final isCorrect = cell.value == num;
+    var newGrid = List<SudokuCell>.from(state.grid);
+
+    final scores = Map<String, int>.from(state.playerScores);
+    final mistakes = Map<String, int>.from(state.playerMistakes);
+
+    if (isCorrect) {
+      newGrid[cellIdx] = cell.copyWith(
+        currentValue: num,
+        notes: {},
+        isError: false,
+        filledByUid: uid,
+        filledByName: name,
+        filledByColor: color,
+      );
+      // Auto erase pencil marks
+      newGrid = _autoEraseNotes(newGrid, r, c, num, size);
+      
+      // Award points
+      scores[uid] = (scores[uid] ?? 0) + 100;
+    } else {
+      // Deduct points, record mistake
+      scores[uid] = (scores[uid] ?? 0) - 50;
+      mistakes[uid] = (mistakes[uid] ?? 0) + 1;
+    }
+
+    // Check if grid is solved
+    bool solved = newGrid.every((c) => c.currentValue == c.value);
+
+    state = state.copyWith(
+      grid: newGrid,
+      playerScores: scores,
+      playerMistakes: mistakes,
+      isFinished: solved,
+    );
+
+    // Sync updated state to all clients
+    _syncMultiplayerState();
   }
 }
 

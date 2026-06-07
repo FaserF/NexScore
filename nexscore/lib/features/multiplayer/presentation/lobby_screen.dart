@@ -181,6 +181,16 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     final lobby = ref.watch(currentLobbyProvider);
     final l10n = AppLocalizations.of(context);
 
+    // Automatically navigate client to Sudoku game when host starts it
+    ref.listen<AsyncValue<Map<String, dynamic>>>(gameStateSyncProvider, (previous, next) {
+      final data = next.value;
+      if (data != null && data['grid'] != null && data['isMultiplayer'] == 1) {
+        if (context.mounted) {
+          context.pushReplacement('/games/sudoku');
+        }
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.get('multiplayer_host')),
@@ -229,9 +239,25 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                       itemCount: lobby.users.length,
                       itemBuilder: (context, index) {
                         final user = lobby.users.values.elementAt(index);
+                        Color avatarColor;
+                        try {
+                          avatarColor = Color(int.parse(user.avatarColor.replaceFirst('#', '0xff')));
+                        } catch (e) {
+                          avatarColor = Colors.blue;
+                        }
+                        final initial = user.name.isNotEmpty
+                            ? user.name.substring(0, 1).toUpperCase()
+                            : '?';
                         return ListTile(
-                          leading: const CircleAvatar(
-                            child: Icon(Icons.person),
+                          leading: CircleAvatar(
+                            backgroundColor: avatarColor,
+                            child: Text(
+                              initial,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                           title: Text(user.name),
                           trailing: user.isHost
@@ -246,7 +272,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     child: FilledButton(
                       onPressed: lobby.users.length > 1
                           ? () {
-                              // Start Game logic
+                              context.push('/games');
                             }
                           : null,
                       style: FilledButton.styleFrom(

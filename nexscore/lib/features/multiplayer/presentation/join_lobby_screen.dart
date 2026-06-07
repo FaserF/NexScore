@@ -41,7 +41,7 @@ class _JoinLobbyScreenState extends ConsumerState<JoinLobbyScreen> {
       await service.joinLobby(
         roomCode: code,
         playerName: name,
-        playerAvatarColor: '#4287f5', // generic blue for now
+        playerAvatarColor: ref.read(settingsProvider).hostColor,
       );
 
       if (mounted) {

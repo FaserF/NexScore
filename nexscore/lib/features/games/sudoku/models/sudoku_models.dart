@@ -16,6 +16,9 @@ class SudokuCell {
   final bool isOriginal;
   final Set<int> notes;
   final bool isError;
+  final String? filledByUid;
+  final String? filledByName;
+  final String? filledByColor;
 
   const SudokuCell({
     required this.row,
@@ -25,12 +28,18 @@ class SudokuCell {
     required this.isOriginal,
     required this.notes,
     this.isError = false,
+    this.filledByUid,
+    this.filledByName,
+    this.filledByColor,
   });
 
   SudokuCell copyWith({
     int? currentValue,
     Set<int>? notes,
     bool? isError,
+    String? filledByUid,
+    String? filledByName,
+    String? filledByColor,
   }) {
     return SudokuCell(
       row: row,
@@ -40,6 +49,9 @@ class SudokuCell {
       isOriginal: isOriginal,
       notes: notes ?? this.notes,
       isError: isError ?? this.isError,
+      filledByUid: filledByUid ?? this.filledByUid,
+      filledByName: filledByName ?? this.filledByName,
+      filledByColor: filledByColor ?? this.filledByColor,
     );
   }
 
@@ -52,6 +64,9 @@ class SudokuCell {
       'isOriginal': isOriginal ? 1 : 0,
       'notes': notes.toList(),
       'isError': isError ? 1 : 0,
+      'filledByUid': filledByUid,
+      'filledByName': filledByName,
+      'filledByColor': filledByColor,
     };
   }
 
@@ -64,6 +79,9 @@ class SudokuCell {
       isOriginal: (map['isOriginal'] as int) == 1,
       notes: List<int>.from(map['notes'] as List).toSet(),
       isError: (map['isError'] as int) == 1,
+      filledByUid: map['filledByUid'] as String?,
+      filledByName: map['filledByName'] as String?,
+      filledByColor: map['filledByColor'] as String?,
     );
   }
 }
@@ -84,6 +102,9 @@ class SudokuGameState {
   final bool isDailyChallenge;
   final String? dailyDate;
   final bool hasUsedHint;
+  final bool isMultiplayer;
+  final Map<String, int> playerScores;
+  final Map<String, int> playerMistakes;
 
   const SudokuGameState({
     required this.grid,
@@ -101,6 +122,9 @@ class SudokuGameState {
     this.isDailyChallenge = false,
     this.dailyDate,
     this.hasUsedHint = false,
+    this.isMultiplayer = false,
+    this.playerScores = const {},
+    this.playerMistakes = const {},
   });
 
   SudokuGameState copyWith({
@@ -119,6 +143,9 @@ class SudokuGameState {
     bool? isDailyChallenge,
     String? dailyDate,
     bool? hasUsedHint,
+    bool? isMultiplayer,
+    Map<String, int>? playerScores,
+    Map<String, int>? playerMistakes,
   }) {
     return SudokuGameState(
       grid: grid ?? this.grid,
@@ -130,12 +157,15 @@ class SudokuGameState {
       maxMistakes: maxMistakes ?? this.maxMistakes,
       timeSeconds: timeSeconds ?? this.timeSeconds,
       isFinished: isFinished ?? this.isFinished,
-      selectedRow: selectedRow, // Note: can be set to null by passing null
+      selectedRow: selectedRow,
       selectedCol: selectedCol,
       notesMode: notesMode ?? this.notesMode,
       isDailyChallenge: isDailyChallenge ?? this.isDailyChallenge,
       dailyDate: dailyDate ?? this.dailyDate,
       hasUsedHint: hasUsedHint ?? this.hasUsedHint,
+      isMultiplayer: isMultiplayer ?? this.isMultiplayer,
+      playerScores: playerScores ?? this.playerScores,
+      playerMistakes: playerMistakes ?? this.playerMistakes,
     );
   }
 
@@ -156,6 +186,9 @@ class SudokuGameState {
       'isDailyChallenge': isDailyChallenge ? 1 : 0,
       'dailyDate': dailyDate,
       'hasUsedHint': hasUsedHint ? 1 : 0,
+      'isMultiplayer': isMultiplayer ? 1 : 0,
+      'playerScores': playerScores,
+      'playerMistakes': playerMistakes,
     };
   }
 
@@ -190,6 +223,9 @@ class SudokuGameState {
       isDailyChallenge: (map['isDailyChallenge'] as int? ?? 0) == 1,
       dailyDate: map['dailyDate'] as String?,
       hasUsedHint: (map['hasUsedHint'] as int? ?? 0) == 1,
+      isMultiplayer: (map['isMultiplayer'] as int? ?? 0) == 1,
+      playerScores: Map<String, int>.from(map['playerScores'] ?? {}),
+      playerMistakes: Map<String, int>.from(map['playerMistakes'] ?? {}),
     );
   }
 }

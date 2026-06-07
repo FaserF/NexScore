@@ -81,12 +81,12 @@ void main() async {
     debugPrint('Firestore: Applying settings...');
     firestore.FirebaseFirestore.instance.settings = firestore.Settings(
       persistenceEnabled: false,
-      // experimentalForceLongPolling is often required on GitHub Pages 
-      // where gRPC-web connections can be unstable or blocked.
-      webExperimentalForceLongPolling: kIsWeb,
+      // Using auto-detect for long polling is more robust as it defaults to standard
+      // connection and falls back to long polling if blocked.
+      webExperimentalAutoDetectLongPolling: kIsWeb,
     );
     debugPrint(
-      'Firestore settings applied: persistenceEnabled=${firestore.FirebaseFirestore.instance.settings.persistenceEnabled}, webExperimentalForceLongPolling=$kIsWeb',
+      'Firestore settings applied: persistenceEnabled=${firestore.FirebaseFirestore.instance.settings.persistenceEnabled}, webExperimentalAutoDetectLongPolling=$kIsWeb',
     );
   } catch (e) {
     debugPrint('Firestore settings error: $e');

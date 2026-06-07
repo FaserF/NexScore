@@ -9,6 +9,9 @@ import '../../../../core/theme/widgets/glass_container.dart';
 import '../../../../core/theme/widgets/animated_scale_button.dart';
 import '../../../../core/providers/audio_provider.dart';
 import '../../../../core/services/audio_service.dart';
+import '../../../../core/providers/persistence_provider.dart';
+import '../../../../core/multiplayer/providers/multiplayer_provider.dart';
+import '../../../../core/multiplayer/models/lobby.dart';
 import '../models/sudoku_models.dart';
 import '../providers/sudoku_provider.dart';
 import '../services/sudoku_sync_service.dart';
@@ -25,11 +28,18 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   final _confettiController = ConfettiController(duration: const Duration(seconds: 4));
   final FocusNode _keyboardFocusNode = FocusNode();
   AudioPlayer? _bgMusicPlayer;
+  AudioPlayer? _sfxPlayer;
   bool _isMusicPlaying = false;
   bool _showLeaderboard = false;
   bool _showStats = false;
   List<Map<String, dynamic>> _leaderboardScores = [];
   bool _loadingLeaderboard = false;
+
+  // Visual Completions & Flashing Indicators
+  final Set<int> _completedRows = {};
+  final Set<int> _completedCols = {};
+  final Set<int> _completedBoxes = {};
+  Set<int> _flashingCells = {};
 
   // Selected setup properties
   SudokuVariant _selectedVariant = SudokuVariant.standard;
@@ -43,12 +53,29 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   void initState() {
     super.initState();
     _bgMusicPlayer = AudioPlayer();
+    _sfxPlayer = AudioPlayer();
+
+    // Check for auto-saved game
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final lobby = ref.read(currentLobbyProvider);
+      if (lobby != null) {
+        // If already inside multiplayer lobby, don't trigger local resumption
+        return;
+      }
+      
+      final service = ref.read(persistenceServiceProvider);
+      final savedStateMap = await service.loadGameState('sudoku');
+      if (savedStateMap != null && mounted) {
+        _showResumeDialog(savedStateMap);
+      }
+    });
   }
 
   @override
   void dispose() {
     _confettiController.dispose();
     _bgMusicPlayer?.dispose();
+    _sfxPlayer?.dispose();
     _keyboardFocusNode.dispose();
     super.dispose();
   }
@@ -72,6 +99,124 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
           );
         }
       }
+    }
+  }
+
+  Future<void> _playMelodicSfx(int num) async {
+    final player = _sfxPlayer;
+    if (player == null) return;
+
+    final pitchShift = switch (num) {
+      1 => 1.0,
+      2 => 1.122,
+      3 => 1.260,
+      4 => 1.335,
+      5 => 1.498,
+      6 => 1.682,
+      7 => 1.888,
+      8 => 2.0,
+      9 => 2.245,
+      _ => 1.0,
+    };
+
+    try {
+      await player.setPlaybackRate(pitchShift);
+      await player.play(AssetSource('audio/beep1.mp3'));
+    } catch (e) {
+      // silent fail
+    }
+  }
+
+  void _checkGridCompletions(List<SudokuCell> grid, int size) {
+    List<int> newCompletedRows = [];
+    List<int> newCompletedCols = [];
+    List<int> newCompletedBoxes = [];
+
+    // Check rows
+    for (int r = 0; r < size; r++) {
+      bool rowCompleted = true;
+      for (int c = 0; c < size; c++) {
+        if (grid[r * size + c].currentValue == 0) {
+          rowCompleted = false;
+          break;
+        }
+      }
+      if (rowCompleted && !_completedRows.contains(r)) {
+        newCompletedRows.add(r);
+      }
+    }
+
+    // Check cols
+    for (int c = 0; c < size; c++) {
+      bool colCompleted = true;
+      for (int r = 0; r < size; r++) {
+        if (grid[r * size + c].currentValue == 0) {
+          colCompleted = false;
+          break;
+        }
+      }
+      if (colCompleted && !_completedCols.contains(c)) {
+        newCompletedCols.add(c);
+      }
+    }
+
+    // Check boxes
+    final boxRows = size == 6 ? 2 : 3;
+    final boxCols = size == 6 ? 3 : 3;
+    final numBoxes = size == 6 ? 6 : 9;
+    
+    for (int b = 0; b < numBoxes; b++) {
+      final startRow = (b ~/ (size ~/ boxRows)) * boxRows;
+      final startCol = (b % (size ~/ boxRows)) * boxCols;
+      
+      bool boxCompleted = true;
+      for (int r = startRow; r < startRow + boxRows; r++) {
+        for (int c = startCol; c < startCol + boxCols; c++) {
+          if (grid[r * size + c].currentValue == 0) {
+            boxCompleted = false;
+            break;
+          }
+        }
+      }
+      if (boxCompleted && !_completedBoxes.contains(b)) {
+        newCompletedBoxes.add(b);
+      }
+    }
+
+    if (newCompletedRows.isNotEmpty || newCompletedCols.isNotEmpty || newCompletedBoxes.isNotEmpty) {
+      final flashing = <int>{};
+      for (final r in newCompletedRows) {
+        _completedRows.add(r);
+        for (int c = 0; c < size; c++) flashing.add(r * size + c);
+      }
+      for (final c in newCompletedCols) {
+        _completedCols.add(c);
+        for (int r = 0; r < size; r++) flashing.add(r * size + c);
+      }
+      for (final b in newCompletedBoxes) {
+        _completedBoxes.add(b);
+        final startRow = (b ~/ (size ~/ boxRows)) * boxRows;
+        final startCol = (b % (size ~/ boxRows)) * boxCols;
+        for (int r = startRow; r < startRow + boxRows; r++) {
+          for (int c = startCol; c < startCol + boxCols; c++) {
+            flashing.add(r * size + c);
+          }
+        }
+      }
+
+      setState(() {
+        _flashingCells = flashing;
+      });
+
+      ref.read(audioServiceProvider).play(SfxType.swipe);
+
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted) {
+          setState(() {
+            _flashingCells.clear();
+          });
+        }
+      });
     }
   }
 
@@ -116,7 +261,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     if (key == LogicalKeyboardKey.digit2 || key == LogicalKeyboardKey.numpad2) enteredNum = 2;
     if (key == LogicalKeyboardKey.digit3 || key == LogicalKeyboardKey.numpad3) enteredNum = 3;
     if (key == LogicalKeyboardKey.digit4 || key == LogicalKeyboardKey.numpad4) enteredNum = 4;
-    if (key == LogicalKeyboardKey.digit5 || key == LogicalKeyboardKey.numpad5) enteredNum = 5;
+    if (key == LogicalKeyboardKey.digit5 || key == LogicalKeyboardKey.numpad5) enteredNum = 6;
     if (key == LogicalKeyboardKey.digit6 || key == LogicalKeyboardKey.numpad6) enteredNum = 6;
     if (size == 9) {
       if (key == LogicalKeyboardKey.digit7 || key == LogicalKeyboardKey.numpad7) enteredNum = 7;
@@ -125,7 +270,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     }
 
     if (enteredNum != null) {
-      ref.read(audioServiceProvider).play(SfxType.swipe);
+      _playMelodicSfx(enteredNum);
       ref.read(sudokuStateProvider.notifier).enterNumber(enteredNum, '');
       return;
     }
@@ -155,8 +300,13 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     // Get theme colors
     final colors = _getThemeColors(gameState.theme, Theme.of(context).colorScheme);
 
-    // Confetti and fanfare trigger when completed successfully
+    // Confetti, fanfare, and grid checks trigger when state updates
     ref.listen<SudokuGameState>(sudokuStateProvider, (prev, next) {
+      if (next.grid.isNotEmpty && prev != null && next.grid.length == prev.grid.length) {
+        final size = next.variant == SudokuVariant.mini6x6 ? 6 : 9;
+        _checkGridCompletions(next.grid, size);
+      }
+
       if (next.isFinished && !(prev?.isFinished ?? false)) {
         final solved = next.grid.every((c) => c.currentValue == c.value);
         if (solved) {
@@ -207,14 +357,14 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                 tooltip: 'Ambient Focus Music',
               ),
               // Leaderboard toggle
-              if (gameState.grid.isNotEmpty)
+              if (gameState.grid.isNotEmpty && !gameState.isMultiplayer)
                 IconButton(
                   icon: const Icon(Icons.emoji_events),
                   onPressed: () => _loadLeaderboardData(gameState),
                   tooltip: l10n.get('sudoku_leaderboard'),
                 ),
               // Reset game
-              if (gameState.grid.isNotEmpty && !gameState.isFinished)
+              if (gameState.grid.isNotEmpty && !gameState.isFinished && !gameState.isMultiplayer)
                 IconButton(
                   icon: const Icon(Icons.refresh),
                   onPressed: () {
@@ -265,68 +415,49 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     );
   }
 
-  // --- Theme Generator Helper ---
+  // --- Resumption Flow Popup ---
 
-  _SudokuThemeColors _getThemeColors(SudokuTheme theme, ColorScheme systemCs) {
-    return switch (theme) {
-      SudokuTheme.aether => _SudokuThemeColors(
-          brightness: Brightness.dark,
-          background: const Color(0xFF0D0E15),
-          surface: const Color(0xFF161926),
-          primary: Colors.indigoAccent.shade200,
-          accent: Colors.pinkAccent,
-          cellBorder: Colors.indigo.shade900,
-          cellOriginal: Colors.white,
-          cellUser: Colors.indigoAccent.shade100,
-          cellError: Colors.redAccent,
-          cellHighlight: Colors.indigoAccent.withAlpha(40),
-          cellSelection: Colors.indigoAccent.withAlpha(90),
+  void _showResumeDialog(Map<String, dynamic> savedMap) {
+    final l10n = AppLocalizations.of(context);
+    final savedState = SudokuGameState.fromMap(savedMap);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.get('resume_game_title')),
+        content: Text(
+          l10n.getWith('resume_game_desc', [l10n.get('game_sudoku')]) +
+              '\n(${savedState.variant.name.toUpperCase()} · ${savedState.difficulty.name.toUpperCase()})',
         ),
-      SudokuTheme.zen => _SudokuThemeColors(
-          brightness: Brightness.light,
-          background: const Color(0xFFF7F4EA),
-          surface: const Color(0xFFEFEAD8),
-          primary: const Color(0xFF8B5A2B), // Earthy wood brown
-          accent: const Color(0xFF4A752C), // Forest green
-          cellBorder: const Color(0xFFD3C5A3),
-          cellOriginal: const Color(0xFF3E2723),
-          cellUser: const Color(0xFF8B5A2B),
-          cellError: Colors.red.shade800,
-          cellHighlight: const Color(0xFFE2D9BC),
-          cellSelection: const Color(0xFFC7B78E),
-        ),
-      SudokuTheme.midnight => _SudokuThemeColors(
-          brightness: Brightness.dark,
-          background: const Color(0xFF050B14),
-          surface: const Color(0xFF0B1528),
-          primary: Colors.blueAccent.shade400,
-          accent: Colors.cyanAccent,
-          cellBorder: Colors.blue.shade900.withAlpha(150),
-          cellOriginal: Colors.white,
-          cellUser: Colors.blueAccent.shade100,
-          cellError: Colors.redAccent,
-          cellHighlight: Colors.blueAccent.withAlpha(30),
-          cellSelection: Colors.blueAccent.withAlpha(80),
-        ),
-      SudokuTheme.cyberpunk => _SudokuThemeColors(
-          brightness: Brightness.dark,
-          background: const Color(0xFF111111),
-          surface: const Color(0xFF1E1E1E),
-          primary: const Color(0xFFEEFF00), // Toxic yellow
-          accent: const Color(0xFF00FF66), // Toxic green
-          cellBorder: const Color(0xFF333333),
-          cellOriginal: Colors.white,
-          cellUser: const Color(0xFFEEFF00),
-          cellError: const Color(0xFFFF0055),
-          cellHighlight: const Color(0xFFEEFF00).withAlpha(30),
-          cellSelection: const Color(0xFFEEFF00).withAlpha(85),
-        ),
-    };
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ref.read(persistenceServiceProvider).clearGameState('sudoku');
+            },
+            child: Text(l10n.get('discard')),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ref.read(sudokuStateProvider.notifier).loadState(savedState);
+              // Register current active game ID to enable auto-saving
+              ref.read(activeGameIdProvider.notifier).state = 'sudoku';
+            },
+            child: Text(l10n.get('resume')),
+          ),
+        ],
+      ),
+    );
   }
 
   // --- Setup / Config View ---
 
   Widget _buildSetupView(AppLocalizations l10n, _SudokuThemeColors colors) {
+    final lobby = ref.watch(currentLobbyProvider);
+    final isHost = ref.watch(isHostProvider);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -359,63 +490,97 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
           ),
           const SizedBox(height: 20),
 
-          // Daily Challenge & Stats Buttons Row
-          Row(
-            children: [
-              Expanded(
-                child: AnimatedScaleButton(
-                  onPressed: () {
-                    final todayStr = DateTime.now().toIso8601String().substring(0, 10);
-                    ref.read(sudokuStateProvider.notifier).setupDaily(
-                      todayStr,
-                      variant: _selectedVariant,
-                      difficulty: _selectedDifficulty,
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [colors.accent, colors.primary],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+          // Multiplayer Lobby Connection Bar
+          if (lobby != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: colors.accent.withAlpha(40),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: colors.accent),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.hub, color: colors.accent),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Connected: Room ${lobby.id} (${lobby.users.length} Players)',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: colors.accent),
                       ),
-                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.today, color: Colors.white, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          l10n.get('sudoku_daily_challenge'),
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                  ],
+                ),
+              ),
+            ),
+
+          if (lobby == null) ...[
+            // Daily Challenge & Stats Buttons Row
+            Row(
+              children: [
+                Expanded(
+                  child: AnimatedScaleButton(
+                    onPressed: () {
+                      ref.read(activeGameIdProvider.notifier).state = 'sudoku';
+                      
+                      final todayStr = DateTime.now().toIso8601String().substring(0, 10);
+                      ref.read(sudokuStateProvider.notifier).setupDaily(
+                        todayStr,
+                        variant: _selectedVariant,
+                        difficulty: _selectedDifficulty,
+                      );
+                      
+                      _completedRows.clear();
+                      _completedCols.clear();
+                      _completedBoxes.clear();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [colors.accent, colors.primary],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.today, color: Colors.white, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.get('sudoku_daily_challenge'),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              AnimatedScaleButton(
-                onPressed: _loadStatsData,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: colors.primary.withAlpha(100)),
+                const SizedBox(width: 12),
+                AnimatedScaleButton(
+                  onPressed: _loadStatsData,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: colors.primary.withAlpha(100)),
+                    ),
+                    child: Icon(Icons.analytics_outlined, color: colors.primary, size: 20),
                   ),
-                  child: Icon(Icons.analytics_outlined, color: colors.primary, size: 20),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
 
           // ── Config Form
           Text(l10n.get('sudoku_variant'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -446,36 +611,65 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
           ),
           const SizedBox(height: 20),
 
-          Text(l10n.get('sudoku_mode'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 8),
-          SegmentedButton<SudokuMode>(
-            segments: [
-              ButtonSegment(value: SudokuMode.classic, label: Text(l10n.get('sudoku_mode_classic'))),
-              ButtonSegment(value: SudokuMode.zen, label: Text(l10n.get('sudoku_mode_zen'))),
-              ButtonSegment(value: SudokuMode.timeAttack, label: Text(l10n.get('sudoku_mode_timeattack'))),
-            ],
-            selected: {_selectedMode},
-            onSelectionChanged: (set) => setState(() => _selectedMode = set.first),
-          ),
-          const SizedBox(height: 32),
+          if (lobby == null) ...[
+            Text(l10n.get('sudoku_mode'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 8),
+            SegmentedButton<SudokuMode>(
+              segments: [
+                ButtonSegment(value: SudokuMode.classic, label: Text(l10n.get('sudoku_mode_classic'))),
+                ButtonSegment(value: SudokuMode.zen, label: Text(l10n.get('sudoku_mode_zen'))),
+                ButtonSegment(value: SudokuMode.timeAttack, label: Text(l10n.get('sudoku_mode_timeattack'))),
+              ],
+              selected: {_selectedMode},
+              onSelectionChanged: (set) => setState(() => _selectedMode = set.first),
+            ),
+            const SizedBox(height: 32),
+          ],
 
           // Start Button
-          FilledButton(
-            onPressed: () {
-              ref.read(sudokuStateProvider.notifier).setupMatch(
-                variant: _selectedVariant,
-                difficulty: _selectedDifficulty,
-                mode: _selectedMode,
-              );
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: colors.primary,
-              foregroundColor: colors.brightness == Brightness.dark ? Colors.black : Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          if (lobby == null || isHost)
+            FilledButton(
+              onPressed: () {
+                ref.read(activeGameIdProvider.notifier).state = 'sudoku';
+
+                ref.read(sudokuStateProvider.notifier).setupMatch(
+                  variant: _selectedVariant,
+                  difficulty: _selectedDifficulty,
+                  mode: lobby != null ? SudokuMode.classic : _selectedMode,
+                  isMultiplayer: lobby != null,
+                );
+
+                _completedRows.clear();
+                _completedCols.clear();
+                _completedBoxes.clear();
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: colors.primary,
+                foregroundColor: colors.brightness == Brightness.dark ? Colors.black : Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+              child: Text(
+                lobby != null ? 'START MULTIPLAYER SUDOKU' : 'START GAME',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            )
+          else
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.0),
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 12),
+                    Text(
+                      'Waiting for host to generate board...',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            child: const Text('START GAME', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          ),
         ],
       ),
     );
@@ -494,47 +688,51 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
         children: [
+          // Multiplayer Scoreboard
+          if (state.isMultiplayer) _buildMultiplayerScoreboard(state, colors),
+
           // Metadata Bar
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${state.variant.name.toUpperCase()} · ${state.difficulty.name.toUpperCase()}',
-                    style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${l10n.get('sudoku_mode')}: ${state.mode.name.toUpperCase()}',
-                    style: TextStyle(fontSize: 10, color: colors.primary, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              // Timer
-              Row(
-                children: [
-                  const Icon(Icons.timer_outlined, size: 16, color: Colors.grey),
-                  const SizedBox(width: 4),
-                  Text(
-                    _formatTime(state.timeSeconds),
-                    style: const TextStyle(fontSize: 16, fontFamily: 'monospace', fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              // Mistakes Indicator
-              if (state.mode != SudokuMode.zen)
-                Text(
-                  '${l10n.get('sudoku_mistakes')}: ${state.mistakes}/${state.maxMistakes}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: state.mistakes > 0 ? colors.cellError : Colors.grey,
-                    fontWeight: FontWeight.bold,
-                  ),
+          if (!state.isMultiplayer)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${state.variant.name.toUpperCase()} · ${state.difficulty.name.toUpperCase()}',
+                      style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${l10n.get('sudoku_mode')}: ${state.mode.name.toUpperCase()}',
+                      style: TextStyle(fontSize: 10, color: colors.primary, fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
-            ],
-          ),
+                // Timer
+                Row(
+                  children: [
+                    const Icon(Icons.timer_outlined, size: 16, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatTime(state.timeSeconds),
+                      style: const TextStyle(fontSize: 16, fontFamily: 'monospace', fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                // Mistakes Indicator
+                if (state.mode != SudokuMode.zen)
+                  Text(
+                    '${l10n.get('sudoku_mistakes')}: ${state.mistakes}/${state.maxMistakes}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: state.mistakes > 0 ? colors.cellError : Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+              ],
+            ),
           const SizedBox(height: 16),
 
           // Main Sudoku Grid
@@ -560,7 +758,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                           final r = index ~/ size;
                           final c = index % size;
                           final cell = state.grid[index];
-                          return _buildCell(cell, r, c, size, state, colors);
+                          return _buildCell(cell, r, c, size, state, colors, index);
                         },
                       );
                     },
@@ -579,7 +777,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                 icon: Icons.undo,
                 label: l10n.get('sudoku_undo'),
                 color: colors.primary,
-                onPressed: ref.read(sudokuStateProvider.notifier).canUndo
+                onPressed: (!state.isMultiplayer && ref.read(sudokuStateProvider.notifier).canUndo)
                     ? () => ref.read(sudokuStateProvider.notifier).undo()
                     : null,
               ),
@@ -593,15 +791,13 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                 icon: Icons.delete_outline,
                 label: l10n.get('sudoku_erase'),
                 color: colors.primary,
-                onPressed: () => ref.read(sudokuStateProvider.notifier).eraseCell(),
+                onPressed: !state.isMultiplayer ? () => ref.read(sudokuStateProvider.notifier).eraseCell() : null,
               ),
               _buildControlButton(
                 icon: Icons.lightbulb_outline,
                 label: l10n.get('sudoku_hint'),
                 color: colors.primary,
-                onPressed: () {
-                  ref.read(sudokuStateProvider.notifier).useHint();
-                },
+                onPressed: !state.isMultiplayer ? () => ref.read(sudokuStateProvider.notifier).useHint() : null,
               ),
             ],
           ),
@@ -615,6 +811,61 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     );
   }
 
+  // --- Multiplayer Header ---
+
+  Widget _buildMultiplayerScoreboard(SudokuGameState state, _SudokuThemeColors colors) {
+    final lobby = ref.watch(currentLobbyProvider);
+    if (lobby == null) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: lobby.users.values.map((u) {
+          final score = state.playerScores[u.uid] ?? 0;
+          final mistakes = state.playerMistakes[u.uid] ?? 0;
+          final isHostPlayer = u.isHost;
+          final avatarColorVal = isHostPlayer ? 0xFF00E5FF : 0xFFFF0055;
+
+          return Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Color(avatarColorVal),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    u.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Pts: $score · Err: $mistakes',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(avatarColorVal),
+                ),
+              ),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   // --- Cell Rendering ---
 
   Widget _buildCell(
@@ -624,16 +875,15 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
     int size,
     SudokuGameState state,
     _SudokuThemeColors colors,
+    int index,
   ) {
     final isSelected = state.selectedRow == r && state.selectedCol == c;
 
-    // Check if cell is in the same row or column or block as selected to highlight
     bool isHighlighted = false;
     if (state.selectedRow != null && state.selectedCol != null) {
       if (state.selectedRow == r || state.selectedCol == c) {
         isHighlighted = true;
       } else {
-        // Block check
         if (size == 6) {
           if ((state.selectedRow! ~/ 2 == r ~/ 2) && (state.selectedCol! ~/ 3 == c ~/ 3)) {
             isHighlighted = true;
@@ -646,18 +896,15 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       }
     }
 
-    // Highlight all matching values currently on the board
     final selectedCellIndex = (state.selectedRow != null && state.selectedCol != null)
         ? state.selectedRow! * size + state.selectedCol!
         : null;
     final selectedVal = selectedCellIndex != null ? state.grid[selectedCellIndex].currentValue : 0;
     final isMatchingValue = selectedVal > 0 && cell.currentValue == selectedVal;
 
-    // Base Borders
     final borderRight = (c == 2 || c == 5) && size == 9 || (c == 2 && size == 6);
     final borderBottom = (r == 2 || r == 5) && size == 9 || (r == 1 || r == 3) && size == 6;
 
-    // Sudoku X Diagonal Highlight
     bool isDiagonal = false;
     if (state.variant == SudokuVariant.diagonal) {
       if (r == c || r == size - 1 - c) {
@@ -665,7 +912,6 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       }
     }
 
-    // Windoku (Hyper Sudoku) Shading
     bool isWindoku = false;
     if (state.variant == SudokuVariant.hyper) {
       if ((r >= 1 && r <= 3 || r >= 5 && r <= 7) && (c >= 1 && c <= 3 || c >= 5 && c <= 7)) {
@@ -673,15 +919,38 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
       }
     }
 
+    final isFlashing = _flashingCells.contains(index);
+
+    // Coloring multiplayer inputs
+    Color? playerColor;
+    if (state.isMultiplayer && cell.filledByColor != null) {
+      final colorCode = int.tryParse(cell.filledByColor!) ?? 0xFFFF0055;
+      playerColor = Color(colorCode).withAlpha(35);
+    }
+
     Color cellBg = Colors.transparent;
-    if (isSelected) {
+    if (isFlashing) {
+      cellBg = colors.accent.withAlpha(150);
+    } else if (isSelected) {
       cellBg = colors.cellSelection;
+    } else if (playerColor != null) {
+      cellBg = playerColor;
     } else if (isMatchingValue) {
       cellBg = colors.cellHighlight.withAlpha(90);
     } else if (isHighlighted) {
       cellBg = colors.cellHighlight;
     } else if (isWindoku) {
       cellBg = colors.primary.withAlpha(20);
+    }
+
+    // Color code representing who filled it in competitive mode
+    Color textCol = cell.isOriginal
+        ? colors.cellOriginal
+        : (cell.isError ? colors.cellError : colors.cellUser);
+    
+    if (state.isMultiplayer && cell.filledByColor != null) {
+      final colorCode = int.tryParse(cell.filledByColor!) ?? 0xFFFF0055;
+      textCol = Color(colorCode);
     }
 
     return GestureDetector(
@@ -704,8 +973,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
         ),
         child: Stack(
           children: [
-            // Sudoku X decorative diagonal indicators
-            if (isDiagonal && !isSelected && !isHighlighted && !isMatchingValue)
+            if (isDiagonal && !isSelected && !isHighlighted && !isMatchingValue && playerColor == null)
               Positioned.fill(
                 child: CustomPaint(
                   painter: _DiagonalPainter(color: colors.primary.withAlpha(40)),
@@ -720,15 +988,28 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                       style: TextStyle(
                         fontSize: size == 6 ? 26 : 22,
                         fontWeight: FontWeight.bold,
-                        color: cell.isOriginal
-                            ? colors.cellOriginal
-                            : (cell.isError ? colors.cellError : colors.cellUser),
+                        color: textCol,
                       ),
                     )
                   : cell.notes.isNotEmpty
                       ? _buildNotesGrid(cell.notes, size, colors)
                       : null,
             ),
+
+            // Mini player indicator label in top-left
+            if (state.isMultiplayer && cell.filledByName != null)
+              Positioned(
+                top: 1,
+                left: 2,
+                child: Text(
+                  cell.filledByName!.substring(0, 1).toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 7,
+                    fontWeight: FontWeight.bold,
+                    color: textCol.withAlpha(150),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -766,7 +1047,6 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   // --- Numpad Bar ---
 
   Widget _buildNumpad(int size, SudokuGameState state, _SudokuThemeColors colors) {
-    // Count placed values to show completion indicator
     final counts = Map<int, int>.fromIterable(
       List.generate(size, (i) => i + 1),
       key: (i) => i as int,
@@ -792,7 +1072,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
               onPressed: completed
                   ? null
                   : () {
-                      ref.read(audioServiceProvider).play(SfxType.swipe);
+                      _playMelodicSfx(val);
                       ref.read(sudokuStateProvider.notifier).enterNumber(val, '');
                     },
               child: Container(
@@ -853,6 +1133,23 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   Widget _buildFinishedView(SudokuGameState state, AppLocalizations l10n, _SudokuThemeColors colors) {
     final solved = state.grid.every((c) => c.currentValue == c.value);
 
+    // Find winner in multiplayer match
+    String? multiWinner;
+    if (state.isMultiplayer) {
+      final lobby = ref.read(currentLobbyProvider);
+      if (lobby != null) {
+        String bestUid = lobby.users.keys.first;
+        int bestScore = -9999;
+        for (final entry in state.playerScores.entries) {
+          if (entry.value > bestScore) {
+            bestScore = entry.value;
+            bestUid = entry.key;
+          }
+        }
+        multiWinner = lobby.users[bestUid]?.name ?? 'Anonymous';
+      }
+    }
+
     return Center(
       child: GlassContainer(
         margin: const EdgeInsets.all(24),
@@ -868,14 +1165,18 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              solved ? l10n.get('sudoku_congrats') : l10n.get('sudoku_game_over'),
+              state.isMultiplayer
+                  ? 'Multiplayer Match Over!'
+                  : (solved ? l10n.get('sudoku_congrats') : l10n.get('sudoku_game_over')),
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colors.primary),
             ),
             const SizedBox(height: 8),
             Text(
-              solved
-                  ? l10n.getWith('sudoku_solved_in', [_formatTime(state.timeSeconds)])
-                  : l10n.get('sudoku_game_over_desc'),
+              state.isMultiplayer
+                  ? 'Winner: $multiWinner!'
+                  : (solved
+                      ? l10n.getWith('sudoku_solved_in', [_formatTime(state.timeSeconds)])
+                      : l10n.get('sudoku_game_over_desc')),
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
@@ -889,31 +1190,37 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                     ref.read(sudokuStateProvider.notifier).loadState(
                           const SudokuGameState(grid: [], difficulty: SudokuDifficulty.medium, variant: SudokuVariant.standard, mode: SudokuMode.classic, theme: SudokuTheme.aether),
                         );
+                    ref.read(activeGameIdProvider.notifier).state = null;
                   },
                   child: Text(l10n.get('back')),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (state.isDailyChallenge && state.dailyDate != null) {
-                      ref.read(sudokuStateProvider.notifier).setupDaily(
-                            state.dailyDate!,
-                            variant: state.variant,
-                            difficulty: state.difficulty,
-                          );
-                    } else {
-                      ref.read(sudokuStateProvider.notifier).setupMatch(
-                            variant: state.variant,
-                            difficulty: state.difficulty,
-                            mode: state.mode,
-                          );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colors.primary,
-                    foregroundColor: colors.brightness == Brightness.dark ? Colors.black : Colors.white,
+                if (!state.isMultiplayer)
+                  ElevatedButton(
+                    onPressed: () {
+                      if (state.isDailyChallenge && state.dailyDate != null) {
+                        ref.read(sudokuStateProvider.notifier).setupDaily(
+                              state.dailyDate!,
+                              variant: state.variant,
+                              difficulty: state.difficulty,
+                            );
+                      } else {
+                        ref.read(sudokuStateProvider.notifier).setupMatch(
+                              variant: state.variant,
+                              difficulty: state.difficulty,
+                              mode: state.mode,
+                            );
+                      }
+                      
+                      _completedRows.clear();
+                      _completedCols.clear();
+                      _completedBoxes.clear();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colors.primary,
+                      foregroundColor: colors.brightness == Brightness.dark ? Colors.black : Colors.white,
+                    ),
+                    child: Text(l10n.get('sudoku_restart')),
                   ),
-                  child: Text(l10n.get('sudoku_restart')),
-                ),
               ],
             ),
           ],
@@ -1119,6 +1426,10 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
                       mode: state.mode,
                     );
               }
+              
+              _completedRows.clear();
+              _completedCols.clear();
+              _completedBoxes.clear();
             },
             child: Text(l10n.get('ok')),
           ),

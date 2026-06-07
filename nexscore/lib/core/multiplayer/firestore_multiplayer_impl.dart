@@ -69,7 +69,8 @@ class FirestoreMultiplayerImpl implements MultiplayerService {
   }
 
   String _generateRoomCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    // Exclude easily confused characters like I, L, O, 0, 1
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     final random = Random();
     return String.fromCharCodes(
       Iterable.generate(
