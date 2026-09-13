@@ -1,5 +1,5 @@
 # Stage 1: Build Flutter Web application (Optional if pre-built)
-FROM ubuntu:26.04@sha256:2260313b31c8c011cd2eebe728008efac1b3982be73eb71348ea2648d2c0e09b AS build-env
+FROM ubuntu:26.04@sha256:513c074113a871b51a8d16ab445c88779d6452d937a164fb5cc479f32668a41d AS build-env
 
 # Setup environment variables
 ENV FLUTTER_HOME=/opt/flutter
