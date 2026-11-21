@@ -42,7 +42,7 @@ dependencies:
   pdf: ^3.11.1
   printing: ^5.13.2
   signature: 6.4.0
-  flutter_local_notifications: ^22.0.0
+  flutter_local_notifications: ^23.0.0
   file_picker: ^13.0.0
 
 
