@@ -1,52 +1,21 @@
-# Path-based labeling for Pull Requests
-core:
-  - changed-files:
-    - any-glob-to-any-file: 'lib/core/**/*'
+# Pull Request Labeler configuration
+enhancement:
+  - head-branch: ['^feat/', '^feature/']
 
-ui:
-  - changed-files:
-    - any-glob-to-any-file: 
-      - 'lib/shared/widgets/**/*'
-      - '**/presentation/**/*'
+bug:
+  - head-branch: ['^fix/', '^bugfix/']
 
-i18n:
-  - changed-files:
-    - any-glob-to-any-file: 
-      - 'lib/core/i18n/**/*'
-      - 'assets/lang/**/*'
+dependencies:
+  - head-branch: ['^renovate/', '^deps/']
 
-game-wizard:
+documentation:
   - changed-files:
-    - any-glob-to-any-file: 'lib/features/games/wizard/**/*'
+    - any-glob-to-any-file: ['**/*.md', 'docs/**']
 
-game-qwixx:
+ci:
   - changed-files:
-    - any-glob-to-any-file: 'lib/features/games/qwixx/**/*'
+    - any-glob-to-any-file: ['.github/**', 'scripts/**']
 
-game-schafkopf:
+tests:
   - changed-files:
-    - any-glob-to-any-file: 'lib/features/games/schafkopf/**/*'
-
-game-sipdeck:
-  - changed-files:
-    - any-glob-to-any-file: 'lib/features/games/sipdeck/**/*'
-
-game-volleyball:
-  - changed-files:
-    - any-glob-to-any-file: 'lib/features/games/volleyball/**/*'
-
-game-wayquest:
-  - changed-files:
-    - any-glob-to-any-file: 'lib/features/games/wayquest/**/*'
-
-game-multiplayer:
-  - changed-files:
-    - any-glob-to-any-file: 'lib/features/multiplayer/**/*'
-
-ci-cd:
-  - changed-files:
-    - any-glob-to-any-file: '.github/workflows/**/*'
-
-test:
-  - changed-files:
-    - any-glob-to-any-file: 'test/**/*'
+    - any-glob-to-any-file: ['tests/**', '**/*test*']
