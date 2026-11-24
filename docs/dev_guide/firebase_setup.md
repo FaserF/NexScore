@@ -185,7 +185,7 @@ Add the following lines **before** the `<script src="flutter_bootstrap.js">` tag
 
 <script>
   firebase.initializeApp({
-    apiKey: "YOUR_FIREBASE_API_KEY", // Injected at build time via CI/CD
+    [REDACTED_SECRET_12454], // Injected at build time via CI/CD
     authDomain: "nexscore-app.firebaseapp.com",
     projectId: "nexscore-app",
     storageBucket: "nexscore-app.firebasestorage.app",
