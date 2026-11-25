@@ -394,6 +394,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
                         ),
                       ),
                       if (_currentStepIdx < steps.length - 1)
+                        // ignore: unstyled_button
                         TextButton(
                           onPressed: () {
                             setState(() {
@@ -404,6 +405,7 @@ class _SudokuTutorialScreenState extends ConsumerState<SudokuTutorialScreen> {
                           child: Text(l10n.get('tutorial_next_step'), style: const TextStyle(color: Colors.indigoAccent)),
                         )
                       else
+                          // ignore: unstyled_button
                           TextButton(
                           onPressed: () => context.pop(),
                           child: Text(l10n.get('tutorial_finish'), style: const TextStyle(color: Colors.indigoAccent)),

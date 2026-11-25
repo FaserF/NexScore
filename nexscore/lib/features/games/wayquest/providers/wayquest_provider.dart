@@ -39,11 +39,19 @@ class WayQuestStateNotifier extends Notifier<WayQuestGameState> {
 
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
     _pushState();
-    final available = wayQuestDatabase.where((c) {
-      final isCategorySelected = state.selectedCategories.contains(c.category);
-      if (!isCategorySelected) return false;
-      return activePlayers.length >= c.minPlayers;
+    final selected = wayQuestDatabase.where((c) {
+      return state.selectedCategories.contains(c.category);
     }).toList();
+
+    final effectivePlayers = activePlayers.isEmpty ? 1 : activePlayers.length;
+    var available = selected.where((c) {
+      return effectivePlayers >= c.minPlayers;
+    }).toList();
+
+    // Fallback so starting or advancing a voyage never silently does nothing.
+    if (available.isEmpty) {
+      available = selected.isNotEmpty ? selected : List<WayQuestCard>.from(wayQuestDatabase);
+    }
 
     if (available.isEmpty) return;
 

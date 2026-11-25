@@ -1,7 +1,7 @@
 import argparse
 import re
-import sys
 import subprocess
+
 
 def get_latest_tag():
     try:
@@ -78,17 +78,17 @@ def main():
         if '-' in version_name or 'b' in version_name or 'rc' in version_name or version_name.startswith('0.'):
             is_prerelease_bool = True
         is_prerelease = "true" if is_prerelease_bool else "false"
-        
+
         docker_tag = version_name.lower().replace('+', '-')
         docker_tag = re.sub(r'[^a-z0-9._-]', '-', docker_tag)
-        
+
         stable_exists = has_stable_tag()
         should_deploy_pages = "false"
         if args.release_type == "stable" and not is_prerelease_bool:
             should_deploy_pages = "true"
         elif args.release_type == "beta" and not stable_exists:
             should_deploy_pages = "true"
-            
+
         print(f"VERSION_NAME={version_name}")
         print(f"TAG_NAME={tag_name}")
         print(f"DOCKER_TAG={docker_tag}")
@@ -99,8 +99,6 @@ def main():
     current_tag = get_latest_tag()
     major, minor, patch, prefix, suffix_num, _ = parse_version(current_tag)
 
-    current_is_beta = (prefix == 'b' or (prefix and 'beta' in prefix))
-    current_is_dev = (prefix and 'dev' in prefix)
     current_is_stable = not prefix
 
     # 1. Version Part Bumps
@@ -151,7 +149,8 @@ def main():
     # Forced beta if < 1.0.0
     if major == 0 and args.release_type == 'stable':
         target_prefix = 'beta'
-        if suffix_num == -1: suffix_num = 0
+        if suffix_num == -1:
+            suffix_num = 0
 
     # Shorten SHA if provided
     short_sha = args.commit_sha[:7] if args.commit_sha else None

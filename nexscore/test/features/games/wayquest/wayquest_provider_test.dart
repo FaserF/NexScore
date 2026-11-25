@@ -1,5 +1,8 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nexscore/core/i18n/app_localizations.dart';
+import 'package:nexscore/core/models/player_model.dart';
 import 'package:nexscore/features/games/wayquest/models/wayquest_models.dart';
 import 'package:nexscore/features/games/wayquest/providers/wayquest_provider.dart';
 
@@ -98,6 +101,35 @@ void main() {
       expect(newState.scores['p2'], 3);
       expect(newState.lastWinnerId, 'p1');
       expect(newState.canUndo, isTrue);
+    });
+
+    test('drawNextCard works with 0, 1, and 2+ active players (#71)', () {
+      final l10n = AppLocalizations(const Locale('en'));
+
+      // 0 players
+      var notifier = container.read(wayQuestStateProvider.notifier);
+      notifier.drawNextCard(const [], l10n);
+      expect(container.read(wayQuestStateProvider).playedCards.length, 1);
+
+      // 1 player
+      notifier.resetGame();
+      notifier.drawNextCard([
+        Player(id: 'p1', name: 'Solo', avatarColor: '#FF0000'),
+      ], l10n);
+      expect(container.read(wayQuestStateProvider).playedCards.length, 1);
+
+      // 2 players, non-repeating draw across initial 20 cards in default 2 categories
+      notifier.resetGame();
+      final players = [
+        Player(id: 'p1', name: 'Alice', avatarColor: '#FF0000'),
+        Player(id: 'p2', name: 'Bob', avatarColor: '#00FF00'),
+      ];
+      final seenIds = <String>{};
+      for (var i = 0; i < 20; i++) {
+        notifier.drawNextCard(players, l10n);
+        seenIds.add(container.read(wayQuestStateProvider).currentCard!.id);
+      }
+      expect(seenIds.length, 20);
     });
   });
 }

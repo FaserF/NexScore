@@ -48,8 +48,10 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
     state = state.copyWith(disabledTags: tags, canUndo: _history.isNotEmpty);
   }
 
-  void toggleFilterMultiplayerOnly(bool value) {
-    _pushState();
+  void toggleFilterMultiplayerOnly(bool value, {bool recordHistory = true}) {
+    if (recordHistory) {
+      _pushState();
+    }
     state = state.copyWith(
       filterMultiplayerOnly: value,
       canUndo: _history.isNotEmpty,
@@ -79,13 +81,20 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
 
   void drawNextCard(List<Player> activePlayers, AppLocalizations l10n) {
     _pushState();
-    final available = getSipDeckDatabase(l10n).where((c) {
+    var available = getSipDeckDatabase(l10n).where((c) {
       final isCategorySelected = state.selectedCategories.contains(c.category);
       if (!isCategorySelected) return false;
 
       // Apply 2-player optimization filter
       if (state.filterMultiplayerOnly && activePlayers.length <= 2) {
         if (c.minPlayers > 2) return false;
+      } else if (activePlayers.length > 2 && c.minPlayers > activePlayers.length) {
+        return false;
+      }
+
+      // When only 1 player is active, avoid dual-player ({1}) prompts if possible.
+      if (activePlayers.length == 1 && c.text.contains('{1}')) {
+        return false;
       }
 
       // Apply granular tag filters
@@ -95,6 +104,17 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
 
       return true;
     }).toList();
+
+    // Fallback to category cards without tag filter if overly restrictive filters leave no cards
+    if (available.isEmpty) {
+      available = getSipDeckDatabase(l10n).where((c) {
+        if (!state.selectedCategories.contains(c.category)) return false;
+        if (state.filterMultiplayerOnly && activePlayers.length <= 2) {
+          return c.minPlayers <= 2;
+        }
+        return true;
+      }).toList();
+    }
 
     if (available.isEmpty) return;
 
@@ -127,13 +147,39 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
         );
         state = state.copyWith(
           playedCards: [...state.playedCards, hydrationCard],
+          canUndo: _history.isNotEmpty,
         );
         return;
       }
     }
     // ----------------------------
 
-    final card = available[random.nextInt(available.length)];
+    // Non-repeating shuffle-bag: draw every eligible card once before repeating.
+    final unseen = available
+        .where((c) => !state.seenCardIds.contains(c.id))
+        .toList();
+    final List<SipDeckCard> pool;
+    final List<String> nextSeenIds;
+
+    if (unseen.isNotEmpty) {
+      pool = unseen;
+      nextSeenIds = List<String>.from(state.seenCardIds);
+    } else {
+      final lastNonHydrationId = state.playedCards.reversed
+          .where((c) => c.id != 'hydration')
+          .map((c) => c.id)
+          .firstOrNull;
+      final withoutImmediateRepeat = available
+          .where((c) => c.id != lastNonHydrationId)
+          .toList();
+      pool = withoutImmediateRepeat.isNotEmpty
+          ? withoutImmediateRepeat
+          : available;
+      nextSeenIds = [];
+    }
+
+    final card = pool[random.nextInt(pool.length)];
+    nextSeenIds.add(card.id);
 
     // Use localization key if available, otherwise fallback to original text
     String baseText = l10n.get(card.key);
@@ -179,11 +225,16 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
       }
     }
 
-    // Detect "Everyone" tasks
-    if (baseText.toLowerCase().contains('everyone') ||
-        baseText.toLowerCase().contains('last place') ||
-        baseText.toLowerCase().contains('group vote') ||
-        baseText.toLowerCase().contains('group challenge')) {
+    // Detect "Everyone" tasks (EN & DE)
+    final lowerText = baseText.toLowerCase();
+    if (lowerText.contains('everyone') ||
+        lowerText.contains('last place') ||
+        lowerText.contains('group vote') ||
+        lowerText.contains('group challenge') ||
+        lowerText.contains('alle ') ||
+        lowerText.contains('jeder ') ||
+        lowerText.contains('gruppenabstimmung') ||
+        lowerText.contains('gruppen-challenge')) {
       targetIds.clear();
       targetIds.addAll(activePlayers.map((p) => p.id));
       targetType = SipTargetType.everyone;
@@ -242,6 +293,7 @@ class SipDeckStateNotifier extends Notifier<SipDeckGameState> {
 
     state = state.copyWith(
       playedCards: [...state.playedCards, hydratedCard],
+      seenCardIds: nextSeenIds,
       activeViruses: activeViruses,
       canUndo: _history.isNotEmpty,
       startedAt: state.startedAt ?? DateTime.now(),

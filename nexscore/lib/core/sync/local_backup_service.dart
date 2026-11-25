@@ -63,9 +63,9 @@ class LocalBackupService {
         allowedExtensions: ['json'],
       );
 
-      if (result == null || result.files.isEmpty) return false;
+      if (result.isEmpty) return false;
 
-      final file = result.files.first;
+      final file = result.first;
       final bytes = await file.readAsBytes();
 
       final jsonString = utf8.decode(bytes);

@@ -21,7 +21,7 @@ class WayQuestCard {
     required this.text,
     this.emoji,
     required this.category,
-    this.minPlayers = 2,
+    this.minPlayers = 1,
   });
 
   String get key => 'wq_card_$id';
@@ -43,7 +43,7 @@ class WayQuestCard {
         (e) => e.name == json['category'],
         orElse: () => WayQuestCategory.deepTalks,
       ),
-      minPlayers: json['minPlayers'] as int? ?? 2,
+      minPlayers: json['minPlayers'] as int? ?? 1,
     );
   }
 }

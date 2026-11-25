@@ -38,13 +38,19 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
   @override
   void initState() {
     super.initState();
-    // Initial auto-toggle based on player count
+    // Initial auto-toggle based on player count without polluting undo history
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final players = ref.read(activePlayersProvider);
-      ref
-          .read(sipDeckStateProvider.notifier)
-          .toggleFilterMultiplayerOnly(players.length == 2);
+      final state = ref.read(sipDeckStateProvider);
+      if (state.playedCards.isEmpty) {
+        ref
+            .read(sipDeckStateProvider.notifier)
+            .toggleFilterMultiplayerOnly(
+              players.length <= 2,
+              recordHistory: false,
+            );
+      }
     });
   }
 
@@ -56,14 +62,14 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
 
     // Auto-toggle optimization based on player count
     ref.listen<List<Player>>(activePlayersProvider, (previous, next) {
-      if (next.length == 2 && previous?.length != 2) {
+      if (next.length <= 2 && (previous == null || previous.length > 2)) {
         ref
             .read(sipDeckStateProvider.notifier)
-            .toggleFilterMultiplayerOnly(true);
-      } else if (next.length != 2 && previous?.length == 2) {
+            .toggleFilterMultiplayerOnly(true, recordHistory: false);
+      } else if (next.length > 2 && previous != null && previous.length <= 2) {
         ref
             .read(sipDeckStateProvider.notifier)
-            .toggleFilterMultiplayerOnly(false);
+            .toggleFilterMultiplayerOnly(false, recordHistory: false);
       }
     });
 
@@ -780,6 +786,7 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                                           (p) =>
                                               p.id ==
                                               currentCard.targetIds.first,
+                                          orElse: () => players.first,
                                         )
                                         .name,
                                     textAlign: TextAlign.center,
@@ -814,6 +821,7 @@ class _SipDeckScreenState extends ConsumerState<SipDeckScreen> {
                                           (p) =>
                                               p.id ==
                                               currentCard.targetIds.last,
+                                          orElse: () => players.last,
                                         )
                                         .name,
                                     textAlign: TextAlign.center,

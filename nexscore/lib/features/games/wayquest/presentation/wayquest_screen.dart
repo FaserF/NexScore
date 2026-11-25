@@ -232,6 +232,7 @@ class _WayQuestScreenState extends ConsumerState<WayQuestScreen> {
           TextButton(
             onPressed: () {
               ref.read(wayQuestStateProvider.notifier).resetGame();
+              setState(() => _showingWinnerSelection = false);
               Navigator.pop(context);
             },
             child: Text(
@@ -367,7 +368,7 @@ class _WayQuestScreenState extends ConsumerState<WayQuestScreen> {
                     children: WayQuestCategory.values.map((cat) {
                       final isSelected = s.selectedCategories.contains(cat);
                       return FilterChip(
-                        label: Text(l10n.get('wayquest_cat_\${cat.name}')),
+                        label: Text(l10n.get('wayquest_cat_${cat.name}')),
                         selected: isSelected,
                         onSelected: (_) => ref
                             .read(wayQuestStateProvider.notifier)

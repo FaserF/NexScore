@@ -93,6 +93,7 @@ class SipDeckGameState {
   final List<SipDeckCategory> selectedCategories;
   final Set<SipDeckTaskTag> disabledTags;
   final List<SipDeckCard> playedCards;
+  final List<String> seenCardIds;
   final List<SipDeckCard> activeViruses;
   final bool
   filterMultiplayerOnly; // If true, cards with minPlayers > 2 are hidden when only 2 play
@@ -109,6 +110,7 @@ class SipDeckGameState {
     this.selectedCategories = const [SipDeckCategory.warmUp],
     this.disabledTags = const {},
     this.playedCards = const [],
+    this.seenCardIds = const [],
     this.activeViruses = const [],
     this.filterMultiplayerOnly = true,
     this.playerSips = const {},
@@ -125,6 +127,7 @@ class SipDeckGameState {
     List<SipDeckCategory>? selectedCategories,
     Set<SipDeckTaskTag>? disabledTags,
     List<SipDeckCard>? playedCards,
+    List<String>? seenCardIds,
     List<SipDeckCard>? activeViruses,
     bool? filterMultiplayerOnly,
     Map<String, int>? playerSips,
@@ -140,6 +143,7 @@ class SipDeckGameState {
       selectedCategories: selectedCategories ?? this.selectedCategories,
       disabledTags: disabledTags ?? this.disabledTags,
       playedCards: playedCards ?? this.playedCards,
+      seenCardIds: seenCardIds ?? this.seenCardIds,
       activeViruses: activeViruses ?? this.activeViruses,
       filterMultiplayerOnly:
           filterMultiplayerOnly ?? this.filterMultiplayerOnly,
@@ -160,6 +164,7 @@ class SipDeckGameState {
       'selectedCategories': selectedCategories.map((e) => e.name).toList(),
       'disabledTags': disabledTags.map((e) => e.name).toList(),
       'playedCards': playedCards.map((e) => e.toJson()).toList(),
+      'seenCardIds': seenCardIds,
       'activeViruses': activeViruses.map((e) => e.toJson()).toList(),
       'filterMultiplayerOnly': filterMultiplayerOnly,
       'playerSips': playerSips,
@@ -184,6 +189,12 @@ class SipDeckGameState {
       playedCards: (map['playedCards'] as List? ?? [])
           .map((e) => SipDeckCard.fromJson(e as Map<String, dynamic>))
           .toList(),
+      seenCardIds: List<String>.from(
+        map['seenCardIds'] ??
+            (map['playedCards'] as List? ?? [])
+                .map((e) => (e as Map<String, dynamic>)['id'])
+                .where((id) => id != null && id != 'hydration'),
+      ),
       activeViruses: (map['activeViruses'] as List? ?? [])
           .map((e) => SipDeckCard.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -228,6 +239,7 @@ List<SipDeckCard> getSipDeckDatabase(AppLocalizations l10n) {
           'Waterfall! {0} starts. Everyone follows. Stop only when the person to your left stops.',
       sips: 0,
       category: SipDeckCategory.warmUp,
+      minPlayers: 3,
       tags: {SipDeckTaskTag.social, SipDeckTaskTag.physical},
     ),
     SipDeckCard(
@@ -288,6 +300,7 @@ List<SipDeckCard> getSipDeckDatabase(AppLocalizations l10n) {
       text: 'Never Have I Ever: {0} starts. Go around the circle once.',
       sips: 0,
       category: SipDeckCategory.warmUp,
+      minPlayers: 3,
       tags: {SipDeckTaskTag.social},
     ),
     SipDeckCard(
@@ -483,6 +496,7 @@ List<SipDeckCard> getSipDeckDatabase(AppLocalizations l10n) {
       text: 'Truth: {0}, rate each person 1–10. Refuse? Take 4 sips.',
       sips: 4,
       category: SipDeckCategory.flirty,
+      minPlayers: 3,
       tags: {SipDeckTaskTag.social},
     ),
     SipDeckCard(
@@ -614,6 +628,7 @@ List<SipDeckCard> getSipDeckDatabase(AppLocalizations l10n) {
           '{0}, invent a new word and use it convincingly. Group votes if it sounds real.',
       sips: 0,
       category: SipDeckCategory.laughs,
+      minPlayers: 3,
       tags: {SipDeckTaskTag.dare},
     ),
     SipDeckCard(

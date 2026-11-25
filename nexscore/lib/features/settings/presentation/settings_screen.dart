@@ -650,7 +650,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
-                Text(release!.body),
+                Text(release.body),
               ],
             ),
           ),

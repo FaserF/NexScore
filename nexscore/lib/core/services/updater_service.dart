@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/logger.dart';
 import '../utils/app_version.dart';
@@ -51,10 +50,11 @@ class GitHubRelease {
 }
 
 class BuiltInUpdaterService {
-  static const String _repoUrl = String.fromEnvironment(
+  static const String _baseRepoUrl = String.fromEnvironment(
     'GITHUB_REPOSITORY_URL',
     defaultValue: 'https://api.github.com/repos/FaserF/NexScore',
-  ) + '/releases';
+  );
+  static const String _repoUrl = '$_baseRepoUrl/releases';
 
   /// Determines if the app was installed from an official App Store / Play Store.
   /// Returns true if it's sideloaded (or run locally in debug/release).
