@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       deploy_pwa:
-        required: true
+        required: false
         type: boolean
         default: false
       version_name:
@@ -84,7 +84,7 @@ jobs:
 
           flutter pub get
           flutter build web --release --no-pub --base-href "/NexScore/" \
-            --dart-define=APP_VERSION=${DEPLOY_VERSION} \
+            --dart-define=APP_VERSION="${DEPLOY_VERSION}" \
             --dart-define=IS_BETA=${{ inputs.is_beta || false }} \
             --dart-define=FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
             --dart-define=FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }} \

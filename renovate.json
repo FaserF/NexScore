@@ -31,7 +31,7 @@
             "platformAutomerge": true
         },
         {
-            "description": "Flutter/Dart pub dependencies – update weekly on Monday early morning",
+            "description": "Flutter/Dart pub dependencies \u2013 update weekly on Monday early morning",
             "matchDatasources": [
                 "pub"
             ],
@@ -40,7 +40,7 @@
             ]
         },
         {
-            "description": "GitHub Actions – update on Monday",
+            "description": "GitHub Actions \u2013 update on Monday",
             "matchManagers": [
                 "github-actions"
             ],
@@ -79,6 +79,13 @@
                 "dev.flutter.flutter-plugin-loader:dev.flutter.flutter-plugin-loader.gradle.plugin"
             ],
             "enabled": false
+        },
+        {
+            "description": "Hold flex_color_scheme on 8.x until Flutter material_ui migration",
+            "matchPackageNames": [
+                "flex_color_scheme"
+            ],
+            "allowedVersions": "<9.0.0"
         }
     ]
 }

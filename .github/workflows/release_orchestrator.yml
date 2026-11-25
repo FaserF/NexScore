@@ -76,7 +76,7 @@ jobs:
             --release-type ${{ github.event.inputs.release_type }} \
             --bump-type ${{ github.event.inputs.bump_type }} \
             --commit-sha ${{ github.sha }} \
-            --custom-version "${{ github.event.inputs.custom_version }}" >> $GITHUB_OUTPUT
+            --custom-version "${{ github.event.inputs.custom_version }}" >> "$GITHUB_OUTPUT"
 
   sync-version:
     name: Sync Repository Version
@@ -165,20 +165,22 @@ jobs:
             -storepass "$RAND_PASS" \
             -keypass "$RAND_PASS"
           B64_KEYSTORE=$(base64 -w 0 nexscore/android/app/release.jks)
-          echo "### 🔑 Android Keystore Auto-Generation Complete!" >> $GITHUB_STEP_SUMMARY
-          echo "Please save the following values as GitHub Secrets in your repository (*Settings > Secrets and variables > Actions*):" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Name:** \`ANDROID_KEYSTORE_BASE64\`" >> $GITHUB_STEP_SUMMARY
-          echo "  **Value:** \`$B64_KEYSTORE\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Name:** \`RELEASE_STORE_PASSWORD\`" >> $GITHUB_STEP_SUMMARY
-          echo "  **Value:** \`$RAND_PASS\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Name:** \`RELEASE_KEY_ALIAS\`" >> $GITHUB_STEP_SUMMARY
-          echo "  **Value:** \`nexscore\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Name:** \`RELEASE_KEY_PASSWORD\`" >> $GITHUB_STEP_SUMMARY
-          echo "  **Value:** \`$RAND_PASS\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "> ⚠️ **Security Warning**: Anyone with access to the workflow logs or summary can see these values. Once you have copied them to GitHub Secrets, run the release workflow again with the auto-generation option disabled to ensure logs and caches are clean." >> $GITHUB_STEP_SUMMARY
-          echo "GEN_PASS=$RAND_PASS" >> $GITHUB_ENV
+          {
+            echo "### 🔑 Android Keystore Auto-Generation Complete!"
+            echo "Please save the following values as GitHub Secrets in your repository (*Settings > Secrets and variables > Actions*):"
+            echo ""
+            echo "- **Name:** \`ANDROID_KEYSTORE_BASE64\`"
+            echo "  **Value:** \`$B64_KEYSTORE\`"
+            echo "- **Name:** \`RELEASE_STORE_PASSWORD\`"
+            echo "  **Value:** \`$RAND_PASS\`"
+            echo "- **Name:** \`RELEASE_KEY_ALIAS\`"
+            echo "  **Value:** \`nexscore\`"
+            echo "- **Name:** \`RELEASE_KEY_PASSWORD\`"
+            echo "  **Value:** \`$RAND_PASS\`"
+            echo ""
+            echo "> ⚠️ **Security Warning**: Anyone with access to the workflow logs or summary can see these values. Once you have copied them to GitHub Secrets, run the release workflow again with the auto-generation option disabled to ensure logs and caches are clean."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "GEN_PASS=$RAND_PASS" >> "$GITHUB_ENV"
         env:
           HAS_EXISTING_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
       - name: Build APK
@@ -194,9 +196,9 @@ jobs:
             fi
           fi
           flutter build apk --release --no-pub \
-            --build-name=${{ needs.version-calc.outputs.version_name }} \
-            --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }} \
-            --dart-define=GITHUB_REPOSITORY_URL=https://api.github.com/repos/${{ github.repository }}
+            --build-name="${{ needs.version-calc.outputs.version_name }}" \
+            --dart-define=APP_VERSION="${{ needs.version-calc.outputs.version_name }}" \
+            --dart-define=GITHUB_REPOSITORY_URL="https://api.github.com/repos/${{ github.repository }}"
         working-directory: nexscore
         env:
           RELEASE_STORE_FILE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && 'release.jks' || '' }}
@@ -208,7 +210,7 @@ jobs:
         id: generate_sha
         run: |
           SHA=$(sha256sum build/app/outputs/flutter-apk/app-release.apk | awk '{print $1}')
-          echo "sha256=$SHA" >> $GITHUB_OUTPUT
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
           echo "$SHA" > build/app/outputs/flutter-apk/app-release.apk.sha256
         working-directory: nexscore
       - name: Upload APK
@@ -251,9 +253,9 @@ jobs:
           flutter pub get
           flutter pub run flutter_launcher_icons
           flutter build ipa --no-codesign --release --no-pub \
-            --build-name=${{ needs.version-calc.outputs.version_name }} \
-            --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }} \
-            --dart-define=GITHUB_REPOSITORY_URL=https://api.github.com/repos/${{ github.repository }}
+            --build-name="${{ needs.version-calc.outputs.version_name }}" \
+            --dart-define=APP_VERSION="${{ needs.version-calc.outputs.version_name }}" \
+            --dart-define=GITHUB_REPOSITORY_URL="https://api.github.com/repos/${{ github.repository }}"
         working-directory: nexscore
       - name: Upload IPA (Artifacts)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -284,7 +286,7 @@ jobs:
           flutter pub get
           flutter build web --release --base-href "/NexScore/" \
             --no-pub \
-            --dart-define=APP_VERSION=${{ needs.version-calc.outputs.version_name }} \
+            --dart-define=APP_VERSION="${{ needs.version-calc.outputs.version_name }}" \
             --dart-define=IS_BETA=${{ github.event.inputs.release_type == 'beta' }} \
             --dart-define=FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
             --dart-define=FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }} \
@@ -292,7 +294,7 @@ jobs:
             --dart-define=FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }} \
             --dart-define=FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }} \
             --dart-define=FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }} \
-            --dart-define=GITHUB_REPOSITORY_URL=https://api.github.com/repos/${{ github.repository }}
+            --dart-define=GITHUB_REPOSITORY_URL="https://api.github.com/repos/${{ github.repository }}"
         working-directory: nexscore
 
       - name: Upload Web Artifact
@@ -316,7 +318,7 @@ jobs:
         id: image_name
         run: |
           IMAGE_NAME=$(echo "ghcr.io/${{ github.repository_owner }}/nexscore" | tr '[:upper:]' '[:lower:]')
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "IMAGE_NAME=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Build and push Docker Image
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
@@ -527,8 +529,8 @@ jobs:
     if: |
       always() &&
       needs.create-release.result == 'success' &&
-      (needs.build-android.result == 'failure' ||
-       needs.build-ios.result == 'failure' ||
+      (needs.update-release-android.result == 'failure' ||
+       needs.update-release-ios.result == 'failure' ||
        needs.publish-release.result == 'failure' ||
        needs.publish-release.result == 'skipped')
     name: Delete Failed Release Draft

@@ -98,7 +98,7 @@ jobs:
 
   build-ios:
     needs: [changes, build-android-web]
-    if: false # Skipped for now to save resources
+    if: vars.ENABLE_IOS_BUILD == 'true' # Skipped by default
     name: 3. Build iOS
     runs-on: macos-latest
     timeout-minutes: 20
