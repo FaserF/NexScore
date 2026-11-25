@@ -89,6 +89,45 @@ jobs:
           name: nexscore-web-pwa
           path: nexscore/build/web
           retention-days: 1
+      - name: Prepare google-services.json
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON_BASE64" ]; then
+            echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > nexscore/android/app/google-services.json
+          elif [ ! -f nexscore/android/app/google-services.json ]; then
+            cat > nexscore/android/app/google-services.json << 'EOF'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "nexscore-ci-placeholder",
+              "storage_bucket": "nexscore-ci-placeholder.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                  "android_client_info": {
+                    "package_name": "de.fabiseitz.nex_score"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "CI_PLACEHOLDER_KEY"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+          fi
       - name: Build Android APK
         run: flutter build apk --release --no-pub
         working-directory: nexscore
