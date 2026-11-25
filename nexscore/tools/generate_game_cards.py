@@ -19,8 +19,6 @@ Usage:
    should manually copy these into `lib/core/i18n/app_localizations.dart`.
 """
 
-import os
-import sys
 
 # Example Data. Add your massive card lists here!
 # ID must be unique (e.g. w100 for WarmUp 100).

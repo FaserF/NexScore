@@ -1,7 +1,9 @@
-import os
 import json
+import os
 import re
+
 import yaml
+
 
 def scan_dart_files(lib_path):
     file_tree = []
@@ -22,7 +24,7 @@ def scan_dart_files(lib_path):
 
                 # Read file to extract classes/providers/routes
                 try:
-                    with open(full_path, 'r', encoding='utf-8') as f:
+                    with open(full_path, encoding='utf-8') as f:
                         content = f.read()
                 except Exception:
                     content = ""
@@ -53,7 +55,7 @@ def scan_dart_files(lib_path):
                     if core_module not in core:
                         core[core_module] = []
                     core[core_module].append(file_info)
-                    
+
                     if core_module == 'services':
                         services.append(file_info)
                     elif core_module == 'providers':
@@ -89,7 +91,7 @@ def main():
     dev_dependencies = {}
     if os.path.exists(pubspec_path):
         try:
-            with open(pubspec_path, 'r', encoding='utf-8') as f:
+            with open(pubspec_path, encoding='utf-8') as f:
                 pubspec_data = yaml.safe_load(f)
                 dependencies = pubspec_data.get('dependencies', {})
                 dev_dependencies = pubspec_data.get('dev_dependencies', {})
