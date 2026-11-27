@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "jimp": "^1.6.0"
+    "jimp": "^2.0.0"
   }
 }
